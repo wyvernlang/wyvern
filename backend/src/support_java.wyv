@@ -1,4 +1,4 @@
-module def bytecode(java: Java)
+module def JavaSupport(java: Java): PlatformSupport
 
 import java:wyvern.stdlib.support.backend.BytecodeWrapper.bytecode
 
@@ -12,3 +12,6 @@ def byteStringToInt(byteString: Dyn): Int
 
 def dynToList(o: Dyn): list.List
 	bytecode.dynToList(o)
+
+def getFirstCommandLineArg(): String
+	"main_js.wyb"

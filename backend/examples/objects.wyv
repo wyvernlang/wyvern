@@ -1,9 +1,4 @@
-// stub, overridden by js backend
-def print(x: Dyn): Unit
-    unit
-
-def println(): Unit
-    print("\n")
+require stdout
 
 type IntList
     def sum():Int
@@ -14,5 +9,5 @@ val empty:IntList = new
 def cons(elem:Int,rest:IntList):IntList = new
     def sum():Int = elem + rest.sum()
 
-print(cons(3,cons(4,empty)).sum())
-println()
+stdout.printInt(cons(3,cons(4,empty)).sum())
+stdout.println()

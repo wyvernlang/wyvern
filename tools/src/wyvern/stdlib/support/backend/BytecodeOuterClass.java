@@ -128,15 +128,15 @@ public final class BytecodeOuterClass {
         getVariableBytes();
 
     /**
-     * <code>required .Type type = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
     boolean hasType();
     /**
-     * <code>required .Type type = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
     wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
     /**
-     * <code>required .Type type = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
     wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
   }
@@ -277,22 +277,22 @@ public final class BytecodeOuterClass {
       }
     }
 
-    public static final int TYPE_FIELD_NUMBER = 2;
+    public static final int TYPE__FIELD_NUMBER = 2;
     private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
     /**
-     * <code>required .Type type = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
     public boolean hasType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .Type type = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
     public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
       return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
     }
     /**
-     * <code>required .Type type = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
     public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
       return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
@@ -385,7 +385,7 @@ public final class BytecodeOuterClass {
         hash = (53 * hash) + getVariable().hashCode();
       }
       if (hasType()) {
-        hash = (37 * hash) + TYPE_FIELD_NUMBER;
+        hash = (37 * hash) + TYPE__FIELD_NUMBER;
         hash = (53 * hash) + getType().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
@@ -733,13 +733,13 @@ public final class BytecodeOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public boolean hasType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
         if (typeBuilder_ == null) {
@@ -749,7 +749,7 @@ public final class BytecodeOuterClass {
         }
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
         if (typeBuilder_ == null) {
@@ -765,7 +765,7 @@ public final class BytecodeOuterClass {
         return this;
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public Builder setType(
           wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
@@ -779,7 +779,7 @@ public final class BytecodeOuterClass {
         return this;
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
         if (typeBuilder_ == null) {
@@ -799,7 +799,7 @@ public final class BytecodeOuterClass {
         return this;
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public Builder clearType() {
         if (typeBuilder_ == null) {
@@ -812,7 +812,7 @@ public final class BytecodeOuterClass {
         return this;
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
         bitField0_ |= 0x00000002;
@@ -820,7 +820,7 @@ public final class BytecodeOuterClass {
         return getTypeFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
         if (typeBuilder_ != null) {
@@ -831,7 +831,7 @@ public final class BytecodeOuterClass {
         }
       }
       /**
-       * <code>required .Type type = 2;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
@@ -1828,15 +1828,15 @@ public final class BytecodeOuterClass {
           getPathBytes();
 
       /**
-       * <code>required .Type type = 5;</code>
+       * <code>required .Type type_ = 5;</code>
        */
       boolean hasType();
       /**
-       * <code>required .Type type = 5;</code>
+       * <code>required .Type type_ = 5;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
       /**
-       * <code>required .Type type = 5;</code>
+       * <code>required .Type type_ = 5;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
 
@@ -2089,22 +2089,22 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int TYPE_FIELD_NUMBER = 5;
+      public static final int TYPE__FIELD_NUMBER = 5;
       private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
       /**
-       * <code>required .Type type = 5;</code>
+       * <code>required .Type type_ = 5;</code>
        */
       public boolean hasType() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>required .Type type = 5;</code>
+       * <code>required .Type type_ = 5;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
       }
       /**
-       * <code>required .Type type = 5;</code>
+       * <code>required .Type type_ = 5;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
@@ -2315,7 +2315,7 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getPath().hashCode();
         }
         if (hasType()) {
-          hash = (37 * hash) + TYPE_FIELD_NUMBER;
+          hash = (37 * hash) + TYPE__FIELD_NUMBER;
           hash = (53 * hash) + getType().hashCode();
         }
         if (hasName()) {
@@ -2859,13 +2859,13 @@ public final class BytecodeOuterClass {
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public boolean hasType() {
           return ((bitField0_ & 0x00000010) == 0x00000010);
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
           if (typeBuilder_ == null) {
@@ -2875,7 +2875,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -2891,7 +2891,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public Builder setType(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
@@ -2905,7 +2905,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -2925,7 +2925,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public Builder clearType() {
           if (typeBuilder_ == null) {
@@ -2938,7 +2938,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
           bitField0_ |= 0x00000010;
@@ -2946,7 +2946,7 @@ public final class BytecodeOuterClass {
           return getTypeFieldBuilder().getBuilder();
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
           if (typeBuilder_ != null) {
@@ -2957,7 +2957,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 5;</code>
+         * <code>required .Type type_ = 5;</code>
          */
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
@@ -4600,15 +4600,15 @@ public final class BytecodeOuterClass {
         com.google.protobuf.MessageOrBuilder {
 
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       boolean hasType();
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
 
@@ -4722,22 +4722,22 @@ public final class BytecodeOuterClass {
       }
 
       private int bitField0_;
-      public static final int TYPE_FIELD_NUMBER = 1;
+      public static final int TYPE__FIELD_NUMBER = 1;
       private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       public boolean hasType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
       }
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
@@ -4852,7 +4852,7 @@ public final class BytecodeOuterClass {
         int hash = 41;
         hash = (19 * hash) + getDescriptor().hashCode();
         if (hasType()) {
-          hash = (37 * hash) + TYPE_FIELD_NUMBER;
+          hash = (37 * hash) + TYPE__FIELD_NUMBER;
           hash = (53 * hash) + getType().hashCode();
         }
         if (hasExpression()) {
@@ -5134,13 +5134,13 @@ public final class BytecodeOuterClass {
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public boolean hasType() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
           if (typeBuilder_ == null) {
@@ -5150,7 +5150,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -5166,7 +5166,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder setType(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
@@ -5180,7 +5180,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -5200,7 +5200,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder clearType() {
           if (typeBuilder_ == null) {
@@ -5213,7 +5213,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
           bitField0_ |= 0x00000001;
@@ -5221,7 +5221,7 @@ public final class BytecodeOuterClass {
           return getTypeFieldBuilder().getBuilder();
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
           if (typeBuilder_ != null) {
@@ -5232,7 +5232,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
@@ -7219,17 +7219,17 @@ public final class BytecodeOuterClass {
     wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.CallExpressionOrBuilder getCallExpressionOrBuilder();
 
     /**
-     * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+     * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
      */
-    boolean hasPrimitiveCallExpression();
+    boolean hasStaticCallExpression();
     /**
-     * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+     * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
      */
-    wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression getPrimitiveCallExpression();
+    wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression getStaticCallExpression();
     /**
-     * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+     * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
      */
-    wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder getPrimitiveCallExpressionOrBuilder();
+    wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder getStaticCallExpressionOrBuilder();
 
     /**
      * <code>optional .Expression.AccessExpression accessExpression = 5;</code>
@@ -7383,14 +7383,14 @@ public final class BytecodeOuterClass {
               break;
             }
             case 34: {
-              wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder subBuilder = null;
+              wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder subBuilder = null;
               if (expressionCase_ == 4) {
-                subBuilder = ((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_).toBuilder();
+                subBuilder = ((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_).toBuilder();
               }
               expression_ =
-                  input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.PARSER, extensionRegistry);
+                  input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_);
+                subBuilder.mergeFrom((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_);
                 expression_ = subBuilder.buildPartial();
               }
               expressionCase_ = 4;
@@ -7495,15 +7495,15 @@ public final class BytecodeOuterClass {
         com.google.protobuf.MessageOrBuilder {
 
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       boolean hasType();
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
 
@@ -7649,22 +7649,22 @@ public final class BytecodeOuterClass {
       }
 
       private int bitField0_;
-      public static final int TYPE_FIELD_NUMBER = 1;
+      public static final int TYPE__FIELD_NUMBER = 1;
       private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       public boolean hasType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
       }
       /**
-       * <code>required .Type type = 1;</code>
+       * <code>required .Type type_ = 1;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
@@ -7845,7 +7845,7 @@ public final class BytecodeOuterClass {
         int hash = 41;
         hash = (19 * hash) + getDescriptor().hashCode();
         if (hasType()) {
-          hash = (37 * hash) + TYPE_FIELD_NUMBER;
+          hash = (37 * hash) + TYPE__FIELD_NUMBER;
           hash = (53 * hash) + getType().hashCode();
         }
         if (hasSelfName()) {
@@ -8168,13 +8168,13 @@ public final class BytecodeOuterClass {
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public boolean hasType() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
           if (typeBuilder_ == null) {
@@ -8184,7 +8184,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -8200,7 +8200,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder setType(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
@@ -8214,7 +8214,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -8234,7 +8234,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public Builder clearType() {
           if (typeBuilder_ == null) {
@@ -8247,7 +8247,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
           bitField0_ |= 0x00000001;
@@ -8255,7 +8255,7 @@ public final class BytecodeOuterClass {
           return getTypeFieldBuilder().getBuilder();
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
           if (typeBuilder_ != null) {
@@ -8266,7 +8266,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 1;</code>
+         * <code>required .Type type_ = 1;</code>
          */
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
@@ -8678,25 +8678,25 @@ public final class BytecodeOuterClass {
           getMethodBytes();
 
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> 
           getArgumentsList();
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Expression getArguments(int index);
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       int getArgumentsCount();
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> 
           getArgumentsOrBuilderList();
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
           int index);
@@ -8868,35 +8868,35 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int ARGUMENTS_FIELD_NUMBER = 3;
+      public static final int ARGUMENTS__FIELD_NUMBER = 3;
       private java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> arguments_;
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> getArgumentsList() {
         return arguments_;
       }
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> 
           getArgumentsOrBuilderList() {
         return arguments_;
       }
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       public int getArgumentsCount() {
         return arguments_.size();
       }
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression getArguments(int index) {
         return arguments_.get(index);
       }
       /**
-       * <code>repeated .Expression arguments = 3;</code>
+       * <code>repeated .Expression arguments_ = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
           int index) {
@@ -9009,7 +9009,7 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getMethod().hashCode();
         }
         if (getArgumentsCount() > 0) {
-          hash = (37 * hash) + ARGUMENTS_FIELD_NUMBER;
+          hash = (37 * hash) + ARGUMENTS__FIELD_NUMBER;
           hash = (53 * hash) + getArgumentsList().hashCode();
         }
         hash = (29 * hash) + unknownFields.hashCode();
@@ -9527,7 +9527,7 @@ public final class BytecodeOuterClass {
             wyvern.stdlib.support.backend.BytecodeOuterClass.Expression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> argumentsBuilder_;
 
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> getArgumentsList() {
           if (argumentsBuilder_ == null) {
@@ -9537,7 +9537,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public int getArgumentsCount() {
           if (argumentsBuilder_ == null) {
@@ -9547,7 +9547,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression getArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -9557,7 +9557,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression value) {
@@ -9574,7 +9574,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder builderForValue) {
@@ -9588,7 +9588,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder addArguments(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression value) {
           if (argumentsBuilder_ == null) {
@@ -9604,7 +9604,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression value) {
@@ -9621,7 +9621,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder addArguments(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder builderForValue) {
@@ -9635,7 +9635,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder builderForValue) {
@@ -9649,7 +9649,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder addAllArguments(
             java.lang.Iterable<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> values) {
@@ -9664,7 +9664,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder clearArguments() {
           if (argumentsBuilder_ == null) {
@@ -9677,7 +9677,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public Builder removeArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -9690,14 +9690,14 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder getArgumentsBuilder(
             int index) {
           return getArgumentsFieldBuilder().getBuilder(index);
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
             int index) {
@@ -9707,7 +9707,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> 
              getArgumentsOrBuilderList() {
@@ -9718,14 +9718,14 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder addArgumentsBuilder() {
           return getArgumentsFieldBuilder().addBuilder(
               wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.getDefaultInstance());
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder addArgumentsBuilder(
             int index) {
@@ -9733,7 +9733,7 @@ public final class BytecodeOuterClass {
               index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.getDefaultInstance());
         }
         /**
-         * <code>repeated .Expression arguments = 3;</code>
+         * <code>repeated .Expression arguments_ = 3;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder> 
              getArgumentsBuilderList() {
@@ -9802,8 +9802,8 @@ public final class BytecodeOuterClass {
 
     }
 
-    public interface PrimitiveCallExpressionOrBuilder extends
-        // @@protoc_insertion_point(interface_extends:Expression.PrimitiveCallExpression)
+    public interface StaticCallExpressionOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:Expression.StaticCallExpression)
         com.google.protobuf.MessageOrBuilder {
 
       /**
@@ -9820,18 +9820,18 @@ public final class BytecodeOuterClass {
       wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getReceiverOrBuilder();
 
       /**
-       * <code>required string primitiveType = 2;</code>
+       * <code>required string receiverType = 2;</code>
        */
-      boolean hasPrimitiveType();
+      boolean hasReceiverType();
       /**
-       * <code>required string primitiveType = 2;</code>
+       * <code>required string receiverType = 2;</code>
        */
-      java.lang.String getPrimitiveType();
+      java.lang.String getReceiverType();
       /**
-       * <code>required string primitiveType = 2;</code>
+       * <code>required string receiverType = 2;</code>
        */
       com.google.protobuf.ByteString
-          getPrimitiveTypeBytes();
+          getReceiverTypeBytes();
 
       /**
        * <code>required string method = 3;</code>
@@ -9848,43 +9848,43 @@ public final class BytecodeOuterClass {
           getMethodBytes();
 
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> 
           getArgumentsList();
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Expression getArguments(int index);
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       int getArgumentsCount();
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> 
           getArgumentsOrBuilderList();
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
           int index);
     }
     /**
-     * Protobuf type {@code Expression.PrimitiveCallExpression}
+     * Protobuf type {@code Expression.StaticCallExpression}
      */
-    public  static final class PrimitiveCallExpression extends
+    public  static final class StaticCallExpression extends
         com.google.protobuf.GeneratedMessageV3 implements
-        // @@protoc_insertion_point(message_implements:Expression.PrimitiveCallExpression)
-        PrimitiveCallExpressionOrBuilder {
+        // @@protoc_insertion_point(message_implements:Expression.StaticCallExpression)
+        StaticCallExpressionOrBuilder {
     private static final long serialVersionUID = 0L;
-      // Use PrimitiveCallExpression.newBuilder() to construct.
-      private PrimitiveCallExpression(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      // Use StaticCallExpression.newBuilder() to construct.
+      private StaticCallExpression(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
       }
-      private PrimitiveCallExpression() {
-        primitiveType_ = "";
+      private StaticCallExpression() {
+        receiverType_ = "";
         method_ = "";
         arguments_ = java.util.Collections.emptyList();
       }
@@ -9894,7 +9894,7 @@ public final class BytecodeOuterClass {
       getUnknownFields() {
         return this.unknownFields;
       }
-      private PrimitiveCallExpression(
+      private StaticCallExpression(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -9936,7 +9936,7 @@ public final class BytecodeOuterClass {
               case 18: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000002;
-                primitiveType_ = bs;
+                receiverType_ = bs;
                 break;
               }
               case 26: {
@@ -9971,14 +9971,14 @@ public final class BytecodeOuterClass {
       }
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_PrimitiveCallExpression_descriptor;
+        return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_StaticCallExpression_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_PrimitiveCallExpression_fieldAccessorTable
+        return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_StaticCallExpression_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.class, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder.class);
+                wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.class, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder.class);
       }
 
       private int bitField0_;
@@ -10003,19 +10003,19 @@ public final class BytecodeOuterClass {
         return receiver_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.getDefaultInstance() : receiver_;
       }
 
-      public static final int PRIMITIVETYPE_FIELD_NUMBER = 2;
-      private volatile java.lang.Object primitiveType_;
+      public static final int RECEIVERTYPE_FIELD_NUMBER = 2;
+      private volatile java.lang.Object receiverType_;
       /**
-       * <code>required string primitiveType = 2;</code>
+       * <code>required string receiverType = 2;</code>
        */
-      public boolean hasPrimitiveType() {
+      public boolean hasReceiverType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string primitiveType = 2;</code>
+       * <code>required string receiverType = 2;</code>
        */
-      public java.lang.String getPrimitiveType() {
-        java.lang.Object ref = primitiveType_;
+      public java.lang.String getReceiverType() {
+        java.lang.Object ref = receiverType_;
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
@@ -10023,22 +10023,22 @@ public final class BytecodeOuterClass {
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
-            primitiveType_ = s;
+            receiverType_ = s;
           }
           return s;
         }
       }
       /**
-       * <code>required string primitiveType = 2;</code>
+       * <code>required string receiverType = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getPrimitiveTypeBytes() {
-        java.lang.Object ref = primitiveType_;
+          getReceiverTypeBytes() {
+        java.lang.Object ref = receiverType_;
         if (ref instanceof java.lang.String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          primitiveType_ = b;
+          receiverType_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -10087,35 +10087,35 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int ARGUMENTS_FIELD_NUMBER = 4;
+      public static final int ARGUMENTS__FIELD_NUMBER = 4;
       private java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> arguments_;
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> getArgumentsList() {
         return arguments_;
       }
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> 
           getArgumentsOrBuilderList() {
         return arguments_;
       }
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       public int getArgumentsCount() {
         return arguments_.size();
       }
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression getArguments(int index) {
         return arguments_.get(index);
       }
       /**
-       * <code>repeated .Expression arguments = 4;</code>
+       * <code>repeated .Expression arguments_ = 4;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
           int index) {
@@ -10132,7 +10132,7 @@ public final class BytecodeOuterClass {
           memoizedIsInitialized = 0;
           return false;
         }
-        if (!hasPrimitiveType()) {
+        if (!hasReceiverType()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -10160,7 +10160,7 @@ public final class BytecodeOuterClass {
           output.writeMessage(1, getReceiver());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          com.google.protobuf.GeneratedMessageV3.writeString(output, 2, primitiveType_);
+          com.google.protobuf.GeneratedMessageV3.writeString(output, 2, receiverType_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           com.google.protobuf.GeneratedMessageV3.writeString(output, 3, method_);
@@ -10181,7 +10181,7 @@ public final class BytecodeOuterClass {
             .computeMessageSize(1, getReceiver());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, primitiveType_);
+          size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, receiverType_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, method_);
@@ -10200,10 +10200,10 @@ public final class BytecodeOuterClass {
         if (obj == this) {
          return true;
         }
-        if (!(obj instanceof wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression)) {
+        if (!(obj instanceof wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression)) {
           return super.equals(obj);
         }
-        wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression other = (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) obj;
+        wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression other = (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) obj;
 
         boolean result = true;
         result = result && (hasReceiver() == other.hasReceiver());
@@ -10211,10 +10211,10 @@ public final class BytecodeOuterClass {
           result = result && getReceiver()
               .equals(other.getReceiver());
         }
-        result = result && (hasPrimitiveType() == other.hasPrimitiveType());
-        if (hasPrimitiveType()) {
-          result = result && getPrimitiveType()
-              .equals(other.getPrimitiveType());
+        result = result && (hasReceiverType() == other.hasReceiverType());
+        if (hasReceiverType()) {
+          result = result && getReceiverType()
+              .equals(other.getReceiverType());
         }
         result = result && (hasMethod() == other.hasMethod());
         if (hasMethod()) {
@@ -10238,16 +10238,16 @@ public final class BytecodeOuterClass {
           hash = (37 * hash) + RECEIVER_FIELD_NUMBER;
           hash = (53 * hash) + getReceiver().hashCode();
         }
-        if (hasPrimitiveType()) {
-          hash = (37 * hash) + PRIMITIVETYPE_FIELD_NUMBER;
-          hash = (53 * hash) + getPrimitiveType().hashCode();
+        if (hasReceiverType()) {
+          hash = (37 * hash) + RECEIVERTYPE_FIELD_NUMBER;
+          hash = (53 * hash) + getReceiverType().hashCode();
         }
         if (hasMethod()) {
           hash = (37 * hash) + METHOD_FIELD_NUMBER;
           hash = (53 * hash) + getMethod().hashCode();
         }
         if (getArgumentsCount() > 0) {
-          hash = (37 * hash) + ARGUMENTS_FIELD_NUMBER;
+          hash = (37 * hash) + ARGUMENTS__FIELD_NUMBER;
           hash = (53 * hash) + getArgumentsList().hashCode();
         }
         hash = (29 * hash) + unknownFields.hashCode();
@@ -10255,69 +10255,69 @@ public final class BytecodeOuterClass {
         return hash;
       }
 
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           java.nio.ByteBuffer data)
           throws com.google.protobuf.InvalidProtocolBufferException {
         return PARSER.parseFrom(data);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           java.nio.ByteBuffer data,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         return PARSER.parseFrom(data, extensionRegistry);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
         return PARSER.parseFrom(data);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           com.google.protobuf.ByteString data,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         return PARSER.parseFrom(data, extensionRegistry);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(byte[] data)
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(byte[] data)
           throws com.google.protobuf.InvalidProtocolBufferException {
         return PARSER.parseFrom(data);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           byte[] data,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         return PARSER.parseFrom(data, extensionRegistry);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(java.io.InputStream input)
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(java.io.InputStream input)
           throws java.io.IOException {
         return com.google.protobuf.GeneratedMessageV3
             .parseWithIOException(PARSER, input);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
         return com.google.protobuf.GeneratedMessageV3
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseDelimitedFrom(java.io.InputStream input)
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
         return com.google.protobuf.GeneratedMessageV3
             .parseDelimitedWithIOException(PARSER, input);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseDelimitedFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
         return com.google.protobuf.GeneratedMessageV3
             .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
         return com.google.protobuf.GeneratedMessageV3
             .parseWithIOException(PARSER, input);
       }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parseFrom(
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
@@ -10329,7 +10329,7 @@ public final class BytecodeOuterClass {
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
       }
-      public static Builder newBuilder(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression prototype) {
+      public static Builder newBuilder(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
       public Builder toBuilder() {
@@ -10344,25 +10344,25 @@ public final class BytecodeOuterClass {
         return builder;
       }
       /**
-       * Protobuf type {@code Expression.PrimitiveCallExpression}
+       * Protobuf type {@code Expression.StaticCallExpression}
        */
       public static final class Builder extends
           com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:Expression.PrimitiveCallExpression)
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder {
+          // @@protoc_insertion_point(builder_implements:Expression.StaticCallExpression)
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder {
         public static final com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_PrimitiveCallExpression_descriptor;
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_StaticCallExpression_descriptor;
         }
 
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_PrimitiveCallExpression_fieldAccessorTable
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_StaticCallExpression_fieldAccessorTable
               .ensureFieldAccessorsInitialized(
-                  wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.class, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder.class);
+                  wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.class, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder.class);
         }
 
-        // Construct using wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.newBuilder()
+        // Construct using wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.newBuilder()
         private Builder() {
           maybeForceBuilderInitialization();
         }
@@ -10387,7 +10387,7 @@ public final class BytecodeOuterClass {
             receiverBuilder_.clear();
           }
           bitField0_ = (bitField0_ & ~0x00000001);
-          primitiveType_ = "";
+          receiverType_ = "";
           bitField0_ = (bitField0_ & ~0x00000002);
           method_ = "";
           bitField0_ = (bitField0_ & ~0x00000004);
@@ -10402,23 +10402,23 @@ public final class BytecodeOuterClass {
 
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_PrimitiveCallExpression_descriptor;
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_Expression_StaticCallExpression_descriptor;
         }
 
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression getDefaultInstanceForType() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+        public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression getDefaultInstanceForType() {
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
         }
 
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression build() {
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression result = buildPartial();
+        public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression build() {
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression result = buildPartial();
           if (!result.isInitialized()) {
             throw newUninitializedMessageException(result);
           }
           return result;
         }
 
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression buildPartial() {
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression result = new wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression(this);
+        public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression buildPartial() {
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression result = new wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression(this);
           int from_bitField0_ = bitField0_;
           int to_bitField0_ = 0;
           if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -10432,7 +10432,7 @@ public final class BytecodeOuterClass {
           if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
             to_bitField0_ |= 0x00000002;
           }
-          result.primitiveType_ = primitiveType_;
+          result.receiverType_ = receiverType_;
           if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
             to_bitField0_ |= 0x00000004;
           }
@@ -10478,22 +10478,22 @@ public final class BytecodeOuterClass {
           return (Builder) super.addRepeatedField(field, value);
         }
         public Builder mergeFrom(com.google.protobuf.Message other) {
-          if (other instanceof wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) {
-            return mergeFrom((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression)other);
+          if (other instanceof wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) {
+            return mergeFrom((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression)other);
           } else {
             super.mergeFrom(other);
             return this;
           }
         }
 
-        public Builder mergeFrom(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression other) {
-          if (other == wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance()) return this;
+        public Builder mergeFrom(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression other) {
+          if (other == wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance()) return this;
           if (other.hasReceiver()) {
             mergeReceiver(other.getReceiver());
           }
-          if (other.hasPrimitiveType()) {
+          if (other.hasReceiverType()) {
             bitField0_ |= 0x00000002;
-            primitiveType_ = other.primitiveType_;
+            receiverType_ = other.receiverType_;
             onChanged();
           }
           if (other.hasMethod()) {
@@ -10536,7 +10536,7 @@ public final class BytecodeOuterClass {
           if (!hasReceiver()) {
             return false;
           }
-          if (!hasPrimitiveType()) {
+          if (!hasReceiverType()) {
             return false;
           }
           if (!hasMethod()) {
@@ -10557,11 +10557,11 @@ public final class BytecodeOuterClass {
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws java.io.IOException {
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression parsedMessage = null;
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression parsedMessage = null;
           try {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-            parsedMessage = (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) e.getUnfinishedMessage();
+            parsedMessage = (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) e.getUnfinishedMessage();
             throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
@@ -10690,24 +10690,24 @@ public final class BytecodeOuterClass {
           return receiverBuilder_;
         }
 
-        private java.lang.Object primitiveType_ = "";
+        private java.lang.Object receiverType_ = "";
         /**
-         * <code>required string primitiveType = 2;</code>
+         * <code>required string receiverType = 2;</code>
          */
-        public boolean hasPrimitiveType() {
+        public boolean hasReceiverType() {
           return ((bitField0_ & 0x00000002) == 0x00000002);
         }
         /**
-         * <code>required string primitiveType = 2;</code>
+         * <code>required string receiverType = 2;</code>
          */
-        public java.lang.String getPrimitiveType() {
-          java.lang.Object ref = primitiveType_;
+        public java.lang.String getReceiverType() {
+          java.lang.Object ref = receiverType_;
           if (!(ref instanceof java.lang.String)) {
             com.google.protobuf.ByteString bs =
                 (com.google.protobuf.ByteString) ref;
             java.lang.String s = bs.toStringUtf8();
             if (bs.isValidUtf8()) {
-              primitiveType_ = s;
+              receiverType_ = s;
             }
             return s;
           } else {
@@ -10715,53 +10715,53 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required string primitiveType = 2;</code>
+         * <code>required string receiverType = 2;</code>
          */
         public com.google.protobuf.ByteString
-            getPrimitiveTypeBytes() {
-          java.lang.Object ref = primitiveType_;
+            getReceiverTypeBytes() {
+          java.lang.Object ref = receiverType_;
           if (ref instanceof String) {
             com.google.protobuf.ByteString b = 
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
-            primitiveType_ = b;
+            receiverType_ = b;
             return b;
           } else {
             return (com.google.protobuf.ByteString) ref;
           }
         }
         /**
-         * <code>required string primitiveType = 2;</code>
+         * <code>required string receiverType = 2;</code>
          */
-        public Builder setPrimitiveType(
+        public Builder setReceiverType(
             java.lang.String value) {
           if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-          primitiveType_ = value;
+          receiverType_ = value;
           onChanged();
           return this;
         }
         /**
-         * <code>required string primitiveType = 2;</code>
+         * <code>required string receiverType = 2;</code>
          */
-        public Builder clearPrimitiveType() {
+        public Builder clearReceiverType() {
           bitField0_ = (bitField0_ & ~0x00000002);
-          primitiveType_ = getDefaultInstance().getPrimitiveType();
+          receiverType_ = getDefaultInstance().getReceiverType();
           onChanged();
           return this;
         }
         /**
-         * <code>required string primitiveType = 2;</code>
+         * <code>required string receiverType = 2;</code>
          */
-        public Builder setPrimitiveTypeBytes(
+        public Builder setReceiverTypeBytes(
             com.google.protobuf.ByteString value) {
           if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-          primitiveType_ = value;
+          receiverType_ = value;
           onChanged();
           return this;
         }
@@ -10855,7 +10855,7 @@ public final class BytecodeOuterClass {
             wyvern.stdlib.support.backend.BytecodeOuterClass.Expression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> argumentsBuilder_;
 
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> getArgumentsList() {
           if (argumentsBuilder_ == null) {
@@ -10865,7 +10865,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public int getArgumentsCount() {
           if (argumentsBuilder_ == null) {
@@ -10875,7 +10875,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression getArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -10885,7 +10885,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression value) {
@@ -10902,7 +10902,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder builderForValue) {
@@ -10916,7 +10916,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder addArguments(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression value) {
           if (argumentsBuilder_ == null) {
@@ -10932,7 +10932,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression value) {
@@ -10949,7 +10949,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder addArguments(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder builderForValue) {
@@ -10963,7 +10963,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder builderForValue) {
@@ -10977,7 +10977,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder addAllArguments(
             java.lang.Iterable<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.Expression> values) {
@@ -10992,7 +10992,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder clearArguments() {
           if (argumentsBuilder_ == null) {
@@ -11005,7 +11005,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public Builder removeArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -11018,14 +11018,14 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder getArgumentsBuilder(
             int index) {
           return getArgumentsFieldBuilder().getBuilder(index);
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
             int index) {
@@ -11035,7 +11035,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder> 
              getArgumentsOrBuilderList() {
@@ -11046,14 +11046,14 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder addArgumentsBuilder() {
           return getArgumentsFieldBuilder().addBuilder(
               wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.getDefaultInstance());
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder addArgumentsBuilder(
             int index) {
@@ -11061,7 +11061,7 @@ public final class BytecodeOuterClass {
               index, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.getDefaultInstance());
         }
         /**
-         * <code>repeated .Expression arguments = 4;</code>
+         * <code>repeated .Expression arguments_ = 4;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.Builder> 
              getArgumentsBuilderList() {
@@ -11092,39 +11092,39 @@ public final class BytecodeOuterClass {
         }
 
 
-        // @@protoc_insertion_point(builder_scope:Expression.PrimitiveCallExpression)
+        // @@protoc_insertion_point(builder_scope:Expression.StaticCallExpression)
       }
 
-      // @@protoc_insertion_point(class_scope:Expression.PrimitiveCallExpression)
-      private static final wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression DEFAULT_INSTANCE;
+      // @@protoc_insertion_point(class_scope:Expression.StaticCallExpression)
+      private static final wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression DEFAULT_INSTANCE;
       static {
-        DEFAULT_INSTANCE = new wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression();
+        DEFAULT_INSTANCE = new wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression();
       }
 
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression getDefaultInstance() {
+      public static wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression getDefaultInstance() {
         return DEFAULT_INSTANCE;
       }
 
-      @java.lang.Deprecated public static final com.google.protobuf.Parser<PrimitiveCallExpression>
-          PARSER = new com.google.protobuf.AbstractParser<PrimitiveCallExpression>() {
-        public PrimitiveCallExpression parsePartialFrom(
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<StaticCallExpression>
+          PARSER = new com.google.protobuf.AbstractParser<StaticCallExpression>() {
+        public StaticCallExpression parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PrimitiveCallExpression(input, extensionRegistry);
+          return new StaticCallExpression(input, extensionRegistry);
         }
       };
 
-      public static com.google.protobuf.Parser<PrimitiveCallExpression> parser() {
+      public static com.google.protobuf.Parser<StaticCallExpression> parser() {
         return PARSER;
       }
 
       @java.lang.Override
-      public com.google.protobuf.Parser<PrimitiveCallExpression> getParserForType() {
+      public com.google.protobuf.Parser<StaticCallExpression> getParserForType() {
         return PARSER;
       }
 
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression getDefaultInstanceForType() {
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
 
@@ -17909,7 +17909,7 @@ public final class BytecodeOuterClass {
       VARIABLE(1),
       NEWEXPRESSION(2),
       CALLEXPRESSION(3),
-      PRIMITIVECALLEXPRESSION(4),
+      STATICCALLEXPRESSION(4),
       ACCESSEXPRESSION(5),
       ASSIGNMENTEXPRESSION(6),
       LITERAL(7),
@@ -17933,7 +17933,7 @@ public final class BytecodeOuterClass {
           case 1: return VARIABLE;
           case 2: return NEWEXPRESSION;
           case 3: return CALLEXPRESSION;
-          case 4: return PRIMITIVECALLEXPRESSION;
+          case 4: return STATICCALLEXPRESSION;
           case 5: return ACCESSEXPRESSION;
           case 6: return ASSIGNMENTEXPRESSION;
           case 7: return LITERAL;
@@ -18055,30 +18055,30 @@ public final class BytecodeOuterClass {
       return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.CallExpression.getDefaultInstance();
     }
 
-    public static final int PRIMITIVECALLEXPRESSION_FIELD_NUMBER = 4;
+    public static final int STATICCALLEXPRESSION_FIELD_NUMBER = 4;
     /**
-     * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+     * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
      */
-    public boolean hasPrimitiveCallExpression() {
+    public boolean hasStaticCallExpression() {
       return expressionCase_ == 4;
     }
     /**
-     * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+     * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
      */
-    public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression getPrimitiveCallExpression() {
+    public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression getStaticCallExpression() {
       if (expressionCase_ == 4) {
-         return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_;
+         return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_;
       }
-      return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+      return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
     }
     /**
-     * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+     * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
      */
-    public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder getPrimitiveCallExpressionOrBuilder() {
+    public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder getStaticCallExpressionOrBuilder() {
       if (expressionCase_ == 4) {
-         return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_;
+         return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_;
       }
-      return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+      return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
     }
 
     public static final int ACCESSEXPRESSION_FIELD_NUMBER = 5;
@@ -18229,8 +18229,8 @@ public final class BytecodeOuterClass {
           return false;
         }
       }
-      if (hasPrimitiveCallExpression()) {
-        if (!getPrimitiveCallExpression().isInitialized()) {
+      if (hasStaticCallExpression()) {
+        if (!getStaticCallExpression().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -18275,7 +18275,7 @@ public final class BytecodeOuterClass {
         output.writeMessage(3, (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.CallExpression) expression_);
       }
       if (expressionCase_ == 4) {
-        output.writeMessage(4, (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_);
+        output.writeMessage(4, (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_);
       }
       if (expressionCase_ == 5) {
         output.writeMessage(5, (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.AccessExpression) expression_);
@@ -18313,7 +18313,7 @@ public final class BytecodeOuterClass {
       }
       if (expressionCase_ == 4) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_);
+          .computeMessageSize(4, (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_);
       }
       if (expressionCase_ == 5) {
         size += com.google.protobuf.CodedOutputStream
@@ -18368,8 +18368,8 @@ public final class BytecodeOuterClass {
               .equals(other.getCallExpression());
           break;
         case 4:
-          result = result && getPrimitiveCallExpression()
-              .equals(other.getPrimitiveCallExpression());
+          result = result && getStaticCallExpression()
+              .equals(other.getStaticCallExpression());
           break;
         case 5:
           result = result && getAccessExpression()
@@ -18419,8 +18419,8 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getCallExpression().hashCode();
           break;
         case 4:
-          hash = (37 * hash) + PRIMITIVECALLEXPRESSION_FIELD_NUMBER;
-          hash = (53 * hash) + getPrimitiveCallExpression().hashCode();
+          hash = (37 * hash) + STATICCALLEXPRESSION_FIELD_NUMBER;
+          hash = (53 * hash) + getStaticCallExpression().hashCode();
           break;
         case 5:
           hash = (37 * hash) + ACCESSEXPRESSION_FIELD_NUMBER;
@@ -18622,10 +18622,10 @@ public final class BytecodeOuterClass {
           }
         }
         if (expressionCase_ == 4) {
-          if (primitiveCallExpressionBuilder_ == null) {
+          if (staticCallExpressionBuilder_ == null) {
             result.expression_ = expression_;
           } else {
-            result.expression_ = primitiveCallExpressionBuilder_.build();
+            result.expression_ = staticCallExpressionBuilder_.build();
           }
         }
         if (expressionCase_ == 5) {
@@ -18721,8 +18721,8 @@ public final class BytecodeOuterClass {
             mergeCallExpression(other.getCallExpression());
             break;
           }
-          case PRIMITIVECALLEXPRESSION: {
-            mergePrimitiveCallExpression(other.getPrimitiveCallExpression());
+          case STATICCALLEXPRESSION: {
+            mergeStaticCallExpression(other.getStaticCallExpression());
             break;
           }
           case ACCESSEXPRESSION: {
@@ -18765,8 +18765,8 @@ public final class BytecodeOuterClass {
             return false;
           }
         }
-        if (hasPrimitiveCallExpression()) {
-          if (!getPrimitiveCallExpression().isInitialized()) {
+        if (hasStaticCallExpression()) {
+          if (!getStaticCallExpression().isInitialized()) {
             return false;
           }
         }
@@ -19187,67 +19187,67 @@ public final class BytecodeOuterClass {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder> primitiveCallExpressionBuilder_;
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder> staticCallExpressionBuilder_;
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public boolean hasPrimitiveCallExpression() {
+      public boolean hasStaticCallExpression() {
         return expressionCase_ == 4;
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression getPrimitiveCallExpression() {
-        if (primitiveCallExpressionBuilder_ == null) {
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression getStaticCallExpression() {
+        if (staticCallExpressionBuilder_ == null) {
           if (expressionCase_ == 4) {
-            return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_;
+            return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_;
           }
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
         } else {
           if (expressionCase_ == 4) {
-            return primitiveCallExpressionBuilder_.getMessage();
+            return staticCallExpressionBuilder_.getMessage();
           }
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public Builder setPrimitiveCallExpression(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression value) {
-        if (primitiveCallExpressionBuilder_ == null) {
+      public Builder setStaticCallExpression(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression value) {
+        if (staticCallExpressionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           expression_ = value;
           onChanged();
         } else {
-          primitiveCallExpressionBuilder_.setMessage(value);
+          staticCallExpressionBuilder_.setMessage(value);
         }
         expressionCase_ = 4;
         return this;
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public Builder setPrimitiveCallExpression(
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder builderForValue) {
-        if (primitiveCallExpressionBuilder_ == null) {
+      public Builder setStaticCallExpression(
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder builderForValue) {
+        if (staticCallExpressionBuilder_ == null) {
           expression_ = builderForValue.build();
           onChanged();
         } else {
-          primitiveCallExpressionBuilder_.setMessage(builderForValue.build());
+          staticCallExpressionBuilder_.setMessage(builderForValue.build());
         }
         expressionCase_ = 4;
         return this;
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public Builder mergePrimitiveCallExpression(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression value) {
-        if (primitiveCallExpressionBuilder_ == null) {
+      public Builder mergeStaticCallExpression(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression value) {
+        if (staticCallExpressionBuilder_ == null) {
           if (expressionCase_ == 4 &&
-              expression_ != wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance()) {
-            expression_ = wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.newBuilder((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_)
+              expression_ != wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance()) {
+            expression_ = wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.newBuilder((wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_)
                 .mergeFrom(value).buildPartial();
           } else {
             expression_ = value;
@@ -19255,18 +19255,18 @@ public final class BytecodeOuterClass {
           onChanged();
         } else {
           if (expressionCase_ == 4) {
-            primitiveCallExpressionBuilder_.mergeFrom(value);
+            staticCallExpressionBuilder_.mergeFrom(value);
           }
-          primitiveCallExpressionBuilder_.setMessage(value);
+          staticCallExpressionBuilder_.setMessage(value);
         }
         expressionCase_ = 4;
         return this;
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public Builder clearPrimitiveCallExpression() {
-        if (primitiveCallExpressionBuilder_ == null) {
+      public Builder clearStaticCallExpression() {
+        if (staticCallExpressionBuilder_ == null) {
           if (expressionCase_ == 4) {
             expressionCase_ = 0;
             expression_ = null;
@@ -19277,49 +19277,49 @@ public final class BytecodeOuterClass {
             expressionCase_ = 0;
             expression_ = null;
           }
-          primitiveCallExpressionBuilder_.clear();
+          staticCallExpressionBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder getPrimitiveCallExpressionBuilder() {
-        return getPrimitiveCallExpressionFieldBuilder().getBuilder();
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder getStaticCallExpressionBuilder() {
+        return getStaticCallExpressionFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder getPrimitiveCallExpressionOrBuilder() {
-        if ((expressionCase_ == 4) && (primitiveCallExpressionBuilder_ != null)) {
-          return primitiveCallExpressionBuilder_.getMessageOrBuilder();
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder getStaticCallExpressionOrBuilder() {
+        if ((expressionCase_ == 4) && (staticCallExpressionBuilder_ != null)) {
+          return staticCallExpressionBuilder_.getMessageOrBuilder();
         } else {
           if (expressionCase_ == 4) {
-            return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_;
+            return (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_;
           }
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+          return wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .Expression.PrimitiveCallExpression primitiveCallExpression = 4;</code>
+       * <code>optional .Expression.StaticCallExpression staticCallExpression = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder> 
-          getPrimitiveCallExpressionFieldBuilder() {
-        if (primitiveCallExpressionBuilder_ == null) {
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder> 
+          getStaticCallExpressionFieldBuilder() {
+        if (staticCallExpressionBuilder_ == null) {
           if (!(expressionCase_ == 4)) {
-            expression_ = wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.getDefaultInstance();
+            expression_ = wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.getDefaultInstance();
           }
-          primitiveCallExpressionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpressionOrBuilder>(
-                  (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PrimitiveCallExpression) expression_,
+          staticCallExpressionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpressionOrBuilder>(
+                  (wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.StaticCallExpression) expression_,
                   getParentForChildren(),
                   isClean());
           expression_ = null;
         }
         expressionCase_ = 4;
         onChanged();;
-        return primitiveCallExpressionBuilder_;
+        return staticCallExpressionBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -20239,15 +20239,15 @@ public final class BytecodeOuterClass {
           getVariableBytes();
 
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       boolean hasType();
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
 
@@ -20438,22 +20438,22 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int TYPE_FIELD_NUMBER = 3;
+      public static final int TYPE__FIELD_NUMBER = 3;
       private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       public boolean hasType() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
       }
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
@@ -20606,7 +20606,7 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getVariable().hashCode();
         }
         if (hasType()) {
-          hash = (37 * hash) + TYPE_FIELD_NUMBER;
+          hash = (37 * hash) + TYPE__FIELD_NUMBER;
           hash = (53 * hash) + getType().hashCode();
         }
         if (hasInitializer()) {
@@ -21026,13 +21026,13 @@ public final class BytecodeOuterClass {
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public boolean hasType() {
           return ((bitField0_ & 0x00000004) == 0x00000004);
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
           if (typeBuilder_ == null) {
@@ -21042,7 +21042,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -21058,7 +21058,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder setType(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
@@ -21072,7 +21072,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -21092,7 +21092,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder clearType() {
           if (typeBuilder_ == null) {
@@ -21105,7 +21105,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
           bitField0_ |= 0x00000004;
@@ -21113,7 +21113,7 @@ public final class BytecodeOuterClass {
           return getTypeFieldBuilder().getBuilder();
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
           if (typeBuilder_ != null) {
@@ -21124,7 +21124,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
@@ -21325,25 +21325,25 @@ public final class BytecodeOuterClass {
           getMethodNameBytes();
 
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> 
           getArgumentsList();
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument getArguments(int index);
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       int getArgumentsCount();
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> 
           getArgumentsOrBuilderList();
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder getArgumentsOrBuilder(
           int index);
@@ -21533,35 +21533,35 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int ARGUMENTS_FIELD_NUMBER = 2;
+      public static final int ARGUMENTS__FIELD_NUMBER = 2;
       private java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> arguments_;
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> getArgumentsList() {
         return arguments_;
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> 
           getArgumentsOrBuilderList() {
         return arguments_;
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public int getArgumentsCount() {
         return arguments_.size();
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument getArguments(int index) {
         return arguments_.get(index);
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder getArgumentsOrBuilder(
           int index) {
@@ -21732,7 +21732,7 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getMethodName().hashCode();
         }
         if (getArgumentsCount() > 0) {
-          hash = (37 * hash) + ARGUMENTS_FIELD_NUMBER;
+          hash = (37 * hash) + ARGUMENTS__FIELD_NUMBER;
           hash = (53 * hash) + getArgumentsList().hashCode();
         }
         if (hasReturnType()) {
@@ -22164,7 +22164,7 @@ public final class BytecodeOuterClass {
             wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> argumentsBuilder_;
 
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> getArgumentsList() {
           if (argumentsBuilder_ == null) {
@@ -22174,7 +22174,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public int getArgumentsCount() {
           if (argumentsBuilder_ == null) {
@@ -22184,7 +22184,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument getArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -22194,7 +22194,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument value) {
@@ -22211,7 +22211,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder builderForValue) {
@@ -22225,7 +22225,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument value) {
           if (argumentsBuilder_ == null) {
@@ -22241,7 +22241,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument value) {
@@ -22258,7 +22258,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(
             wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder builderForValue) {
@@ -22272,7 +22272,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder builderForValue) {
@@ -22286,7 +22286,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addAllArguments(
             java.lang.Iterable<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> values) {
@@ -22301,7 +22301,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder clearArguments() {
           if (argumentsBuilder_ == null) {
@@ -22314,7 +22314,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder removeArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -22327,14 +22327,14 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder getArgumentsBuilder(
             int index) {
           return getArgumentsFieldBuilder().getBuilder(index);
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder getArgumentsOrBuilder(
             int index) {
@@ -22344,7 +22344,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> 
              getArgumentsOrBuilderList() {
@@ -22355,14 +22355,14 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder addArgumentsBuilder() {
           return getArgumentsFieldBuilder().addBuilder(
               wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.getDefaultInstance());
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder addArgumentsBuilder(
             int index) {
@@ -22370,7 +22370,7 @@ public final class BytecodeOuterClass {
               index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.getDefaultInstance());
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder> 
              getArgumentsBuilderList() {
@@ -24662,28 +24662,42 @@ public final class BytecodeOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+     * <code>optional string extends_ = 1;</code>
      */
-    boolean hasCaseDesc();
+    boolean hasExtends();
     /**
-     * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+     * <code>optional string extends_ = 1;</code>
      */
-    wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc getCaseDesc();
+    java.lang.String getExtends();
     /**
-     * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+     * <code>optional string extends_ = 1;</code>
      */
-    wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder getCaseDescOrBuilder();
+    com.google.protobuf.ByteString
+        getExtendsBytes();
 
     /**
-     * <code>optional .TypeDesc.Tag tag = 2;</code>
+     * <code>required .Type type_ = 2;</code>
+     */
+    boolean hasType();
+    /**
+     * <code>required .Type type_ = 2;</code>
+     */
+    wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
+    /**
+     * <code>required .Type type_ = 2;</code>
+     */
+    wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
+
+    /**
+     * <code>optional .TypeDesc.Tag tag = 3;</code>
      */
     boolean hasTag();
     /**
-     * <code>optional .TypeDesc.Tag tag = 2;</code>
+     * <code>optional .TypeDesc.Tag tag = 3;</code>
      */
     wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag getTag();
     /**
-     * <code>optional .TypeDesc.Tag tag = 2;</code>
+     * <code>optional .TypeDesc.Tag tag = 3;</code>
      */
     wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.TagOrBuilder getTagOrBuilder();
   }
@@ -24704,6 +24718,7 @@ public final class BytecodeOuterClass {
       super(builder);
     }
     private TypeDesc() {
+      extends_ = "";
     }
 
     @java.lang.Override
@@ -24738,21 +24753,27 @@ public final class BytecodeOuterClass {
               break;
             }
             case 10: {
-              wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                subBuilder = caseDesc_.toBuilder();
-              }
-              caseDesc_ = input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(caseDesc_);
-                caseDesc_ = subBuilder.buildPartial();
-              }
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
+              extends_ = bs;
               break;
             }
             case 18: {
-              wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.Builder subBuilder = null;
+              wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder subBuilder = null;
               if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                subBuilder = type_.toBuilder();
+              }
+              type_ = input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.Type.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(type_);
+                type_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 26: {
+              wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
                 subBuilder = tag_.toBuilder();
               }
               tag_ = input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.PARSER, extensionRegistry);
@@ -24760,7 +24781,7 @@ public final class BytecodeOuterClass {
                 subBuilder.mergeFrom(tag_);
                 tag_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000004;
               break;
             }
           }
@@ -24785,785 +24806,6 @@ public final class BytecodeOuterClass {
       return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_TypeDesc_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.class, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Builder.class);
-    }
-
-    public interface CaseDescOrBuilder extends
-        // @@protoc_insertion_point(interface_extends:TypeDesc.CaseDesc)
-        com.google.protobuf.MessageOrBuilder {
-
-      /**
-       * <code>optional string extends = 1;</code>
-       */
-      boolean hasExtends();
-      /**
-       * <code>optional string extends = 1;</code>
-       */
-      java.lang.String getExtends();
-      /**
-       * <code>optional string extends = 1;</code>
-       */
-      com.google.protobuf.ByteString
-          getExtendsBytes();
-
-      /**
-       * <code>required .Type type = 2;</code>
-       */
-      boolean hasType();
-      /**
-       * <code>required .Type type = 2;</code>
-       */
-      wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
-      /**
-       * <code>required .Type type = 2;</code>
-       */
-      wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
-    }
-    /**
-     * <pre>
-     * c
-     * </pre>
-     *
-     * Protobuf type {@code TypeDesc.CaseDesc}
-     */
-    public  static final class CaseDesc extends
-        com.google.protobuf.GeneratedMessageV3 implements
-        // @@protoc_insertion_point(message_implements:TypeDesc.CaseDesc)
-        CaseDescOrBuilder {
-    private static final long serialVersionUID = 0L;
-      // Use CaseDesc.newBuilder() to construct.
-      private CaseDesc(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-        super(builder);
-      }
-      private CaseDesc() {
-        extends_ = "";
-      }
-
-      @java.lang.Override
-      public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
-        return this.unknownFields;
-      }
-      private CaseDesc(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        this();
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        int mutable_bitField0_ = 0;
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-            com.google.protobuf.UnknownFieldSet.newBuilder();
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              default: {
-                if (!parseUnknownField(
-                    input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-              case 10: {
-                com.google.protobuf.ByteString bs = input.readBytes();
-                bitField0_ |= 0x00000001;
-                extends_ = bs;
-                break;
-              }
-              case 18: {
-                wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                  subBuilder = type_.toBuilder();
-                }
-                type_ = input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.Type.PARSER, extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(type_);
-                  type_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000002;
-                break;
-              }
-            }
-          }
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(this);
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
-        } finally {
-          this.unknownFields = unknownFields.build();
-          makeExtensionsImmutable();
-        }
-      }
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_TypeDesc_CaseDesc_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_TypeDesc_CaseDesc_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.class, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder.class);
-      }
-
-      private int bitField0_;
-      public static final int EXTENDS_FIELD_NUMBER = 1;
-      private volatile java.lang.Object extends_;
-      /**
-       * <code>optional string extends = 1;</code>
-       */
-      public boolean hasExtends() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>optional string extends = 1;</code>
-       */
-      public java.lang.String getExtends() {
-        java.lang.Object ref = extends_;
-        if (ref instanceof java.lang.String) {
-          return (java.lang.String) ref;
-        } else {
-          com.google.protobuf.ByteString bs = 
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            extends_ = s;
-          }
-          return s;
-        }
-      }
-      /**
-       * <code>optional string extends = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getExtendsBytes() {
-        java.lang.Object ref = extends_;
-        if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          extends_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-
-      public static final int TYPE_FIELD_NUMBER = 2;
-      private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
-      /**
-       * <code>required .Type type = 2;</code>
-       */
-      public boolean hasType() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required .Type type = 2;</code>
-       */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
-        return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
-      }
-      /**
-       * <code>required .Type type = 2;</code>
-       */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
-        return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
-      }
-
-      private byte memoizedIsInitialized = -1;
-      public final boolean isInitialized() {
-        byte isInitialized = memoizedIsInitialized;
-        if (isInitialized == 1) return true;
-        if (isInitialized == 0) return false;
-
-        if (!hasType()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-        if (!getType().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-        memoizedIsInitialized = 1;
-        return true;
-      }
-
-      public void writeTo(com.google.protobuf.CodedOutputStream output)
-                          throws java.io.IOException {
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          com.google.protobuf.GeneratedMessageV3.writeString(output, 1, extends_);
-        }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeMessage(2, getType());
-        }
-        unknownFields.writeTo(output);
-      }
-
-      public int getSerializedSize() {
-        int size = memoizedSize;
-        if (size != -1) return size;
-
-        size = 0;
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, extends_);
-        }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(2, getType());
-        }
-        size += unknownFields.getSerializedSize();
-        memoizedSize = size;
-        return size;
-      }
-
-      @java.lang.Override
-      public boolean equals(final java.lang.Object obj) {
-        if (obj == this) {
-         return true;
-        }
-        if (!(obj instanceof wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc)) {
-          return super.equals(obj);
-        }
-        wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc other = (wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc) obj;
-
-        boolean result = true;
-        result = result && (hasExtends() == other.hasExtends());
-        if (hasExtends()) {
-          result = result && getExtends()
-              .equals(other.getExtends());
-        }
-        result = result && (hasType() == other.hasType());
-        if (hasType()) {
-          result = result && getType()
-              .equals(other.getType());
-        }
-        result = result && unknownFields.equals(other.unknownFields);
-        return result;
-      }
-
-      @java.lang.Override
-      public int hashCode() {
-        if (memoizedHashCode != 0) {
-          return memoizedHashCode;
-        }
-        int hash = 41;
-        hash = (19 * hash) + getDescriptor().hashCode();
-        if (hasExtends()) {
-          hash = (37 * hash) + EXTENDS_FIELD_NUMBER;
-          hash = (53 * hash) + getExtends().hashCode();
-        }
-        if (hasType()) {
-          hash = (37 * hash) + TYPE_FIELD_NUMBER;
-          hash = (53 * hash) + getType().hashCode();
-        }
-        hash = (29 * hash) + unknownFields.hashCode();
-        memoizedHashCode = hash;
-        return hash;
-      }
-
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data, extensionRegistry);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data, extensionRegistry);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data, extensionRegistry);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
-        return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
-        return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
-        return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
-      }
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-      }
-
-      public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder() {
-        return DEFAULT_INSTANCE.toBuilder();
-      }
-      public static Builder newBuilder(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc prototype) {
-        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-      }
-      public Builder toBuilder() {
-        return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
-      }
-
-      @java.lang.Override
-      protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
-      }
-      /**
-       * <pre>
-       * c
-       * </pre>
-       *
-       * Protobuf type {@code TypeDesc.CaseDesc}
-       */
-      public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:TypeDesc.CaseDesc)
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
-            getDescriptor() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_TypeDesc_CaseDesc_descriptor;
-        }
-
-        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-            internalGetFieldAccessorTable() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_TypeDesc_CaseDesc_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                  wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.class, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder.class);
-        }
-
-        // Construct using wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.newBuilder()
-        private Builder() {
-          maybeForceBuilderInitialization();
-        }
-
-        private Builder(
-            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-          super(parent);
-          maybeForceBuilderInitialization();
-        }
-        private void maybeForceBuilderInitialization() {
-          if (com.google.protobuf.GeneratedMessageV3
-                  .alwaysUseFieldBuilders) {
-            getTypeFieldBuilder();
-          }
-        }
-        public Builder clear() {
-          super.clear();
-          extends_ = "";
-          bitField0_ = (bitField0_ & ~0x00000001);
-          if (typeBuilder_ == null) {
-            type_ = null;
-          } else {
-            typeBuilder_.clear();
-          }
-          bitField0_ = (bitField0_ & ~0x00000002);
-          return this;
-        }
-
-        public com.google.protobuf.Descriptors.Descriptor
-            getDescriptorForType() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.internal_static_TypeDesc_CaseDesc_descriptor;
-        }
-
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc getDefaultInstanceForType() {
-          return wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance();
-        }
-
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc build() {
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc result = buildPartial();
-          if (!result.isInitialized()) {
-            throw newUninitializedMessageException(result);
-          }
-          return result;
-        }
-
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc buildPartial() {
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc result = new wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc(this);
-          int from_bitField0_ = bitField0_;
-          int to_bitField0_ = 0;
-          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-            to_bitField0_ |= 0x00000001;
-          }
-          result.extends_ = extends_;
-          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-            to_bitField0_ |= 0x00000002;
-          }
-          if (typeBuilder_ == null) {
-            result.type_ = type_;
-          } else {
-            result.type_ = typeBuilder_.build();
-          }
-          result.bitField0_ = to_bitField0_;
-          onBuilt();
-          return result;
-        }
-
-        public Builder clone() {
-          return (Builder) super.clone();
-        }
-        public Builder setField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-          return (Builder) super.setField(field, value);
-        }
-        public Builder clearField(
-            com.google.protobuf.Descriptors.FieldDescriptor field) {
-          return (Builder) super.clearField(field);
-        }
-        public Builder clearOneof(
-            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-          return (Builder) super.clearOneof(oneof);
-        }
-        public Builder setRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, java.lang.Object value) {
-          return (Builder) super.setRepeatedField(field, index, value);
-        }
-        public Builder addRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-          return (Builder) super.addRepeatedField(field, value);
-        }
-        public Builder mergeFrom(com.google.protobuf.Message other) {
-          if (other instanceof wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc) {
-            return mergeFrom((wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc)other);
-          } else {
-            super.mergeFrom(other);
-            return this;
-          }
-        }
-
-        public Builder mergeFrom(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc other) {
-          if (other == wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance()) return this;
-          if (other.hasExtends()) {
-            bitField0_ |= 0x00000001;
-            extends_ = other.extends_;
-            onChanged();
-          }
-          if (other.hasType()) {
-            mergeType(other.getType());
-          }
-          this.mergeUnknownFields(other.unknownFields);
-          onChanged();
-          return this;
-        }
-
-        public final boolean isInitialized() {
-          if (!hasType()) {
-            return false;
-          }
-          if (!getType().isInitialized()) {
-            return false;
-          }
-          return true;
-        }
-
-        public Builder mergeFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc parsedMessage = null;
-          try {
-            parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-            parsedMessage = (wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc) e.getUnfinishedMessage();
-            throw e.unwrapIOException();
-          } finally {
-            if (parsedMessage != null) {
-              mergeFrom(parsedMessage);
-            }
-          }
-          return this;
-        }
-        private int bitField0_;
-
-        private java.lang.Object extends_ = "";
-        /**
-         * <code>optional string extends = 1;</code>
-         */
-        public boolean hasExtends() {
-          return ((bitField0_ & 0x00000001) == 0x00000001);
-        }
-        /**
-         * <code>optional string extends = 1;</code>
-         */
-        public java.lang.String getExtends() {
-          java.lang.Object ref = extends_;
-          if (!(ref instanceof java.lang.String)) {
-            com.google.protobuf.ByteString bs =
-                (com.google.protobuf.ByteString) ref;
-            java.lang.String s = bs.toStringUtf8();
-            if (bs.isValidUtf8()) {
-              extends_ = s;
-            }
-            return s;
-          } else {
-            return (java.lang.String) ref;
-          }
-        }
-        /**
-         * <code>optional string extends = 1;</code>
-         */
-        public com.google.protobuf.ByteString
-            getExtendsBytes() {
-          java.lang.Object ref = extends_;
-          if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
-                com.google.protobuf.ByteString.copyFromUtf8(
-                    (java.lang.String) ref);
-            extends_ = b;
-            return b;
-          } else {
-            return (com.google.protobuf.ByteString) ref;
-          }
-        }
-        /**
-         * <code>optional string extends = 1;</code>
-         */
-        public Builder setExtends(
-            java.lang.String value) {
-          if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-          extends_ = value;
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>optional string extends = 1;</code>
-         */
-        public Builder clearExtends() {
-          bitField0_ = (bitField0_ & ~0x00000001);
-          extends_ = getDefaultInstance().getExtends();
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>optional string extends = 1;</code>
-         */
-        public Builder setExtendsBytes(
-            com.google.protobuf.ByteString value) {
-          if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-          extends_ = value;
-          onChanged();
-          return this;
-        }
-
-        private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_ = null;
-        private com.google.protobuf.SingleFieldBuilderV3<
-            wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public boolean hasType() {
-          return ((bitField0_ & 0x00000002) == 0x00000002);
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
-          if (typeBuilder_ == null) {
-            return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
-          } else {
-            return typeBuilder_.getMessage();
-          }
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
-          if (typeBuilder_ == null) {
-            if (value == null) {
-              throw new NullPointerException();
-            }
-            type_ = value;
-            onChanged();
-          } else {
-            typeBuilder_.setMessage(value);
-          }
-          bitField0_ |= 0x00000002;
-          return this;
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public Builder setType(
-            wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
-          if (typeBuilder_ == null) {
-            type_ = builderForValue.build();
-            onChanged();
-          } else {
-            typeBuilder_.setMessage(builderForValue.build());
-          }
-          bitField0_ |= 0x00000002;
-          return this;
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
-          if (typeBuilder_ == null) {
-            if (((bitField0_ & 0x00000002) == 0x00000002) &&
-                type_ != null &&
-                type_ != wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance()) {
-              type_ =
-                wyvern.stdlib.support.backend.BytecodeOuterClass.Type.newBuilder(type_).mergeFrom(value).buildPartial();
-            } else {
-              type_ = value;
-            }
-            onChanged();
-          } else {
-            typeBuilder_.mergeFrom(value);
-          }
-          bitField0_ |= 0x00000002;
-          return this;
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public Builder clearType() {
-          if (typeBuilder_ == null) {
-            type_ = null;
-            onChanged();
-          } else {
-            typeBuilder_.clear();
-          }
-          bitField0_ = (bitField0_ & ~0x00000002);
-          return this;
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
-          bitField0_ |= 0x00000002;
-          onChanged();
-          return getTypeFieldBuilder().getBuilder();
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
-          if (typeBuilder_ != null) {
-            return typeBuilder_.getMessageOrBuilder();
-          } else {
-            return type_ == null ?
-                wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
-          }
-        }
-        /**
-         * <code>required .Type type = 2;</code>
-         */
-        private com.google.protobuf.SingleFieldBuilderV3<
-            wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
-            getTypeFieldBuilder() {
-          if (typeBuilder_ == null) {
-            typeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder>(
-                    getType(),
-                    getParentForChildren(),
-                    isClean());
-            type_ = null;
-          }
-          return typeBuilder_;
-        }
-        public final Builder setUnknownFields(
-            final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return super.setUnknownFields(unknownFields);
-        }
-
-        public final Builder mergeUnknownFields(
-            final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return super.mergeUnknownFields(unknownFields);
-        }
-
-
-        // @@protoc_insertion_point(builder_scope:TypeDesc.CaseDesc)
-      }
-
-      // @@protoc_insertion_point(class_scope:TypeDesc.CaseDesc)
-      private static final wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc DEFAULT_INSTANCE;
-      static {
-        DEFAULT_INSTANCE = new wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc();
-      }
-
-      public static wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc getDefaultInstance() {
-        return DEFAULT_INSTANCE;
-      }
-
-      @java.lang.Deprecated public static final com.google.protobuf.Parser<CaseDesc>
-          PARSER = new com.google.protobuf.AbstractParser<CaseDesc>() {
-        public CaseDesc parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new CaseDesc(input, extensionRegistry);
-        }
-      };
-
-      public static com.google.protobuf.Parser<CaseDesc> parser() {
-        return PARSER;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<CaseDesc> getParserForType() {
-        return PARSER;
-      }
-
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc getDefaultInstanceForType() {
-        return DEFAULT_INSTANCE;
-      }
-
     }
 
     public interface TagOrBuilder extends
@@ -26213,43 +25455,85 @@ public final class BytecodeOuterClass {
     }
 
     private int bitField0_;
-    public static final int CASEDESC_FIELD_NUMBER = 1;
-    private wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc caseDesc_;
+    public static final int EXTENDS__FIELD_NUMBER = 1;
+    private volatile java.lang.Object extends_;
     /**
-     * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+     * <code>optional string extends_ = 1;</code>
      */
-    public boolean hasCaseDesc() {
+    public boolean hasExtends() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+     * <code>optional string extends_ = 1;</code>
      */
-    public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc getCaseDesc() {
-      return caseDesc_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance() : caseDesc_;
+    public java.lang.String getExtends() {
+      java.lang.Object ref = extends_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          extends_ = s;
+        }
+        return s;
+      }
     }
     /**
-     * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+     * <code>optional string extends_ = 1;</code>
      */
-    public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder getCaseDescOrBuilder() {
-      return caseDesc_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance() : caseDesc_;
+    public com.google.protobuf.ByteString
+        getExtendsBytes() {
+      java.lang.Object ref = extends_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        extends_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
-    public static final int TAG_FIELD_NUMBER = 2;
-    private wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag tag_;
+    public static final int TYPE__FIELD_NUMBER = 2;
+    private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
     /**
-     * <code>optional .TypeDesc.Tag tag = 2;</code>
+     * <code>required .Type type_ = 2;</code>
      */
-    public boolean hasTag() {
+    public boolean hasType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional .TypeDesc.Tag tag = 2;</code>
+     * <code>required .Type type_ = 2;</code>
+     */
+    public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
+      return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
+    }
+    /**
+     * <code>required .Type type_ = 2;</code>
+     */
+    public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
+      return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
+    }
+
+    public static final int TAG_FIELD_NUMBER = 3;
+    private wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag tag_;
+    /**
+     * <code>optional .TypeDesc.Tag tag = 3;</code>
+     */
+    public boolean hasTag() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional .TypeDesc.Tag tag = 3;</code>
      */
     public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag getTag() {
       return tag_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.getDefaultInstance() : tag_;
     }
     /**
-     * <code>optional .TypeDesc.Tag tag = 2;</code>
+     * <code>optional .TypeDesc.Tag tag = 3;</code>
      */
     public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.TagOrBuilder getTagOrBuilder() {
       return tag_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.getDefaultInstance() : tag_;
@@ -26261,11 +25545,11 @@ public final class BytecodeOuterClass {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasCaseDesc()) {
+      if (!hasType()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!getCaseDesc().isInitialized()) {
+      if (!getType().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -26276,10 +25560,13 @@ public final class BytecodeOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, getCaseDesc());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, extends_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, getTag());
+        output.writeMessage(2, getType());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeMessage(3, getTag());
       }
       unknownFields.writeTo(output);
     }
@@ -26290,12 +25577,15 @@ public final class BytecodeOuterClass {
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getCaseDesc());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, extends_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getTag());
+          .computeMessageSize(2, getType());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getTag());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -26313,10 +25603,15 @@ public final class BytecodeOuterClass {
       wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc other = (wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc) obj;
 
       boolean result = true;
-      result = result && (hasCaseDesc() == other.hasCaseDesc());
-      if (hasCaseDesc()) {
-        result = result && getCaseDesc()
-            .equals(other.getCaseDesc());
+      result = result && (hasExtends() == other.hasExtends());
+      if (hasExtends()) {
+        result = result && getExtends()
+            .equals(other.getExtends());
+      }
+      result = result && (hasType() == other.hasType());
+      if (hasType()) {
+        result = result && getType()
+            .equals(other.getType());
       }
       result = result && (hasTag() == other.hasTag());
       if (hasTag()) {
@@ -26334,9 +25629,13 @@ public final class BytecodeOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasCaseDesc()) {
-        hash = (37 * hash) + CASEDESC_FIELD_NUMBER;
-        hash = (53 * hash) + getCaseDesc().hashCode();
+      if (hasExtends()) {
+        hash = (37 * hash) + EXTENDS__FIELD_NUMBER;
+        hash = (53 * hash) + getExtends().hashCode();
+      }
+      if (hasType()) {
+        hash = (37 * hash) + TYPE__FIELD_NUMBER;
+        hash = (53 * hash) + getType().hashCode();
       }
       if (hasTag()) {
         hash = (37 * hash) + TAG_FIELD_NUMBER;
@@ -26471,24 +25770,26 @@ public final class BytecodeOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getCaseDescFieldBuilder();
+          getTypeFieldBuilder();
           getTagFieldBuilder();
         }
       }
       public Builder clear() {
         super.clear();
-        if (caseDescBuilder_ == null) {
-          caseDesc_ = null;
-        } else {
-          caseDescBuilder_.clear();
-        }
+        extends_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
+        if (typeBuilder_ == null) {
+          type_ = null;
+        } else {
+          typeBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
         if (tagBuilder_ == null) {
           tag_ = null;
         } else {
           tagBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -26516,13 +25817,17 @@ public final class BytecodeOuterClass {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        if (caseDescBuilder_ == null) {
-          result.caseDesc_ = caseDesc_;
-        } else {
-          result.caseDesc_ = caseDescBuilder_.build();
-        }
+        result.extends_ = extends_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
+        }
+        if (typeBuilder_ == null) {
+          result.type_ = type_;
+        } else {
+          result.type_ = typeBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
         }
         if (tagBuilder_ == null) {
           result.tag_ = tag_;
@@ -26571,8 +25876,13 @@ public final class BytecodeOuterClass {
 
       public Builder mergeFrom(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc other) {
         if (other == wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.getDefaultInstance()) return this;
-        if (other.hasCaseDesc()) {
-          mergeCaseDesc(other.getCaseDesc());
+        if (other.hasExtends()) {
+          bitField0_ |= 0x00000001;
+          extends_ = other.extends_;
+          onChanged();
+        }
+        if (other.hasType()) {
+          mergeType(other.getType());
         }
         if (other.hasTag()) {
           mergeTag(other.getTag());
@@ -26583,10 +25893,10 @@ public final class BytecodeOuterClass {
       }
 
       public final boolean isInitialized() {
-        if (!hasCaseDesc()) {
+        if (!hasType()) {
           return false;
         }
-        if (!getCaseDesc().isInitialized()) {
+        if (!getType().isInitialized()) {
           return false;
         }
         return true;
@@ -26611,135 +25921,211 @@ public final class BytecodeOuterClass {
       }
       private int bitField0_;
 
-      private wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc caseDesc_ = null;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder> caseDescBuilder_;
+      private java.lang.Object extends_ = "";
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>optional string extends_ = 1;</code>
        */
-      public boolean hasCaseDesc() {
+      public boolean hasExtends() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>optional string extends_ = 1;</code>
        */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc getCaseDesc() {
-        if (caseDescBuilder_ == null) {
-          return caseDesc_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance() : caseDesc_;
+      public java.lang.String getExtends() {
+        java.lang.Object ref = extends_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            extends_ = s;
+          }
+          return s;
         } else {
-          return caseDescBuilder_.getMessage();
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>optional string extends_ = 1;</code>
        */
-      public Builder setCaseDesc(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc value) {
-        if (caseDescBuilder_ == null) {
+      public com.google.protobuf.ByteString
+          getExtendsBytes() {
+        java.lang.Object ref = extends_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          extends_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string extends_ = 1;</code>
+       */
+      public Builder setExtends(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        extends_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string extends_ = 1;</code>
+       */
+      public Builder clearExtends() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        extends_ = getDefaultInstance().getExtends();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string extends_ = 1;</code>
+       */
+      public Builder setExtendsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        extends_ = value;
+        onChanged();
+        return this;
+      }
+
+      private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
+      /**
+       * <code>required .Type type_ = 2;</code>
+       */
+      public boolean hasType() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required .Type type_ = 2;</code>
+       */
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
+        if (typeBuilder_ == null) {
+          return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
+        } else {
+          return typeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>required .Type type_ = 2;</code>
+       */
+      public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
+        if (typeBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          caseDesc_ = value;
+          type_ = value;
           onChanged();
         } else {
-          caseDescBuilder_.setMessage(value);
+          typeBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         return this;
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>required .Type type_ = 2;</code>
        */
-      public Builder setCaseDesc(
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder builderForValue) {
-        if (caseDescBuilder_ == null) {
-          caseDesc_ = builderForValue.build();
+      public Builder setType(
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
+        if (typeBuilder_ == null) {
+          type_ = builderForValue.build();
           onChanged();
         } else {
-          caseDescBuilder_.setMessage(builderForValue.build());
+          typeBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         return this;
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>required .Type type_ = 2;</code>
        */
-      public Builder mergeCaseDesc(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc value) {
-        if (caseDescBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              caseDesc_ != null &&
-              caseDesc_ != wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance()) {
-            caseDesc_ =
-              wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.newBuilder(caseDesc_).mergeFrom(value).buildPartial();
+      public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
+        if (typeBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              type_ != null &&
+              type_ != wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance()) {
+            type_ =
+              wyvern.stdlib.support.backend.BytecodeOuterClass.Type.newBuilder(type_).mergeFrom(value).buildPartial();
           } else {
-            caseDesc_ = value;
+            type_ = value;
           }
           onChanged();
         } else {
-          caseDescBuilder_.mergeFrom(value);
+          typeBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         return this;
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>required .Type type_ = 2;</code>
        */
-      public Builder clearCaseDesc() {
-        if (caseDescBuilder_ == null) {
-          caseDesc_ = null;
+      public Builder clearType() {
+        if (typeBuilder_ == null) {
+          type_ = null;
           onChanged();
         } else {
-          caseDescBuilder_.clear();
+          typeBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>required .Type type_ = 2;</code>
        */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder getCaseDescBuilder() {
-        bitField0_ |= 0x00000001;
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
+        bitField0_ |= 0x00000002;
         onChanged();
-        return getCaseDescFieldBuilder().getBuilder();
+        return getTypeFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>required .Type type_ = 2;</code>
        */
-      public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder getCaseDescOrBuilder() {
-        if (caseDescBuilder_ != null) {
-          return caseDescBuilder_.getMessageOrBuilder();
+      public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
+        if (typeBuilder_ != null) {
+          return typeBuilder_.getMessageOrBuilder();
         } else {
-          return caseDesc_ == null ?
-              wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.getDefaultInstance() : caseDesc_;
+          return type_ == null ?
+              wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
         }
       }
       /**
-       * <code>required .TypeDesc.CaseDesc caseDesc = 1;</code>
+       * <code>required .Type type_ = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder> 
-          getCaseDescFieldBuilder() {
-        if (caseDescBuilder_ == null) {
-          caseDescBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDesc.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.CaseDescOrBuilder>(
-                  getCaseDesc(),
+          wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
+          getTypeFieldBuilder() {
+        if (typeBuilder_ == null) {
+          typeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder>(
+                  getType(),
                   getParentForChildren(),
                   isClean());
-          caseDesc_ = null;
+          type_ = null;
         }
-        return caseDescBuilder_;
+        return typeBuilder_;
       }
 
       private wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag tag_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
           wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.TagOrBuilder> tagBuilder_;
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public boolean hasTag() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag getTag() {
         if (tagBuilder_ == null) {
@@ -26749,7 +26135,7 @@ public final class BytecodeOuterClass {
         }
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public Builder setTag(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag value) {
         if (tagBuilder_ == null) {
@@ -26761,11 +26147,11 @@ public final class BytecodeOuterClass {
         } else {
           tagBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public Builder setTag(
           wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.Builder builderForValue) {
@@ -26775,15 +26161,15 @@ public final class BytecodeOuterClass {
         } else {
           tagBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public Builder mergeTag(wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag value) {
         if (tagBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+          if (((bitField0_ & 0x00000004) == 0x00000004) &&
               tag_ != null &&
               tag_ != wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.getDefaultInstance()) {
             tag_ =
@@ -26795,11 +26181,11 @@ public final class BytecodeOuterClass {
         } else {
           tagBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public Builder clearTag() {
         if (tagBuilder_ == null) {
@@ -26808,19 +26194,19 @@ public final class BytecodeOuterClass {
         } else {
           tagBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.Builder getTagBuilder() {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         onChanged();
         return getTagFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.TagOrBuilder getTagOrBuilder() {
         if (tagBuilder_ != null) {
@@ -26831,7 +26217,7 @@ public final class BytecodeOuterClass {
         }
       }
       /**
-       * <code>optional .TypeDesc.Tag tag = 2;</code>
+       * <code>optional .TypeDesc.Tag tag = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.Tag.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeDesc.TagOrBuilder> 
@@ -29453,15 +28839,15 @@ public final class BytecodeOuterClass {
           getVariableBytes();
 
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       boolean hasType();
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType();
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder();
     }
@@ -29626,22 +29012,22 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int TYPE_FIELD_NUMBER = 3;
+      public static final int TYPE__FIELD_NUMBER = 3;
       private wyvern.stdlib.support.backend.BytecodeOuterClass.Type type_;
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       public boolean hasType() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
       }
       /**
-       * <code>required .Type type = 3;</code>
+       * <code>required .Type type_ = 3;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
         return type_ == null ? wyvern.stdlib.support.backend.BytecodeOuterClass.Type.getDefaultInstance() : type_;
@@ -29753,7 +29139,7 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getVariable().hashCode();
         }
         if (hasType()) {
-          hash = (37 * hash) + TYPE_FIELD_NUMBER;
+          hash = (37 * hash) + TYPE__FIELD_NUMBER;
           hash = (53 * hash) + getType().hashCode();
         }
         hash = (29 * hash) + unknownFields.hashCode();
@@ -30145,13 +29531,13 @@ public final class BytecodeOuterClass {
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> typeBuilder_;
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public boolean hasType() {
           return ((bitField0_ & 0x00000004) == 0x00000004);
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type getType() {
           if (typeBuilder_ == null) {
@@ -30161,7 +29547,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder setType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -30177,7 +29563,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder setType(
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder builderForValue) {
@@ -30191,7 +29577,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder mergeType(wyvern.stdlib.support.backend.BytecodeOuterClass.Type value) {
           if (typeBuilder_ == null) {
@@ -30211,7 +29597,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public Builder clearType() {
           if (typeBuilder_ == null) {
@@ -30224,7 +29610,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder getTypeBuilder() {
           bitField0_ |= 0x00000004;
@@ -30232,7 +29618,7 @@ public final class BytecodeOuterClass {
           return getTypeFieldBuilder().getBuilder();
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder getTypeOrBuilder() {
           if (typeBuilder_ != null) {
@@ -30243,7 +29629,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>required .Type type = 3;</code>
+         * <code>required .Type type_ = 3;</code>
          */
         private com.google.protobuf.SingleFieldBuilderV3<
             wyvern.stdlib.support.backend.BytecodeOuterClass.Type, wyvern.stdlib.support.backend.BytecodeOuterClass.Type.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.TypeOrBuilder> 
@@ -30326,25 +29712,25 @@ public final class BytecodeOuterClass {
           getMethodNameBytes();
 
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> 
           getArgumentsList();
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument getArguments(int index);
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       int getArgumentsCount();
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> 
           getArgumentsOrBuilderList();
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder getArgumentsOrBuilder(
           int index);
@@ -30508,35 +29894,35 @@ public final class BytecodeOuterClass {
         }
       }
 
-      public static final int ARGUMENTS_FIELD_NUMBER = 2;
+      public static final int ARGUMENTS__FIELD_NUMBER = 2;
       private java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> arguments_;
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> getArgumentsList() {
         return arguments_;
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> 
           getArgumentsOrBuilderList() {
         return arguments_;
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public int getArgumentsCount() {
         return arguments_.size();
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument getArguments(int index) {
         return arguments_.get(index);
       }
       /**
-       * <code>repeated .MethodArgument arguments = 2;</code>
+       * <code>repeated .MethodArgument arguments_ = 2;</code>
        */
       public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder getArgumentsOrBuilder(
           int index) {
@@ -30666,7 +30052,7 @@ public final class BytecodeOuterClass {
           hash = (53 * hash) + getMethodName().hashCode();
         }
         if (getArgumentsCount() > 0) {
-          hash = (37 * hash) + ARGUMENTS_FIELD_NUMBER;
+          hash = (37 * hash) + ARGUMENTS__FIELD_NUMBER;
           hash = (53 * hash) + getArgumentsList().hashCode();
         }
         if (hasReturnType()) {
@@ -31070,7 +30456,7 @@ public final class BytecodeOuterClass {
             wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> argumentsBuilder_;
 
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> getArgumentsList() {
           if (argumentsBuilder_ == null) {
@@ -31080,7 +30466,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public int getArgumentsCount() {
           if (argumentsBuilder_ == null) {
@@ -31090,7 +30476,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument getArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -31100,7 +30486,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument value) {
@@ -31117,7 +30503,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder setArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder builderForValue) {
@@ -31131,7 +30517,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument value) {
           if (argumentsBuilder_ == null) {
@@ -31147,7 +30533,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument value) {
@@ -31164,7 +30550,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(
             wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder builderForValue) {
@@ -31178,7 +30564,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addArguments(
             int index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder builderForValue) {
@@ -31192,7 +30578,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder addAllArguments(
             java.lang.Iterable<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument> values) {
@@ -31207,7 +30593,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder clearArguments() {
           if (argumentsBuilder_ == null) {
@@ -31220,7 +30606,7 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public Builder removeArguments(int index) {
           if (argumentsBuilder_ == null) {
@@ -31233,14 +30619,14 @@ public final class BytecodeOuterClass {
           return this;
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder getArgumentsBuilder(
             int index) {
           return getArgumentsFieldBuilder().getBuilder(index);
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder getArgumentsOrBuilder(
             int index) {
@@ -31250,7 +30636,7 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public java.util.List<? extends wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgumentOrBuilder> 
              getArgumentsOrBuilderList() {
@@ -31261,14 +30647,14 @@ public final class BytecodeOuterClass {
           }
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder addArgumentsBuilder() {
           return getArgumentsFieldBuilder().addBuilder(
               wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.getDefaultInstance());
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder addArgumentsBuilder(
             int index) {
@@ -31276,7 +30662,7 @@ public final class BytecodeOuterClass {
               index, wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.getDefaultInstance());
         }
         /**
-         * <code>repeated .MethodArgument arguments = 2;</code>
+         * <code>repeated .MethodArgument arguments_ = 2;</code>
          */
         public java.util.List<wyvern.stdlib.support.backend.BytecodeOuterClass.MethodArgument.Builder> 
              getArgumentsBuilderList() {
@@ -34567,10 +33953,10 @@ public final class BytecodeOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Expression_CallExpression_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Expression_PrimitiveCallExpression_descriptor;
+    internal_static_Expression_StaticCallExpression_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Expression_PrimitiveCallExpression_fieldAccessorTable;
+      internal_static_Expression_StaticCallExpression_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Expression_AccessExpression_descriptor;
   private static final 
@@ -34632,11 +34018,6 @@ public final class BytecodeOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_TypeDesc_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_TypeDesc_CaseDesc_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_TypeDesc_CaseDesc_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_TypeDesc_Tag_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -34685,104 +34066,103 @@ public final class BytecodeOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016bytecode.proto\"7\n\016MethodArgument\022\020\n\010va" +
-      "riable\030\001 \002(\t\022\023\n\004type\030\002 \002(\0132\005.Type\"\256\002\n\010By" +
-      "tecode\022\"\n\007version\030\001 \002(\0132\021.Bytecode.Versi" +
-      "on\022\014\n\004path\030\002 \002(\t\022!\n\007imports\030\003 \003(\0132\020.Byte" +
-      "code.Import\022\030\n\007modules\030\004 \003(\0132\007.Module\0326\n" +
-      "\007Version\022\r\n\005magic\030\001 \002(\005\022\r\n\005major\030\002 \002(\005\022\r" +
-      "\n\005minor\030\003 \002(\005\032{\n\006Import\022\030\n\020isMetadataImp" +
-      "ort\030\001 \002(\010\022\024\n\014isTypeImport\030\002 \002(\010\022\020\n\010platf" +
-      "orm\030\003 \002(\t\022\014\n\004path\030\004 \002(\t\022\023\n\004type\030\005 \002(\0132\005." +
-      "Type\022\014\n\004name\030\006 \002(\t\"\205\002\n\006Module\022\014\n\004path\030\001 " +
-      "\002(\t\022*\n\013valueModule\030\002 \001(\0132\023.Module.ValueM" +
-      "oduleH\000\022(\n\ntypeModule\030\003 \001(\0132\022.Module.Typ" +
-      "eModuleH\000\032C\n\013ValueModule\022\023\n\004type\030\001 \002(\0132\005" +
-      ".Type\022\037\n\nexpression\030\002 \002(\0132\013.Expression\032H" +
-      "\n\nTypeModule\022\033\n\010typeDesc\030\001 \002(\0132\t.TypeDes" +
-      "c\022\035\n\010metadata\030\002 \001(\0132\013.ExpressionB\010\n\006modu" +
-      "le\"\220\014\n\nExpression\022\022\n\010variable\030\001 \001(\tH\000\0222\n" +
-      "\rnewExpression\030\002 \001(\0132\031.Expression.NewExp" +
-      "ressionH\000\0224\n\016callExpression\030\003 \001(\0132\032.Expr" +
-      "ession.CallExpressionH\000\022F\n\027primitiveCall" +
-      "Expression\030\004 \001(\0132#.Expression.PrimitiveC" +
-      "allExpressionH\000\0228\n\020accessExpression\030\005 \001(" +
-      "\0132\034.Expression.AccessExpressionH\000\022@\n\024ass" +
-      "ignmentExpression\030\006 \001(\0132 .Expression.Ass" +
-      "ignmentExpressionH\000\022&\n\007literal\030\007 \001(\0132\023.E" +
-      "xpression.LiteralH\000\0226\n\017matchExpression\030\010" +
-      " \001(\0132\033.Expression.MatchExpressionH\000\022<\n\022s" +
-      "equenceExpression\030\t \001(\0132\036.Expression.Seq" +
-      "uenceExpressionH\000\032Z\n\rNewExpression\022\023\n\004ty" +
-      "pe\030\001 \002(\0132\005.Type\022\020\n\010selfName\030\002 \002(\t\022\"\n\014dec" +
-      "larations\030\003 \003(\0132\014.Declaration\032_\n\016CallExp" +
-      "ression\022\035\n\010receiver\030\001 \002(\0132\013.Expression\022\016" +
-      "\n\006method\030\002 \002(\t\022\036\n\targuments\030\003 \003(\0132\013.Expr" +
-      "ession\032\177\n\027PrimitiveCallExpression\022\035\n\010rec" +
-      "eiver\030\001 \002(\0132\013.Expression\022\025\n\rprimitiveTyp" +
-      "e\030\002 \002(\t\022\016\n\006method\030\003 \002(\t\022\036\n\targuments\030\004 \003" +
-      "(\0132\013.Expression\032B\n\020AccessExpression\022\037\n\ne" +
-      "xpression\030\001 \002(\0132\013.Expression\022\r\n\005field\030\002 " +
-      "\002(\t\032b\n\024AssignmentExpression\022\037\n\nexpressio" +
-      "n\030\001 \002(\0132\013.Expression\022\r\n\005field\030\002 \002(\t\022\032\n\005v" +
-      "alue\030\003 \002(\0132\013.Expression\032\225\001\n\007Literal\022\027\n\rs" +
-      "tringLiteral\030\001 \001(\tH\000\022\030\n\016integerLiteral\030\002" +
-      " \001(\014H\000\022\026\n\014floatLiteral\030\003 \001(\001H\000\022\030\n\016boolea" +
-      "nLiteral\030\004 \001(\010H\000\022\032\n\020characterLiteral\030\005 \001" +
-      "(\tH\000B\t\n\007literal\032\316\001\n\017MatchExpression\022\037\n\ne" +
-      "xpression\030\001 \002(\0132\013.Expression\0222\n\004arms\030\002 \003" +
-      "(\0132$.Expression.MatchExpression.MatchArm" +
-      "\022\031\n\004else\030\003 \001(\0132\013.Expression\032K\n\010MatchArm\022" +
-      "\020\n\010variable\030\001 \002(\t\022\014\n\004path\030\002 \002(\t\022\037\n\nexpre" +
-      "ssion\030\003 \002(\0132\013.Expression\032\304\001\n\022SequenceExp" +
-      "ression\022D\n\nstatements\030\001 \003(\01320.Expression" +
-      ".SequenceExpression.SequenceStatement\032h\n" +
-      "\021SequenceStatement\022!\n\nexpression\030\001 \001(\0132\013" +
-      ".ExpressionH\000\022#\n\013declaration\030\002 \001(\0132\014.Dec" +
-      "larationH\000B\013\n\tstatementB\014\n\nexpression\"\310\004" +
-      "\n\013Declaration\022?\n\023variableDeclaration\030\001 \001" +
-      "(\0132 .Declaration.VariableDeclarationH\000\022;" +
-      "\n\021methodDeclaration\030\002 \001(\0132\036.Declaration." +
-      "MethodDeclarationH\000\0227\n\017typeDeclaration\030\003" +
-      " \001(\0132\034.Declaration.TypeDeclarationH\000\032\221\001\n" +
-      "\023VariableDeclaration\0221\n\017declarationType\030" +
-      "\001 \002(\0162\030.VariableDeclarationType\022\020\n\010varia" +
-      "ble\030\002 \002(\t\022\023\n\004type\030\003 \002(\0132\005.Type\022 \n\013initia" +
-      "lizer\030\004 \002(\0132\013.Expression\032\201\001\n\021MethodDecla" +
-      "ration\022\022\n\nmethodName\030\001 \002(\t\022\"\n\targuments\030" +
-      "\002 \003(\0132\017.MethodArgument\022\031\n\nreturnType\030\003 \002" +
-      "(\0132\005.Type\022\031\n\004body\030\004 \002(\0132\013.Expression\032[\n\017" +
-      "TypeDeclaration\022\014\n\004name\030\001 \002(\t\022\033\n\010typeDes" +
-      "c\030\002 \002(\0132\t.TypeDesc\022\035\n\010metadata\030\003 \001(\0132\013.E" +
-      "xpressionB\r\n\013declaration\"\224\001\n\010TypeDesc\022$\n" +
-      "\010caseDesc\030\001 \002(\0132\022.TypeDesc.CaseDesc\022\032\n\003t" +
-      "ag\030\002 \001(\0132\r.TypeDesc.Tag\0320\n\010CaseDesc\022\017\n\007e" +
-      "xtends\030\001 \001(\t\022\023\n\004type\030\002 \002(\0132\005.Type\032\024\n\003Tag" +
-      "\022\r\n\005paths\030\001 \003(\t\"\206\002\n\004Type\022*\n\014compoundType" +
-      "\030\001 \001(\0132\022.Type.CompoundTypeH\000\022\016\n\004path\030\002 \001" +
-      "(\tH\000\022&\n\nsimpleType\030\003 \001(\0162\020.Type.SimpleTy" +
-      "peH\000\032e\n\014CompoundType\022\023\n\004base\030\001 \002(\0132\005.Typ" +
-      "e\022\020\n\010selfName\030\002 \002(\t\022\034\n\tdeclTypes\030\003 \003(\0132\t" +
-      ".DeclType\022\020\n\010stateful\030\004 \002(\010\"+\n\nSimpleTyp" +
-      "e\022\007\n\003Top\020\001\022\013\n\007Nothing\020\002\022\007\n\003Dyn\020\003B\006\n\004type" +
-      "\"\364\004\n\010DeclType\0222\n\014variableDecl\030\001 \001(\0132\032.De" +
-      "clType.VariableDeclTypeH\000\022.\n\nmethodDecl\030" +
-      "\002 \001(\0132\030.DeclType.MethodDeclTypeH\000\022<\n\023dec" +
-      "lTypeDeclaration\030\003 \001(\0132\035.DeclType.DeclTy" +
-      "peDeclarationH\000\0222\n\016opaqueTypeDecl\030\004 \001(\0132" +
-      "\030.DeclType.OpaqueTypeDeclH\000\032l\n\020VariableD" +
-      "eclType\0221\n\017declarationType\030\001 \002(\0162\030.Varia" +
-      "bleDeclarationType\022\020\n\010variable\030\002 \002(\t\022\023\n\004" +
-      "type\030\003 \002(\0132\005.Type\032c\n\016MethodDeclType\022\022\n\nm" +
-      "ethodName\030\001 \002(\t\022\"\n\targuments\030\002 \003(\0132\017.Met" +
-      "hodArgument\022\031\n\nreturnType\030\003 \002(\0132\005.Type\032_" +
-      "\n\023DeclTypeDeclaration\022\014\n\004name\030\001 \002(\t\022\033\n\010t" +
-      "ypeDesc\030\002 \002(\0132\t.TypeDesc\022\035\n\010metadata\030\003 \001" +
-      "(\0132\013.Expression\032O\n\016OpaqueTypeDecl\022\014\n\004nam" +
-      "e\030\001 \002(\t\022\020\n\010stateful\030\002 \002(\010\022\035\n\010metadata\030\003 " +
-      "\001(\0132\013.ExpressionB\r\n\013declaration*+\n\027Varia" +
-      "bleDeclarationType\022\007\n\003VAL\020\001\022\007\n\003VAR\020\002B\037\n\035" +
-      "wyvern.stdlib.support.backend"
+      "\n\016bytecode.proto\"8\n\016MethodArgument\022\020\n\010va" +
+      "riable\030\001 \002(\t\022\024\n\005type_\030\002 \002(\0132\005.Type\"\257\002\n\010B" +
+      "ytecode\022\"\n\007version\030\001 \002(\0132\021.Bytecode.Vers" +
+      "ion\022\014\n\004path\030\002 \002(\t\022!\n\007imports\030\003 \003(\0132\020.Byt" +
+      "ecode.Import\022\030\n\007modules\030\004 \003(\0132\007.Module\0326" +
+      "\n\007Version\022\r\n\005magic\030\001 \002(\005\022\r\n\005major\030\002 \002(\005\022" +
+      "\r\n\005minor\030\003 \002(\005\032|\n\006Import\022\030\n\020isMetadataIm" +
+      "port\030\001 \002(\010\022\024\n\014isTypeImport\030\002 \002(\010\022\020\n\010plat" +
+      "form\030\003 \002(\t\022\014\n\004path\030\004 \002(\t\022\024\n\005type_\030\005 \002(\0132" +
+      "\005.Type\022\014\n\004name\030\006 \002(\t\"\206\002\n\006Module\022\014\n\004path\030" +
+      "\001 \002(\t\022*\n\013valueModule\030\002 \001(\0132\023.Module.Valu" +
+      "eModuleH\000\022(\n\ntypeModule\030\003 \001(\0132\022.Module.T" +
+      "ypeModuleH\000\032D\n\013ValueModule\022\024\n\005type_\030\001 \002(" +
+      "\0132\005.Type\022\037\n\nexpression\030\002 \002(\0132\013.Expressio" +
+      "n\032H\n\nTypeModule\022\033\n\010typeDesc\030\001 \002(\0132\t.Type" +
+      "Desc\022\035\n\010metadata\030\002 \001(\0132\013.ExpressionB\010\n\006m" +
+      "odule\"\211\014\n\nExpression\022\022\n\010variable\030\001 \001(\tH\000" +
+      "\0222\n\rnewExpression\030\002 \001(\0132\031.Expression.New" +
+      "ExpressionH\000\0224\n\016callExpression\030\003 \001(\0132\032.E" +
+      "xpression.CallExpressionH\000\022@\n\024staticCall" +
+      "Expression\030\004 \001(\0132 .Expression.StaticCall" +
+      "ExpressionH\000\0228\n\020accessExpression\030\005 \001(\0132\034" +
+      ".Expression.AccessExpressionH\000\022@\n\024assign" +
+      "mentExpression\030\006 \001(\0132 .Expression.Assign" +
+      "mentExpressionH\000\022&\n\007literal\030\007 \001(\0132\023.Expr" +
+      "ession.LiteralH\000\0226\n\017matchExpression\030\010 \001(" +
+      "\0132\033.Expression.MatchExpressionH\000\022<\n\022sequ" +
+      "enceExpression\030\t \001(\0132\036.Expression.Sequen" +
+      "ceExpressionH\000\032[\n\rNewExpression\022\024\n\005type_" +
+      "\030\001 \002(\0132\005.Type\022\020\n\010selfName\030\002 \002(\t\022\"\n\014decla" +
+      "rations\030\003 \003(\0132\014.Declaration\032`\n\016CallExpre" +
+      "ssion\022\035\n\010receiver\030\001 \002(\0132\013.Expression\022\016\n\006" +
+      "method\030\002 \002(\t\022\037\n\narguments_\030\003 \003(\0132\013.Expre" +
+      "ssion\032|\n\024StaticCallExpression\022\035\n\010receive" +
+      "r\030\001 \002(\0132\013.Expression\022\024\n\014receiverType\030\002 \002" +
+      "(\t\022\016\n\006method\030\003 \002(\t\022\037\n\narguments_\030\004 \003(\0132\013" +
+      ".Expression\032B\n\020AccessExpression\022\037\n\nexpre" +
+      "ssion\030\001 \002(\0132\013.Expression\022\r\n\005field\030\002 \002(\t\032" +
+      "b\n\024AssignmentExpression\022\037\n\nexpression\030\001 " +
+      "\002(\0132\013.Expression\022\r\n\005field\030\002 \002(\t\022\032\n\005value" +
+      "\030\003 \002(\0132\013.Expression\032\225\001\n\007Literal\022\027\n\rstrin" +
+      "gLiteral\030\001 \001(\tH\000\022\030\n\016integerLiteral\030\002 \001(\014" +
+      "H\000\022\026\n\014floatLiteral\030\003 \001(\001H\000\022\030\n\016booleanLit" +
+      "eral\030\004 \001(\010H\000\022\032\n\020characterLiteral\030\005 \001(\tH\000" +
+      "B\t\n\007literal\032\316\001\n\017MatchExpression\022\037\n\nexpre" +
+      "ssion\030\001 \002(\0132\013.Expression\0222\n\004arms\030\002 \003(\0132$" +
+      ".Expression.MatchExpression.MatchArm\022\031\n\004" +
+      "else\030\003 \001(\0132\013.Expression\032K\n\010MatchArm\022\020\n\010v" +
+      "ariable\030\001 \002(\t\022\014\n\004path\030\002 \002(\t\022\037\n\nexpressio" +
+      "n\030\003 \002(\0132\013.Expression\032\304\001\n\022SequenceExpress" +
+      "ion\022D\n\nstatements\030\001 \003(\01320.Expression.Seq" +
+      "uenceExpression.SequenceStatement\032h\n\021Seq" +
+      "uenceStatement\022!\n\nexpression\030\001 \001(\0132\013.Exp" +
+      "ressionH\000\022#\n\013declaration\030\002 \001(\0132\014.Declara" +
+      "tionH\000B\013\n\tstatementB\014\n\nexpression\"\312\004\n\013De" +
+      "claration\022?\n\023variableDeclaration\030\001 \001(\0132 " +
+      ".Declaration.VariableDeclarationH\000\022;\n\021me" +
+      "thodDeclaration\030\002 \001(\0132\036.Declaration.Meth" +
+      "odDeclarationH\000\0227\n\017typeDeclaration\030\003 \001(\013" +
+      "2\034.Declaration.TypeDeclarationH\000\032\222\001\n\023Var" +
+      "iableDeclaration\0221\n\017declarationType\030\001 \002(" +
+      "\0162\030.VariableDeclarationType\022\020\n\010variable\030" +
+      "\002 \002(\t\022\024\n\005type_\030\003 \002(\0132\005.Type\022 \n\013initializ" +
+      "er\030\004 \002(\0132\013.Expression\032\202\001\n\021MethodDeclarat" +
+      "ion\022\022\n\nmethodName\030\001 \002(\t\022#\n\narguments_\030\002 " +
+      "\003(\0132\017.MethodArgument\022\031\n\nreturnType\030\003 \002(\013" +
+      "2\005.Type\022\031\n\004body\030\004 \002(\0132\013.Expression\032[\n\017Ty" +
+      "peDeclaration\022\014\n\004name\030\001 \002(\t\022\033\n\010typeDesc\030" +
+      "\002 \002(\0132\t.TypeDesc\022\035\n\010metadata\030\003 \001(\0132\013.Exp" +
+      "ressionB\r\n\013declaration\"d\n\010TypeDesc\022\020\n\010ex" +
+      "tends_\030\001 \001(\t\022\024\n\005type_\030\002 \002(\0132\005.Type\022\032\n\003ta" +
+      "g\030\003 \001(\0132\r.TypeDesc.Tag\032\024\n\003Tag\022\r\n\005paths\030\001" +
+      " \003(\t\"\207\002\n\004Type\022*\n\014compoundType\030\001 \001(\0132\022.Ty" +
+      "pe.CompoundTypeH\000\022\016\n\004path\030\002 \001(\tH\000\022&\n\nsim" +
+      "pleType\030\003 \001(\0162\020.Type.SimpleTypeH\000\032e\n\014Com" +
+      "poundType\022\023\n\004base\030\001 \002(\0132\005.Type\022\020\n\010selfNa" +
+      "me\030\002 \002(\t\022\034\n\tdeclTypes\030\003 \003(\0132\t.DeclType\022\020" +
+      "\n\010stateful\030\004 \002(\010\"+\n\nSimpleType\022\007\n\003Top\020\001\022" +
+      "\013\n\007Nothing\020\002\022\007\n\003Dyn\020\003B\007\n\005type_\"\366\004\n\010DeclT" +
+      "ype\0222\n\014variableDecl\030\001 \001(\0132\032.DeclType.Var" +
+      "iableDeclTypeH\000\022.\n\nmethodDecl\030\002 \001(\0132\030.De" +
+      "clType.MethodDeclTypeH\000\022<\n\023declTypeDecla" +
+      "ration\030\003 \001(\0132\035.DeclType.DeclTypeDeclarat" +
+      "ionH\000\0222\n\016opaqueTypeDecl\030\004 \001(\0132\030.DeclType" +
+      ".OpaqueTypeDeclH\000\032m\n\020VariableDeclType\0221\n" +
+      "\017declarationType\030\001 \002(\0162\030.VariableDeclara" +
+      "tionType\022\020\n\010variable\030\002 \002(\t\022\024\n\005type_\030\003 \002(" +
+      "\0132\005.Type\032d\n\016MethodDeclType\022\022\n\nmethodName" +
+      "\030\001 \002(\t\022#\n\narguments_\030\002 \003(\0132\017.MethodArgum" +
+      "ent\022\031\n\nreturnType\030\003 \002(\0132\005.Type\032_\n\023DeclTy" +
+      "peDeclaration\022\014\n\004name\030\001 \002(\t\022\033\n\010typeDesc\030" +
+      "\002 \002(\0132\t.TypeDesc\022\035\n\010metadata\030\003 \001(\0132\013.Exp" +
+      "ression\032O\n\016OpaqueTypeDecl\022\014\n\004name\030\001 \002(\t\022" +
+      "\020\n\010stateful\030\002 \002(\010\022\035\n\010metadata\030\003 \001(\0132\013.Ex" +
+      "pressionB\r\n\013declaration*+\n\027VariableDecla" +
+      "rationType\022\007\n\003VAL\020\001\022\007\n\003VAR\020\002B\037\n\035wyvern.s" +
+      "tdlib.support.backend"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -34843,7 +34223,7 @@ public final class BytecodeOuterClass {
     internal_static_Expression_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Expression_descriptor,
-        new java.lang.String[] { "Variable", "NewExpression", "CallExpression", "PrimitiveCallExpression", "AccessExpression", "AssignmentExpression", "Literal", "MatchExpression", "SequenceExpression", "Expression", });
+        new java.lang.String[] { "Variable", "NewExpression", "CallExpression", "StaticCallExpression", "AccessExpression", "AssignmentExpression", "Literal", "MatchExpression", "SequenceExpression", "Expression", });
     internal_static_Expression_NewExpression_descriptor =
       internal_static_Expression_descriptor.getNestedTypes().get(0);
     internal_static_Expression_NewExpression_fieldAccessorTable = new
@@ -34856,12 +34236,12 @@ public final class BytecodeOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Expression_CallExpression_descriptor,
         new java.lang.String[] { "Receiver", "Method", "Arguments", });
-    internal_static_Expression_PrimitiveCallExpression_descriptor =
+    internal_static_Expression_StaticCallExpression_descriptor =
       internal_static_Expression_descriptor.getNestedTypes().get(2);
-    internal_static_Expression_PrimitiveCallExpression_fieldAccessorTable = new
+    internal_static_Expression_StaticCallExpression_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Expression_PrimitiveCallExpression_descriptor,
-        new java.lang.String[] { "Receiver", "PrimitiveType", "Method", "Arguments", });
+        internal_static_Expression_StaticCallExpression_descriptor,
+        new java.lang.String[] { "Receiver", "ReceiverType", "Method", "Arguments", });
     internal_static_Expression_AccessExpression_descriptor =
       internal_static_Expression_descriptor.getNestedTypes().get(3);
     internal_static_Expression_AccessExpression_fieldAccessorTable = new
@@ -34933,15 +34313,9 @@ public final class BytecodeOuterClass {
     internal_static_TypeDesc_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_TypeDesc_descriptor,
-        new java.lang.String[] { "CaseDesc", "Tag", });
-    internal_static_TypeDesc_CaseDesc_descriptor =
-      internal_static_TypeDesc_descriptor.getNestedTypes().get(0);
-    internal_static_TypeDesc_CaseDesc_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_TypeDesc_CaseDesc_descriptor,
-        new java.lang.String[] { "Extends", "Type", });
+        new java.lang.String[] { "Extends", "Type", "Tag", });
     internal_static_TypeDesc_Tag_descriptor =
-      internal_static_TypeDesc_descriptor.getNestedTypes().get(1);
+      internal_static_TypeDesc_descriptor.getNestedTypes().get(0);
     internal_static_TypeDesc_Tag_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_TypeDesc_Tag_descriptor,
