@@ -5,6 +5,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 
 public class Case extends ASTNode {
     private BindingSite site;
@@ -37,7 +38,12 @@ public class Case extends ASTNode {
     public ValueType getAdaptedPattern(ValueType matchType) {
         return adapt(this.getPattern(), matchType);
     }
-    
+
+    @Override
+    public FileLocation getLocation() {
+        return pattern.getLocation();
+    }
+
     private ValueType adapt(NominalType basePattern, ValueType matchType) {
         if (matchType instanceof NominalType) {
             return basePattern;
