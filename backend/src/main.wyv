@@ -17,6 +17,7 @@ def compileExpression(e: wyb_ast.Expression): String
     emit_js.visitExpression(r)
 
 def compile(wyb: Dyn): Unit
+    stdout.print("(function(){\"use strict\";")
     def importLoop(i: Int, c: Int): Unit
         if (i < c)
             val imp = wyb.getImports(i)
@@ -39,6 +40,7 @@ def compile(wyb: Dyn): Unit
             moduleLoop(i - 1)
     val m: Int = wyb.getModulesCount()
     moduleLoop(m - 1)
+    stdout.print("})();")
 
 val filename = support.getFirstCommandLineArg()
 val wyb = support.loadBytecode(filename)
