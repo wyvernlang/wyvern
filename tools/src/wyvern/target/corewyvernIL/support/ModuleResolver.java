@@ -51,7 +51,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
  */
 public class ModuleResolver {
     private List<File> searchPath;
-    private Path platformPath;
+    private List<Path> platformPath;
     private String platform;
     private Map<String, Module> moduleCache = new HashMap<String, Module>();
     private Deque<String> modulesBeingResolved = new ArrayDeque<>();
@@ -65,6 +65,8 @@ public class ModuleResolver {
         this.rootDir = rootDir;
         this.libDir = libDir;
         this.modules =  new HashMap<>();
+        this.platformPath = new ArrayList<>();
+
         ArrayList<File> searchPath = new ArrayList<File>();
         if (rootDir != null && !rootDir.isDirectory()) {
             throw new RuntimeException("the root path \"" + rootDir + "\" for the module resolver must be a directory");
@@ -74,12 +76,13 @@ public class ModuleResolver {
         }
         if (rootDir != null) {
             searchPath.add(rootDir);
+            platformPath.add(rootDir.toPath().resolve("platform").resolve(platform).toAbsolutePath());
         }
         if (libDir != null) {
             searchPath.add(libDir);
-            platformPath = libDir.toPath().resolve("platform").resolve(platform).toAbsolutePath();
-            searchPath.add(platformPath.toFile());
+            platformPath.add(libDir.toPath().resolve("platform").resolve(platform).toAbsolutePath());
         }
+        searchPath.addAll(platformPath.stream().map(path -> path.toFile()).collect(Collectors.toList()));
         this.searchPath = searchPath;
     }
 
@@ -311,7 +314,7 @@ public class ModuleResolver {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
-        if (file.toPath().toAbsolutePath().startsWith(platformPath)) {
+        if (platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
             // if the type is in functor form
             if (moduleType instanceof StructuralType
                     && ((StructuralType) moduleType).getDeclTypes().size() == 1
@@ -389,24 +392,28 @@ public class ModuleResolver {
         return ctx;
     }
 
-    public BytecodeOuterClass.Bytecode emitBytecode(Module module, List<TypedModuleSpec> dependencies) {
+    public SeqExpr buildPreludedExpression(Expression expression) {
         Module prelude = Globals.getPreludeModule();
-        SeqExpr preludeExpression = (SeqExpr) prelude.getExpression();
+        SeqExpr expr = new SeqExpr();
+        expr.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+        expr.merge(prelude.getExpression());
+        expr.merge(expression);
+        return expr;
+    }
 
+    public BytecodeOuterClass.Bytecode emitBytecode(Module module, List<TypedModuleSpec> dependencies) {
         BytecodeOuterClass.Bytecode.Builder wyb = BytecodeOuterClass.Bytecode.newBuilder();
         wyb.setVersion(BytecodeOuterClass.Bytecode.Version.newBuilder().setMagic(42)
                 .setMajor(0).setMinor(1))
                 .setPath("com.todo");
 
-        SeqExpr expressionWithPrelude = preludeExpression.clone();
-        expressionWithPrelude.merge(module.getExpression());
-
         BytecodeOuterClass.Module.ValueModule.Builder v = BytecodeOuterClass.Module.ValueModule.newBuilder()
                 .setType(module.getSpec().getType().emitBytecodeType())
-                .setExpression(expressionWithPrelude.emitBytecode());
+                .setExpression(buildPreludedExpression(module.getExpression()).emitBytecode());
 
         wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath("toplevel").setValueModule(v));
 
+        Module prelude = Globals.getPreludeModule();
         dependencies.addAll(prelude.getDependencies());
         List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (TypedModuleSpec spec : noDups) {
@@ -415,8 +422,7 @@ public class ModuleResolver {
             if (prelude.getDependencies().contains(spec)) {
                 e = dep.getExpression();
             } else {
-                e = preludeExpression.clone();
-                ((SeqExpr) e).merge(dep.getExpression());
+                e = buildPreludedExpression(dep.getExpression());
             }
 
             v = BytecodeOuterClass.Module.ValueModule.newBuilder()

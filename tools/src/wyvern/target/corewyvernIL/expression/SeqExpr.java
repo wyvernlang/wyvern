@@ -228,10 +228,4 @@ public class SeqExpr extends Expression {
             addExpr(body);
         }
     }
-
-    public SeqExpr clone() {
-        SeqExpr clone = new SeqExpr();
-        clone.elements.addAll(this.elements);
-        return clone;
-    }
 }

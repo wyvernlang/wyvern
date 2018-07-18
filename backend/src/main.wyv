@@ -1,10 +1,14 @@
-module def compile(stdout: Stdout, support: PlatformSupport)
+require platform
+require stdout
 
+import support
 import from_protobuf
 import wyb_ast
 import rename
 import emit_js
 import util
+
+val support = support.apply(platform)
 
 val from_protobuf = from_protobuf.apply(support)
 
@@ -36,7 +40,6 @@ def compile(wyb: Dyn): Unit
     val m: Int = wyb.getModulesCount()
     moduleLoop(m - 1)
 
-def main(): Unit
-    val filename = support.getFirstCommandLineArg()
-    val wyb = support.loadBytecode(filename)
-    compile(wyb)
+val filename = support.getFirstCommandLineArg()
+val wyb = support.loadBytecode(filename)
+compile(wyb)

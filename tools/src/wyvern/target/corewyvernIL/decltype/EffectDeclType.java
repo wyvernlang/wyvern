@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
@@ -31,6 +32,14 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
     public EffectSet getEffectSet() {
         return effectSet;
+    }
+
+    @Override
+    public BytecodeOuterClass.DeclType emitBytecode() {
+        // stub
+        return BytecodeOuterClass.DeclType.newBuilder().setOpaqueTypeDecl(
+                BytecodeOuterClass.DeclType.OpaqueTypeDecl.newBuilder().setName(getName()).setStateful(false)
+        ).build();
     }
 
     /** Conduct semantics check, by decomposing the effect sets of the two

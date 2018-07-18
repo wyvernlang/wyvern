@@ -103,7 +103,9 @@ public final class Globals {
 
     private static SeqExpr getPrelude() {
         if (!usePrelude) {
-            return new SeqExpr();
+            SeqExpr result = new SeqExpr();
+            result.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+            return result;
         }
         if (prelude == null) {
             if (gettingPrelude) {
@@ -116,6 +118,7 @@ public final class Globals {
             preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
             prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
             TailCallVisitor.annotate(prelude);
+            prelude.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
         }
         return prelude;
     }
@@ -161,7 +164,7 @@ public final class Globals {
         return system;
     }
 
-    private static ValueType getSystemType() {
+    public static ValueType getSystemType() {
         List<FormalArg> ifTrueArgs = Arrays.asList(
                 new FormalArg("trueBranch", Util.unitToDynType()),
                 new FormalArg("falseBranch", Util.unitToDynType()));
@@ -226,7 +229,7 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
         ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType());
         declTypes.add(new ConcreteTypeMember("Platform", platformType));
-        NominalType systemPlatform = new NominalType("system", "Platform");
+        NominalType systemPlatform = new NominalType("this", "Platform");
         ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType());
         declTypes.add(new ConcreteTypeMember("Java", javaType));
         ExtensibleTagType javascriptType = new ExtensibleTagType(systemPlatform, Util.unitType());
@@ -243,7 +246,7 @@ public final class Globals {
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));
         declTypes.add(new EffectDeclType("ffiEffect", null, null));
-        ValueType systemType = new StructuralType(system, declTypes);
+        ValueType systemType = new StructuralType(new BindingSite("this"), declTypes);
         return systemType;
     }
 
@@ -258,7 +261,6 @@ public final class Globals {
 
     public static EvalContext getStandardEvalContext() {
         EvalContext ctx = EvalContext.empty();
-        ctx = ctx.extend(system, Globals.getSystemValue());
         SeqExpr sexpr = prelude;
         if (sexpr != null) {
             ctx = sexpr.interpretCtx(ctx).getSecond();
@@ -266,7 +268,11 @@ public final class Globals {
         return ctx;
     }
 
-    private static ObjectValue getSystemValue() {
+    private static Declaration platformTypeDeclaration(String platform) {
+        return new TypeDeclaration(platform, ((ConcreteTypeMember) getSystemType().findDecl(platform, null)).getSourceType(), FileLocation.UNKNOWN);
+    }
+
+    public static ObjectValue getSystemValue() {
         // construct a type for the system object
         List<Declaration> decls = new LinkedList<Declaration>();
         decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
@@ -276,10 +282,10 @@ public final class Globals {
         decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Nothing", new BottomType(), FileLocation.UNKNOWN));
-        decls.add(new TypeDeclaration("Java", new NominalType("this", "Java"), FileLocation.UNKNOWN));
-        decls.add(new TypeDeclaration("Platform", new NominalType("this", "Platform"), FileLocation.UNKNOWN));
-        decls.add(new TypeDeclaration("Python", new NominalType("this", "Python"), FileLocation.UNKNOWN));
-        decls.add(new TypeDeclaration("JavaScript", new NominalType("this", "JavaScript"), FileLocation.UNKNOWN));
+        decls.add(platformTypeDeclaration("Platform"));
+        decls.add(platformTypeDeclaration("Java"));
+        decls.add(platformTypeDeclaration("Python"));
+        decls.add(platformTypeDeclaration("JavaScript"));
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
         ObjectValue systemVal = new ObjectValue(decls, new BindingSite("this"), getSystemType(), null, null, EvalContext.empty());
         return systemVal;
