@@ -1,6 +1,7 @@
 require stdout
 require thread.thread
 import thread.ThreadGroup
+import thread.Thread
 
 
 def foo1() : Unit
@@ -9,7 +10,7 @@ def foo1() : Unit
 	thread.sleep(100)
 	stdout.print("2")
 
-var thread1 : thread.Thread = thread.make(() => foo1())
+var thread1 : Thread = thread.make(() => foo1())
 
 def foo2() : Unit
 	thread1.join()
@@ -18,7 +19,7 @@ def foo2() : Unit
 	stdout.print("4")
 	stdout.println()
 
-var thread2 : thread.Thread = thread.make(() => foo2())
+var thread2 : Thread = thread.make(() => foo2())
 
 val g1 = thread1.getThreadGroup()
 val g2 = thread2.getThreadGroup()

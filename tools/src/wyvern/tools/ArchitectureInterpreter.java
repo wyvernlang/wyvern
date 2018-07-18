@@ -54,6 +54,7 @@ import wyvern.tools.parsing.coreparser.arch.Node;
 import wyvern.tools.tests.TestUtil;
 
 public final class ArchitectureInterpreter {
+    protected ArchitectureInterpreter() { }
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("usage: wyvarch <filename>");
@@ -93,16 +94,9 @@ public final class ArchitectureInterpreter {
             InterpreterState state = new InterpreterState(
                     InterpreterState.PLATFORM_JAVA, new File(rootLoc),
                     new File(wyvernPath));
-            // Check architecture file
-            File f = new File(rootLoc + "/" + filepath.toString());
-            BufferedReader source = new BufferedReader(new FileReader(f));
-            ArchParser wp = new ArchParser(
-                    (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(
-                            source, "test", ArchLexer.class, ArchParserConstants.class));
-            wp.fname = filename;
-            Node start = wp.ArchDesc();
-            DeclCheckVisitor visitor = new DeclCheckVisitor(state);
-            visitor.visit((ASTArchDesc) start, null);
+
+            DeclCheckVisitor visitor = checkArchFile(rootLoc, wyvernPath, filename, filepath, state);
+
             // Process connectors and begin generation
             HashMap<String, String> connectors = visitor.getConnectors();
             for (String connectorInstance : connectors.keySet()) {
@@ -137,10 +131,10 @@ public final class ArchitectureInterpreter {
                 ValueType metadataType = metadata.getType();
                 StructuralType metadataStructure = metadataType
                         .getStructuralType(genCtx);
+
                 // Execute metadata
                 Value portCompatibility = null, connectorImpl = null,
                         connectorInit = null;
-                HashMap<String, Expression> astLib = new HashMap<>();
                 for (DeclType dt : metadataStructure.getDeclTypes()) {
                     if (dt instanceof DefDeclType) {
                         DefDeclType defdecl = (DefDeclType) dt;
@@ -169,36 +163,8 @@ public final class ArchitectureInterpreter {
                             FileLocation.UNKNOWN, connector);
                 }
                 int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
-                List<Expression> portInstances = new LinkedList<>();
-                Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
-                // getFirst is an option
-                Value value = ((Invokable) getFirst).getField("value");
-                // value is an internal.list
-                for (int i = 0; i < numPortAST; i++) {
-                    List<Value> invokeArgs = new LinkedList<>();
-                    invokeArgs.add(new IntegerLiteral(i));
-                    Value fromIList = ((Invokable) value).invoke("get", invokeArgs).executeIfThunk();
-                    // fromIList is another other
-                    Value option2 = ((Invokable) fromIList).getField("value");
-                    // a wyvern AST !!!
-                    JavaValue ast = (JavaValue) ((Invokable) option2).getField("ast");
-                    // a JavaValue !!!!!!!!!!!!!!!!
-                    JObject obj = (JObject) ast.getFObject();
-                    Object javaAST = obj.getWrappedValue();
-                    if (javaAST instanceof New) {
-                        New newAST = (New) javaAST;
-                        String moduleName = null;
-                        for (Declaration decl : newAST.getDecls()) {
-                            if (decl instanceof ModuleDeclaration) {
-                                moduleName = ((ModuleDeclaration) decl).getName();
-                            }
-                            astLib.put(moduleName, newAST);
-                            portInstances.add(newAST);
-                        }
-                    } else {
-                        System.out.println("error?");
-                    }
-                }
+                List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state);
+
                 // generate initAST
                 List<Value> testArgs = new LinkedList<>();
                 testArgs.add(javaToWyvernList(portInstances));
@@ -222,6 +188,55 @@ public final class ArchitectureInterpreter {
             e.printStackTrace();
         }
         System.out.println("~DONE~");
+    }
+
+    public static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
+                                                 Path filepath, InterpreterState state) throws ParseException, FileNotFoundException {
+        File f = new File(rootLoc + "/" + filepath.toString());
+        BufferedReader source = new BufferedReader(new FileReader(f));
+        ArchParser wp = new ArchParser(
+                (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(
+                        source, "test", ArchLexer.class, ArchParserConstants.class));
+        wp.fname = filename;
+        Node start = wp.ArchDesc();
+        DeclCheckVisitor visitor = new DeclCheckVisitor(state);
+        visitor.visit((ASTArchDesc) start, null);
+        return visitor;
+    }
+
+    public static List<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state) {
+        List<Expression> portInstances = new LinkedList<>();
+        Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
+        // getFirst is an option
+        Value value = ((Invokable) getFirst).getField("value");
+        // value is an internal.list
+        for (int i = 0; i < numPortAST; i++) {
+            List<Value> invokeArgs = new LinkedList<>();
+            invokeArgs.add(new IntegerLiteral(i));
+            Value fromIList = ((Invokable) value).invoke("get", invokeArgs).executeIfThunk();
+            // fromIList is another other
+            Value option2 = ((Invokable) fromIList).getField("value");
+            // a wyvern AST !!!
+            JavaValue ast = (JavaValue) ((Invokable) option2).getField("ast");
+            // a JavaValue !!!!!!!!!!!!!!!!
+            JObject obj = (JObject) ast.getFObject();
+            Object javaAST = obj.getWrappedValue();
+            if (javaAST instanceof New) {
+                New newAST = (New) javaAST;
+                String moduleName = null;
+                for (Declaration decl : newAST.getDecls()) {
+                    if (decl instanceof ModuleDeclaration) {
+                        moduleName = ((ModuleDeclaration) decl).getName();
+                        state.getResolver().add(newAST);
+                    }
+                    portInstances.add(newAST);
+
+                }
+            } else {
+                System.out.println("error?");
+            }
+        }
+        return portInstances;
     }
 
     public static Value javaToWyvernList(Object result) {
@@ -255,7 +270,6 @@ public final class ArchitectureInterpreter {
 
     // used to set WYVERN_HOME when called programmatically
     public static final ThreadLocal<String> wyvernHome = new ThreadLocal<String>();
-
     // used to set WYVERN_ROOT when called programmatically
     public static final ThreadLocal<String> wyvernRoot = new ThreadLocal<String>();
 }

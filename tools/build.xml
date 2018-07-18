@@ -73,7 +73,7 @@
         </javac>
     </target>
 
-    <target name="test" depends="build">
+    <target name="test" depends="build, lint">
         <property environment="env"/>
         <fail message="WYVERN_HOME environment variable is set but points at a folder that does not look like valid Wyvern folder.">
             <condition>

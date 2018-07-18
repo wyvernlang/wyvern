@@ -58,11 +58,13 @@ public class ModuleResolver {
     private InterpreterState state;
     private File rootDir;
     private File libDir;
+    private HashMap<String, IExpr> modules;
 
     public ModuleResolver(String platform, File rootDir, File libDir) {
         this.platform = platform;
         this.rootDir = rootDir;
         this.libDir = libDir;
+        this.modules =  new HashMap<>();
         ArrayList<File> searchPath = new ArrayList<File>();
         if (rootDir != null && !rootDir.isDirectory()) {
             throw new RuntimeException("the root path \"" + rootDir + "\" for the module resolver must be a directory");
