@@ -1,0 +1,5 @@
+import effects.network8
+
+val n = network8()
+n.sendData("Network8 with effects")
+n.receiveData()

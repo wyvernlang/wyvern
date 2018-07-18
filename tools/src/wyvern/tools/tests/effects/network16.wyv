@@ -1,0 +1,8 @@
+module def network16(stdout: Stdout): effects.NetworkType
+effect send = {stdout.hi}
+effect receive = {}
+var data: String = ""
+def sendData(sd: String): {} Unit
+    data = sd
+def receiveData(): {receive} String
+    data
