@@ -78,3 +78,6 @@ tools/report
 node_modules
 *.wyb
 out.js
+*/examples/*.js
+boot.js
+*.js.old

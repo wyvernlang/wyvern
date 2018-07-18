@@ -1,0 +1,9 @@
+module Float
+
+import java:wyvern.stdlib.support.Float.utils
+
+def from(str : String) : Float
+  utils.from(str)
+
+def ofInt(i : Int) : Float
+  utils.ofInt(i)

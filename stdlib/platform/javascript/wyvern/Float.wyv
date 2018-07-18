@@ -1,0 +1,9 @@
+module Float
+
+import javascript:stdlib.support.float
+
+def from(str : String) : Float
+  float.from(str)
+
+def ofInt(i : Int) : Float
+  float.ofInt(i)

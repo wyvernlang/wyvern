@@ -1,0 +1,11 @@
+module def network3(): effects.NetworkType
+effect send = {}
+effect receive = {}
+effect process = {}
+var data: String = ""
+def sendData(sd: String): {} Unit
+    data = sd
+def receiveData(): {receive} String
+    data
+def processData(): {process} String
+    receiveData()

@@ -1,0 +1,10 @@
+require stdout
+require java
+
+import support_java
+import main
+
+val support = support_java.apply(java)
+val main = main.apply(stdout, support)
+
+main.main()

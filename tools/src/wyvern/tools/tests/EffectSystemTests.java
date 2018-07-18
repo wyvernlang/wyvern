@@ -1,35 +1,23 @@
 package wyvern.tools.tests;
 
+import org.hamcrest.core.StringContains;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 /**
- * Test suite for the effect system (adapted from ExampleTests.java).
- *
- * Successful test cases have the following printout format:
- * "data sent: Network%d%d with(out) effects
- * data received"
- *
- * Test cases that should be broken are in the category of
- * @Category(CurrentlyBroken.class); test cases that should
- * be broken but pass for now due to unimplemented features
- * are commented as "work-in-progress".
- *
- * Comments related to effects: "declaration, definition, method annotation"
- * Appearance in Wyvern:
- * effect "declared_effect" = {"its_defined_effects"}
- * def method_name() : {"method_annotation_of_effects"} return_type
- *
- * @author vzhao
+ * Test suite for the effect system.
  */
 @Category(RegressionTests.class)
 public class EffectSystemTests {
@@ -40,227 +28,306 @@ public class EffectSystemTests {
         WyvernResolver.getInstance().addPath(PATH);
     }
 
-    @Test
-    public void testEffectNetwork00() throws ParseException {
-        /* Type & module def with no annotations. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork00", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    public void testEffectNetwork01() throws ParseException {
-        /* Declared in type + module def;
-         * Defined in module def;
-         * Method annotations in both. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork01", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testEffectNetwork02() throws ParseException {
-        /* No declarations. Undefined method annotations in module def (doesn't match the valid type signature,
-         * to isolate testing for just method-checking in module def). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork02", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    public void testEffectNetwork03() throws ParseException {
-        /* In addition to declarations (not defined) & method annotations in type, additional declaration &
-         * definition in module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork03", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class) // Parse error
-    public void testEffectNetwork04() throws ParseException {
-        /* "gibberish" where "{}" should be in type's method header annotation. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork04", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class) // Parse error
-    public void testEffectNetwork05() throws ParseException {
-        /* "gibberish" where "{}" should be in module def's method header annotation. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork05", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class) // Parse error
-    public void testEffectNetwork06() throws ParseException {
-        /* Bogus declaration ("effect send = stdout") in module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork06", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    public void testEffectNetwork07() throws ParseException {
-        /* Declarations + 1 defined in type;
-         * Declarations + definitions in module def;
-         * Method annotations in both.
-         */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork07", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class) // Invalid effect (actually DSL block instead)
-    public void testEffectNetwork08() throws ParseException {
-        /* Like network07, but "effect receive = {{}}" */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork08", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    public void testEffectNetwork09() throws ParseException {
-        /* No method annotations despite declarations in type + module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork09", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class) // Parse error (undefined effects in module def are taken care of by the parser)
-    public void testEffectNetwork0A() throws ParseException {
-        /* Effect undefined in module def. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0A", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testEffectNetwork0B() throws ParseException {
-        /* Nonexistent effect in method annotation in type (not in module def,
-         * but error should be reported before module def is evaluated). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0B", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testEffectNetwork0C() throws ParseException {
-        /* Int included as effect in module annotation of type (not in module def,
-         * but error should be reported before module def is evaluated). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0C", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testEffectNetwork0D() throws ParseException {
-        /* Bogus declaration ("effect send = {something.hi}") in module def (something being not an object defined)
-         * for an effect that was left undefined in the type and not actually used
-         * in a method (so that we can be sure that the checking is happening upon declaration). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0D", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testEffectNetwork0E() throws ParseException {
-        /* Bad declaration ("effect send = {stdout.hi}") in module def (stdout being an actual object that does
-         * not have the effect "hi" defined) for an effect that was left undefined in the type and not actually used
-         * in a method (so that we can be sure that the checking is happening upon declaration). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0E", Util.unitType(), Util.unitValue());
-    }
-
-    @Test
-    @Category(CurrentlyBroken.class)
-    public void testEffectNetwork0F() throws ParseException {
-        /* Same as network01 but with incorrect effect definition (effect receive = {undefined}, should report error here)
-         * and method annotation (def sendData(data : String) : {error} Unit) -- both in type signature *only*, to isolate
-         * testing in type signature. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork0F", Util.unitType(), Util.unitValue());
-    }
-
-//    @Test
-//    public void testEffectNetwork10() throws ParseException { /* Work-in-progress */
-//        /* For testing effects defined by a pure module. */
-//        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.unitType(), Util.unitValue());
-//    }
-
-    @Test
-    public void testEffectNetwork11() throws ParseException {
-        /* Same as network01 but with all effects defined in type and module def (for testing DataProcessor). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.unitType(), Util.unitValue());
-    }
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testDataProcessor() throws ParseException {
-        /* Involve real effect abstraction ("effect process = {net.receive}").
-         * Uses network11 because effects in its type are defined, to make sure that effect-checking for methods do work. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor", Util.unitType(), Util.unitValue());
+        /* Involve effect abstraction ("effect process = {net.receive}"). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor", Util.stringType(), new StringLiteral(""));
     }
 
     @Test
     public void testDataProcessor2() throws ParseException {
-        /* Involve even more effect abstractions ("effect send = {net.send}, effect process = {net.receive, send}"). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor2", Util.unitType(), Util.unitValue());
+        /* Involve even more effect abstractions: effect send = {net.send}, effect process = {net.receive, send}. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor2", Util.stringType(), new StringLiteral("From dataProcessor2"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
-    public void testDataProcessor3() throws ParseException {
-        /* Shorter version of dataProcessor2, with "effect process = {net.receive, gibberish}". */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor3", Util.unitType(), Util.unitValue());
+    public void testDataProcessor3() throws Exception {
+        /* Undefined effect is used in the right-hand side of an effect definition. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"gibberish\" is undefined at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/dataProcessor3.wyv on line 3 column 8"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor3", Util.stringType(), new StringLiteral(""));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
-    public void testDataProcessor4() throws ParseException {
-        /* Shorter version of dataProcessor2, with "effect process = {net.gibberish, process}" (i.e. recursive). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor4", Util.unitType(), Util.unitValue());
+    public void testDataProcessor4() throws Exception {
+        /* A recursive effect definition. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"process\" is being defined recursively at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/dataProcessor4.wyv on line 3 column 8"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor4", Util.stringType(), new StringLiteral(""));
     }
 
     @Test
     public void testDataProcessor5() throws ParseException {
-        /* Like dataProcessor2, but has "effect receive = {}" in addition to the use of net.receive (i.e. same name, dif paths). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor5", Util.unitType(), Util.unitValue());
+        /* A module has two effects that have the same name but different paths. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor5", Util.stringType(), new StringLiteral("From dataProcessor5"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testDataProcessor6() throws ParseException {
-        /* Similar to dataProcessor2, but method processData() has "net.receive" from one of its method calls that it did not annotate. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor6", Util.unitType(), Util.unitValue());
+        /* Method effect annotation is missing an effect. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect annotation {"));
+        expectedException.expectMessage(StringContains.containsString(".genN} on method processData is not a subtype of "
+                + "effects that method produces, which are ["));
+        expectedException.expectMessage(StringContains.containsString("net.receive"));
+        expectedException.expectMessage(StringContains.containsString(".genN"));
+        expectedException.expectMessage(StringContains.containsString("];  at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/dataProcessor6.wyv on line 5 column 5"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor6", Util.stringType(), new StringLiteral(""));
     }
 
     @Test
     public void testDataProcessor7() throws ParseException {
-        /* Similar to dataProcessor6, but method processData() over-compensates with annotation "net.send" in addition
-         * to its method call effects (and does not know that "net.send" is empty). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor7", Util.unitType(), Util.unitValue());
-    }
-
-    // Another test in which a third module takes in a data processor which takes in a network,
-    // so that the there's multiple (external) layers of effect abstraction?
-    @Test
-    public void testEffectObjNetwork00() throws ParseException {
-        /* Object notation with no effect annotations. */
-        TestUtil.doTestScriptModularly(PATH, "effects.objNetwork00", Util.unitType(), Util.unitValue());
+        /* Method processData() is annotated with more effects than it actually produces
+         * (and does not know that "net.send" is empty). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor7", Util.stringType(), new StringLiteral(""));
     }
 
     @Test
-    public void testImportTypeBug() throws ParseException {
-        /* Object notation with no effect annotations. */
-        TestUtil.doTestScriptModularly(PATH, "effects.dummyBug", Util.intType(), new IntegerLiteral(1));
+    public void testBasic() throws ParseException {
+        /* Does not use any outside objects, types, or functions */
+        TestUtil.doTestScriptModularly(PATH, "effects.testBasic", Util.stringType(), new StringLiteral("basic.m3()"));
     }
 
     @Test
-    public void testEffectObjNetwork01() throws ParseException {
-        /* Except for the "new" notation, should otherwise use the same parser code as modules. */
-        TestUtil.doTestScriptModularly(PATH, "effects.objNetwork01", Util.unitType(), Util.unitValue());
+    public void testBasic1() throws ParseException {
+        /* Uses a module that doesn't use any outside objects, types, or functions. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testBasic1", Util.stringType(), new StringLiteral("basic1.m5()"));
     }
 
     @Test
-    public void testDummy() throws ParseException {
-        /* Does not use any outside objects/types or functions */
-        TestUtil.doTestScriptModularly(PATH, "effects.dummyTest", Util.stringType(), new StringLiteral("dummyDef.m3()"));
-    }
-
-    @Test
-    public void testDummyTaker() throws ParseException {
-        /* Does not use any outside objects/types or functions other than dummyDef, which itself doesn't use any
-         * outside objects/types or functions. */
-        TestUtil.doTestScriptModularly(PATH, "effects.dummyTakerTest", Util.stringType(), new StringLiteral("dummyTakerDef.m5()"));
+    public void testFileIO() throws ParseException {
+        /* Globally available effects (system.ffiEffect) are used in effect definitions in module (only). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
     public void testFileIO1() throws ParseException {
+        /* Effects defined in a pure module are used in effect definitions in module (only). */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO1", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testFileIO2() throws ParseException {
+        /* Effects defined in a pure module are used in effect definitions in both type and module. */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger() throws ParseException {
+        expectedException.expect(ToolError.class);
+        /* A method has an effect annotation involving a globally available effect (system.ffiEffect)
+         * in module but not in type. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger1() throws ParseException {
+        /* Globally available effect (system.ffiEffect) is used to annotate a method directly,
+         * without defining any local effects. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger1", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger2() throws ParseException {
+        expectedException.expect(ToolError.class);
+        /* A method has an effect annotation, involving a passed in resource, in module but not in type. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger2", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testLogger3() throws ParseException {
+        /* The exact resource instance passed into a module functor is conditional
+         * (i.e. it is decided by an if statement). */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger3", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testNested() throws ParseException {
+        /* An object in a module's immutable field defines an effect
+         * and uses it in a method annotation inside that object. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNested", Util.intType(), new IntegerLiteral(1));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testNested2() throws ParseException {
+        /* An object in a module's immutable field defines an effect
+         * and uses it in a method annotation inside that object.
+         * Then that effect is used from outside the module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNested2", Util.intType(), new IntegerLiteral(1));
+    }
+
+    @Test
+    public void testNetwork() throws ParseException {
+        /* Declared in type and module; defined in module; method annotations in both. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork", Util.stringType(), new StringLiteral("Network with effects"));
+    }
+
+    @Test
+    public void testNetwork1() throws ParseException {
+        /* Type and module with no annotations. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork1", Util.stringType(), new StringLiteral("Network1 without effects"));
+    }
+
+    @Test
+    public void testNetwork2() throws ParseException {
+        /* No effect declarations. Undefined method annotations in module (doesn't match the valid type signature,
+         * to isolate testing for just method-checking in module). */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network2.wyv on line 5 column 5"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork2", Util.stringType(), new StringLiteral("Network2 with effects"));
+    }
+
+    @Test
+    public void testNetwork3() throws ParseException {
+        /* In addition to declarations (not defined) and method annotations in type,
+         * additional declaration and definition in module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork3", Util.stringType(), new StringLiteral("Network3 with effects"));
+    }
+
+    @Test
+    public void testNetwork4() throws ParseException {
+        /* Parse error due to an effect annotation not being enclosed in "{}" in a method annotation;
+         * also the effect is undefined. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"String\" at line 5, column 32.\n"
+                + "Was expecting one of:"));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/NetworkType4.wyt on line 5 column 22"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork4", Util.stringType(), new StringLiteral("Network4 with effects"));
+    }
+
+    @Test
+    public void testNetwork5() throws ParseException {
+        /* Parse error due to an effect annotation not being enclosed in "{}" in a method annotation in a module;
+         * however, the effect is defined. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"Unit\" at line 5, column 32.\n"
+                + "Was expecting one of:"));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network5.wyv on line 5 column 27"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork5", Util.stringType(), new StringLiteral("Network5 with effects"));
+    }
+
+    @Test
+    public void testNetwork6() throws ParseException {
+        /* Parse error due to an effect in the right-hand side of an effect definition not being enclosed in "{}" in a module. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"something\" at line 2, column 15.\n"
+                + "Was expecting:"));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network6.wyv on line 2 column 13"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork6", Util.stringType(), new StringLiteral("Network6 with effects"));
+    }
+
+    @Test
+    public void testNetwork7() throws ParseException {
+        /* Two effect declarations, one of which is defined in type; method annotations in both type and module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork7", Util.stringType(), new StringLiteral("Network7 with effects"));
+    }
+
+    @Test
+    public void testNetwork8() throws ParseException {
+        /* Invalid effect (actually DSL block instead) due to the module having "effect receive = {{}}". */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Invalid characters for effect--should not be a DSL block: "
+                + "\"effect receive = {{}}\" at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network8.wyv on line 3 column 8"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork8", Util.stringType(), new StringLiteral("Network8 with effects"));
+    }
+
+    @Test
+    public void testNetwork9() throws ParseException {
+        /* No method annotations despite effect declarations in type and module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork9", Util.stringType(), new StringLiteral("Network9 with effects"));
+    }
+
+    @Test
+    public void testNetwork10() throws ParseException {
+        /* Globally available effects defined in a pure module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork10", Util.stringType(), new StringLiteral("Network10 with effects"));
+    }
+
+    @Test
+    public void testNetwork11() throws ParseException {
+        /* All effects defined in type and module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork11", Util.stringType(), new StringLiteral("Network11 with effects"));
+    }
+
+    @Test
+    public void testNetwork12() throws ParseException {
+        /* Parse error due to an effect being undefined in a module. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"\" at line 2, column 12.\n"
+                + "Was expecting:"));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network12.wyv on line 2 column 8"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork12", Util.stringType(), new StringLiteral("Network12 with effects"));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testNetwork13() throws ParseException {
+        /* Nonexistent effect in method annotation in type (not in module,
+         * but error should be reported before module is evaluated). */
+        expectedException.expect(ToolError.class);
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork13", Util.stringType(), new StringLiteral("Network13 with effects"));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testNetwork14() throws ParseException {
+        /* Int included as effect in module annotation of type (not in module,
+         * but error should be reported before module is evaluated). */
+        expectedException.expect(ToolError.class);
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork14", Util.stringType(), new StringLiteral("Network14 with effects"));
+    }
+
+    @Test
+    public void testNetwork15() throws ParseException {
+        /* Bogus right-hand side of an effect definition in a module;
+         * the effect was left undefined in the type and isn't actually used
+         * in any method annotation (so that we can be sure that the checking is happening upon definition). */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network15.wyv on line 2 column 8"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork15", Util.stringType(), new StringLiteral("Network15 with effects"));
+    }
+
+    @Test
+    public void testNetwork16() throws ParseException {
+        /* Trying to use a nonexistent effect of an object in scope in a module;
+         * the effect was left undefined in the type and is not actually used
+         * in any method annotation (so that we can be sure that the checking is happening upon definition). */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"stdout.hi\" not found in scope at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network16.wyv on line 2 column 8"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork16", Util.stringType(), new StringLiteral("Network16 with effects"));
+    }
+
+    @Test
+    public void testNetwork17() throws ParseException {
+        /* Incorrect effect definition (effect receive = {something}, should report error here)
+         * and method annotation (def sendData(data : String) : {error} Unit) -- both in type signature *only*,
+         * to isolate testing in type signature. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "));
+        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/NetworkType17.wyt on line 3 column 10"));
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork17", Util.stringType(), new StringLiteral("Network17 with effects"));
+    }
+
+    @Test
+    public void testObjNetwork() throws ParseException {
+        /* Object with effect annotations. */
+        TestUtil.doTestScriptModularly(PATH, "effects.objNetwork", Util.stringType(), new StringLiteral("ObjNetwork with effects"));
     }
 }

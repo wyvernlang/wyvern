@@ -1,0 +1,8 @@
+module def module_foo(javascript: JavaScript)
+
+import stdout
+
+val stdout = stdout.apply(javascript)
+
+def test(): Unit
+    stdout.print("Hello world across modules\n")

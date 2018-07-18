@@ -9,77 +9,41 @@ import util
 type List = list.List
 type Option = option.Option
 
-def replaceAcc(s: String, c: String, replacement: String, acc: String): String
-    if (s == "")
-            acc
-        elif (s.substring(0, 1) == c)
-            replaceAcc(s.substring(1, s.length()), c, replacement, acc + replacement)
-        else
-            replaceAcc(s.substring(1, s.length()), c, replacement, acc + s.substring(0, 1))
+def isKeyword(s: String): Boolean
+    s == "this" || s == "if" || s == "arguments" || s == "return"
 
-// c should be one character
-def replace(s: String, c: String, replacement: String): String
-    val x = replaceAcc(s, c, replacement, "")
-    if (x.length() == 0)
-        runtime.fail("tiny")
-    x
-
+// @Speed (also it's ugly)
 def escapeVariable(s: String): String
-    replace(replace(s, "@", "at"), "-", "_")
+    util.replace(util.replace(util.replace(util.replace(s, "@", "at"), "-", "_"), "$", "_M_"), ".", "_DOT_")
 
 def renameVariable(s: String): String
-    "_" + escapeVariable(s)
+    if (isKeyword(s))
+            "_" + s
+        else
+            escapeVariable(s)
 
 def renameTypename(s: String): String
-    "t_" + escapeVariable(s)
+    "_t_" + escapeVariable(s)
 
 def renameVariablePath(s: String): String
-    val l = split(s, ".")
+    val l = util.split(s, ".")
     val j = l.map[String](p => renameVariable(p))
     util.join(j, ".")
 
-resource type VarInt
-    var x: Int
-
-def makeVarInt(n: Int): VarInt = new
-    var x: Int = n
-
-def renameTypenamePathHelper(v: VarInt, l: Int, s: String): String
-    var o: String = ""
-    if (v.x == l - 1)
-            o = renameTypename(s)
-        else
-            o = renameVariable(s)
-    v.x = v.x + 1
-    o
-
 def renameTypenamePath(s: String): String
-    val l = split(s, ".")
+    val l = util.split(s, ".")
     val len = l.length()
-    val i = makeVarInt(0)
-    val j = l.map[String](it: String => renameTypenamePathHelper(i, len, it))
-    util.join(j, ".")
-
-// assume delim is one character
-def split(s: String, delim: String) : List[String]
-    def loop(l: List[String], prev: Int, i: Int): List[String]
-        if(i == s.length())
-                l.append(s.substring(prev, i))
-                l
-            elif (s.substring(i, i+1) == delim)
-                if (prev == i)
-                        loop(l, i + 1, i +1)
-                    else
-                        l.append(s.substring(prev, i))
-                        loop(l, i + 1, i+1)
-            else
-                loop(l, prev, i+1)
-    loop(list.make[String](), 0, 0)
+    if (len == 1)
+            renameTypename(s)
+        else
+            val last = util.unwrap[String](l.get(len - 1))
+            l.remove(len - 1)
+            val path = util.join(l, ".")
+            renameVariable(path) + "." + renameTypename(last)
 
 def visitTag(tag: wyb_ast.Tag): wyb_ast.Tag = match tag:
     e: wyb_ast.ExTag => e
     dt: wyb_ast.DataTag => wyb_ast.DataTag(dt.paths.map[String](x => renameTypenamePath(x)))
-
 
 def visitTypeDesc(typeDesc: wyb_ast.TypeDesc): wyb_ast.TypeDesc
     val tdExtends = typeDesc.tdExtends.map[String](s => renameTypenamePath(s))
@@ -116,7 +80,7 @@ def visitExpression(e: wyb_ast.Expression): wyb_ast.Expression = match e:
     s: wyb_ast.StringLiteral => s
     ne: wyb_ast.NewExpression => wyb_ast.NewExpression(visitType(ne.t), renameVariable(ne.thisVariable), ne.declarations.map[wyb_ast.Declaration](d => visitDeclaration(d)))
     ce: wyb_ast.CallExpression => wyb_ast.CallExpression(visitExpression(ce.receiver), renameVariable(ce.method), visitExpressions(ce.arguments))
-    pce: wyb_ast.PrimitiveCallExpression => wyb_ast.PrimitiveCallExpression(visitExpression(pce.receiver), pce.primitiveType, pce.method, visitExpressions(pce.arguments))
+    pce: wyb_ast.StaticCallExpression => wyb_ast.StaticCallExpression(visitExpression(pce.receiver), pce.receiverType, pce.method, visitExpressions(pce.arguments))
     se: wyb_ast.SequenceExpression => wyb_ast.SequenceExpression(se.statements.map[wyb_ast.Statement](s => visitStatement(s)))
     me: wyb_ast.MatchExpression => visitMatch(me)
     ae: wyb_ast.AccessExpression => wyb_ast.AccessExpression(visitExpression(ae.e), renameVariable(ae.field))
