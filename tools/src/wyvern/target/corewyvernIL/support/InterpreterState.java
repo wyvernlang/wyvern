@@ -25,13 +25,6 @@ public class InterpreterState {
     localInterpreter.set(this);
   }
 
-  public InterpreterState(String platform, File rootDir, File libDir,
-      HashMap<String, SimpleNode> hashMap) {
-    resolver = new ModuleResolver(platform, rootDir, libDir, hashMap);
-    resolver.setInterpreterState(this);
-    localInterpreter.set(this);
-  }
-
   public ModuleResolver getResolver() {
     return resolver;
   }

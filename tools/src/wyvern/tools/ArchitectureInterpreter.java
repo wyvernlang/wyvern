@@ -217,7 +217,9 @@ public class ArchitectureInterpreter {
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
 
-                System.out.println(connectorInit);
+                JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
+                JObject initASTObj = (JObject) fromInit.getFObject();
+                Expression initAST = (Expression) initASTObj.getWrappedValue();
 
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();

@@ -66,6 +66,6 @@ type JSONCtrProperties
 			
 			val init = "import JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\n"
 //			val init = "val str : String = \"Hello World\""
-			val initAST = ast.parseExpressionNoContext(init)
+			val initAST : ast.AST = ast.parseExpressionNoContext(init)
 			initAST
 

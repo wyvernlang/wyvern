@@ -85,33 +85,6 @@ public class ModuleResolver {
     this.searchPath = searchPath;
   }
 
-  public ModuleResolver(String platform, File rootDir, File libDir,
-      HashMap<String, SimpleNode> hashMap) {
-    this.platform = platform;
-    this.rootDir = rootDir;
-    this.libDir = libDir;
-    this.mods = hashMap;
-    ArrayList<File> searchPath = new ArrayList<File>();
-    if (rootDir != null && !rootDir.isDirectory()) {
-      throw new RuntimeException("the root path \"" + rootDir
-          + "\" for the module resolver must be a directory");
-    }
-    if (libDir != null && !libDir.isDirectory()) {
-      throw new RuntimeException("the lib path \"" + libDir
-          + "\" for the module resolver must be a directory");
-    }
-    if (rootDir != null) {
-      searchPath.add(rootDir);
-    }
-    if (libDir != null) {
-      searchPath.add(libDir);
-      platformPath = libDir.toPath().resolve("platform").resolve(platform)
-          .toAbsolutePath();
-      searchPath.add(platformPath.toFile());
-    }
-    this.searchPath = searchPath;
-  }
-
   public void setInterpreterState(InterpreterState s) {
     state = s;
   }

@@ -346,11 +346,9 @@ public class AST {
                 return module;
             } else if (typAST instanceof Script) {
                 Script script = (Script) typAST;
-                script.generateIL(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                        new File(rootLoc), new File(wyvernPath))), Util.unitType(), new LinkedList<TypedModuleSpec>());
-                // empty list of dependencies?
-                // is this context enough?
-                return null;
+                Expression expr = (Expression) (script.generateIL(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                        new File(rootLoc), new File(wyvernPath))), Util.unitType(), new LinkedList<TypedModuleSpec>()));
+                return expr;
             } else {
                 return null;
             }
