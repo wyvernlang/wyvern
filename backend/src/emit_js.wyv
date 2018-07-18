@@ -45,7 +45,7 @@ def ifTrue(cond: wyb_ast.Expression, trueArm: wyb_ast.Expression, falseArm: wyb_
     val c = visitExpression(cond)
     val t = visitExpression(trueArm)
     val f = visitExpression(falseArm)
-    "(function() { if (" + c + ") { return " + t + ".apply(); } else { return " + f + ".apply(); } })()"
+    "(" + c + "?" + t + ".apply()" + ":" + f + ".apply())"
 
 def visitCallExpression(c: wyb_ast.CallExpression): String
     visitExpression(c.receiver) + "." + c.method + "(" + util.join(c.arguments.map[String](e => visitExpression(e)), ",") + ")"
