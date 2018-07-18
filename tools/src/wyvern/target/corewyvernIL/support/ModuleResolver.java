@@ -166,7 +166,17 @@ public class ModuleResolver {
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, false);
             modulesBeingResolved.add(qualifiedName);
-            moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+            if (f == null || !f.exists()) {
+                IExpr moduleAST = modules.get(qualifiedName);
+                if (moduleAST == null) {
+                    ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "module", qualifiedName);
+                } else {
+                    Module m = loadContinuation(null, qualifiedName, moduleAST, false, toplevel);
+                    moduleCache.put(qualifiedName, m);
+                }
+            } else {
+                moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+            }
             modulesBeingResolved.remove(qualifiedName);
         }
         return moduleCache.get(qualifiedName);
@@ -218,9 +228,6 @@ public class ModuleResolver {
                 names[names.length - 1] = lastName.substring(0, lastName.length() - 4) + ".wyt";
                 f = findFile2(names);
             }
-            if (f == null || !f.exists()) {
-                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, (FileLocation) null, isType ? "type" : "module", qualifiedName);
-            }
         }
         return f;
     }
@@ -255,33 +262,11 @@ public class ModuleResolver {
         return f;
     }
 
-    /**
-     * Reads the file.
-     * Parses it, generates IL, and typechecks it.
-     * In the process, loads other modules as necessary.
-     * Returns the resulting module expression.
-     *
-     * @param file
-     * @param state
-     * @return
-     */
-    public Module load(String qualifiedName, File file, boolean toplevel) {
-        boolean loadingType = file.getName().endsWith(".wyt");
-        TypedAST ast = null;
-        try {
-            ast = TestUtil.getNewAST(file);
-        } catch (ParseException e) {
-            if (e.getCurrentToken() != null) {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR,
-                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
-            } else {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
-            }
-        }
-
+    public Module loadContinuation(File file, String qualifiedName, Object ast, boolean loadingType, boolean toplevel) {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
+
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
@@ -320,6 +305,32 @@ public class ModuleResolver {
         return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel, loadingType);
     }
 
+    /**
+     * Reads the file.
+     * Parses it, generates IL, and typechecks it.
+     * In the process, loads other modules as necessary.
+     * Returns the resulting module expression.
+     *
+     * @param file
+     * @param state
+     * @return
+     */
+    public Module load(String qualifiedName, File file, boolean toplevel) {
+        boolean loadingType = file.getName().endsWith(".wyt");
+        TypedAST ast = null;
+        try {
+            ast = TestUtil.getNewAST(file);
+        } catch (ParseException e) {
+            if (e.getCurrentToken() != null) {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
+            } else {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
+            }
+        }
+        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel);
+    }
+
     private Module createAdaptedModule(File file, String qualifiedName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
                                        TypeContext ctx, boolean toplevel, boolean loadingType) {
@@ -331,7 +342,8 @@ public class ModuleResolver {
             if (moduleType instanceof StructuralType
                     && ((StructuralType) moduleType).getDeclTypes().size() == 1
                     && ((StructuralType) moduleType).getDeclTypes().get(0) instanceof DefDeclType
-                    && ((StructuralType) moduleType).getDeclTypes().get(0).getName().equals("apply")) {
+                    && ((StructuralType) moduleType).getDeclTypes().get(0).getName().equals("apply")
+                    && file != null) {
                 DefDeclType appType = (DefDeclType) ((StructuralType) moduleType).getDeclTypes().get(0);
                 // if the functor takes a system.X object for current platform type X
                 ILFactory f = ILFactory.instance();
