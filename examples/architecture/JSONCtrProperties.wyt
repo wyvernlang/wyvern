@@ -44,8 +44,14 @@ type JSONCtrProperties
 
 		def generateConnectorImpl(l : list.List[archast.PortDecl]) : list.List[ast.AST]
 			if (this.checkPortCompatibility(l) > 0)
-					val portList = list.make[ast.AST]()
-						
+					var connectorIface : String = ""
+					val portDecl = l.get(0).getOrElse(() => archast.Nil)
+					if (portDecl.getRequires() =="")
+							connectorIface = portDecl.getProvides()
+						else
+							connectorIface = portDecl.getRequires()	
+
+					val portList = list.make[ast.AST]()	
 					val CSIface_requires_port = "module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java) : CSIface\nimport io.io\nimport json\nimport io.Socket\nval io = io(java)\nval json = json(java)\ndef getVal(key : String) : String\n\tval tcpClient : Socket = io.makeSocket(jsonCtrProps.host, jsonCtrProps.prt)\n\tval out = tcpClient.getOutputStream()\n\tval in = tcpClient.getInputStream()\n\tval outData = io.makeDataOutputStream(out)\n\tval inData = io.makeDataInputStream(in)\n\toutData.writeUTF((json.serializeToJSON(key)).toString())\n\tinData.readUTF()\n"
 					val test = "module def CSIface_provides_port(java : Java)\nimport stdout\nval stdout = stdout(java)\nval a = \"A\"\ndef three() : Int\n\tstdout.print(\"three\")\n\t3\n"
 					val CSIface_provides_port = ""

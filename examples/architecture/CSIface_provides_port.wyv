@@ -15,8 +15,8 @@ def run() : Unit
 	val socket : Socket = tcpServer.accept()
 	val outData : DataOutputStream = io.makeDataOutputStream(socket.getOutputStream())
 	val inData : DataInputStream = io.makeDataInputStream(socket.getInputStream())
-	val key : String = inData.readUTF()
-	//inData.write(port.getVal(json.deserializeFromJSON(key)))
+	val key : json.JSON = json.stringToJSON(inData.readUTF())
+	outData.writeUTF(port.getVal(json.deserializeFromJSON(key)))
 	run()	
 
 val runningThread : Thread = thread.make(() => run())
