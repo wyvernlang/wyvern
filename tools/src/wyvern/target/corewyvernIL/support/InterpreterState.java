@@ -1,14 +1,13 @@
 package wyvern.target.corewyvernIL.support;
 
-import java.io.File;
-import java.util.HashMap;
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 
-import wyvern.tools.parsing.coreparser.arch.SimpleNode;
+import java.io.File;
+import java.util.ArrayList;
 
 public class InterpreterState {
     private static final ThreadLocal<InterpreterState> localInterpreter = new ThreadLocal<InterpreterState>() {
-        @Override
-        protected InterpreterState initialValue() {
+        @Override protected InterpreterState initialValue() {
             return null;
         }
     };
@@ -16,8 +15,16 @@ public class InterpreterState {
     private ModuleResolver resolver;
     private GenContext genCtx;
 
+    private ArrayList<BytecodeOuterClass.Bytecode.Import> javascriptFFIImports = new ArrayList<>();
+
+    public ArrayList<BytecodeOuterClass.Bytecode.Import> getJavascriptFFIImports() {
+        return javascriptFFIImports;
+    }
+
+
     public static final String PLATFORM_PYTHON = "python";
     public static final String PLATFORM_JAVA = "java";
+    public static final String PLATFORM_JAVASCRIPT = "javascript";
 
     public InterpreterState(String platform, File rootDir, File libDir) {
         resolver = new ModuleResolver(platform, rootDir, libDir);
@@ -32,7 +39,6 @@ public class InterpreterState {
     public GenContext getGenContext() {
         return genCtx;
     }
-
     public void setGenContext(GenContext ctx) {
         if (genCtx != null) {
             throw new RuntimeException();
@@ -40,10 +46,9 @@ public class InterpreterState {
         genCtx = ctx;
     }
 
-    /**
-     * Get the interpreter state for this thread. Admittedly this is slightly
-     * hacky, but it's a way for code to get the surrounding interpreter if it
-     * isn't passed in explicitly.
+    /** Get the interpreter state for this thread.
+     * Admittedly this is slightly hacky, but it's a way for code to get the surrounding
+     * interpreter if it isn't passed in explicitly.
      *
      * @return
      */

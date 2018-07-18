@@ -2,28 +2,28 @@
 package wyvern.tools.parsing.coreparser.arch;
 
 public interface ArchParserVisitor {
-    public Object visit(SimpleNode node, Object data);
+    Object visit(SimpleNode node, Object data);
 
-    public Object visit(ASTArchDesc node, Object data);
+    Object visit(ASTArchDesc node, Object data);
 
-    public Object visit(ASTComponentTypeDecl node, Object data);
+    Object visit(ASTComponentTypeDecl node, Object data);
 
-    public Object visit(ASTConnectorTypeDecl node, Object data);
+    Object visit(ASTConnectorTypeDecl node, Object data);
 
-    public Object visit(ASTArchitectureTypeDecl node, Object data);
+    Object visit(ASTArchitectureTypeDecl node, Object data);
 
-    public Object visit(ASTComponentDecl node, Object data);
+    Object visit(ASTComponentDecl node, Object data);
 
-    public Object visit(ASTConnectorDecl node, Object data);
+    Object visit(ASTConnectorDecl node, Object data);
 
-    public Object visit(ASTAttachmentDecl node, Object data);
+    Object visit(ASTAttachmentDecl node, Object data);
 
-    public Object visit(ASTBindingDecl node, Object data);
+    Object visit(ASTBindingDecl node, Object data);
 
-    public Object visit(ASTEntryPointDecl node, Object data);
+    Object visit(ASTEntryPointDecl node, Object data);
 
-    public Object visit(ASTPortDecl node, Object data);
+    Object visit(ASTPortDecl node, Object data);
 
-    public Object visit(ASTValDecl node, Object data);
+    Object visit(ASTValDecl node, Object data);
 }
 /* JavaCC - OriginalChecksum=d1ed00e694c4f9cc2e7a09c1da530eb6 (do not edit this line) */

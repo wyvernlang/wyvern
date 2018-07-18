@@ -40,7 +40,6 @@ import wyvern.tools.arch.lexing.ArchLexer;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.interop.FObject;
 import wyvern.tools.interop.JObject;
 import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -54,7 +53,7 @@ import wyvern.tools.parsing.coreparser.arch.DeclCheckVisitor;
 import wyvern.tools.parsing.coreparser.arch.Node;
 import wyvern.tools.tests.TestUtil;
 
-public class ArchitectureInterpreter {
+public final class ArchitectureInterpreter {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("usage: wyvarch <filename>");
@@ -90,12 +89,10 @@ public class ArchitectureInterpreter {
                         "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
                 return;
             }
-
             // Construct interpreter state
             InterpreterState state = new InterpreterState(
                     InterpreterState.PLATFORM_JAVA, new File(rootLoc),
                     new File(wyvernPath));
-
             // Check architecture file
             File f = new File(rootLoc + "/" + filepath.toString());
             BufferedReader source = new BufferedReader(new FileReader(f));
@@ -106,13 +103,10 @@ public class ArchitectureInterpreter {
             Node start = wp.ArchDesc();
             DeclCheckVisitor visitor = new DeclCheckVisitor(state);
             visitor.visit((ASTArchDesc) start, null);
-
             // Process connectors and begin generation
-
             HashMap<String, String> connectors = visitor.getConnectors();
             for (String connectorInstance : connectors.keySet()) {
                 String connector = connectors.get(connectorInstance);
-
                 HashSet<String> fullports = visitor.getAttachments()
                         .get(connectorInstance);
                 HashSet<String> ports = new HashSet<>();
@@ -122,8 +116,6 @@ public class ArchitectureInterpreter {
                     ports.add(pair[1]);
                     portobjs.add(visitor.getPortDecls().get(pair[1]));
                 }
-
-
                 // Load the connector type module and get context
                 Module m = state.getResolver().resolveType(connector + "Properties");
                 GenContext genCtx = Globals.getGenContext(state);
@@ -132,14 +124,12 @@ public class ArchitectureInterpreter {
                         m.getDependencies(), evalCtx);
                 genCtx = mSeqExpr.extendContext(genCtx);
                 evalCtx = mSeqExpr.interpretCtx(evalCtx).getSecond();
-
                 // Get AST node
                 TypedModuleSpec mSpec = m.getSpec();
                 ValueType mType = mSpec.getType();
                 StructuralType mSType = mType.getStructuralType(genCtx);
                 ConcreteTypeMember connectorDecl = (ConcreteTypeMember) mSType
                         .findDecl(connector + "Properties", genCtx);
-
                 // Interpret type and get metadata
                 ConcreteTypeMember contype = (ConcreteTypeMember) connectorDecl
                         .interpret(evalCtx);
@@ -147,7 +137,6 @@ public class ArchitectureInterpreter {
                 ValueType metadataType = metadata.getType();
                 StructuralType metadataStructure = metadataType
                         .getStructuralType(genCtx);
-
                 // Execute metadata
                 Value portCompatibility = null, connectorImpl = null,
                         connectorInit = null;
@@ -207,27 +196,22 @@ public class ArchitectureInterpreter {
                             portInstances.add(newAST);
                         }
                     } else {
-                        // error?
+                        System.out.println("error?");
                     }
                 }
-
                 // generate initAST
                 List<Value> testArgs = new LinkedList<>();
                 testArgs.add(javaToWyvernList(portInstances));
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
-
                 JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
                 JObject initASTObj = (JObject) fromInit.getFObject();
                 Expression initAST = (Expression) initASTObj.getWrappedValue();
-
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
                 for (String component : entrypoints.keySet()) {
                     String entrypoint = entrypoints.get(component);
-
                     String initScript = component + "." + entrypoint + "()";
-
                 }
             }
         } catch (ToolError e) {

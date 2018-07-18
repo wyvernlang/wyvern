@@ -142,6 +142,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
         node.collectPorts();
         if (!node.checkModule(state)) {
             // module def not found HANDLED IN CHECKMODULE
+            return super.visit(node, data);
         } else {
             componentTypes.put(node.getTypeName(), node);
         }
@@ -157,6 +158,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
         node.collectVals();
         if (!node.checkModule(state)) {
             // module not found HANDLED IN CHECKMODULE
+            return super.visit(node, data);
         } else {
             connectorTypes.add(node.getTypeName());
         }
