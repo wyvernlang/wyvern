@@ -173,6 +173,7 @@ public final class ArchitectureInterpreter {
                 JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
                 JObject initASTObj = (JObject) fromInit.getFObject();
                 Expression initAST = (Expression) initASTObj.getWrappedValue();
+
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
                 for (String component : entrypoints.keySet()) {
@@ -180,11 +181,7 @@ public final class ArchitectureInterpreter {
                     String initScript = component + "." + entrypoint + "()";
                 }
             }
-        } catch (ToolError e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (ToolError | FileNotFoundException | ParseException e) {
             e.printStackTrace();
         }
         System.out.println("~DONE~");
