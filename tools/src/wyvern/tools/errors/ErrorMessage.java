@@ -129,7 +129,8 @@ public enum ErrorMessage {
     MEMBER_NOT_DECLARED("%ARG \"%ARG\" has not been declared", 2),
     ARCH_TYPE_NOT_DEFINED("%ARG type \"%ARG\" if not defined", 2),
     CONNECTOR_VAL_INCONSISTENCY("type properties and connector \"%ARG\" have inconsistent val declarations", 1),
-    INVALID_CONNECTOR_METADATA("properties of connector \"%ARG\" contain invalid metadata", 1);
+    INVALID_CONNECTOR_METADATA("properties of connector \"%ARG\" contain invalid metadata", 1),
+    DUPLICATE_GENERATED_MODULES("multiple modules generated with name \"%ARG\"", 1);
 
     ErrorMessage(String message, int numArgs) {
         errorMessage = message;

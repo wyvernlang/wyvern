@@ -227,10 +227,9 @@ public final class ArchitectureInterpreter {
                 for (Declaration decl : newAST.getDecls()) {
                     if (decl instanceof ModuleDeclaration) {
                         moduleName = ((ModuleDeclaration) decl).getName();
-                        state.getResolver().add(newAST);
+                        state.getResolver().addModuleAST(moduleName, newAST);
                     }
                     portInstances.add(newAST);
-
                 }
             } else {
                 System.out.println("error?");

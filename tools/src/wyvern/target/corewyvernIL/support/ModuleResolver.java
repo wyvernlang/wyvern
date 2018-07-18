@@ -44,8 +44,9 @@ import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-/** Resolves abstract module paths to concrete files, then parses the files into modules.
- *  Knows the root directory
+/**
+ * Resolves abstract module paths to concrete files, then parses the files into modules.
+ * Knows the root directory
  *
  * @author aldrich
  */
@@ -64,7 +65,7 @@ public class ModuleResolver {
         this.platform = platform;
         this.rootDir = rootDir;
         this.libDir = libDir;
-        this.modules =  new HashMap<>();
+        this.modules = new HashMap<>();
         this.platformPath = new ArrayList<>();
 
         ArrayList<File> searchPath = new ArrayList<File>();
@@ -84,6 +85,14 @@ public class ModuleResolver {
         }
         searchPath.addAll(platformPath.stream().map(path -> path.toFile()).collect(Collectors.toList()));
         this.searchPath = searchPath;
+    }
+
+    public void addModuleAST(String moduleName, IExpr moduleAST) {
+        if (modules.containsKey(moduleName)) {
+            ToolError.reportError(ErrorMessage.DUPLICATE_GENERATED_MODULES, FileLocation.UNKNOWN, moduleName);
+        } else {
+            modules.put(moduleName, moduleAST);
+        }
     }
 
     public void setInterpreterState(InterpreterState s) {
@@ -139,11 +148,13 @@ public class ModuleResolver {
         return ctx;
     }
 
-    /** The main utility function for the ModuleResolver.
-     *  Accepts a string argument of the module name to import
-     *  Loads a module expression from the file (or looks it up in a cache)
-     *  Returns the uninstantiated module (a function to be applied,
-     *  or an expression to be evaluated)
+    /**
+     * The main utility function for the ModuleResolver.
+     * Accepts a string argument of the module name to import
+     * Loads a module expression from the file (or looks it up in a cache)
+     * Returns the uninstantiated module (a function to be applied,
+     * or an expression to be evaluated)
+     *
      * @throws ParseException
      */
     public Module resolveModule(String qualifiedName) {
@@ -163,6 +174,7 @@ public class ModuleResolver {
 
     /**
      * Check if trying to resolve the specified module would introduce a cyclic dependency on itself.
+     *
      * @param qualifiedName: the name of the module to resolve.
      * @throws ToolError of type ErrorMessage.IMPORT_CYCLE: if there is a cyclic dependency.
      */
@@ -180,7 +192,7 @@ public class ModuleResolver {
                 }
             }
             errorMessage.append(qualifiedName);
-            ToolError.reportError(ErrorMessage.IMPORT_CYCLE,  HasLocation.UNKNOWN, errorMessage.toString());
+            ToolError.reportError(ErrorMessage.IMPORT_CYCLE, HasLocation.UNKNOWN, errorMessage.toString());
         }
     }
 
@@ -437,13 +449,13 @@ public class ModuleResolver {
         return wyb.build();
     }
 
-    /** Wraps this program with all its dependencies.  Unlike wrapWitCtx, we do not cache values as we add dependencies.
+    /**
+     * Wraps this program with all its dependencies.  Unlike wrapWitCtx, we do not cache values as we add dependencies.
      *
      * @param program
      * @param dependencies The modules this program depends on.
-     * Duplicate modules are OK; duplicates will be eliminated, and
-     * dependencies will be sorted, before the program is linked.
-     *
+     *                     Duplicate modules are OK; duplicates will be eliminated, and
+     *                     dependencies will be sorted, before the program is linked.
      * @return
      */
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
@@ -458,15 +470,16 @@ public class ModuleResolver {
         return seqProg;
     }
 
-    /** Wraps this program with all its dependencies.  The dependencies are
+    /**
+     * Wraps this program with all its dependencies.  The dependencies are
      * evaluated to values using the ctx, and the values are cached in
      * order to reduce duplicate evaluation.
+     *
      * @param program
      * @param dependencies The modules this program depends on.
-     * Duplicate modules are OK; duplicates will be eliminated, and
-     * dependencies will be sorted, before the program is linked.
-     *
-     * @param ctx The evaluation context to use; should include the prelude if it is needed
+     *                     Duplicate modules are OK; duplicates will be eliminated, and
+     *                     dependencies will be sorted, before the program is linked.
+     * @param ctx          The evaluation context to use; should include the prelude if it is needed
      * @return
      */
     public SeqExpr wrapWithCtx(IExpr program, List<TypedModuleSpec> dependencies, EvalContext ctx) {
@@ -485,14 +498,15 @@ public class ModuleResolver {
         return seqProg;
     }
 
-    /** Constructs an executable SeqExpr consisting of the following:
-     *  - The dependencies of the prelude
-     *  - The prelude itself
-     *  - The dependencies of the main program (with the prelude's dependencies removed)
-     *  - The main program
-     *
-     *  It differs from wrap()/wrapWithCtx() mainly in that it does not turn everything into values,
-     *  which seems to create problems when exporting to Python.
+    /**
+     * Constructs an executable SeqExpr consisting of the following:
+     * - The dependencies of the prelude
+     * - The prelude itself
+     * - The dependencies of the main program (with the prelude's dependencies removed)
+     * - The main program
+     * <p>
+     * It differs from wrap()/wrapWithCtx() mainly in that it does not turn everything into values,
+     * which seems to create problems when exporting to Python.
      */
     public SeqExpr wrapForPython(IExpr program, List<TypedModuleSpec> dependencies) {
         SeqExpr seqProg = new SeqExpr();
@@ -507,8 +521,10 @@ public class ModuleResolver {
         return seqProg;
     }
 
-    /** Does not modify deps.
-     * Adds deduplicated deps to seqProg, in order from last to first. */
+    /**
+     * Does not modify deps.
+     * Adds deduplicated deps to seqProg, in order from last to first.
+     */
     private void addDeps(SeqExpr seqProg, List<TypedModuleSpec> deps) {
         List<TypedModuleSpec> noDups = sortDependencies(deps);
         for (int i = noDups.size() - 1; i >= 0; --i) {
@@ -519,7 +535,9 @@ public class ModuleResolver {
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
     }
-    /** Returns a fresh list, with duplicates eliminated.
+
+    /**
+     * Returns a fresh list, with duplicates eliminated.
      * The last occurrence of each element is left in the returned list.
      */
     private LinkedList<TypedModuleSpec> deDuplicate(List<TypedModuleSpec> dependencies) {
@@ -552,7 +570,9 @@ public class ModuleResolver {
         return libDir;
     }
 
-    /** de-duplicates dependencies and sorts them so that if A depends on B, A comes earlier in the list */
+    /**
+     * de-duplicates dependencies and sorts them so that if A depends on B, A comes earlier in the list
+     */
     public List<TypedModuleSpec> sortDependencies(List<TypedModuleSpec> dependencies) {
         LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
         noDups.sort(new Comparator<TypedModuleSpec>() {
