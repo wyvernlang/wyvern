@@ -1,0 +1,45 @@
+require platform
+require stdout
+
+import support
+import from_protobuf
+import wyb_ast
+import rename
+import emit_js
+import util
+
+val support = support.apply(platform)
+
+val from_protobuf = from_protobuf.apply(support)
+
+def compileExpression(e: wyb_ast.Expression): String
+    val r = rename.visitExpression(e)
+    emit_js.visitExpression(r)
+
+def compile(wyb: Dyn): Unit
+    def importLoop(i: Int, c: Int): Unit
+        if (i < c)
+            val imp = wyb.getImports(i)
+            val p: String = imp.getPath()
+            val n: String = imp.getName()
+            // Undesirable coupling with rename?
+            stdout.print("const " + rename.renameVariable("FFI_" + n) + " = require(process.env.WYVERN_HOME + \"/backend/" + util.replace(p, ".", "/") + "\");")
+            stdout.println()
+            importLoop(i + 1, c)
+    val c: Int = wyb.getImportsCount()
+    importLoop(0, c)
+
+    def moduleLoop(i: Int): Unit
+        val m = wyb.getModules(i)
+        val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
+        val p = "MOD$" + m.getPath()
+        // Undesirable coupling with rename?
+        stdout.print("let " + rename.renameVariable(p) + " = " + compileExpression(e) + ";")
+        if (i > 0)
+            moduleLoop(i - 1)
+    val m: Int = wyb.getModulesCount()
+    moduleLoop(m - 1)
+
+val filename = support.getFirstCommandLineArg()
+val wyb = support.loadBytecode(filename)
+compile(wyb)

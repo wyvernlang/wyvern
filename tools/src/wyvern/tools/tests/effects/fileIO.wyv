@@ -1,0 +1,10 @@
+module def fileIO(java: Java): effects.FileIO
+import java:wyvern.tools.tests.Illustrations.nativeFileIO
+effect readF = {system.ffiEffect}
+effect writeF = {system.ffiEffect}
+
+def read(): {readF} Int
+    nativeFileIO.read()
+    
+def write(x: Int): {writeF} Int
+    nativeFileIO.write(x)

@@ -74,16 +74,16 @@ public class MethodCall extends Expression {
         // Should match primitives in Globals.java
         String[] primitives = {"Int", "Float", "String", "Character", "Boolean"};
         if (receiverType instanceof NominalType && Arrays.asList(primitives).contains(((NominalType) receiverType).getTypeMember())) {
-            BytecodeOuterClass.Expression.PrimitiveCallExpression.Builder pce = BytecodeOuterClass.Expression.PrimitiveCallExpression.newBuilder()
+            BytecodeOuterClass.Expression.StaticCallExpression.Builder pce = BytecodeOuterClass.Expression.StaticCallExpression.newBuilder()
                     .setMethod(methodName)
-                    .setPrimitiveType(((NominalType) receiverType).getTypeMember())
+                    .setReceiverType(((NominalType) receiverType).getTypeMember())
                     .setReceiver(((Expression) objectExpr).emitBytecode());
 
             for (IExpr expr : args) {
                 Expression e = (Expression) expr;
                 pce.addArguments(e.emitBytecode());
             }
-            return BytecodeOuterClass.Expression.newBuilder().setPrimitiveCallExpression(pce).build();
+            return BytecodeOuterClass.Expression.newBuilder().setStaticCallExpression(pce).build();
         } else {
             BytecodeOuterClass.Expression.CallExpression.Builder ce = BytecodeOuterClass.Expression.CallExpression.newBuilder()
                     .setMethod(methodName)

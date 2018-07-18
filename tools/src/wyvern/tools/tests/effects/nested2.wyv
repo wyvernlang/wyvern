@@ -1,0 +1,7 @@
+module nested2
+import effects.nested
+
+val y = nested.x
+
+def callId(a: Int): {y.e} Int
+  y.id(a)

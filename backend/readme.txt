@@ -1,37 +1,30 @@
-In the current state of the backend, most unmodified programs do not work
-because modules and ffi aren't implemented. I wrote some some hand-modified
-programs that do work currently and put them in the examples/ directory
+To test out the backend, install the necessary nodejs dependencies and then
+bootstrap. Bootstrapping takes ~8min on a reasonably fast machine.
 
-Here's how to run one of them. Note that some examples take a very long time to
-compile because the performance of the wyvern interpreter isn't the best right
-now. lambda.wyv takes ~2min to compile and most other programs take ~5-30s on a
-fast computer.
+$ cd wyvern/backend
+$ npm install
+$ ./bootstrap.sh
 
-First run the frontend bytecode compiler on the program.
+This will automatically do a sanity check to ensure that the bootstrapped
+compiler correctly compiles itself.
 
-$ cd wyvern/backend/
-$ wyby examples/mandelbrot.wyv # wyby is in wyvern/bin
+Then, all of the examples in the examples directory can be run with
 
-This prints the program's CoreWyvernIL for debugging purposes and writes out
-examples/mandelbrot.wyb
+$ ./test.sh
 
-Edit src/backend.wyv's loadBytecode() line at the end of the file to load the
-desired bytecode file (wyvern doesn't have command line arguments right now).
+Any wyvern file should be runnable with
 
-$ vim src/backend.wyv
+$ ./test.sh path/to/file.wyv
 
-And change the line near the end:
+If you make changes to the compiler and want to rebuild, run
 
-"val wyb = bytecode.loadBytecode("../examples/mandelbrot.wyb")"
+$ ./self-bootstrap.sh
 
-Now you can run the backend:
-
-$ cd src/ # need to be here for wyvern modules to resolve
-$ wyvern backend.wyv > out.js
-$ node out.js
-
-Right now the generated code is very poorly formatted, so if you want to look
-at it a javascript prettifier like prettier is recommended.
+The old boot.js will be moved to boot.js.old. Sanity checks ensuring the new
+compiler at least compiles itself will be automatically run. Note that the backend
+is designed to function with both the interpreter (java platform) and when compiled
+by itself using the javascript platform. Only a complete bootstrap will test both
+of these platforms; ./self-bootstrap.sh only uses the javascript platform.
 
 ================================================================================
 

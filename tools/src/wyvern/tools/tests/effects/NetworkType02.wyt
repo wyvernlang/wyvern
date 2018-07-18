@@ -1,3 +1,0 @@
-resource type NetworkType02		
-  def sendData(data : String) : {} Unit
-  def receiveData() : {} Unit

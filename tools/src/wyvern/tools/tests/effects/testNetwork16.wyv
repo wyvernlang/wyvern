@@ -1,0 +1,6 @@
+require stdout
+import effects.network16
+
+val n = network16(stdout)
+n.sendData("Network16 with effects")
+n.receiveData()

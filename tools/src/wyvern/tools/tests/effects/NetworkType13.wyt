@@ -1,0 +1,5 @@
+resource type NetworkType13
+  effect send
+  effect receive
+  def sendData(sd: String): {} Unit
+  def receiveData(): {unknown} String

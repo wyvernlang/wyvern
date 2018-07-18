@@ -1,6 +1,9 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
+
 import java.io.File;
+import java.util.ArrayList;
 
 public class InterpreterState {
     private static final ThreadLocal<InterpreterState> localInterpreter = new ThreadLocal<InterpreterState>() {
@@ -12,8 +15,16 @@ public class InterpreterState {
     private ModuleResolver resolver;
     private GenContext genCtx;
 
+    private ArrayList<BytecodeOuterClass.Bytecode.Import> javascriptFFIImports = new ArrayList<>();
+
+    public ArrayList<BytecodeOuterClass.Bytecode.Import> getJavascriptFFIImports() {
+        return javascriptFFIImports;
+    }
+
+
     public static final String PLATFORM_PYTHON = "python";
     public static final String PLATFORM_JAVA = "java";
+    public static final String PLATFORM_JAVASCRIPT = "javascript";
 
     public InterpreterState(String platform, File rootDir, File libDir) {
         resolver = new ModuleResolver(platform, rootDir, libDir);
