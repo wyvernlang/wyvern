@@ -1,4 +1,4 @@
-module def JavaScriptSupport(javascript: JavaScript): PlatformSupport
+module def support(javascript: JavaScript): PlatformSupport
 
 import wyvern.collections.list
 
