@@ -1,5 +1,7 @@
 package wyvern.tools.tests;
 
+import java.nio.file.Paths;
+
 import org.hamcrest.core.StringContains;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -47,8 +49,8 @@ public class EffectSystemTests {
     public void testDataProcessor3() throws Exception {
         /* Undefined effect is used in the right-hand side of an effect definition. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"gibberish\" is undefined at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/dataProcessor3.wyv on line 3 column 8"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"gibberish\" is undefined at location file "
+                + Paths.get(PATH, "effects", "dataProcessor3.wyv").toAbsolutePath().toString() + " on line 3 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor3", Util.stringType(), new StringLiteral(""));
     }
 
@@ -56,8 +58,8 @@ public class EffectSystemTests {
     public void testDataProcessor4() throws Exception {
         /* A recursive effect definition. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"process\" is being defined recursively at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/dataProcessor4.wyv on line 3 column 8"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"process\" is being defined recursively at location file "
+                + Paths.get(PATH, "effects", "dataProcessor4.wyv").toAbsolutePath().toString() + " on line 3 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor4", Util.stringType(), new StringLiteral(""));
     }
 
@@ -76,8 +78,8 @@ public class EffectSystemTests {
                 + "effects that method produces, which are ["));
         expectedException.expectMessage(StringContains.containsString("net.receive"));
         expectedException.expectMessage(StringContains.containsString(".genN"));
-        expectedException.expectMessage(StringContains.containsString("];  at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/dataProcessor6.wyv on line 5 column 5"));
+        expectedException.expectMessage(StringContains.containsString("];  at location file "
+                + Paths.get(PATH, "effects", "dataProcessor6.wyv").toAbsolutePath().toString() + " on line 5 column 5"));
         TestUtil.doTestScriptModularly(PATH, "effects.testDataProcessor6", Util.stringType(), new StringLiteral(""));
     }
 
@@ -186,8 +188,8 @@ public class EffectSystemTests {
         /* No effect declarations. Undefined method annotations in module (doesn't match the valid type signature,
          * to isolate testing for just method-checking in module). */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network2.wyv on line 5 column 5"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "
+                + Paths.get(PATH, "effects", "network2.wyv").toAbsolutePath().toString() + " on line 5 column 5"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork2", Util.stringType(), new StringLiteral("Network2 with effects"));
     }
 
@@ -205,7 +207,8 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"String\" at line 5, column 32.\n"
                 + "Was expecting one of:"));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/NetworkType4.wyt on line 5 column 22"));
+        expectedException.expectMessage(StringContains.containsString(
+                Paths.get(PATH, "effects", "NetworkType4.wyt").toAbsolutePath().toString() + " on line 5 column 22"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork4", Util.stringType(), new StringLiteral("Network4 with effects"));
     }
 
@@ -216,7 +219,8 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"Unit\" at line 5, column 32.\n"
                 + "Was expecting one of:"));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network5.wyv on line 5 column 27"));
+        expectedException.expectMessage(StringContains.containsString(
+                Paths.get(PATH, "effects", "network5.wyv").toAbsolutePath().toString() + " on line 5 column 27"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork5", Util.stringType(), new StringLiteral("Network5 with effects"));
     }
 
@@ -226,7 +230,8 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"something\" at line 2, column 15.\n"
                 + "Was expecting:"));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network6.wyv on line 2 column 13"));
+        expectedException.expectMessage(StringContains.containsString(
+                Paths.get(PATH, "effects", "network6.wyv").toAbsolutePath().toString() + " on line 2 column 13"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork6", Util.stringType(), new StringLiteral("Network6 with effects"));
     }
 
@@ -242,7 +247,8 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Invalid characters for effect--should not be a DSL block: "
                 + "\"effect receive = {{}}\" at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network8.wyv on line 3 column 8"));
+        expectedException.expectMessage(StringContains.containsString(
+                Paths.get(PATH, "effects", "network8.wyv").toAbsolutePath().toString() + " on line 3 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork8", Util.stringType(), new StringLiteral("Network8 with effects"));
     }
 
@@ -270,7 +276,8 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"\" at line 2, column 12.\n"
                 + "Was expecting:"));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network12.wyv on line 2 column 8"));
+        expectedException.expectMessage(StringContains.containsString(
+                Paths.get(PATH, "effects", "network12.wyv").toAbsolutePath().toString() + " on line 2 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork12", Util.stringType(), new StringLiteral("Network12 with effects"));
     }
 
@@ -298,8 +305,8 @@ public class EffectSystemTests {
          * the effect was left undefined in the type and isn't actually used
          * in any method annotation (so that we can be sure that the checking is happening upon definition). */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network15.wyv on line 2 column 8"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "
+                + Paths.get(PATH, "effects", "network15.wyv").toAbsolutePath().toString() + " on line 2 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork15", Util.stringType(), new StringLiteral("Network15 with effects"));
     }
 
@@ -309,8 +316,8 @@ public class EffectSystemTests {
          * the effect was left undefined in the type and is not actually used
          * in any method annotation (so that we can be sure that the checking is happening upon definition). */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"stdout.hi\" not found in scope at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/network16.wyv on line 2 column 8"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"stdout.hi\" not found in scope at location file "
+                + Paths.get(PATH, "effects", "network16.wyv").toAbsolutePath().toString() + " on line 2 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork16", Util.stringType(), new StringLiteral("Network16 with effects"));
     }
 
@@ -320,8 +327,8 @@ public class EffectSystemTests {
          * and method annotation (def sendData(data : String) : {error} Unit) -- both in type signature *only*,
          * to isolate testing in type signature. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "));
-        expectedException.expectMessage(StringContains.containsString("wyvern/tools/src/wyvern/tools/tests/effects/NetworkType17.wyt on line 3 column 10"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "
+                + Paths.get(PATH, "effects", "NetworkType17.wyt").toAbsolutePath().toString() + " on line 3 column 10"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork17", Util.stringType(), new StringLiteral("Network17 with effects"));
     }
 
