@@ -11,7 +11,7 @@ exports.length = function(l) {
 exports.bufferToInteger = function(b) {
     var l = b.length;
     var n = 0;
-    for (var i = l - 1; i >= 0; i--) {
+    for (var i = 0; i < b.length; i++) {
         n *= 256;
         n += b[i];
     }

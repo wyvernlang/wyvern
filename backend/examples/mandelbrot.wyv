@@ -1,7 +1,7 @@
 require stdout
 
 def iterateMandelbrot(a_z : Float, b_z : Float, a : Float, b : Float, c : Int) : String
-    if (c > 100)
+    if (c > 200)
             " "
         elif ((a_z*a_z - b_z*b_z + a)*(a_z*a_z - b_z*b_z + a) + (2.0*a_z*b_z + b)*(2.0*a_z*b_z + b) > 2.0)
             encode(c)

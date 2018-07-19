@@ -12,9 +12,10 @@ val support = support.apply(platform)
 
 val from_protobuf = from_protobuf.apply(support)
 
-def compileExpression(e: wyb_ast.Expression): String
+def compileModule(modulePath: String, e: wyb_ast.Expression): String
     val r = rename.visitExpression(e)
-    emit_js.visitExpression(r)
+    val e = emit_js.visitExpression(r)
+    e.lifting + "let " + rename.renameVariable(modulePath) + " = " + e.expr + ";"
 
 def compile(wyb: Dyn): Unit
     stdout.print("(function(){\"use strict\";")
@@ -35,7 +36,7 @@ def compile(wyb: Dyn): Unit
         val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
         val p = "MOD$" + m.getPath()
         // Undesirable coupling with rename?
-        stdout.print("let " + rename.renameVariable(p) + " = " + compileExpression(e) + ";")
+        stdout.print(compileModule(p, e))
         if (i > 0)
             moduleLoop(i - 1)
     val m: Int = wyb.getModulesCount()
