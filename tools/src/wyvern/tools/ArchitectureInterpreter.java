@@ -13,13 +13,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.FormalArg;
+import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
@@ -32,6 +36,7 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -172,7 +177,9 @@ public final class ArchitectureInterpreter {
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
                 JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
                 JObject initASTObj = (JObject) fromInit.getFObject();
-                Expression initAST = (Expression) initASTObj.getWrappedValue();
+                IExpr initAST = (Expression) initASTObj.getWrappedValue();
+                
+                // extend context?
 
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
