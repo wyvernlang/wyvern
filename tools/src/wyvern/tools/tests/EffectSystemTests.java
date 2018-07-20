@@ -205,8 +205,8 @@ public class EffectSystemTests {
         /* Parse error due to an effect annotation not being enclosed in "{}" in a method annotation;
          * also the effect is undefined. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"String\" at line 5, column 32.\n"
-                + "Was expecting one of:"));
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"String\" at line 5, column 32."
+                + System.lineSeparator() + "Was expecting one of:"));
         expectedException.expectMessage(StringContains.containsString(
                 Paths.get(PATH, "effects", "NetworkType4.wyt").toAbsolutePath().toString() + " on line 5 column 22"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork4", Util.stringType(), new StringLiteral("Network4 with effects"));
@@ -217,8 +217,8 @@ public class EffectSystemTests {
         /* Parse error due to an effect annotation not being enclosed in "{}" in a method annotation in a module;
          * however, the effect is defined. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"Unit\" at line 5, column 32.\n"
-                + "Was expecting one of:"));
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"Unit\" at line 5, column 32."
+                + System.lineSeparator() + "Was expecting one of:"));
         expectedException.expectMessage(StringContains.containsString(
                 Paths.get(PATH, "effects", "network5.wyv").toAbsolutePath().toString() + " on line 5 column 27"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork5", Util.stringType(), new StringLiteral("Network5 with effects"));
@@ -228,8 +228,8 @@ public class EffectSystemTests {
     public void testNetwork6() throws ParseException {
         /* Parse error due to an effect in the right-hand side of an effect definition not being enclosed in "{}" in a module. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"something\" at line 2, column 15.\n"
-                + "Was expecting:"));
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"something\" at line 2, column 15."
+                + System.lineSeparator() + "Was expecting:"));
         expectedException.expectMessage(StringContains.containsString(
                 Paths.get(PATH, "effects", "network6.wyv").toAbsolutePath().toString() + " on line 2 column 13"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork6", Util.stringType(), new StringLiteral("Network6 with effects"));
@@ -274,8 +274,8 @@ public class EffectSystemTests {
     public void testNetwork12() throws ParseException {
         /* Parse error due to an effect being undefined in a module. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"\" at line 2, column 12.\n"
-                + "Was expecting:"));
+        expectedException.expectMessage(StringContains.containsString("Parse error: Encountered \"\" at line 2, column 12."
+                + System.lineSeparator() + "Was expecting:"));
         expectedException.expectMessage(StringContains.containsString(
                 Paths.get(PATH, "effects", "network12.wyv").toAbsolutePath().toString() + " on line 2 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork12", Util.stringType(), new StringLiteral("Network12 with effects"));
