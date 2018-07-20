@@ -19,9 +19,5 @@ $WYBY main.wyv
 echo "Self-bootstrapping"
 echo -n "time: "
 time node boot.js src/main.wyb > selfboot.js
-echo "Next boot"
-echo -n "time: "
-time node selfboot.js src/main.wyb > nextboot.js
 mv boot.js boot.js.old
-mv nextboot.js boot.js
-rm selfboot.js
+mv selfboot.js boot.js

@@ -66,6 +66,7 @@ message Expression {
         required Expression receiver = 1;
         required string method = 2;
         repeated Expression arguments_ = 3;
+        required bool isTailCall = 4;
     }
     message StaticCallExpression {
         required Expression receiver = 1;
