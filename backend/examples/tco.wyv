@@ -1,0 +1,18 @@
+require stdout
+
+datatype Bool
+    True
+    False
+
+def Bool(b: Boolean): Bool
+    b.ifTrue(() => True(), () => False())
+
+def id(n: Int): Int
+    def count(n: Int, acc: Int): Int
+        match Bool(n == 0):
+            _: True => acc
+            _: False => recur count(n - 1, acc + 1)
+    count(n, 0)
+
+stdout.printInt(id(10000))
+stdout.println()

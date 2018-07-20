@@ -7,13 +7,15 @@ import wyb_ast
 import rename
 import emit_js
 import util
+import tco
 
 val support = support.apply(platform)
 
 val from_protobuf = from_protobuf.apply(support)
 
 def compileModule(modulePath: String, e: wyb_ast.Expression): String
-    val r = rename.visitExpression(e)
+    val t = tco.visitExpression(e)
+    val r = rename.visitExpression(t)
     val e = emit_js.visitExpression(r)
     e.lifting + "let " + rename.renameVariable(modulePath) + " = " + e.expr + ";"
 

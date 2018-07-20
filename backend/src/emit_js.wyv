@@ -50,12 +50,40 @@ def visitTypeDeclaration(td: wyb_ast.TypeDeclaration): String
                 else
                     defn
 
+def tcoArgsList(n: Int): List[String]
+    val l = list.make[String]()
+    def loop(l: List[String], i: Int, n: Int): Unit
+        if (i < n)
+            l.append("__" + String.ofInt(i))
+            loop(l, i+1, n)
+    loop(l, 0, n)
+    l
+
+def generateTcoPrefix(arguments: List[wyb_ast.Argument]): String
+    var l: String = ""
+    var i: Int = 0
+    def do1(a: wyb_ast.Argument): Unit
+        l = l + a.variable + " = __" + String.ofInt(i) + ";"
+        i = i + 1
+    arguments.do(a => do1(a))
+    l 
+
 def visitMethodDeclaration(md: wyb_ast.MethodDeclaration, selfName: Option[String]): String
     var selfDeclaration: String = ""
     if (selfName.isDefined)
         selfDeclaration = "let " + util.unwrap[String](selfName) + " = this;"
     val bodyJS = visitExpression(md.body)
-    md.methodName + "= function(" + util.join(md.arguments.map[String](a => a.variable), ",")+ ") { " + selfDeclaration + bodyJS.lifting + "return "  + bodyJS.expr + ";}" + "\n"
+    var tcoPrefix: String = ""
+    var tcoPostfix: String = ""
+    var arguments: String = ""
+    if (md.tco)
+            arguments = util.join(tcoArgsList(md.arguments.length()), ",")
+            tcoPrefix = util.join(md.arguments.map[String](a => "let " + a.variable + ";"), "") + md.methodName + ": while (true) {" + generateTcoPrefix(md.arguments)
+            tcoPostfix = "}"
+        else
+            arguments = util.join(md.arguments.map[String](a => a.variable), ",")
+
+    md.methodName + "= function(" + arguments + ") { " + selfDeclaration + tcoPrefix + bodyJS.lifting + "return "  + bodyJS.expr + tcoPostfix + ";}" + "\n"
 
 def visitVariableDeclaration(vd: wyb_ast.VariableDeclaration): LiftedExpression
    val initializerJS = visitExpression(vd.initializer)
@@ -72,14 +100,24 @@ def ifTrue(cond: wyb_ast.Expression, trueArm: wyb_ast.Expression, falseArm: wyb_
     val f = visitExpression(falseArm)
     LiftedExpression(c.lifting + t.lifting + f.lifting, "(" + c.expr + "?" + t.expr + ".apply()" + ":" + f.expr + ".apply())")
 
+def generateTailCall(methodName: String, argumentJS: List[LiftedExpression]): LiftedExpression
+    var l: String = ""
+    var i: Int = 0
+    def do(a: LiftedExpression): Unit
+        l = l + "__" + String.ofInt(i) + " = " + a.expr + ";"
+        i = i + 1
+    argumentJS.do(a => do(a))
+    LiftedExpression(util.join(argumentJS.map[String](a => a.lifting), "") + l + "continue " + methodName + ";", "null")
+
 def visitCallExpression(c: wyb_ast.CallExpression): LiftedExpression
     val receiverJS = visitExpression(c.receiver)
     val argumentJS = c.arguments.map[LiftedExpression](e => visitExpression(e))
-    LiftedExpression(receiverJS.lifting + util.join(argumentJS.map[String](a => a.lifting), ""), receiverJS.expr + "." + c.method + "(" + util.join(argumentJS.map[String](a => a.expr), ",") + ")")
+    var comment: String = ""
+    if (c.isTailCall)
+            generateTailCall(c.method, argumentJS)
+        else
+            LiftedExpression(receiverJS.lifting + util.join(argumentJS.map[String](a => a.lifting), ""), receiverJS.expr + "." + c.method + "(" + util.join(argumentJS.map[String](a => a.expr), ",") + ")" + comment)
 
-
-// is this the best way to get the tag information off something that's
-// potentially a refinement type?
 def newTypeExtends(nt: wyb_ast.Type): Option = match nt:
     ct: wyb_ast.CompoundType => newTypeExtends(ct.base)
     tp: wyb_ast.TypePath => option.Some[String](tp.path)
@@ -184,7 +222,7 @@ def visitStaticCallExpression(e: wyb_ast.StaticCallExpression): LiftedExpression
             assert e.arguments.length() == 0
             LiftedExpression(receiverJS.lifting, "(" + receiverJS.expr + ").length")
         elif (op == "charAt" || op == "substring" || op == "concat")
-            visitExpression(wyb_ast.CallExpression(e.receiver, op, e.arguments))
+            visitExpression(wyb_ast.CallExpression(e.receiver, op, e.arguments, false))
         elif (op == "floor")
             LiftedExpression(receiverJS.lifting, "Math.floor(" + receiverJS.expr + ")")
         elif (op == "ifTrue")
