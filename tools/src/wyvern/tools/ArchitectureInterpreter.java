@@ -178,8 +178,6 @@ public final class ArchitectureInterpreter {
                 JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
                 JObject initASTObj = (JObject) fromInit.getFObject();
                 IExpr initAST = (Expression) initASTObj.getWrappedValue();
-                
-                // extend context?
 
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();

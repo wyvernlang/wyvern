@@ -13,7 +13,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     private InterpreterState state;
     private HashMap<String, ASTComponentTypeDecl> componentTypes = new HashMap<>();
     private HashSet<String> connectorTypes = new HashSet<>();
-    private HashMap<String, String> components = new HashMap<>();
+    private HashMap<String, ASTComponentDecl> components = new HashMap<>();
     private HashMap<String, String> connectors = new HashMap<>();
     private HashMap<String, String> entrypoints = new HashMap<>();
     private HashMap<String, HashSet<String>> attachments = new HashMap<>();
@@ -27,7 +27,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
         return connectorTypes;
     }
 
-    public HashMap<String, String> getComponents() {
+    public HashMap<String, ASTComponentDecl> getComponents() {
         return components;
     }
 
@@ -73,7 +73,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
             String port = portParts[1];
             // check component declaration exists
             // get component type
-            String type = components.get(component);
+            String type = components.get(component).getType();
             if (type == null) {
                 ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
                         node.getLocation(), "component", component);
@@ -109,7 +109,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
             ToolError.reportError(ErrorMessage.ARCH_TYPE_NOT_DEFINED,
                     node.getLocation(), "component", type);
         }
-        if (components.putIfAbsent(name, type) != null) {
+        if (components.putIfAbsent(name, node) != null) {
             // duplicate members
             ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER_NAMES,
                     node.getLocation(), name);
