@@ -10,8 +10,8 @@ type JSONCtrProperties
 		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Int
 			val length = l.length()
 			type PortDecl = archast.PortDecl
-			var p1 : PortDecl = archast.Nil
-			var p2 : PortDecl = archast.Nil
+			var p1 : PortDecl = archast.NonePort
+			var p2 : PortDecl = archast.NonePort
 			if (l.length() == 2)	
 					val op1 : option.Option[PortDecl] = l.get(0)
 					val op2 : option.Option[PortDecl] = l.get(1)
@@ -45,7 +45,7 @@ type JSONCtrProperties
 		def generateConnectorImpl(l : list.List[archast.PortDecl]) : list.List[ast.AST]
 			if (this.checkPortCompatibility(l) > 0)
 					var connectorIface : String = ""
-					val portDecl = l.get(0).getOrElse(() => archast.Nil)
+					val portDecl = l.get(0).getOrElse(() => archast.NonePort)
 					if (portDecl.getRequires() =="")
 							connectorIface = portDecl.getProvides()
 						else
@@ -67,7 +67,7 @@ type JSONCtrProperties
 				else
 					list.make[ast.AST]()
 
-		def generateConnectorInit(portInstances : list.List[ast.AST]) : ast.AST
+		def generateConnectorInit(portInstances : list.List[ast.AST], compInstances : list.List[archast.ComponentDecl]) : ast.AST
 			// in the future these should be retrieved from a deployment AST
 			val hostIP = "\"localhost\""
 			val hostport = "8000"

@@ -80,7 +80,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
             }
             // check component of that type has port
             ASTComponentTypeDecl typeDecl = componentTypes
-                    .get(components.get(component));
+                    .get(components.get(component).getType());
             if (!typeDecl.getReqs().containsKey(port)
                     && !typeDecl.getProvs().containsKey(port)) {
                 ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,

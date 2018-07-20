@@ -51,6 +51,7 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.TokenManager;
 import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.parsing.coreparser.arch.ASTArchDesc;
+import wyvern.tools.parsing.coreparser.arch.ASTComponentDecl;
 import wyvern.tools.parsing.coreparser.arch.ASTPortDecl;
 import wyvern.tools.parsing.coreparser.arch.ArchParser;
 import wyvern.tools.parsing.coreparser.arch.ArchParserConstants;
@@ -109,11 +110,13 @@ public final class ArchitectureInterpreter {
                 HashSet<String> fullports = visitor.getAttachments()
                         .get(connectorInstance);
                 HashSet<String> ports = new HashSet<>();
-                List<ASTPortDecl> portobjs = new LinkedList<>();
+                List<ASTPortDecl> portObjs = new LinkedList<>();
+                List<ASTComponentDecl> compObjs = new LinkedList<>();
                 for (String p : fullports) {
                     String[] pair = p.split("\\.");
                     ports.add(pair[1]);
-                    portobjs.add(visitor.getPortDecls().get(pair[1]));
+                    portObjs.add(visitor.getPortDecls().get(pair[1]));
+                    compObjs.add(visitor.getComponents().get(pair[0]));
                 }
                 // Load the connector type module and get context
                 Module m = state.getResolver().resolveType(connector + "Properties");
@@ -146,11 +149,11 @@ public final class ArchitectureInterpreter {
                         String methodName = defdecl.getName();
                         List<Value> testArgs = new LinkedList<Value>();
                         if (methodName.equals("checkPortCompatibility")) {
-                            testArgs.add(javaToWyvernList(portobjs));
+                            testArgs.add(javaToWyvernList(portObjs));
                             portCompatibility = ((Invokable) metadata)
                                     .invoke(methodName, testArgs).executeIfThunk();
                         } else if (methodName.equals("generateConnectorImpl")) {
-                            testArgs.add(javaToWyvernList(portobjs));
+                            testArgs.add(javaToWyvernList(portObjs));
                             connectorImpl = ((Invokable) metadata)
                                     .invoke(methodName, testArgs).executeIfThunk();
                         } else if (methodName.equals("generateConnectorInit")) {
@@ -173,6 +176,7 @@ public final class ArchitectureInterpreter {
                 // generate initAST
                 List<Value> testArgs = new LinkedList<>();
                 testArgs.add(javaToWyvernList(portInstances));
+                testArgs.add(javaToWyvernList(compObjs));
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
                 JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
@@ -261,6 +265,12 @@ public final class ArchitectureInterpreter {
             declTypes.add(new DefDeclType("getProvides", Util.stringType(), new LinkedList<FormalArg>()));
             StructuralType wyvPortDeclType = new StructuralType("PortDecl", declTypes);
             return new JavaValue(JavaWrapper.wrapObject(result), wyvPortDeclType);
+        } else if (result instanceof ASTComponentDecl) {
+            List<DeclType> declTypes = new LinkedList<>();
+            declTypes.add(new DefDeclType("getType", Util.stringType(), new LinkedList<FormalArg>()));
+            declTypes.add(new DefDeclType("getName", Util.stringType(), new LinkedList<FormalArg>()));
+            StructuralType wyvCompDeclType = new StructuralType("ComponentDecl", declTypes);
+            return new JavaValue(JavaWrapper.wrapObject(result), wyvCompDeclType);
         } else if (result instanceof New) {
             return new JavaValue(JavaWrapper.wrapObject(result), new NominalType("ast", "AST"));
         } else {
