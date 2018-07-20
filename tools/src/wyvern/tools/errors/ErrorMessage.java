@@ -81,7 +81,7 @@ public enum ErrorMessage {
     UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
     UNMATCHABLE_CASE("Case type %ARG is not a subtype of match expression type %ARG: %ARG", 3),
     UNMATCHED_CASE("Matched expression %ARG has no matching case", 1),
-    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: ", 1),
+    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: %ARG", 1),
 
     // Evaluation errors
     VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

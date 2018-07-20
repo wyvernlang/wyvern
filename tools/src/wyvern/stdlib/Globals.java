@@ -66,6 +66,16 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
         javaWhiteList.add("wyvern.stdlib.support.Sys.utils");
+        javaWhiteList.add("wyvern.stdlib.support.HashMapWrapper.hashmapwrapper");
+    }
+
+    static {
+        // the whitelist that anyone can import without requiring javascript or becoming a resource module
+        // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
+        javascriptWhiteList.add("stdlib.support.runtime");
+        javascriptWhiteList.add("stdlib.support.jsinterop");
+        javascriptWhiteList.add("stdlib.support.string");
+        javascriptWhiteList.add("stdlib.support.float");
     }
 
     static {
