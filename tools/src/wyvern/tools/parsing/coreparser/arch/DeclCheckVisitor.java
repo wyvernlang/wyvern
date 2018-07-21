@@ -22,14 +22,16 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
 
     public List<DependencyGraphNode> generateDependencyGraph() {
-        HashMap<String,DependencyGraphNode> nodes = new HashMap<>();
+        // Assemble the dependency graph!
+        HashMap<String, DependencyGraphNode> nodes = new HashMap<>();
         ArrayList<DependencyGraphNode> noReqNodes = new ArrayList<>();
+        List<ASTComponentDecl> orderTopo = new LinkedList<>();
         for (String connector : attachments.keySet()) {
             HashSet<String> fullports = attachments.get(connector);
-            for (String fullport : fullports)   {
+            for (String fullport : fullports) {
                 String[] pair = fullport.split("\\.");
                 String component = pair[0];
-                String  port = pair[1];
+                String port = pair[1];
                 ASTComponentDecl compObj = components.get(component);
                 ASTComponentTypeDecl compType = componentTypes.get(compObj.getType());
                 if (!nodes.containsKey(component)) {
@@ -40,11 +42,11 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
                 if (compType.getReqs().size() == 0) {
                     noReqNodes.add(compNode);
                 }
-                for (String reqs : compType.getReqs().values())  {
-                    for (String innerfullport : fullports)   {
+                for (String reqs : compType.getReqs().values()) {
+                    for (String innerfullport : fullports) {
                         String[] innerpair = innerfullport.split("\\.");
                         String innercomponent = innerpair[0];
-                        String  innerport = innerpair[1];
+                        String innerport = innerpair[1];
                         ASTComponentDecl innercompObj = components.get(innercomponent);
                         ASTComponentTypeDecl innercompType = componentTypes.get(innercompObj.getType());
                         if (!nodes.containsKey(innercomponent)) {
@@ -52,9 +54,11 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
                             nodes.put(innercomponent, innercompNode);
                         }
                         DependencyGraphNode innercompNode = nodes.get(innercomponent);
-                        for (String provs : innercompType.getProvs().values())  {
+                        for (String provs : innercompType.getProvs().values()) {
                             if (provs.equals(reqs)) {
-                                compNode.addDependency(innercompNode);
+                                compNode.addRequires(innercompNode);
+                                innercompNode.addProvides(compNode);
+                                nodes.put(innercomponent,innercompNode);
                                 nodes.put(component, compNode);
                             }
                         }
@@ -63,9 +67,17 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
             }
         }
 
-        for (DependencyGraphNode node : nodes.values()) {
+        // Apply topological sort to the graph!
+        for (DependencyGraphNode indp : noReqNodes) {
 
         }
+/*
+        for (DependencyGraphNode node : nodes.values()) {
+            System.out.println(node.getComponentDecl().getName());
+            System.out.println("prov: " + node.getProvides().size());
+            System.out.println("req: " + node.getRequires().size());
+        }
+*/
         return null;
     }
 
