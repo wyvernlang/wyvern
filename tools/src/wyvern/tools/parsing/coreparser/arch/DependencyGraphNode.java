@@ -1,18 +1,17 @@
 package wyvern.tools.parsing.coreparser.arch;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 public class DependencyGraphNode {
     private ASTComponentDecl component;
-    private List<DependencyGraphNode> requires;
-    private List<DependencyGraphNode> provides;
+    private HashSet<DependencyGraphNode> requires;
+    private HashSet<DependencyGraphNode> provides;
     private boolean visited;
 
     public DependencyGraphNode(ASTComponentDecl component) {
         this.component = component;
-        requires = new ArrayList<>();
-        provides = new ArrayList<>();
+        requires = new HashSet<>();
+        provides = new HashSet<>();
         visited = false;
     }
 
@@ -37,11 +36,11 @@ public class DependencyGraphNode {
         return component;
     }
 
-    public List<DependencyGraphNode> getRequires() {
+    public HashSet<DependencyGraphNode> getRequires() {
         return requires;
     }
 
-    public List<DependencyGraphNode> getProvides() {
+    public HashSet<DependencyGraphNode> getProvides() {
         return provides;
     }
 }

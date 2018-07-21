@@ -21,11 +21,11 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     private HashMap<String, HashSet<String>> attachments = new HashMap<>();
     private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
 
-    public List<DependencyGraphNode> generateDependencyGraph() {
+    public List<ASTComponentDecl> generateDependencyGraph() {
         // Assemble the dependency graph!
         HashMap<String, DependencyGraphNode> nodes = new HashMap<>();
         ArrayList<DependencyGraphNode> noReqNodes = new ArrayList<>();
-        List<ASTComponentDecl> orderTopo = new LinkedList<>();
+        List<ASTComponentDecl> ordered = new LinkedList<>();
         for (String connector : attachments.keySet()) {
             HashSet<String> fullports = attachments.get(connector);
             for (String fullport : fullports) {
@@ -58,7 +58,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
                             if (provs.equals(reqs)) {
                                 compNode.addRequires(innercompNode);
                                 innercompNode.addProvides(compNode);
-                                nodes.put(innercomponent,innercompNode);
+                                nodes.put(innercomponent, innercompNode);
                                 nodes.put(component, compNode);
                             }
                         }
@@ -68,8 +68,14 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
         }
 
         // Apply topological sort to the graph!
-        for (DependencyGraphNode indp : noReqNodes) {
-
+        for (DependencyGraphNode m : noReqNodes) {
+            ordered.add(m.getComponentDecl());
+            for (DependencyGraphNode n : m.getProvides()) {
+                n.getProvides().remove(m);
+                if (n.getProvides().size() == 0) {
+                    ordered.add(n.getComponentDecl());
+                }
+            }
         }
 /*
         for (DependencyGraphNode node : nodes.values()) {
@@ -78,7 +84,8 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
             System.out.println("req: " + node.getRequires().size());
         }
 */
-        return null;
+
+        return ordered;
     }
 
     public HashMap<String, ASTComponentTypeDecl> getComponentTypes() {

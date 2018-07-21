@@ -60,7 +60,9 @@ import wyvern.tools.parsing.coreparser.arch.Node;
 import wyvern.tools.tests.TestUtil;
 
 public final class ArchitectureInterpreter {
-    protected ArchitectureInterpreter() { }
+    protected ArchitectureInterpreter() {
+    }
+
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("usage: wyvarch <filename>");
@@ -111,12 +113,10 @@ public final class ArchitectureInterpreter {
                         .get(connectorInstance);
                 HashSet<String> ports = new HashSet<>();
                 List<ASTPortDecl> portObjs = new LinkedList<>();
-                List<ASTComponentDecl> compObjs = new LinkedList<>();
                 for (String p : fullports) {
                     String[] pair = p.split("\\.");
                     ports.add(pair[1]);
                     portObjs.add(visitor.getPortDecls().get(pair[1]));
-                    compObjs.add(visitor.getComponents().get(pair[0]));
                 }
                 // Load the connector type module and get context
                 Module m = state.getResolver().resolveType(connector + "Properties");
@@ -173,17 +173,17 @@ public final class ArchitectureInterpreter {
                 int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
                 List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state);
 
+                List<ASTComponentDecl> compOrder = visitor.generateDependencyGraph();
+
                 // generate initAST
                 List<Value> testArgs = new LinkedList<>();
                 testArgs.add(javaToWyvernList(portInstances));
-                testArgs.add(javaToWyvernList(compObjs));
+                testArgs.add(javaToWyvernList(compOrder));
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
                 JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
                 JObject initASTObj = (JObject) fromInit.getFObject();
                 IExpr initAST = (Expression) initASTObj.getWrappedValue();
-
-                visitor.generateDependencyGraph();
 
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
