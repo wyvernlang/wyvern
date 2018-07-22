@@ -23,7 +23,6 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
@@ -181,9 +180,7 @@ public final class ArchitectureInterpreter {
                 testArgs.add(javaToWyvernList(compOrder));
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
-                JavaValue fromInit = (JavaValue) ((Invokable) connectorInit).getField("ast");
-                JObject initASTObj = (JObject) fromInit.getFObject();
-                IExpr initAST = (Expression) initASTObj.getWrappedValue();
+                List<Expression> initASTs = unwrapGeneratedAST(numPortAST, connectorInit, state);
 
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
@@ -230,6 +227,7 @@ public final class ArchitectureInterpreter {
             JObject obj = (JObject) ast.getFObject();
             Object javaAST = obj.getWrappedValue();
             if (javaAST instanceof New) {
+                // Get module def ASTs from generateConnectorImpl
                 New newAST = (New) javaAST;
                 String moduleName = null;
                 for (Declaration decl : newAST.getDecls()) {
@@ -239,6 +237,10 @@ public final class ArchitectureInterpreter {
                     }
                     portInstances.add(newAST);
                 }
+            } else if (javaAST instanceof SeqExpr) {
+                SeqExpr seqAST = (SeqExpr) javaAST;
+                portInstances.add(seqAST);
+                // Add to module resolver?
             } else {
                 System.out.println("error?");
             }

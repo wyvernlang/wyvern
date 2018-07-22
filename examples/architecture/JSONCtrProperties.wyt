@@ -64,16 +64,18 @@ type JSONCtrProperties
 				else
 					list.make[ast.AST]()
 
-		def generateConnectorInit(portInstances : list.List[ast.AST], compInstances : list.List[archast.ComponentDecl]) : ast.AST
+		def generateConnectorInit(portInstances : list.List[ast.AST], compInstances : list.List[archast.ComponentDecl]) : list.List[ast.AST]
+			val astList = list.make[ast.AST]()
 			// in the future these should be retrieved from a deployment AST
 			val hostIP = "\"localhost\""
 			val hostport = "8000"
 			
-			val client = "require java\nimport Client\nimport CSIface_requires_port\nimport CSIface\nimport JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\nval client_getInfo: CSIface = CSIface_requires_port(jsonCtrProps, java)\n"
+			val client = "require java\nimport CSIface_requires_port\nimport CSIface\nimport JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\nval client_getInfo: CSIface = CSIface_requires_port(jsonCtrProps, java)\n"
 			val server = "require io.io\nrequire java\nimport CSIface_provides_port\nimport Server\nval server = Server()\nval server_sendInfo = CSIface_provides_port(server.sendInfo, io.makeServerSocket("+hostport+"), java)\nserver_sendInfo.run()\n"
 
-//			val clientAST : ast.AST = ast.parseExpressionNoContext(client)
+			val clientAST : ast.AST = ast.parseExpressionNoContext(client)
 			val serverAST : ast.AST = ast.parseExpressionNoContext(server)
-			serverAST
-//			clientAST
+			astList.append(serverAST)
+			astList.append(clientAST)
+			astList
 
