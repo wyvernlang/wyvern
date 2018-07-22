@@ -8,10 +8,12 @@ import wyvern.target.corewyvernIL.type.TagType;
 public class Tag {
     private ObjectValue object;
     private String memberName;
+    private String nameHint; // for error messages
     
-    public Tag(ObjectValue v, String memberName) {
+    public Tag(ObjectValue v, String memberName, String nameHint) {
         object = v;
         this.memberName = memberName;
+        this.nameHint = nameHint;
     }
     
     boolean isSubTag(Tag t, EvalContext ctx) {
@@ -29,5 +31,10 @@ public class Tag {
         }
         NominalType nt = ((TagType) td.getSourceType()).getParentType(null);
         return nt == null ? null : nt.getTag(object.getEvalCtx());
+    }
+    
+    @Override
+    public String toString() {
+        return nameHint;
     }
 }
