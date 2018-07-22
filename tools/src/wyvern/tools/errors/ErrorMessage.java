@@ -80,7 +80,7 @@ public enum ErrorMessage {
     SUPERTAG_PRECEEDS_SUBTAG("Supertag %ARG preceeds subtag %ARG: unreachable case", 2),
     UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
     UNMATCHABLE_CASE("Case type %ARG is not a subtype of match expression type %ARG: %ARG", 3),
-    UNMATCHED_CASE("Matched expression %ARG has no matching case", 1),
+    UNMATCHED_CASE("Matched value with tag %ARG has no matching case arm", 1),
     CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: %ARG", 1),
 
     // Evaluation errors
