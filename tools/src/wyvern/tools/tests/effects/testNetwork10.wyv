@@ -1,7 +1,5 @@
-// for testing effects defined by pure modules
-require stdout
 import effects.network10
 
-val n10 = network10(stdout)
-n10.sendData("Network10 with effects")	// print "data sent: Network10 with effects"
-n10.receiveData()		// print "data received"
+val n = network10()
+n.sendData("Network10 with effects")
+n.receiveData()

@@ -1,0 +1,13 @@
+import effects.network3
+
+val n = network3()
+n.sendData("Network3 with effects")
+n.receiveData()
+//n.processData()
+/* network3 has NetworkType ascription, but defines a
+ * processData() that NetworkType doesn't have; therefore,
+ * calling it on n will not work. It also defines a "process"
+ * effect that NetworkType doesn't have, which should be
+ * hidden from any other modules that network3 objects are
+ * passed into.
+ */

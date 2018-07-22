@@ -1,0 +1,6 @@
+module def basic1(b: effects.Basic)
+effect e4 = {}
+effect e5 = {e4, b.e3}
+def m5(): {e5} String
+    val s: String = b.m3()
+    "basic1.m5()"

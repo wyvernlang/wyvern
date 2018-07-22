@@ -1,9 +1,8 @@
-module def network11(stdout : Stdout) : effects.NetworkType11
+module def network11(): effects.NetworkType11
 effect send = {}
 effect receive = {}
-def sendData(data : String) : {} Unit
-    stdout.print("data sent: ")
-    stdout.print(data)
-    stdout.print("\n")
-def receiveData() : {receive} Unit
-    stdout.print("data received\n")
+var data: String = ""
+def sendData(sd: String): {} Unit
+    data = sd
+def receiveData(): {receive} String
+    data

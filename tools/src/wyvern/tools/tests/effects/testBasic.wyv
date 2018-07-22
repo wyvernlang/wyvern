@@ -1,0 +1,4 @@
+import effects.basic
+
+val b = basic()
+b.m3()

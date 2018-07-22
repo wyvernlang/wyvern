@@ -6,10 +6,10 @@ public enum ErrorMessage {
     // Type errors
     ACTUAL_FORMAL_TYPE_MISMATCH("Actual argument type %ARG does not match formal argument type %ARG", 2),
     CANNOT_INFER_GENERIC("Cannot infer the type of the generic argument at the call site. "
-                       + "Please provide the type of the generic argument at the call site.", 0),
+            + "Please provide the type of the generic argument at the call site.", 0),
     EXTRA_GENERICS_AT_CALL_SITE("More generic arguments were provided at the call site than in the declaration of the function.", 0),
     MISSING_GENERICS_AT_CALL_SITE("Generic argument(s) for the method %ARG "
-                                + "were not inferrable and must be provided at the call site", 1),
+            + "were not inferrable and must be provided at the call site", 1),
     TYPE_CANNOT_BE_APPLIED("Type %ARG cannot be applied to an argument", 1),
     CANNOT_BE_ASSIGNED("Member %ARG cannot be assigned after initalization", 1),
     TYPE_NOT_DEFINED("Type %ARG is not defined", 1),
@@ -81,7 +81,7 @@ public enum ErrorMessage {
     UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
     UNMATCHABLE_CASE("Case type %ARG is not a subtype of match expression type %ARG: %ARG", 3),
     UNMATCHED_CASE("Matched expression %ARG has no matching case", 1),
-    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: ", 1),
+    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: %ARG", 1),
 
     // Evaluation errors
     VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),
@@ -103,7 +103,7 @@ public enum ErrorMessage {
     NOT_AN_FFI("Expected an FFI object as the schema in an import URI", 0),
     SCHEME_NOT_RECOGNIZED("import scheme %ARG not recognized; did you forget to \"require java\"?", 1),
     UNSAFE_JAVA_IMPORT("To import the %ARG object %ARG, make sure you \"require %ARG\" "
-                       + "(security experts only: if this object is harmless, you can add it to the built-in whitelist (see Globals.java)", 3),
+            + "(security experts only: if this object is harmless, you can add it to the built-in whitelist (see Globals.java)", 3),
     ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
     UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
     NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),
@@ -114,14 +114,14 @@ public enum ErrorMessage {
 
     // effects errors
     MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: \"effect %ARG = {%ARG}\"", 2),
-//    UNDEFINED_EFFECT("Effect undefined outside of type signature: \"%ARG\"", 1),
+    UNDEFINED_EFFECT("Effect \"%ARG\" is undefined", 1),
     EFFECT_NOT_IN_SCOPE("Effect \"%ARG\" not found in scope", 1),
-//    EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
+    //    EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
     RECURSIVE_EFFECT("Effect \"%ARG\" is being defined recursively", 1),
     UNKNOWN_EFFECT("Effects of method call \"%ARG\" are unknown", 1);
 
     ErrorMessage(String message, int numArgs) {
-        this.errorMessage = message;
+        errorMessage = message;
         this.numArgs = numArgs;
     }
 
@@ -129,7 +129,7 @@ public enum ErrorMessage {
         assert numArgs == args.length;
 
         String str = errorMessage;
-        for (String arg : args) {
+        for (final String arg : args) {
             str = str.replaceFirst("%ARG", Matcher.quoteReplacement(arg));
         }
         return str;

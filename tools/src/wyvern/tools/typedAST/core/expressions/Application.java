@@ -34,6 +34,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
     private List<TypedAST> arguments;
     private List<Type> generics;
     private FileLocation location;
+    private boolean markedAsTailCall;
 
     /**
      * Application represents a call cite for a function call.
@@ -42,13 +43,15 @@ public class Application extends AbstractExpressionAST implements CoreAST {
      * @param arguments the arguments passed at the call site
      * @param location the location of the call site in the source file
      * @param generics2 the vector of type parameters passed at the call site
+     * @param markedAsTailCall is this a `recur` function call
      */
     public Application(TypedAST function, List<TypedAST> arguments,
-            FileLocation location, List<Type> generics2) {
+            FileLocation location, List<Type> generics2, boolean markedAsTailCall) {
         this.function = (ExpressionAST) function;
         this.arguments = arguments == null ? new LinkedList<TypedAST>() : arguments;
         this.location = location;
         this.generics = (generics2 != null) ? generics2 : new LinkedList<Type>();
+        this.markedAsTailCall = markedAsTailCall;
     }
 
     public List<TypedAST> getArguments() {
@@ -101,7 +104,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
                     receiver,
                     opName,
                     args,
-                    this);
+                    this, isMarkedAsTailCall());
         }
 
         /* Otherwise look up declaration. Ensure arguments match the declaration. */
@@ -115,7 +118,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         generateILForTuples(formals, args, ctx, dependencies);
 
         // generate the call
-        return exprGen.genExprWithArgs(args, this);
+        return exprGen.genExprWithArgs(args, this, isMarkedAsTailCall());
     }
 
     private int countFormalGenerics(List<FormalArg> formals) {
@@ -302,4 +305,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         arguments = args;
     }
 
+    public boolean isMarkedAsTailCall() {
+        return markedAsTailCall;
+    }
 }

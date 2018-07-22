@@ -183,6 +183,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     terminal Token defaultKwd_t ::= /default/ in (keywds) {: RESULT = token(DEFLT,lexeme); :};
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
+    terminal Token recurKwd_t ::= /recur/ in (keywds) {: RESULT = token(RECUR,lexeme); :};
 
  	terminal Token booleanLit_t ::= /true|false/ in (keywds) {: RESULT = token(BOOLEAN_LITERAL,lexeme); :};
 	terminal Token floatingPoint_t ::= /([0]\.[0-9]*)|([1-9][0-9]*\.[0-9]+)|(\.[0-9]+)|([1-9][0-9]*\.)/ {: RESULT = token(FLOATING_POINT_LITERAL, lexeme); :};
@@ -327,6 +328,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | asKwd_t:t {: RESULT = t; :}
 	       | resourceKwd_t:t {: RESULT = t; :}
 	       | effectKwd_t:t {: RESULT = t; :}
+	       | recurKwd_t:t {: RESULT = t; :}
 	       ;
 //	       | :t {: RESULT = t; :}
 

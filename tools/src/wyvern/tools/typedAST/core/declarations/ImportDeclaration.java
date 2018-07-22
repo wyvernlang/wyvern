@@ -182,6 +182,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                     type = Globals.JAVA_IMPORT_TYPE;
                 } else if (resolver.getPlatform().equals("python")) {
                     type = Globals.PYTHON_IMPORT_TYPE;
+                } else if (resolver.getPlatform().equals("javascript")) {
+                    type = Globals.JAVASCRIPT_IMPORT_TYPE;
                 } else {
                     throw new RuntimeException("interpreter state has an unexpected platform " + resolver.getPlatform());
                 }

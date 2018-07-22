@@ -24,11 +24,11 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class DefDeclaration extends NamedDeclaration {
-    private List<FormalArg> formalArgs;
-    private ValueType type;
-    private IExpr body;
+    private final List<FormalArg> formalArgs;
+    private final ValueType type;
+    private final IExpr body;
     private boolean hasResource = false;
-    private EffectSet effectSet;
+    private final EffectSet effectSet;
 
     public DefDeclaration(String methodName, List<FormalArg> formalArgs,
             ValueType type, IExpr iExpr, FileLocation loc) {
@@ -43,13 +43,13 @@ public class DefDeclaration extends NamedDeclaration {
             throw new RuntimeException();
         }
         this.type = type;
-        this.body = iExpr;
+        body = iExpr;
         this.effectSet = effectSet;
     }
 
     @Override
     public boolean containsResource(TypeContext ctx) {
-        return this.hasResource;
+        return hasResource;
     }
 
     private void setHasResource(boolean hasResource) {
@@ -60,7 +60,7 @@ public class DefDeclaration extends NamedDeclaration {
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
         dest.append(indent).append("def ").append(getName()).append('(');
         boolean first = true;
-        for (FormalArg arg: formalArgs) {
+        for (final FormalArg arg: formalArgs) {
             if (first) {
                 first = false;
             } else {
@@ -68,7 +68,7 @@ public class DefDeclaration extends NamedDeclaration {
             }
             arg.doPrettyPrint(dest, indent);
         }
-        String newIndent = indent + "    ";
+        final String newIndent = indent + "    ";
         dest.append(") : ");
         if (effectSet != null) {
             dest.append(effectSet.toString());
@@ -78,11 +78,6 @@ public class DefDeclaration extends NamedDeclaration {
         body.doPrettyPrint(dest, newIndent);
         dest.append('\n');
     }
-
-    /*@Override
-    public String toString() {
-        return "DefDeclaration[" + getName() + "(...) : " + type + " = " + body + "]";
-    }*/
 
     public List<FormalArg> getFormalArgs() {
         return formalArgs;
@@ -108,38 +103,38 @@ public class DefDeclaration extends NamedDeclaration {
     @Override
     public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
         TypeContext methodCtx = thisCtx;
-        for (FormalArg arg : formalArgs) {
+        for (final FormalArg arg : formalArgs) {
             methodCtx = methodCtx.extend(arg.getSite(), arg.getType());
         }
-        if (!this.containsResource(methodCtx)) {
-            for (String freeVar : this.getFreeVariables()) {
-                ValueType t = (new Variable(freeVar)).typeCheck(methodCtx, null);
+        if (!containsResource(methodCtx)) {
+            for (final String freeVar : getFreeVariables()) {
+                final ValueType t = new Variable(freeVar).typeCheck(methodCtx, null);
                 if (t != null && t.isResource(methodCtx)) {
-                    this.setHasResource(true);
+                    setHasResource(true);
                     break;
                 }
             }
         }
 
         // if the method makes no claim about the effects it has, do not check its calls for effects (i.e. null)
-        EffectAccumulator effectAccumulator = (effectSet == null) ? null : new EffectAccumulator();
+        final EffectAccumulator effectAccumulator = effectSet == null ? null : new EffectAccumulator();
 
-        ValueType bodyType = body.typeCheck(methodCtx, effectAccumulator);
+        final ValueType bodyType = body.typeCheck(methodCtx, effectAccumulator);
 
         if (effectSet != null) {
             effectsCheck(methodCtx, effectAccumulator);
         }
 
-        FailureReason r = new FailureReason();
+        final FailureReason r = new FailureReason();
         if (bodyType != null && !bodyType.isSubtypeOf(getType(), methodCtx, r)) {
             // for debugging
-            ValueType resultType = getType();
+            final ValueType resultType = getType();
             bodyType.isSubtypeOf(resultType, methodCtx, r);
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
-                                  this,
-                                  "method body's type " + bodyType.desugar(methodCtx),
-                                  "declared type " + resultType.desugar(thisCtx),
-                                  r.getReason());
+                    this,
+                    "method body's type " + bodyType.desugar(methodCtx),
+                    "declared type " + resultType.desugar(thisCtx),
+                    r.getReason());
 
         }
         return new DefDeclType(getName(), type, formalArgs, effectSet);
@@ -151,16 +146,16 @@ public class DefDeclaration extends NamedDeclaration {
         if (effectSet.getEffects() != null) {
             effectSet.effectsCheck(methodCtx);
 
-            Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
+            final Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
 
             // compare method call effects with annotated ones
-            EffectDeclType actualEffects = new EffectDeclType(getName() + "-actualEffects", new EffectSet(actualEffectSet), getLocation());
-            EffectDeclType annotatedEffects = new EffectDeclType(getName() + "-annotatedEffects", effectSet, getLocation());
-            FailureReason r = new FailureReason();
+            final EffectDeclType actualEffects = new EffectDeclType(getName() + "-actualEffects", new EffectSet(actualEffectSet), getLocation());
+            final EffectDeclType annotatedEffects = new EffectDeclType(getName() + "-annotatedEffects", effectSet, getLocation());
+            final FailureReason r = new FailureReason();
             if (!actualEffects.isSubtypeOf(annotatedEffects, methodCtx, r)) { // changed from ctx
                 ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(),
-                        "set of effects from the method calls " + actualEffectSet.toString(),
-                        "set of effects specified by " + getName() + effectSet.toString(),
+                        "Effect annotation " + effectSet.toString() + " on method " + getName(),
+                        "effects that method produces, which are " + actualEffectSet.toString(),
                         r.getReason());
             }
         }
@@ -168,12 +163,12 @@ public class DefDeclaration extends NamedDeclaration {
 
     @Override
     public BytecodeOuterClass.Declaration emitBytecode() {
-        BytecodeOuterClass.Declaration.MethodDeclaration.Builder md = BytecodeOuterClass.Declaration.MethodDeclaration.newBuilder()
+        final BytecodeOuterClass.Declaration.MethodDeclaration.Builder md = BytecodeOuterClass.Declaration.MethodDeclaration.newBuilder()
                 .setMethodName(getName())
                 .setReturnType(getType().emitBytecodeType())
                 .setBody(((Expression) body).emitBytecode());
 
-        for (FormalArg arg : formalArgs) {
+        for (final FormalArg arg : formalArgs) {
             md.addArguments(arg.emitBytecode());
         }
         return BytecodeOuterClass.Declaration.newBuilder().setMethodDeclaration(md).build();
@@ -182,10 +177,10 @@ public class DefDeclaration extends NamedDeclaration {
     @Override
     public Set<String> getFreeVariables() {
         // Get all free variables in the body of the method.
-        Set<String> freeVars = body.getFreeVariables();
+        final Set<String> freeVars = body.getFreeVariables();
 
         // Remove variables that became bound in this method's scope.
-        for (FormalArg farg : formalArgs) {
+        for (final FormalArg farg : formalArgs) {
             freeVars.remove(farg.getName());
         }
         return freeVars;

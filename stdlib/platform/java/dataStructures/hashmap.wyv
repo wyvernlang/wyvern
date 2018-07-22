@@ -1,4 +1,4 @@
-module def hashmap(java : Java)
+module def hashmap()
 
 import java:wyvern.stdlib.support.HashMapWrapper.hashmapwrapper
 
