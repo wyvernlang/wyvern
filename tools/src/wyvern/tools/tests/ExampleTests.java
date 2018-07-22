@@ -1,9 +1,11 @@
 package wyvern.tools.tests;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
@@ -22,10 +24,10 @@ import wyvern.tools.tests.suites.RegressionTests;
 public class ExampleTests {
   private static final String PATH = TestUtil.EXAMPLES_PATH;
 
-  /*@Before
+  @Before
   public void setup() {
     Globals.resetState();
-  }*/
+  }
 
   @BeforeClass
   public static void setupResolver() {

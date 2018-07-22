@@ -287,9 +287,11 @@ public final class Globals {
 
     /** Resets all static state in the program.
      * Should not matter, but sometimes it has in the past when testing.
-     * The only static state should be the current InterpreterState.
+     * The only static state should be the current InterpreterState and the java types object.
      */
     public static void resetState() {
         InterpreterState.resetThreadLocalInterpreter();
+        GenUtil.resetJavaTypes();
+        usePrelude = true;
     }
 }

@@ -41,6 +41,7 @@ public class DemoTests {
 
     @Test
     public void testWebServer() throws ParseException {
+        Globals.resetState();
         Globals.setUsePrelude(true);
         TestUtil.doTestScriptModularly("webarch.driver", Util.stringType(), new StringLiteral("ha"));
         Globals.setUsePrelude(false);
