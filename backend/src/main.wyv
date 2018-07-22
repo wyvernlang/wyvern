@@ -7,16 +7,20 @@ import wyb_ast
 import rename
 import emit_js
 import util
+import tco
 
 val support = support.apply(platform)
 
 val from_protobuf = from_protobuf.apply(support)
 
-def compileExpression(e: wyb_ast.Expression): String
-    val r = rename.visitExpression(e)
-    emit_js.visitExpression(r)
+def compileModule(modulePath: String, e: wyb_ast.Expression): String
+    val t = tco.visitExpression(e)
+    val r = rename.visitExpression(t)
+    val e = emit_js.visitExpression(r)
+    e.lifting + "let " + rename.renameVariable(modulePath) + " = " + e.expr + ";"
 
 def compile(wyb: Dyn): Unit
+    stdout.print("(function(){\"use strict\";")
     def importLoop(i: Int, c: Int): Unit
         if (i < c)
             val imp = wyb.getImports(i)
@@ -34,11 +38,12 @@ def compile(wyb: Dyn): Unit
         val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
         val p = "MOD$" + m.getPath()
         // Undesirable coupling with rename?
-        stdout.print("let " + rename.renameVariable(p) + " = " + compileExpression(e) + ";")
+        stdout.print(compileModule(p, e))
         if (i > 0)
             moduleLoop(i - 1)
     val m: Int = wyb.getModulesCount()
     moduleLoop(m - 1)
+    stdout.print("})();")
 
 val filename = support.getFirstCommandLineArg()
 val wyb = support.loadBytecode(filename)

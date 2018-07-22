@@ -1,9 +1,13 @@
 require stdout
-require support_java
+require java
+
+import support
+
+val support = support.apply(java)
 
 
 // Designed to work with interpreter only right now
 
-val test = support_java.loadBytecode("main.wyb")
+val test = support.loadBytecode("../test.wyb")
 val expression = test.getModules(0).getValueModule().getExpression()
 stdout.print(test.toString())
