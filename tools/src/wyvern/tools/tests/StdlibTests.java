@@ -1,5 +1,6 @@
 package wyvern.tools.tests;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -14,11 +15,11 @@ import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
 public class StdlibTests {
-    /*@Before
+    @Before
     public void setup() {
-        Globals.resetPrelude();
-    }*/
-    
+      Globals.resetState();
+    }
+
     @Test
     public void testRegex() throws ParseException {
         // this test is independent of the standard prelude
