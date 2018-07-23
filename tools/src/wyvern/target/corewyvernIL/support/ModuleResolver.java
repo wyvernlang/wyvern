@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.Globals;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
@@ -58,6 +59,8 @@ public class ModuleResolver {
     private InterpreterState state;
     private File rootDir;
     private File libDir;
+    private SeqExpr prelude = null;
+    private Module preludeModule = null;
 
     public ModuleResolver(String platform, File rootDir, File libDir) {
         this.platform = platform;
@@ -474,7 +477,6 @@ public class ModuleResolver {
             TypedModuleSpec spec = noDups.get(i);
             Module m = resolveModule(spec.getQualifiedName());
             Value v = m.getAsValue(ctx);
-            String internalName = m.getSpec().getInternalName();
             ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(m.getSpec().getSite(), type, v /*m.getExpression()*/, true);
@@ -512,7 +514,6 @@ public class ModuleResolver {
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
             Module m = resolveModule(spec.getQualifiedName());
-            String internalName = m.getSpec().getInternalName();
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
@@ -571,5 +572,24 @@ public class ModuleResolver {
 
         });
         return noDups;
+    }
+
+    public SeqExpr getPreludeIfPresent() {
+        return prelude;
+    }
+
+    public SeqExpr loadPrelude(File file) {
+        preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
+        prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
+        TailCallVisitor.annotate(prelude);
+        prelude.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+        return prelude;
+}
+
+    public Module getPreludeModule() {
+        if (prelude == null) {
+            Globals.getPrelude();
+        }
+        return preludeModule;
     }
 }

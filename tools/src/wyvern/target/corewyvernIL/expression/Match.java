@@ -133,7 +133,7 @@ public class Match extends Expression {
             }
         }
         if (matchedCase == null && elseExpr == null) {
-            ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchValue.toString());
+            ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchTag.toString());
         }
         if (matchedCase == null) {
             return elseExpr.interpret(ctx);

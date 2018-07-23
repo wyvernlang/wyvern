@@ -1,9 +1,11 @@
 package wyvern.tools.tests;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
@@ -11,9 +13,15 @@ import wyvern.tools.tests.suites.RegressionTests;
 
 @Category(RegressionTests.class)
 public class CoreParserTests {
-    @BeforeClass public static void setupResolver() {
+    @BeforeClass public static void setup() {
         TestUtil.setPaths();
+        Globals.setUsePrelude(false);
     }
+
+    @AfterClass public static void teardown() {
+        Globals.setUsePrelude(true);  // restore the default to use the prelude
+    }
+
 
     @Test
     public void testIdentityApp() throws ParseException {

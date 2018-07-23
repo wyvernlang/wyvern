@@ -8,19 +8,22 @@ import wyvern.stdlib.Globals;
 import wyvern.stdlib.support.WyvernAssertion;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
-import wyvern.tools.errors.ToolError;
 
 @Category(RegressionTests.class)
 public class StdlibTests {
     @Before
     public void setup() {
-        Globals.resetPrelude();
+      Globals.resetState();
     }
+
     @Test
     public void testRegex() throws ParseException {
+        // this test is independent of the standard prelude
+        Globals.setUsePrelude(false);
         String input = ""
                 + "import wyvern.Int\n"
                 + "import wyvern.option\n"
@@ -29,6 +32,7 @@ public class StdlibTests {
                 + "val threeString = r.findPrefixOf(\"3 men in a tub\")\n"
                 + "Int.from(threeString.getOrElse(() => \"5\"))";
         TestUtil.doTestInt(input, 3);
+        Globals.setUsePrelude(true);
     }
 
     @Test

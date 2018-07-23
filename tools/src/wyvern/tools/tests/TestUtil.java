@@ -211,13 +211,21 @@ public final class TestUtil {
     // TODO: make other string tests call this function
     public static void doTest(String input, ValueType expectedType, Value expectedResult) throws ParseException {
         ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
-        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                new File(BASE_PATH),
-                new File(LIB_PATH)));
+        GenContext genCtx = Globals.getGenContext(getInterpreterState());
         final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         IExpr program = ast.generateIL(genCtx, null, dependencies);
         program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
         TestUtil.doChecks(program, expectedType, expectedResult);
+    }
+
+    private static InterpreterState getInterpreterState() {
+        InterpreterState s = InterpreterState.getLocalThreadInterpreter();
+        if (s == null) {
+            s = new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                    new File(BASE_PATH),
+                    new File(LIB_PATH));
+        }
+        return s;
     }
 
     // TODO: make other script tests call this function
@@ -272,14 +280,17 @@ public final class TestUtil {
         }
     }
 
+    /** Evaluates the input, using the interpreter state from the current thread if possible */
     public static Value evaluate(String input) throws ParseException {
         // Parse to AST
         ExpressionAST ast = (ExpressionAST) getNewAST(input, "eval input");
 
         // Generate IL
-        GenContext genCtx = Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                new File(BASE_PATH),
-                new File(LIB_PATH)));
+        InterpreterState state = InterpreterState.getLocalThreadInterpreter();
+        if (state == null) {
+            state = getInterpreterState();
+        }
+        GenContext genCtx = Globals.getGenContext(state);
         final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         IExpr program = ast.generateIL(genCtx, null, dependencies);
         program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);

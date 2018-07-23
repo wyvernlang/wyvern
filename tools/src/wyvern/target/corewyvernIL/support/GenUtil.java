@@ -7,7 +7,7 @@ public final class GenUtil {
     private GenUtil() { }
     public static final String javaTypesObjectName = "java$types";
     private static final Variable javaTypesObject = new Variable(javaTypesObjectName);
-    private static ValueType javaTypes = null;
+    private static ValueType javaTypes = new StructuralTypesFromJava();;
 
     public static ValueType javaClassToWyvernType(Class<?> javaClass, TypeContext ctx) {
         //return javaClassToWyvernTypeRec(javaClass, new HashSet<String>());
@@ -93,15 +93,19 @@ public final class GenUtil {
         return javaTypesObject;
     }
 
+    public static void resetJavaTypes() {
+        javaTypes = new StructuralTypesFromJava();
+    }
+    
     public static GenContext ensureJavaTypesPresent(GenContext ctx) {
         if (ctx.isPresent(javaTypesObjectName, true)) {
             return ctx;
         }
         // we just reuse the Java structural types object
         // no harm in this provided we aren't loading multiple versions of the same Java class
-        if (javaTypes == null) {
-            javaTypes = new StructuralTypesFromJava();
-        }
+        //if (javaTypes == null) {
+        //    javaTypes = new StructuralTypesFromJava();
+        //}
         return ctx.extend(javaTypesObjectName, javaTypesObject, javaTypes);
     }
 }

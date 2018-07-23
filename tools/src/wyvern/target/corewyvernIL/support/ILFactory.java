@@ -16,7 +16,7 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public final class ILFactory {
-    private static ILFactory instance = new ILFactory();
+    private static final ILFactory instance = new ILFactory();
     public static ILFactory instance() {
         return instance;
     }

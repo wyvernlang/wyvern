@@ -9,7 +9,6 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
@@ -33,8 +32,8 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.VarGenContext;
-import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.BottomType;
+import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -53,8 +52,6 @@ public final class Globals {
     private static final Set<String> javascriptWhiteList = new HashSet<String>();
     private static final String PRELUDE_NAME = "prelude.wyv";
     private static final BindingSite system = new BindingSite("system");
-    private static SeqExpr prelude = null;
-    private static Module preludeModule = null;
 
     static {
         // the whitelist that anyone can import without requiring java or becoming a resource module
@@ -95,27 +92,33 @@ public final class Globals {
         usePrelude = update;
     }
 
-    public static void resetPrelude() {
+    /*public static void resetPrelude() {
         prelude = null;
         gettingPrelude = false;
-    }
+    }*/
 
     public static Module getPreludeModule() {
         if (!usePrelude) {
             throw new RuntimeException("may not call getPreludeModule if preludes are disabled");
         }
-        if (prelude == null) {
-            getPrelude();
-        }
-        return preludeModule;
+        return ModuleResolver.getLocal().getPreludeModule();
     }
 
-    private static SeqExpr getPrelude() {
+    private static SeqExpr getPreludeIfPresent() {
+        InterpreterState s = InterpreterState.getLocalThreadInterpreter();
+        if (s == null) {
+            return null;
+        }
+        return s.getResolver().getPreludeIfPresent();
+    }
+    
+    public static SeqExpr getPrelude() {
         if (!usePrelude) {
             SeqExpr result = new SeqExpr();
             result.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
             return result;
         }
+        SeqExpr prelude = getPreludeIfPresent();
         if (prelude == null) {
             if (gettingPrelude) {
                 return new SeqExpr();
@@ -123,11 +126,8 @@ public final class Globals {
             gettingPrelude = true;
             String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
             File file = new File(preludeLocation);
-
-            preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
-            prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
-            TailCallVisitor.annotate(prelude);
-            prelude.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+            prelude = ModuleResolver.getLocal().loadPrelude(file);
+            gettingPrelude = false;
         }
         return prelude;
     }
@@ -270,7 +270,8 @@ public final class Globals {
 
     public static EvalContext getStandardEvalContext() {
         EvalContext ctx = EvalContext.empty();
-        SeqExpr sexpr = prelude;
+        //ctx = ctx.extend(system, Globals.getSystemValue());
+        SeqExpr sexpr = getPreludeIfPresent();
         if (sexpr != null) {
             ctx = sexpr.interpretCtx(ctx).getSecond();
         }
@@ -298,5 +299,15 @@ public final class Globals {
         decls.add(new ValDeclaration("unit", Util.unitType(), Util.unitValue(), null));
         ObjectValue systemVal = new ObjectValue(decls, new BindingSite("this"), getSystemType(), null, null, EvalContext.empty());
         return systemVal;
+    }
+
+    /** Resets all static state in the program.
+     * Should not matter, but sometimes it has in the past when testing.
+     * The only static state should be the current InterpreterState and the java types object.
+     */
+    public static void resetState() {
+        InterpreterState.resetThreadLocalInterpreter();
+        GenUtil.resetJavaTypes();
+        usePrelude = true;
     }
 }

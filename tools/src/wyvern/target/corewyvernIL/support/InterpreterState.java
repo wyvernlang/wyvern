@@ -55,4 +55,8 @@ public class InterpreterState {
     public static InterpreterState getLocalThreadInterpreter() {
         return localInterpreter.get();
     }
+
+    public static void resetThreadLocalInterpreter() {
+        localInterpreter.set(null);
+    }
 }
