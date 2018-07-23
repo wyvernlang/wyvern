@@ -100,6 +100,14 @@ def ifTrue(cond: wyb_ast.Expression, trueArm: wyb_ast.Expression, falseArm: wyb_
     val f = visitExpression(falseArm)
     LiftedExpression(c.lifting + t.lifting + f.lifting, "(" + c.expr + "?" + t.expr + ".apply()" + ":" + f.expr + ".apply())")
 
+def visitInlineIf(ii: wyb_ast.InlineIf): LiftedExpression
+    val c = visitExpression(ii.cond)
+    val t = visitExpression(ii.trueExpr)
+    val f = visitExpression(ii.falseExpr)
+    val temp = tempVar()
+    val lifting = c.lifting + "let " + temp + ";if (" + c.expr + ") {" + t.lifting + temp + " = " + t.expr + "; } else { " + f.lifting + temp + " = " + f.expr + "; }"
+    LiftedExpression(lifting, temp)
+
 def generateTailCall(methodName: String, argumentJS: List[LiftedExpression]): LiftedExpression
     var l: String = ""
     var i: Int = 0
@@ -276,6 +284,7 @@ def visitExpression(e: wyb_ast.Expression): LiftedExpression = match e:
     s: wyb_ast.StringLiteral => noLifting('"' + unescape(s.s) + '"')
     n: wyb_ast.NewExpression => noLifting(visitNewExpression(n))
     c: wyb_ast.CallExpression => visitCallExpression(c)
+    ii: wyb_ast.InlineIf => visitInlineIf(ii)
     s: wyb_ast.SequenceExpression => sequenceExpression(s)
     poe: wyb_ast.StaticCallExpression => visitStaticCallExpression(poe)
     me: wyb_ast.MatchExpression => visitMatchExpression(me)

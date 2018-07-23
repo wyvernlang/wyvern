@@ -75,6 +75,7 @@ resource datatype Expression
     NewExpression(t: Type, thisVariable: String, declarations: List[Declaration])
     CallExpression(receiver: Expression, method: String, arguments: List[Expression], isTailCall: Boolean)
     StaticCallExpression(receiver: Expression, receiverType: String, method: String, arguments: List[Expression])
+    InlineIf(cond: Expression, trueExpr: Expression, falseExpr: Expression)
     SequenceExpression(statements: List[Statement])
     MatchExpression(e: Expression, arms: List[MatchArm], elseClause: Option[Expression])
     AccessExpression(e: Expression, field: String)

@@ -1,4 +1,4 @@
-module tco
+module inline_if
 
 import wyvern.option
 import wyvern.collections.list
@@ -9,46 +9,42 @@ import util
 type List = list.List
 type Option = option.Option
 
-def any(l: List[Boolean]): Boolean
-    l.find(e: Boolean => e).isDefined
 
 def visitStatement(s: wyb_ast.Statement): wyb_ast.Statement = match s:
     e: wyb_ast.E => wyb_ast.E(visitExpression(e.expression))
     d: wyb_ast.D => wyb_ast.D(visitDeclaration(d.declaration))
 
-// This is exponential
-def visitMethodDeclaration(md: wyb_ast.MethodDeclaration): wyb_ast.MethodDeclaration
-   wyb_ast.MethodDeclaration(md.methodName, md.arguments, md.returnType, visitExpression(md.body), containsTailCalls(md.body)) 
-
-def containsTailCalls(e: wyb_ast.Expression): Boolean = match e:
-    se: wyb_ast.SequenceExpression => any(se.statements.map[Boolean](s => statementContainsTailCalls(s)))
-    ce: wyb_ast.CallExpression => ce.isTailCall
-    me: wyb_ast.MatchExpression => matchContainsTallCalls(me)
-    default => false
-
-def statementContainsTailCalls(s: wyb_ast.Statement): Boolean = match s:
-    e: wyb_ast.E => containsTailCalls(e.expression)
-    default => false
-
-def matchContainsTallCalls(me: wyb_ast.MatchExpression): Boolean
-    any(me.arms.map[Boolean](a => armContainsTailCalls(a))) || me.elseClause.map[Boolean](x => containsTailCalls(x)).getOrElse(() => false)
-
-def armContainsTailCalls(a: wyb_ast.MatchArm): Boolean
-    containsTailCalls(a.e)
-
 def visitDeclaration(d: wyb_ast.Declaration): wyb_ast.Declaration = match d:
     vd: wyb_ast.VariableDeclaration => wyb_ast.VariableDeclaration(vd.declarationType, vd.variable, vd.t, visitExpression(vd.initializer))
-    md: wyb_ast.MethodDeclaration => visitMethodDeclaration(md)
-    td: wyb_ast.TypeDeclaration => td
+    md: wyb_ast.MethodDeclaration => wyb_ast.MethodDeclaration(md.methodName, md.arguments, md.returnType, visitExpression(md.body), md.tco)
+    td: wyb_ast.TypeDeclaration => wyb_ast.TypeDeclaration(td.name, td.typeDesc)
+
+def inlineIf(args: List[wyb_ast.Expression]): wyb_ast.Expression
+    val cond = util.unwrap[wyb_ast.Expression](args.get(0))
+    val ifBlock: Dyn = util.unwrap[wyb_ast.Expression](args.get(1))
+    val trueExpr = util.unwrap[wyb_ast.MethodDeclaration](ifBlock.declarations.get(0)).body
+    val falseExpr = util.unwrap[wyb_ast.MethodDeclaration](ifBlock.declarations.get(1)).body
+    wyb_ast.InlineIf(cond, trueExpr, falseExpr)
+
+def visitCallExpression(ce: wyb_ast.CallExpression): wyb_ast.Expression
+    val r = visitExpression(ce.receiver)
+    val isIf = match r:
+        v: wyb_ast.Var => v.v == "if"
+        default => false
+    if (isIf)
+            val args = visitExpressions(ce.arguments)
+            inlineIf(args)
+        else
+            wyb_ast.CallExpression(r, ce.method, visitExpressions(ce.arguments), ce.isTailCall)
 
 def visitExpression(e: wyb_ast.Expression): wyb_ast.Expression = match e:
-    v: wyb_ast.Var => v
+    v: wyb_ast.Var => wyb_ast.Var(v.v)
     i: wyb_ast.IntegerLiteral => i
     b: wyb_ast.BooleanLiteral => b
     f: wyb_ast.FloatLiteral => f
     s: wyb_ast.StringLiteral => s
     ne: wyb_ast.NewExpression => wyb_ast.NewExpression(ne.t, ne.thisVariable, ne.declarations.map[wyb_ast.Declaration](d => visitDeclaration(d)))
-    ce: wyb_ast.CallExpression => wyb_ast.CallExpression(visitExpression(ce.receiver), ce.method, visitExpressions(ce.arguments), ce.isTailCall)
+    ce: wyb_ast.CallExpression => visitCallExpression(ce)
     pce: wyb_ast.StaticCallExpression => wyb_ast.StaticCallExpression(visitExpression(pce.receiver), pce.receiverType, pce.method, visitExpressions(pce.arguments))
     se: wyb_ast.SequenceExpression => wyb_ast.SequenceExpression(se.statements.map[wyb_ast.Statement](s => visitStatement(s)))
     me: wyb_ast.MatchExpression => visitMatch(me)
@@ -69,4 +65,3 @@ def visitMatch(me: wyb_ast.MatchExpression): wyb_ast.MatchExpression
 
 def visitExpressions(expressions: List[wyb_ast.Expression]): List[wyb_ast.Expression]
     expressions.map[wyb_ast.Expression](e => visitExpression(e))
-
