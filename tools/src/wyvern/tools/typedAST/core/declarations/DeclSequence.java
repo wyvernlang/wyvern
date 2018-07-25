@@ -183,6 +183,29 @@ public class DeclSequence extends Sequence {
         }
 
         ValueType type = new StructuralType(site, declts);
+        updateTLC(tlc, newName, site, decls, newCtx, type);
+
+        // determine if we need to be a resource type
+        for (wyvern.target.corewyvernIL.decl.Declaration d: decls) {
+            d.typeCheck(tlc.getContext(), tlc.getContext());
+            if (d.containsResource(tlc.getContext())) {
+                type = new StructuralType(site, declts, true);
+                // ISSUE: d.addModuleDecl (in updateTLC) side-effects the tlc (by calling addModuleDecl on it).  So we have to undo.
+                tlc.undoAddModuleDecls(declts.size());
+                decls = new LinkedList<wyvern.target.corewyvernIL.decl.Declaration>();
+                // now we must redo the declaration translation
+                updateTLC(tlc, newName, site, decls, newCtx, type);
+                break;
+            }
+        }
+
+        /* wrap the declarations into an object */
+        Expression newExp = new New(decls, site, type, getLocation());
+        tlc.addLet(site, type, newExp, true);
+    }
+
+    private void updateTLC(TopLevelContext tlc, String newName, BindingSite site,
+            List<wyvern.target.corewyvernIL.decl.Declaration> decls, GenContext newCtx, ValueType type) {
         GenContext genCtx = newCtx.extend(site, new Variable(newName), type);
 
         // Do the translation using this updated context
@@ -195,19 +218,6 @@ public class DeclSequence extends Sequence {
             d.addModuleDecl(tlc);
         }
         tlc.setReceiverName(null);
-
-        // determine if we need to be a resource type
-        for (wyvern.target.corewyvernIL.decl.Declaration d: decls) {
-            d.typeCheck(tlc.getContext(), tlc.getContext());
-            if (d.containsResource(tlc.getContext())) {
-                type = new StructuralType(site, declts, true);
-                break;
-            }
-        }
-
-        /* wrap the declarations into an object */
-        Expression newExp = new New(decls, site, type, getLocation());
-        tlc.addLet(site, type, newExp, true);
     }
 
     /**
