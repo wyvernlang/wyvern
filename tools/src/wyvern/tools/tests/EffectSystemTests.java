@@ -131,10 +131,13 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLogger1() throws ParseException {
-        /* Globally available effect (system.ffiEffect) is used to annotate a method directly,
-         * without defining any local effects. */
+        /* Globally available effect (system.ffiEffect) is attempted to be used to annotate a method directly
+         * without having exposed the effect definition in the type. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect annotation {system.ffiEffect} "
+                + "on method updateLog is not a subtype of effects that method produces, which are [fio.writeF];  at location file "
+                + Paths.get(PATH, "effects", "logger1.wyv").toAbsolutePath().toString() + " on line 2 column 5"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger1", Util.intType(), new IntegerLiteral(5));
     }
 
