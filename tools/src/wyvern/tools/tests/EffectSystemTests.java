@@ -165,7 +165,6 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNested() throws ParseException {
         /* An object in a module's immutable field defines an effect
          * and uses it in a method annotation inside that object. */
