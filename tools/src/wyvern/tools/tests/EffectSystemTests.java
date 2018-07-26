@@ -158,6 +158,13 @@ public class EffectSystemTests {
     }
 
     @Test
+    public void testLogger4() throws ParseException {
+        /* Globally available effect (system.ffiEffect) is used to annotate a method directly
+         * without defining any local effects. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger4", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
     @Category(CurrentlyBroken.class)
     public void testNested() throws ParseException {
         /* An object in a module's immutable field defines an effect
