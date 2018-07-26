@@ -122,6 +122,12 @@ public class EffectSystemTests {
     }
 
     @Test
+    public void testFileIO3() throws ParseException {
+        /* Effect names may be the same as method names. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO3", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
     @Category(CurrentlyBroken.class)
     public void testLogger() throws ParseException {
         expectedException.expect(ToolError.class);
