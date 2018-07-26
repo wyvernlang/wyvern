@@ -7,25 +7,28 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.stdlib.Globals;
-import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
-import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
+import wyvern.stdlib.support.AST;
+import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -43,6 +46,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.arch.lexing.ArchLexer;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.JObject;
 import wyvern.tools.interop.JavaWrapper;
@@ -171,7 +175,6 @@ public final class ArchitectureInterpreter {
                 }
                 int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
                 List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state);
-
                 List<ASTComponentDecl> compOrder = visitor.generateDependencyGraph();
 
                 // generate initAST
@@ -180,19 +183,64 @@ public final class ArchitectureInterpreter {
                 testArgs.add(javaToWyvernList(compOrder));
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
-                List<Expression> initASTs = unwrapGeneratedAST(numPortAST, connectorInit, state);
+                List<Expression> orderedInitASTs = makeASTOrder(compOrder,
+                        unwrapGeneratedAST(numPortAST, connectorInit, state));
+                addInitToContext(evalCtx, orderedInitASTs);
 
-                // find and call entrypoints
+                // find and invoke entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
                 for (String component : entrypoints.keySet()) {
                     String entrypoint = entrypoints.get(component);
-                    String initScript = component + "." + entrypoint + "()";
+                    String initScript = component + "." + entrypoint + "()\n";
+
+                    IExpr program = AST.utils.parseExpression(initScript, genCtx);
+                    program.interpret(evalCtx);
                 }
             }
         } catch (ToolError | FileNotFoundException | ParseException e) {
             e.printStackTrace();
         }
         System.out.println("~DONE~");
+    }
+
+    public static List<Expression> makeASTOrder(List<ASTComponentDecl> order, ArrayList<Expression> unordered) {
+        List<Expression> orderedExprs = new LinkedList<>();
+        for (ASTComponentDecl comp : order) {
+            for (int i = 0; i < unordered.size(); i++) {
+                Expression seq = unordered.get(i);
+                if (seq instanceof SeqExpr) {
+                    for (HasLocation elem : ((SeqExpr) seq).getElements()) {
+                        if (elem instanceof VarBinding && ((VarBinding) elem).getVarName().contains(comp.getName())) {
+                            orderedExprs.add(seq);
+                            break;
+                        }
+                    }
+                } else {
+                    System.out.println("error?");
+                }
+            }
+        }
+        return orderedExprs;
+    }
+
+    public static void addInitToContext(EvalContext evalCtx, List<Expression> orderedInitASTs){
+        for (Expression initAST: orderedInitASTs) {
+            if (initAST instanceof SeqExpr) {
+                SeqExpr seq = (SeqExpr) initAST;
+                for (HasLocation e : seq.getElements()) {
+                    //evalCtx.extend();
+                    if (e instanceof VarBinding) {
+                        BindingSite site = ((VarBinding) e).getSite();
+                        Value val = ((VarBinding) e).getExpression().interpret(evalCtx);
+                        evalCtx.extend(site, val);
+                    } else if (e instanceof MethodCall) {
+                        ((MethodCall) e).interpret(evalCtx);
+                    } else if (e instanceof ObjectValue) {
+                        // pass?
+                    }
+                }
+            }
+        }
     }
 
     public static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
@@ -209,8 +257,8 @@ public final class ArchitectureInterpreter {
         return visitor;
     }
 
-    public static List<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state) {
-        List<Expression> portInstances = new LinkedList<>();
+    public static ArrayList<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state) {
+        ArrayList<Expression> portInstances = new ArrayList<>();
         Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
         // getFirst is an option
         Value value = ((Invokable) getFirst).getField("value");

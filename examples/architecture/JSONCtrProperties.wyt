@@ -70,7 +70,7 @@ type JSONCtrProperties
 			val hostIP = "\"localhost\""
 			val hostport = "8000"
 			
-			val client = "require java\nimport CSIface_requires_port\nimport CSIface\nimport JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\nval client_getInfo: CSIface = CSIface_requires_port(jsonCtrProps, java)\n"
+			val client = "require java\nimport Client\nimport CSIface_requires_port\nimport CSIface\nimport JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\nval client_getInfo: CSIface = CSIface_requires_port(jsonCtrProps, java)\nval client = Client(client_getInfo)\n"
 			val server = "require io.io\nrequire java\nimport CSIface_provides_port\nimport Server\nval server = Server()\nval server_sendInfo = CSIface_provides_port(server.sendInfo, io.makeServerSocket("+hostport+"), java)\nserver_sendInfo.run()\n"
 
 			val clientAST : ast.AST = ast.parseExpressionNoContext(client)
