@@ -405,6 +405,11 @@ public class ILTests {
     }*/
 
     @Test
+    public void testNestedFunctions() throws ParseException {
+      TestUtil.doTestScriptModularly("modules.nestedFunctions", null, null);
+    }
+
+    @Test
     public void testRecursiveMethod() throws ParseException {
         TestUtil.doTestScriptModularly("modules.module.recursive", null, null);
     }

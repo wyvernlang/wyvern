@@ -173,7 +173,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         IExpr toReplace = (IExpr) let.getToReplace().acceptVisitor(this, state);
         IExpr inExpr = (IExpr) let.getInExpr().acceptVisitor(this, state);
 
-        Let result = new Let(let.getVarName(), let.getVarType(), toReplace, inExpr);
+        Let result = new Let(let.getSite(), let.getVarType(), toReplace, inExpr);
         result.copyMetadata(let);
         return result;
     }

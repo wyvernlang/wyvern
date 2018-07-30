@@ -1,5 +1,0 @@
-resource type FileIO1
-    effect readF
-    effect writeF
-    def read(): {readF} Int
-    def write(x: Int): {writeF} Int

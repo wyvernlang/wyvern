@@ -119,6 +119,7 @@ TOKEN : /* Keywords */
 | < INSTANTIATE : "instantiate" >
 | < AS : "as" >
 | < EFFECT : "effect" >
+| < RECUR : "recur" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -828,9 +829,11 @@ AST UnaryExpression(ExpFlags flags) :
 AST PrimaryExpression(ExpFlags flags) :
 { AST exp; Token t; Token selfName = null;
   LinkedList<String> names = new LinkedList<String>();
-  LinkedList<AST> args = new LinkedList<AST>(); }
+  LinkedList<AST> args = new LinkedList<AST>();
+  Token r = null;
+}
 {
-  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )* ( Extension(names, args) )*  {
+   [ r = <RECUR> ] { boolean recur = r != null; } exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags, recur) )* ( Extension(names, args) )*  {
     if (names.size() + args.size() > 0) {
       exp = build.addArguments(exp,names,args);
     }
@@ -865,11 +868,11 @@ void Extension(LinkedList<String> names, LinkedList<AST> args) :
 }
 
 AST PrimaryPrefix(ExpFlags flags) :
-{ AST exp; Token t; }
+{ AST exp; Token t; boolean recur = false; }
 {
   exp = Literal() { return exp; }
 |
-  t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
+  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |
@@ -902,13 +905,13 @@ AST Literal() :
   <RATIONAL_LITERAL>
 }
 
-AST PrimarySuffix(AST lhs, ExpFlags flags) :
+AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :
 { List<AST> rhs; Token t; List<Type> gentypes = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
   [gentypes = Generics()] rhs = Arguments(flags) {
-    return build.application(lhs, rhs, null, gentypes);
+    return build.application(lhs, rhs, null, gentypes, recur);
   }
 }
 

@@ -115,17 +115,25 @@ public class Match extends Expression {
     @Override
     public Value interpret(EvalContext ctx) {
         Value matchValue = matchExpr.interpret(ctx);
-        Tag matchTag = ((ObjectValue) matchValue).getTag();
+        Tag matchTag;
+        if (matchValue instanceof  ObjectValue) {
+            matchTag = ((ObjectValue) matchValue).getTag();
+        } else if (matchValue instanceof FFI) {
+            matchTag = ((FFI) matchValue).getTag(ctx);
+        } else {
+            throw new UnsupportedOperationException("Attempted to match on value without tag");
+        }
         Case matchedCase = null;
         FailureReason reason = new FailureReason();
         for (Case c : cases) {
             ValueType caseMatchedType = c.getPattern();
             if (matchTag.isSubTag(caseMatchedType.getTag(ctx), ctx)) {
                 matchedCase = c;
+                break;
             }
         }
         if (matchedCase == null && elseExpr == null) {
-            ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchValue.toString());
+            ToolError.reportError(ErrorMessage.UNMATCHED_CASE, getLocation(), matchTag.toString());
         }
         if (matchedCase == null) {
             return elseExpr.interpret(ctx);

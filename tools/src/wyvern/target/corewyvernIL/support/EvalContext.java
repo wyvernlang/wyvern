@@ -33,7 +33,7 @@ public abstract class EvalContext extends TypeContext {
         return theEmpty;
     }
 
-    private static EvalContext theEmpty = new EmptyValContext();
+    private static final EvalContext theEmpty = new EmptyValContext();
 
     public abstract String endToString();
 }

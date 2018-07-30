@@ -26,8 +26,8 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class TopLevelContext {
 
     //private Stack<VarBinding> pending = new Stack<VarBinding>();
-    private List<Declaration> moduleDecls = new LinkedList<Declaration>();
-    private List<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
+    private LinkedList<Declaration> moduleDecls = new LinkedList<Declaration>();
+    private LinkedList<DeclType> moduleDeclTypes = new LinkedList<DeclType>();
     private List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
     private Map<BindingSite, Boolean> avoidanceMap = new HashMap<BindingSite, Boolean>();
     private GenContext ctx;
@@ -124,6 +124,17 @@ public class TopLevelContext {
         decl = copyTypes(decl);
         moduleDecls.add(decl);
         moduleDeclTypes.add(dt);
+    }
+    
+    /** Undoes the last 'count' adds
+     * 
+     * @param count
+     */
+    public void undoAddModuleDecls(int count) {
+        for (int i = 0; i < count; ++i) {
+            moduleDecls.removeLast();
+            moduleDeclTypes.removeLast();
+        }
     }
 
     private Declaration copyTypes(Declaration decl) {

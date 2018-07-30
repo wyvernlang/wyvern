@@ -8700,6 +8700,15 @@ public final class BytecodeOuterClass {
        */
       wyvern.stdlib.support.backend.BytecodeOuterClass.ExpressionOrBuilder getArgumentsOrBuilder(
           int index);
+
+      /**
+       * <code>required bool isTailCall = 4;</code>
+       */
+      boolean hasIsTailCall();
+      /**
+       * <code>required bool isTailCall = 4;</code>
+       */
+      boolean getIsTailCall();
     }
     /**
      * Protobuf type {@code Expression.CallExpression}
@@ -8716,6 +8725,7 @@ public final class BytecodeOuterClass {
       private CallExpression() {
         method_ = "";
         arguments_ = java.util.Collections.emptyList();
+        isTailCall_ = false;
       }
 
       @java.lang.Override
@@ -8775,6 +8785,11 @@ public final class BytecodeOuterClass {
                 }
                 arguments_.add(
                     input.readMessage(wyvern.stdlib.support.backend.BytecodeOuterClass.Expression.PARSER, extensionRegistry));
+                break;
+              }
+              case 32: {
+                bitField0_ |= 0x00000004;
+                isTailCall_ = input.readBool();
                 break;
               }
             }
@@ -8903,6 +8918,21 @@ public final class BytecodeOuterClass {
         return arguments_.get(index);
       }
 
+      public static final int ISTAILCALL_FIELD_NUMBER = 4;
+      private boolean isTailCall_;
+      /**
+       * <code>required bool isTailCall = 4;</code>
+       */
+      public boolean hasIsTailCall() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>required bool isTailCall = 4;</code>
+       */
+      public boolean getIsTailCall() {
+        return isTailCall_;
+      }
+
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -8914,6 +8944,10 @@ public final class BytecodeOuterClass {
           return false;
         }
         if (!hasMethod()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+        if (!hasIsTailCall()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -8942,6 +8976,9 @@ public final class BytecodeOuterClass {
         for (int i = 0; i < arguments_.size(); i++) {
           output.writeMessage(3, arguments_.get(i));
         }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          output.writeBool(4, isTailCall_);
+        }
         unknownFields.writeTo(output);
       }
 
@@ -8960,6 +8997,10 @@ public final class BytecodeOuterClass {
         for (int i = 0; i < arguments_.size(); i++) {
           size += com.google.protobuf.CodedOutputStream
             .computeMessageSize(3, arguments_.get(i));
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(4, isTailCall_);
         }
         size += unknownFields.getSerializedSize();
         memoizedSize = size;
@@ -8989,6 +9030,11 @@ public final class BytecodeOuterClass {
         }
         result = result && getArgumentsList()
             .equals(other.getArgumentsList());
+        result = result && (hasIsTailCall() == other.hasIsTailCall());
+        if (hasIsTailCall()) {
+          result = result && (getIsTailCall()
+              == other.getIsTailCall());
+        }
         result = result && unknownFields.equals(other.unknownFields);
         return result;
       }
@@ -9011,6 +9057,11 @@ public final class BytecodeOuterClass {
         if (getArgumentsCount() > 0) {
           hash = (37 * hash) + ARGUMENTS__FIELD_NUMBER;
           hash = (53 * hash) + getArgumentsList().hashCode();
+        }
+        if (hasIsTailCall()) {
+          hash = (37 * hash) + ISTAILCALL_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getIsTailCall());
         }
         hash = (29 * hash) + unknownFields.hashCode();
         memoizedHashCode = hash;
@@ -9157,6 +9208,8 @@ public final class BytecodeOuterClass {
           } else {
             argumentsBuilder_.clear();
           }
+          isTailCall_ = false;
+          bitField0_ = (bitField0_ & ~0x00000008);
           return this;
         }
 
@@ -9202,6 +9255,10 @@ public final class BytecodeOuterClass {
           } else {
             result.arguments_ = argumentsBuilder_.build();
           }
+          if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+            to_bitField0_ |= 0x00000004;
+          }
+          result.isTailCall_ = isTailCall_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -9278,6 +9335,9 @@ public final class BytecodeOuterClass {
               }
             }
           }
+          if (other.hasIsTailCall()) {
+            setIsTailCall(other.getIsTailCall());
+          }
           this.mergeUnknownFields(other.unknownFields);
           onChanged();
           return this;
@@ -9288,6 +9348,9 @@ public final class BytecodeOuterClass {
             return false;
           }
           if (!hasMethod()) {
+            return false;
+          }
+          if (!hasIsTailCall()) {
             return false;
           }
           if (!getReceiver().isInitialized()) {
@@ -9752,6 +9815,38 @@ public final class BytecodeOuterClass {
             arguments_ = null;
           }
           return argumentsBuilder_;
+        }
+
+        private boolean isTailCall_ ;
+        /**
+         * <code>required bool isTailCall = 4;</code>
+         */
+        public boolean hasIsTailCall() {
+          return ((bitField0_ & 0x00000008) == 0x00000008);
+        }
+        /**
+         * <code>required bool isTailCall = 4;</code>
+         */
+        public boolean getIsTailCall() {
+          return isTailCall_;
+        }
+        /**
+         * <code>required bool isTailCall = 4;</code>
+         */
+        public Builder setIsTailCall(boolean value) {
+          bitField0_ |= 0x00000008;
+          isTailCall_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>required bool isTailCall = 4;</code>
+         */
+        public Builder clearIsTailCall() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          isTailCall_ = false;
+          onChanged();
+          return this;
         }
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -34082,7 +34177,7 @@ public final class BytecodeOuterClass {
       "\0132\005.Type\022\037\n\nexpression\030\002 \002(\0132\013.Expressio" +
       "n\032H\n\nTypeModule\022\033\n\010typeDesc\030\001 \002(\0132\t.Type" +
       "Desc\022\035\n\010metadata\030\002 \001(\0132\013.ExpressionB\010\n\006m" +
-      "odule\"\211\014\n\nExpression\022\022\n\010variable\030\001 \001(\tH\000" +
+      "odule\"\235\014\n\nExpression\022\022\n\010variable\030\001 \001(\tH\000" +
       "\0222\n\rnewExpression\030\002 \001(\0132\031.Expression.New" +
       "ExpressionH\000\0224\n\016callExpression\030\003 \001(\0132\032.E" +
       "xpression.CallExpressionH\000\022@\n\024staticCall" +
@@ -34096,73 +34191,74 @@ public final class BytecodeOuterClass {
       "enceExpression\030\t \001(\0132\036.Expression.Sequen" +
       "ceExpressionH\000\032[\n\rNewExpression\022\024\n\005type_" +
       "\030\001 \002(\0132\005.Type\022\020\n\010selfName\030\002 \002(\t\022\"\n\014decla" +
-      "rations\030\003 \003(\0132\014.Declaration\032`\n\016CallExpre" +
+      "rations\030\003 \003(\0132\014.Declaration\032t\n\016CallExpre" +
       "ssion\022\035\n\010receiver\030\001 \002(\0132\013.Expression\022\016\n\006" +
       "method\030\002 \002(\t\022\037\n\narguments_\030\003 \003(\0132\013.Expre" +
-      "ssion\032|\n\024StaticCallExpression\022\035\n\010receive" +
-      "r\030\001 \002(\0132\013.Expression\022\024\n\014receiverType\030\002 \002" +
-      "(\t\022\016\n\006method\030\003 \002(\t\022\037\n\narguments_\030\004 \003(\0132\013" +
-      ".Expression\032B\n\020AccessExpression\022\037\n\nexpre" +
-      "ssion\030\001 \002(\0132\013.Expression\022\r\n\005field\030\002 \002(\t\032" +
-      "b\n\024AssignmentExpression\022\037\n\nexpression\030\001 " +
-      "\002(\0132\013.Expression\022\r\n\005field\030\002 \002(\t\022\032\n\005value" +
-      "\030\003 \002(\0132\013.Expression\032\225\001\n\007Literal\022\027\n\rstrin" +
-      "gLiteral\030\001 \001(\tH\000\022\030\n\016integerLiteral\030\002 \001(\014" +
-      "H\000\022\026\n\014floatLiteral\030\003 \001(\001H\000\022\030\n\016booleanLit" +
-      "eral\030\004 \001(\010H\000\022\032\n\020characterLiteral\030\005 \001(\tH\000" +
-      "B\t\n\007literal\032\316\001\n\017MatchExpression\022\037\n\nexpre" +
-      "ssion\030\001 \002(\0132\013.Expression\0222\n\004arms\030\002 \003(\0132$" +
-      ".Expression.MatchExpression.MatchArm\022\031\n\004" +
-      "else\030\003 \001(\0132\013.Expression\032K\n\010MatchArm\022\020\n\010v" +
-      "ariable\030\001 \002(\t\022\014\n\004path\030\002 \002(\t\022\037\n\nexpressio" +
-      "n\030\003 \002(\0132\013.Expression\032\304\001\n\022SequenceExpress" +
-      "ion\022D\n\nstatements\030\001 \003(\01320.Expression.Seq" +
-      "uenceExpression.SequenceStatement\032h\n\021Seq" +
-      "uenceStatement\022!\n\nexpression\030\001 \001(\0132\013.Exp" +
-      "ressionH\000\022#\n\013declaration\030\002 \001(\0132\014.Declara" +
-      "tionH\000B\013\n\tstatementB\014\n\nexpression\"\312\004\n\013De" +
-      "claration\022?\n\023variableDeclaration\030\001 \001(\0132 " +
-      ".Declaration.VariableDeclarationH\000\022;\n\021me" +
-      "thodDeclaration\030\002 \001(\0132\036.Declaration.Meth" +
-      "odDeclarationH\000\0227\n\017typeDeclaration\030\003 \001(\013" +
-      "2\034.Declaration.TypeDeclarationH\000\032\222\001\n\023Var" +
-      "iableDeclaration\0221\n\017declarationType\030\001 \002(" +
-      "\0162\030.VariableDeclarationType\022\020\n\010variable\030" +
-      "\002 \002(\t\022\024\n\005type_\030\003 \002(\0132\005.Type\022 \n\013initializ" +
-      "er\030\004 \002(\0132\013.Expression\032\202\001\n\021MethodDeclarat" +
-      "ion\022\022\n\nmethodName\030\001 \002(\t\022#\n\narguments_\030\002 " +
-      "\003(\0132\017.MethodArgument\022\031\n\nreturnType\030\003 \002(\013" +
-      "2\005.Type\022\031\n\004body\030\004 \002(\0132\013.Expression\032[\n\017Ty" +
-      "peDeclaration\022\014\n\004name\030\001 \002(\t\022\033\n\010typeDesc\030" +
-      "\002 \002(\0132\t.TypeDesc\022\035\n\010metadata\030\003 \001(\0132\013.Exp" +
-      "ressionB\r\n\013declaration\"d\n\010TypeDesc\022\020\n\010ex" +
-      "tends_\030\001 \001(\t\022\024\n\005type_\030\002 \002(\0132\005.Type\022\032\n\003ta" +
-      "g\030\003 \001(\0132\r.TypeDesc.Tag\032\024\n\003Tag\022\r\n\005paths\030\001" +
-      " \003(\t\"\207\002\n\004Type\022*\n\014compoundType\030\001 \001(\0132\022.Ty" +
-      "pe.CompoundTypeH\000\022\016\n\004path\030\002 \001(\tH\000\022&\n\nsim" +
-      "pleType\030\003 \001(\0162\020.Type.SimpleTypeH\000\032e\n\014Com" +
-      "poundType\022\023\n\004base\030\001 \002(\0132\005.Type\022\020\n\010selfNa" +
-      "me\030\002 \002(\t\022\034\n\tdeclTypes\030\003 \003(\0132\t.DeclType\022\020" +
-      "\n\010stateful\030\004 \002(\010\"+\n\nSimpleType\022\007\n\003Top\020\001\022" +
-      "\013\n\007Nothing\020\002\022\007\n\003Dyn\020\003B\007\n\005type_\"\366\004\n\010DeclT" +
-      "ype\0222\n\014variableDecl\030\001 \001(\0132\032.DeclType.Var" +
-      "iableDeclTypeH\000\022.\n\nmethodDecl\030\002 \001(\0132\030.De" +
-      "clType.MethodDeclTypeH\000\022<\n\023declTypeDecla" +
-      "ration\030\003 \001(\0132\035.DeclType.DeclTypeDeclarat" +
-      "ionH\000\0222\n\016opaqueTypeDecl\030\004 \001(\0132\030.DeclType" +
-      ".OpaqueTypeDeclH\000\032m\n\020VariableDeclType\0221\n" +
-      "\017declarationType\030\001 \002(\0162\030.VariableDeclara" +
-      "tionType\022\020\n\010variable\030\002 \002(\t\022\024\n\005type_\030\003 \002(" +
-      "\0132\005.Type\032d\n\016MethodDeclType\022\022\n\nmethodName" +
-      "\030\001 \002(\t\022#\n\narguments_\030\002 \003(\0132\017.MethodArgum" +
-      "ent\022\031\n\nreturnType\030\003 \002(\0132\005.Type\032_\n\023DeclTy" +
-      "peDeclaration\022\014\n\004name\030\001 \002(\t\022\033\n\010typeDesc\030" +
-      "\002 \002(\0132\t.TypeDesc\022\035\n\010metadata\030\003 \001(\0132\013.Exp" +
-      "ression\032O\n\016OpaqueTypeDecl\022\014\n\004name\030\001 \002(\t\022" +
-      "\020\n\010stateful\030\002 \002(\010\022\035\n\010metadata\030\003 \001(\0132\013.Ex" +
-      "pressionB\r\n\013declaration*+\n\027VariableDecla" +
-      "rationType\022\007\n\003VAL\020\001\022\007\n\003VAR\020\002B\037\n\035wyvern.s" +
-      "tdlib.support.backend"
+      "ssion\022\022\n\nisTailCall\030\004 \002(\010\032|\n\024StaticCallE" +
+      "xpression\022\035\n\010receiver\030\001 \002(\0132\013.Expression" +
+      "\022\024\n\014receiverType\030\002 \002(\t\022\016\n\006method\030\003 \002(\t\022\037" +
+      "\n\narguments_\030\004 \003(\0132\013.Expression\032B\n\020Acces" +
+      "sExpression\022\037\n\nexpression\030\001 \002(\0132\013.Expres" +
+      "sion\022\r\n\005field\030\002 \002(\t\032b\n\024AssignmentExpress" +
+      "ion\022\037\n\nexpression\030\001 \002(\0132\013.Expression\022\r\n\005" +
+      "field\030\002 \002(\t\022\032\n\005value\030\003 \002(\0132\013.Expression\032" +
+      "\225\001\n\007Literal\022\027\n\rstringLiteral\030\001 \001(\tH\000\022\030\n\016" +
+      "integerLiteral\030\002 \001(\014H\000\022\026\n\014floatLiteral\030\003" +
+      " \001(\001H\000\022\030\n\016booleanLiteral\030\004 \001(\010H\000\022\032\n\020char" +
+      "acterLiteral\030\005 \001(\tH\000B\t\n\007literal\032\316\001\n\017Matc" +
+      "hExpression\022\037\n\nexpression\030\001 \002(\0132\013.Expres" +
+      "sion\0222\n\004arms\030\002 \003(\0132$.Expression.MatchExp" +
+      "ression.MatchArm\022\031\n\004else\030\003 \001(\0132\013.Express" +
+      "ion\032K\n\010MatchArm\022\020\n\010variable\030\001 \002(\t\022\014\n\004pat" +
+      "h\030\002 \002(\t\022\037\n\nexpression\030\003 \002(\0132\013.Expression" +
+      "\032\304\001\n\022SequenceExpression\022D\n\nstatements\030\001 " +
+      "\003(\01320.Expression.SequenceExpression.Sequ" +
+      "enceStatement\032h\n\021SequenceStatement\022!\n\nex" +
+      "pression\030\001 \001(\0132\013.ExpressionH\000\022#\n\013declara" +
+      "tion\030\002 \001(\0132\014.DeclarationH\000B\013\n\tstatementB" +
+      "\014\n\nexpression\"\312\004\n\013Declaration\022?\n\023variabl" +
+      "eDeclaration\030\001 \001(\0132 .Declaration.Variabl" +
+      "eDeclarationH\000\022;\n\021methodDeclaration\030\002 \001(" +
+      "\0132\036.Declaration.MethodDeclarationH\000\0227\n\017t" +
+      "ypeDeclaration\030\003 \001(\0132\034.Declaration.TypeD" +
+      "eclarationH\000\032\222\001\n\023VariableDeclaration\0221\n\017" +
+      "declarationType\030\001 \002(\0162\030.VariableDeclarat" +
+      "ionType\022\020\n\010variable\030\002 \002(\t\022\024\n\005type_\030\003 \002(\013" +
+      "2\005.Type\022 \n\013initializer\030\004 \002(\0132\013.Expressio" +
+      "n\032\202\001\n\021MethodDeclaration\022\022\n\nmethodName\030\001 " +
+      "\002(\t\022#\n\narguments_\030\002 \003(\0132\017.MethodArgument" +
+      "\022\031\n\nreturnType\030\003 \002(\0132\005.Type\022\031\n\004body\030\004 \002(" +
+      "\0132\013.Expression\032[\n\017TypeDeclaration\022\014\n\004nam" +
+      "e\030\001 \002(\t\022\033\n\010typeDesc\030\002 \002(\0132\t.TypeDesc\022\035\n\010" +
+      "metadata\030\003 \001(\0132\013.ExpressionB\r\n\013declarati" +
+      "on\"d\n\010TypeDesc\022\020\n\010extends_\030\001 \001(\t\022\024\n\005type" +
+      "_\030\002 \002(\0132\005.Type\022\032\n\003tag\030\003 \001(\0132\r.TypeDesc.T" +
+      "ag\032\024\n\003Tag\022\r\n\005paths\030\001 \003(\t\"\207\002\n\004Type\022*\n\014com" +
+      "poundType\030\001 \001(\0132\022.Type.CompoundTypeH\000\022\016\n" +
+      "\004path\030\002 \001(\tH\000\022&\n\nsimpleType\030\003 \001(\0162\020.Type" +
+      ".SimpleTypeH\000\032e\n\014CompoundType\022\023\n\004base\030\001 " +
+      "\002(\0132\005.Type\022\020\n\010selfName\030\002 \002(\t\022\034\n\tdeclType" +
+      "s\030\003 \003(\0132\t.DeclType\022\020\n\010stateful\030\004 \002(\010\"+\n\n" +
+      "SimpleType\022\007\n\003Top\020\001\022\013\n\007Nothing\020\002\022\007\n\003Dyn\020" +
+      "\003B\007\n\005type_\"\366\004\n\010DeclType\0222\n\014variableDecl\030" +
+      "\001 \001(\0132\032.DeclType.VariableDeclTypeH\000\022.\n\nm" +
+      "ethodDecl\030\002 \001(\0132\030.DeclType.MethodDeclTyp" +
+      "eH\000\022<\n\023declTypeDeclaration\030\003 \001(\0132\035.DeclT" +
+      "ype.DeclTypeDeclarationH\000\0222\n\016opaqueTypeD" +
+      "ecl\030\004 \001(\0132\030.DeclType.OpaqueTypeDeclH\000\032m\n" +
+      "\020VariableDeclType\0221\n\017declarationType\030\001 \002" +
+      "(\0162\030.VariableDeclarationType\022\020\n\010variable" +
+      "\030\002 \002(\t\022\024\n\005type_\030\003 \002(\0132\005.Type\032d\n\016MethodDe" +
+      "clType\022\022\n\nmethodName\030\001 \002(\t\022#\n\narguments_" +
+      "\030\002 \003(\0132\017.MethodArgument\022\031\n\nreturnType\030\003 " +
+      "\002(\0132\005.Type\032_\n\023DeclTypeDeclaration\022\014\n\004nam" +
+      "e\030\001 \002(\t\022\033\n\010typeDesc\030\002 \002(\0132\t.TypeDesc\022\035\n\010" +
+      "metadata\030\003 \001(\0132\013.Expression\032O\n\016OpaqueTyp" +
+      "eDecl\022\014\n\004name\030\001 \002(\t\022\020\n\010stateful\030\002 \002(\010\022\035\n" +
+      "\010metadata\030\003 \001(\0132\013.ExpressionB\r\n\013declarat" +
+      "ion*+\n\027VariableDeclarationType\022\007\n\003VAL\020\001\022" +
+      "\007\n\003VAR\020\002B\037\n\035wyvern.stdlib.support.backen" +
+      "d"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -34235,7 +34331,7 @@ public final class BytecodeOuterClass {
     internal_static_Expression_CallExpression_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Expression_CallExpression_descriptor,
-        new java.lang.String[] { "Receiver", "Method", "Arguments", });
+        new java.lang.String[] { "Receiver", "Method", "Arguments", "IsTailCall", });
     internal_static_Expression_StaticCallExpression_descriptor =
       internal_static_Expression_descriptor.getNestedTypes().get(2);
     internal_static_Expression_StaticCallExpression_fieldAccessorTable = new

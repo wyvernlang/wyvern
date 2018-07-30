@@ -174,7 +174,7 @@ public class RefinementType extends ValueType {
             newDTs = getDeclTypes(ctx);
         }
 
-        return new StructuralType(baseST.getSelfName(), newDTs, isResource(ctx));
+        return new StructuralType(baseST.getSelfSite(), newDTs, isResource(ctx));
     }
     @Override
     public boolean isResource(TypeContext ctx) {

@@ -40,7 +40,7 @@ interface ASTBuilder<AST, Type> {
     AST integerLit(int value, FileLocation loc);
     AST booleanLit(boolean value, FileLocation loc);
     AST invocation(AST receiver, String name, AST argument, FileLocation loc);
-    AST application(AST function, List<AST> arguments, FileLocation loc, List<Type> generics);
+    AST application(AST function, List<AST> arguments, FileLocation loc, List<Type> generics, boolean recur);
     AST addArguments(AST application, List<String> names, List<AST> arguments) throws ParseException;
     AST assignment(AST lhs, AST rhs, FileLocation loc);
     AST unitValue(FileLocation loc);

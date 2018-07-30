@@ -1,0 +1,12 @@
+var x: Unit = unit
+
+def test(): Unit
+    val y = x
+    unit
+
+
+def foo(): Unit
+    def bar(): Unit
+        test()
+    unit
+
