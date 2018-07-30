@@ -37,6 +37,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
     private NamedType ascribedType;
     private boolean resourceFlag;
     private final List<NameBindingImpl> args;
+
     private final List<ImportDeclaration> imports;
 
     public ModuleDeclaration(String name, List imports, List<NameBindingImpl> args, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
@@ -251,5 +252,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         }
         /* resource module translated into method */
         return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
+    }
+
+    public List<ImportDeclaration> getImports() {
+        return imports;
     }
 }

@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -331,21 +332,26 @@ public class AST {
                         "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
             }
             TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
+            InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(rootLoc), new File(wyvernPath));
+            GenContext genContext = Globals.getGenContext(state);
             if (typAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
                 wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod =
-                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration)
-                                TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
-                ModuleDeclaration moduleDecl = (ModuleDeclaration)
-                        mod.topLevelGen(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                                new File(rootLoc), new File(wyvernPath))), new LinkedList<TypedModuleSpec>());
+                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) typAST;
+                List<TypedModuleSpec> dependencies = getDependencies(mod.getImports(), genContext);
+                ModuleDeclaration moduleDecl = (ModuleDeclaration) mod.topLevelGen(genContext, dependencies);
                 List<NamedDeclaration> l = new LinkedList<>();
                 l.add(moduleDecl);
-                New module = new New(l, FileLocation.UNKNOWN);
-                return module;
+                New moduleExpression = new New(l, FileLocation.UNKNOWN);
+                return moduleExpression;
+//                return state.getResolver().wrap(moduleExpression, dependencies);
             } else if (typAST instanceof Script) {
                 Script script = (Script) typAST;
-                Expression expr = (Expression) (script.generateIL(Globals.getGenContext(new InterpreterState(InterpreterState.PLATFORM_JAVA,
-                        new File(rootLoc), new File(wyvernPath))), Util.unitType(), new LinkedList<TypedModuleSpec>()));
+                List<ImportDeclaration> importDecls = new ArrayList<>();
+                importDecls.addAll(script.getImports());
+                importDecls.addAll(script.getRequires());
+                List<TypedModuleSpec> dependencies = getDependencies(importDecls, genContext);
+                Expression expr = (Expression) (script.generateIL(genContext, Util.unitType(), dependencies));
+                expr = state.getResolver().wrap(expr, dependencies);
                 return expr;
             } else {
                 return null;
@@ -354,6 +360,14 @@ public class AST {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");
             throw e;
         }
+    }
+
+    private static List<TypedModuleSpec> getDependencies(List<ImportDeclaration> importDecls, GenContext genContext) {
+        List<TypedModuleSpec> dependencies = new ArrayList<>();
+        for (ImportDeclaration importDecl : importDecls) {
+            importDecl.genBinding(genContext, dependencies);
+        }
+        return dependencies;
     }
 
     public List<IExpr> parseExpressionList(String input, GenContext ctx) throws ParseException {

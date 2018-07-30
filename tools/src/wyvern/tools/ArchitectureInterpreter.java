@@ -16,7 +16,6 @@ import java.util.List;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.stdlib.support.AST;
-import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
@@ -61,6 +60,7 @@ import wyvern.tools.parsing.coreparser.arch.ArchParserConstants;
 import wyvern.tools.parsing.coreparser.arch.DeclCheckVisitor;
 import wyvern.tools.parsing.coreparser.arch.Node;
 import wyvern.tools.tests.TestUtil;
+import wyvern.tools.util.Pair;
 
 public final class ArchitectureInterpreter {
     protected ArchitectureInterpreter() {
@@ -174,7 +174,7 @@ public final class ArchitectureInterpreter {
                             FileLocation.UNKNOWN, connector);
                 }
                 int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
-                List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state);
+                List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state, evalCtx);
                 List<ASTComponentDecl> compOrder = visitor.generateDependencyGraph();
 
                 // generate initAST
@@ -184,8 +184,11 @@ public final class ArchitectureInterpreter {
                 connectorInit = ((Invokable) metadata)
                         .invoke("generateConnectorInit", testArgs).executeIfThunk();
                 List<Expression> orderedInitASTs = makeASTOrder(compOrder,
-                        unwrapGeneratedAST(numPortAST, connectorInit, state));
-                addInitToContext(evalCtx, orderedInitASTs);
+                        unwrapGeneratedAST(numPortAST, connectorInit, state, evalCtx));
+
+                Pair<GenContext, EvalContext> contexts = addInitToContext(evalCtx, genCtx, orderedInitASTs, state);
+                genCtx = contexts.getFirst();
+                evalCtx = contexts.getSecond();
 
                 // find and invoke entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
@@ -223,24 +226,25 @@ public final class ArchitectureInterpreter {
         return orderedExprs;
     }
 
-    public static void addInitToContext(EvalContext evalCtx, List<Expression> orderedInitASTs){
-        for (Expression initAST: orderedInitASTs) {
+    public static Pair<GenContext, EvalContext> addInitToContext(
+            EvalContext evalCtx, GenContext genCtx, List<Expression> orderedInitASTs, InterpreterState state) {
+        for (Expression initAST : orderedInitASTs) {
             if (initAST instanceof SeqExpr) {
                 SeqExpr seq = (SeqExpr) initAST;
                 for (HasLocation e : seq.getElements()) {
-                    //evalCtx.extend();
                     if (e instanceof VarBinding) {
-                        BindingSite site = ((VarBinding) e).getSite();
-                        Value val = ((VarBinding) e).getExpression().interpret(evalCtx);
-                        evalCtx.extend(site, val);
+                        genCtx = genCtx.extend(((VarBinding) e).getSite(),
+                                (Expression) ((VarBinding) e).getExpression(), ((VarBinding) e).getType());
+                        evalCtx = evalCtx.extend(((VarBinding) e).getSite(), ((VarBinding) e).getExpression().interpret(evalCtx));
                     } else if (e instanceof MethodCall) {
                         ((MethodCall) e).interpret(evalCtx);
-                    } else if (e instanceof ObjectValue) {
-                        // pass?
+                    } else {
+                        throw new RuntimeException(":(");
                     }
                 }
             }
         }
+        return new Pair<GenContext, EvalContext>(genCtx, evalCtx);
     }
 
     public static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
@@ -257,7 +261,7 @@ public final class ArchitectureInterpreter {
         return visitor;
     }
 
-    public static ArrayList<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state) {
+    public static ArrayList<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state, EvalContext evalCtx) {
         ArrayList<Expression> portInstances = new ArrayList<>();
         Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
         // getFirst is an option
@@ -276,9 +280,9 @@ public final class ArchitectureInterpreter {
             Object javaAST = obj.getWrappedValue();
             if (javaAST instanceof New) {
                 // Get module def ASTs from generateConnectorImpl
-                New newAST = (New) javaAST;
+                Expression newAST = (New) javaAST;
                 String moduleName = null;
-                for (Declaration decl : newAST.getDecls()) {
+                for (Declaration decl : ((New) newAST).getDecls()) {
                     if (decl instanceof ModuleDeclaration) {
                         moduleName = ((ModuleDeclaration) decl).getName();
                         state.getResolver().addModuleAST(moduleName, newAST);

@@ -1,4 +1,4 @@
 module def Client(getInfo : CSIface) : TCPClient
 
-def start() : Unit	
+def start() : String
 	getInfo.getVal("key")

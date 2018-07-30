@@ -39,9 +39,11 @@ public class Script extends AbstractExpressionAST implements CoreAST {
     public TopLevelContext generateTLC(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         TopLevelContext tlc = new TopLevelContext(ctx, expectedType);
         for (ImportDeclaration i: requires) {
+            //System.out.println("req: " + i);
             i.genTopLevel(tlc);
         }
         for (ImportDeclaration i: imports) {
+            //System.out.println("imp: " + i);
             i.genTopLevel(tlc);
         }
         Sequence combinedSeq = ((Sequence) body).combine();
