@@ -84,4 +84,5 @@ public final class Interpreter {
 
     // used to set WYVERN_ROOT when called programmatically
     public static final ThreadLocal<String> wyvernRoot = new ThreadLocal<String>();
+
 }

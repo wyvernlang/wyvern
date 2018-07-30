@@ -1,0 +1,6 @@
+def factorial(n:Int):Int
+	(n < 2).ifTrue(
+		() => 1,
+		() => n * factorial(n-1)
+)
+val y = 0
