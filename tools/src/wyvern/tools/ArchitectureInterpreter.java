@@ -203,7 +203,6 @@ public final class ArchitectureInterpreter {
         } catch (ToolError | FileNotFoundException | ParseException e) {
             e.printStackTrace();
         }
-        System.out.println("~DONE~");
     }
 
     public static List<Expression> makeASTOrder(List<ASTComponentDecl> order, ArrayList<Expression> unordered) {
@@ -238,8 +237,12 @@ public final class ArchitectureInterpreter {
                         evalCtx = evalCtx.extend(((VarBinding) e).getSite(), ((VarBinding) e).getExpression().interpret(evalCtx));
                     } else if (e instanceof MethodCall) {
                         ((MethodCall) e).interpret(evalCtx);
+                    } else if (e instanceof New) {
+                        if (!((New) e).getSelfName().equals("unitSelf")) {
+                            throw new RuntimeException("Unexpected expression in generated init AST");
+                        }
                     } else {
-                        throw new RuntimeException(":(");
+                        throw new RuntimeException("Unexpected expression in generated init AST");
                     }
                 }
             }
