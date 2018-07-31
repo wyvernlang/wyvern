@@ -183,6 +183,8 @@ public final class ArchitectureInterpreter {
                 JObject initASTObj = (JObject) fromInit.getFObject();
                 IExpr initAST = (Expression) initASTObj.getWrappedValue();
 
+                visitor.generateDependencyGraph();
+
                 // find and call entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
                 for (String component : entrypoints.keySet()) {

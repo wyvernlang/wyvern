@@ -2,8 +2,10 @@ package wyvern.tools.parsing.coreparser.arch;
 
 //combine with modulecheckvisitor
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.tools.errors.ErrorMessage;
@@ -18,6 +20,54 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
     private HashMap<String, String> entrypoints = new HashMap<>();
     private HashMap<String, HashSet<String>> attachments = new HashMap<>();
     private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
+
+    public List<DependencyGraphNode> generateDependencyGraph() {
+        HashMap<String,DependencyGraphNode> nodes = new HashMap<>();
+        ArrayList<DependencyGraphNode> noReqNodes = new ArrayList<>();
+        for (String connector : attachments.keySet()) {
+            HashSet<String> fullports = attachments.get(connector);
+            for (String fullport : fullports)   {
+                String[] pair = fullport.split("\\.");
+                String component = pair[0];
+                String  port = pair[1];
+                ASTComponentDecl compObj = components.get(component);
+                ASTComponentTypeDecl compType = componentTypes.get(compObj.getType());
+                if (!nodes.containsKey(component)) {
+                    DependencyGraphNode compNode = new DependencyGraphNode(compObj);
+                    nodes.put(component, compNode);
+                }
+                DependencyGraphNode compNode = nodes.get(component);
+                if (compType.getReqs().size() == 0) {
+                    noReqNodes.add(compNode);
+                }
+                for (String reqs : compType.getReqs().values())  {
+                    for (String innerfullport : fullports)   {
+                        String[] innerpair = innerfullport.split("\\.");
+                        String innercomponent = innerpair[0];
+                        String  innerport = innerpair[1];
+                        ASTComponentDecl innercompObj = components.get(innercomponent);
+                        ASTComponentTypeDecl innercompType = componentTypes.get(innercompObj.getType());
+                        if (!nodes.containsKey(innercomponent)) {
+                            DependencyGraphNode innercompNode = new DependencyGraphNode(innercompObj);
+                            nodes.put(innercomponent, innercompNode);
+                        }
+                        DependencyGraphNode innercompNode = nodes.get(innercomponent);
+                        for (String provs : innercompType.getProvs().values())  {
+                            if (provs.equals(reqs)) {
+                                compNode.addDependency(innercompNode);
+                                nodes.put(component, compNode);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (DependencyGraphNode node : nodes.values()) {
+
+        }
+        return null;
+    }
 
     public HashMap<String, ASTComponentTypeDecl> getComponentTypes() {
         return componentTypes;

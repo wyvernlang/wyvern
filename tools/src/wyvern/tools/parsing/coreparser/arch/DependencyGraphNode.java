@@ -5,14 +5,14 @@ import java.util.List;
 
 public class DependencyGraphNode {
     private ASTComponentDecl component;
-    private List<ASTComponentDecl> dependencies;
+    private List<DependencyGraphNode> dependencies;
 
     public DependencyGraphNode(ASTComponentDecl component)  {
         this.component = component;
         dependencies = new ArrayList<>();
     }
 
-    public void addDependency(ASTComponentDecl dep) {
+    public void addDependency(DependencyGraphNode dep) {
         dependencies.add(dep);
     }
 }
