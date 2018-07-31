@@ -93,24 +93,25 @@ public class ArchParser/*@bgen(jjtree)*/implements ArchParserTreeConstants/*@ege
      * System.out.println(kindToName(t.kind)); } }
      */
 
-    // Parsing attempt
-    try {
-      Node start = wp.ArchDesc();
-      // ((SimpleNode) start).dump(">");
-      DeclCheckVisitor visitor = new DeclCheckVisitor();
-      visitor.visit((ASTArchDesc) start, null);
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
+        // Parsing attempt
+        /*
+        try {
+          Node start = wp.ArchDesc();
+          // ((SimpleNode) start).dump(">");
+          DeclCheckVisitor visitor = new DeclCheckVisitor();
+          visitor.visit((ASTArchDesc) start, null);
+        } catch (ParseException e) {
+          e.printStackTrace();
+        }
 
-    /* What's left after parsing attempt */
-    Token t = wp.getNextToken();
-    while (!kindToName(t.kind).equals("UNKNOWN(0)")) {
-      System.out.println(kindToName(t.kind));
-      t = wp.getNextToken();
-    }
+        Token t = wp.getNextToken();
+        while (!kindToName(t.kind).equals("UNKNOWN(0)")) {
+          System.out.println(kindToName(t.kind));
+          t = wp.getNextToken();
+        }
 
-    System.out.println("~PARSING DONE~");
+        System.out.println("~PARSING DONE~");
+        */
 
   }
 }

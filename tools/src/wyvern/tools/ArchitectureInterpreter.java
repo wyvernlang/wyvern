@@ -27,7 +27,6 @@ import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.JavaValue;
-import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -60,13 +59,13 @@ import wyvern.tools.parsing.coreparser.arch.ArchParserConstants;
 import wyvern.tools.parsing.coreparser.arch.DeclCheckVisitor;
 import wyvern.tools.parsing.coreparser.arch.Node;
 import wyvern.tools.tests.TestUtil;
-import wyvern.tools.util.Pair;
 
 public final class ArchitectureInterpreter {
     protected ArchitectureInterpreter() {
     }
 
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         if (args.length != 1) {
             System.err.println("usage: wyvarch <filename>");
             System.exit(1);
@@ -114,12 +113,11 @@ public final class ArchitectureInterpreter {
                 String connector = connectors.get(connectorInstance);
                 HashSet<String> fullports = visitor.getAttachments()
                         .get(connectorInstance);
-                HashSet<String> ports = new HashSet<>();
                 List<ASTPortDecl> portObjs = new LinkedList<>();
+                HashMap portDecls = visitor.getPortDecls();
                 for (String p : fullports) {
                     String[] pair = p.split("\\.");
-                    ports.add(pair[1]);
-                    portObjs.add(visitor.getPortDecls().get(pair[1]));
+                    portObjs.add((ASTPortDecl) portDecls.get(pair[1]));
                 }
                 // Load the connector type module and get context
                 Module m = state.getResolver().resolveType(connector + "Properties");
@@ -160,7 +158,6 @@ public final class ArchitectureInterpreter {
                             connectorImpl = ((Invokable) metadata)
                                     .invoke(methodName, testArgs).executeIfThunk();
                         } else if (methodName.equals("generateConnectorInit")) {
-                            // for now
                             connectorInit = portCompatibility;
                         } else {
                             ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
@@ -186,26 +183,31 @@ public final class ArchitectureInterpreter {
                 List<Expression> orderedInitASTs = makeASTOrder(compOrder,
                         unwrapGeneratedAST(numPortAST, connectorInit, state, evalCtx));
 
-                Pair<GenContext, EvalContext> contexts = addInitToContext(evalCtx, genCtx, orderedInitASTs, state);
-                genCtx = contexts.getFirst();
-                evalCtx = contexts.getSecond();
+                // add init ASTs to contexts
+                for (Expression initAST : orderedInitASTs) {
+                    if (initAST instanceof SeqExpr) {
+                        genCtx = ((SeqExpr) initAST).extendContext(genCtx);
+                        evalCtx = ((SeqExpr) initAST).interpretCtx(evalCtx).getSecond();
+                    }
+                }
 
                 // find and invoke entrypoints
                 HashMap<String, String> entrypoints = visitor.getEntrypoints();
                 for (String component : entrypoints.keySet()) {
                     String entrypoint = entrypoints.get(component);
                     String initScript = component + "." + entrypoint + "()\n";
-
                     IExpr program = AST.utils.parseExpression(initScript, genCtx);
                     program.interpret(evalCtx);
                 }
+                long end = System.currentTimeMillis();
+                //System.out.println((end - start) / 1000.0 + "s");
             }
         } catch (ToolError | FileNotFoundException | ParseException e) {
             e.printStackTrace();
         }
     }
 
-    public static List<Expression> makeASTOrder(List<ASTComponentDecl> order, ArrayList<Expression> unordered) {
+    private static List<Expression> makeASTOrder(List<ASTComponentDecl> order, ArrayList<Expression> unordered) {
         List<Expression> orderedExprs = new LinkedList<>();
         for (ASTComponentDecl comp : order) {
             for (int i = 0; i < unordered.size(); i++) {
@@ -225,32 +227,7 @@ public final class ArchitectureInterpreter {
         return orderedExprs;
     }
 
-    public static Pair<GenContext, EvalContext> addInitToContext(
-            EvalContext evalCtx, GenContext genCtx, List<Expression> orderedInitASTs, InterpreterState state) {
-        for (Expression initAST : orderedInitASTs) {
-            if (initAST instanceof SeqExpr) {
-                SeqExpr seq = (SeqExpr) initAST;
-                for (HasLocation e : seq.getElements()) {
-                    if (e instanceof VarBinding) {
-                        genCtx = genCtx.extend(((VarBinding) e).getSite(),
-                                (Expression) ((VarBinding) e).getExpression(), ((VarBinding) e).getType());
-                        evalCtx = evalCtx.extend(((VarBinding) e).getSite(), ((VarBinding) e).getExpression().interpret(evalCtx));
-                    } else if (e instanceof MethodCall) {
-                        ((MethodCall) e).interpret(evalCtx);
-                    } else if (e instanceof New) {
-                        if (!((New) e).getSelfName().equals("unitSelf")) {
-                            throw new RuntimeException("Unexpected expression in generated init AST");
-                        }
-                    } else {
-                        throw new RuntimeException("Unexpected expression in generated init AST");
-                    }
-                }
-            }
-        }
-        return new Pair<GenContext, EvalContext>(genCtx, evalCtx);
-    }
-
-    public static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
+    private static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
                                                  Path filepath, InterpreterState state) throws ParseException, FileNotFoundException {
         File f = new File(rootLoc + "/" + filepath.toString());
         BufferedReader source = new BufferedReader(new FileReader(f));
@@ -264,7 +241,7 @@ public final class ArchitectureInterpreter {
         return visitor;
     }
 
-    public static ArrayList<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state, EvalContext evalCtx) {
+    private static ArrayList<Expression> unwrapGeneratedAST(int numPortAST, Value connectorImpl, InterpreterState state, EvalContext evalCtx) {
         ArrayList<Expression> portInstances = new ArrayList<>();
         Value getFirst = ((Invokable) connectorImpl).invoke("_getFirst", new LinkedList<>()).executeIfThunk();
         // getFirst is an option
@@ -284,26 +261,24 @@ public final class ArchitectureInterpreter {
             if (javaAST instanceof New) {
                 // Get module def ASTs from generateConnectorImpl
                 Expression newAST = (New) javaAST;
-                String moduleName = null;
                 for (Declaration decl : ((New) newAST).getDecls()) {
                     if (decl instanceof ModuleDeclaration) {
-                        moduleName = ((ModuleDeclaration) decl).getName();
+                        String moduleName = ((ModuleDeclaration) decl).getName();
                         state.getResolver().addModuleAST(moduleName, newAST);
                     }
-                    portInstances.add(newAST);
                 }
+                portInstances.add(newAST);
             } else if (javaAST instanceof SeqExpr) {
                 SeqExpr seqAST = (SeqExpr) javaAST;
                 portInstances.add(seqAST);
-                // Add to module resolver?
             } else {
-                System.out.println("error?");
+                throw new RuntimeException("Unexpected expression in generated AST");
             }
         }
         return portInstances;
     }
 
-    public static Value javaToWyvernList(Object result) {
+    private static Value javaToWyvernList(Object result) {
         if (result instanceof List) {
             ObjectValue v = null;
             try {

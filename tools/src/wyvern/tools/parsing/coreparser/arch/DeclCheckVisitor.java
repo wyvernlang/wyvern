@@ -1,7 +1,5 @@
 package wyvern.tools.parsing.coreparser.arch;
 
-//combine with modulecheckvisitor
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,9 +28,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
         for (String connector : attachments.keySet()) {
             HashSet<String> fullports = attachments.get(connector);
             for (String fullport : fullports) {
-                String[] pair = fullport.split("\\.");
-                String component = pair[0];
-                String port = pair[1];
+                String component = fullport.substring(0, fullport.indexOf("."));
                 ASTComponentDecl compObj = components.get(component);
                 ASTComponentTypeDecl compType = componentTypes.get(compObj.getType());
                 if (!nodes.containsKey(component)) {
@@ -45,9 +41,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
                 }
                 for (String reqs : compType.getReqs().values()) {
                     for (String innerfullport : fullports) {
-                        String[] innerpair = innerfullport.split("\\.");
-                        String innercomponent = innerpair[0];
-                        String innerport = innerpair[1];
+                        String innercomponent = innerfullport.substring(0, innerfullport.indexOf("."));
                         ASTComponentDecl innercompObj = components.get(innercomponent);
                         ASTComponentTypeDecl innercompType = componentTypes.get(innercompObj.getType());
                         if (!nodes.containsKey(innercomponent)) {
@@ -78,14 +72,6 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
                 }
             }
         }
-/*
-        for (DependencyGraphNode node : nodes.values()) {
-            System.out.println(node.getComponentDecl().getName());
-            System.out.println("prov: " + node.getProvides().size());
-            System.out.println("req: " + node.getRequires().size());
-        }
-*/
-
         return ordered;
     }
 
@@ -150,7 +136,7 @@ public class DeclCheckVisitor extends ArchParserVisitorAdapter {
             }
             // check component of that type has port
             ASTComponentTypeDecl typeDecl = componentTypes
-                    .get(components.get(component).getType());
+                    .get(type);
             if (!typeDecl.getReqs().containsKey(port)
                     && !typeDecl.getProvs().containsKey(port)) {
                 ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,

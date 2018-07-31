@@ -1,4 +1,4 @@
-module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java) : CSIface
+module def CSIface_requires_port(jsonCtrProps : JSONCtrProperties, java : Java, stdout: Stdout) : CSIface
 
 import io.io
 import json
@@ -12,5 +12,14 @@ def getVal(key : String) : String
 	val in = tcpClient.getInputStream()
 	val outData = io.makeDataOutputStream(out)
 	val inData = io.makeDataInputStream(in)	
+	stdout.print("Requesting '")
+	stdout.print(key)
+	stdout.print("' from server...")
+	stdout.println()
 	outData.writeUTF((json.serializeToJSON(key)).toString())
-	inData.readUTF()
+	val returnData = inData.readUTF()
+	stdout.print("...received '")
+	stdout.print(returnData)
+	stdout.print("' from server!")
+	stdout.println()
+	returnData
