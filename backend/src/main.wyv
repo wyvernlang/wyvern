@@ -31,7 +31,7 @@ def compile(wyb: Dyn): Unit
             // Undesirable coupling with rename?
             stdout.print("const " + rename.renameVariable("FFI_" + n) + " = require(process.env.WYVERN_HOME + \"/backend/" + util.replace(p, ".", "/") + "\");")
             stdout.println()
-            importLoop(i + 1, c)
+            recur importLoop(i + 1, c)
     val c: Int = wyb.getImportsCount()
     importLoop(0, c)
 
@@ -42,7 +42,7 @@ def compile(wyb: Dyn): Unit
         // Undesirable coupling with rename?
         stdout.print(compileModule(p, e))
         if (i > 0)
-            moduleLoop(i - 1)
+            recur moduleLoop(i - 1)
     val m: Int = wyb.getModulesCount()
     moduleLoop(m - 1)
     stdout.print("})();")

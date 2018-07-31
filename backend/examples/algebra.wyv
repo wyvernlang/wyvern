@@ -42,7 +42,7 @@ def intPow(x : Float, n : Float) : Float
     if (m < 0.1)
       total
      else
-      lp(x * total, m - 1.0)
+      recur lp(x * total, m - 1.0)
   lp(1.0, n)
 
 def fac(n : Float) : Float
@@ -50,7 +50,7 @@ def fac(n : Float) : Float
     if (m < 0.1)
       total
      else
-      lp(total * m, m - 1.0)
+      recur lp(total * m, m - 1.0)
   lp(1.0, n)
 
 def summation(start : Float, end : Float, term : Float -> Float) : Float
@@ -58,7 +58,7 @@ def summation(start : Float, end : Float, term : Float -> Float) : Float
     if (n > end + 0.1)
       total
      else
-      lp(total + term(n), n + 1.0)
+      recur lp(total + term(n), n + 1.0)
   lp(0.0, start)
 
 // Works well for x in [-15, 15]
@@ -85,9 +85,9 @@ def logBase(base : Float, x : Float) : Float
 // Returns x "mod" 2pi
 def trigNormalize(x : Float) : Float
   if (x < 0.0)
-    trigNormalize(x + 2.0 * pi)
+    recur trigNormalize(x + 2.0 * pi)
    elif (x > 2.0 * pi)
-    trigNormalize(x - 2.0 * pi)
+    recur trigNormalize(x - 2.0 * pi)
    else
     x
 
@@ -426,7 +426,7 @@ def simplify(t : Term) : TermStep
 
 def fullySimplify(t : Term) : Term
   match simplify(t):
-    a:Step => fullySimplify(a.term)
+    a:Step => recur fullySimplify(a.term)
     a:NoStep => t
 
 //------------------------------------------------------------------------------

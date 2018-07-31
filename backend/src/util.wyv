@@ -23,9 +23,9 @@ def replace(s: String, c: String, replacement: String): String
         if (s == "")
                 acc
             elif (s.substring(0, 1) == c)
-                replaceAcc(s.substring(1, s.length()), c, replacement, acc + replacement)
+                recur replaceAcc(s.substring(1, s.length()), c, replacement, acc + replacement)
             else
-                replaceAcc(s.substring(1, s.length()), c, replacement, acc + s.substring(0, 1))
+                recur replaceAcc(s.substring(1, s.length()), c, replacement, acc + s.substring(0, 1))
     val x = replaceAcc(s, c, replacement, "")
     if (x.length() == 0)
         runtime.fail("tiny")
@@ -39,10 +39,10 @@ def split(s: String, delim: String) : List[String]
                 l
             elif (s.substring(i, i+1) == delim)
                 if (prev == i)
-                        loop(l, i + 1, i +1)
+                        recur loop(l, i + 1, i +1)
                     else
                         l.append(s.substring(prev, i))
-                        loop(l, i + 1, i+1)
+                        recur loop(l, i + 1, i+1)
             else
-                loop(l, prev, i+1)
+                recur loop(l, prev, i+1)
     loop(list.make[String](), 0, 0)
