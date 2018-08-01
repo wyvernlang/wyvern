@@ -12,14 +12,7 @@ PARSER_BEGIN(ArchParser)
 
 package wyvern.tools.parsing.coreparser.arch;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.File;
-import wyvern.tools.arch.lexing.ArchLexer;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import edu.umn.cs.melt.copper.runtime.logging.CopperParserException;
-import wyvern.tools.parsing.coreparser.WyvernTokenManager;
+
 import wyvern.tools.parsing.coreparser.TokenManager;
 import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -29,7 +22,7 @@ public class ArchParser/*@bgen(jjtree)*/implements ArchParserTreeConstants/*@ege
 
 /*@egen*/ 
 
-    public static String fname;
+    public String fname;
     public static String kindToName(int kind) {
       switch (kind) {
       case MULTI_LINE_COMMENT: return "MULTI_LINE_COMMENT";
@@ -60,60 +53,6 @@ public class ArchParser/*@bgen(jjtree)*/implements ArchParserTreeConstants/*@ege
       default: return "UNKNOWN(" + kind + ")";
       }
     }
-    
-    public static void main(String[] args)
-      throws CopperParserException, IOException, FileNotFoundException {
-    String root = System.getProperty("user.dir");
-    File example1, example2, example3, test;
-    if (root.substring(root.length() - 5).equals("tools")) {
-      example1 = new File(root + "/../examples/architecture/example1.wyc");
-      example2 = new File(root + "/../examples/architecture/example2.wyc");
-      example3 = new File(root + "/../examples/architecture/example3.wyc");
-      test = new File(root + "/../examples/architecture/test.wyc");
-    } else {
-      example1 = new File(root + "/../../examples/architecture/example1.wyc");
-      example2 = new File(root + "/../../examples/architecture/example2.wyc");
-      example3 = new File(root + "/../../examples/architecture/example3.wyc");
-      test = new File(root + "/../../examples/architecture/test.wyc");
-    }
-    BufferedReader source = new BufferedReader(new FileReader(
-        // example1
-        // example2
-        // example3
-        test));
-    fname = test.getName();
-    ArchParser wp = new ArchParser(
-        (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(
-            source, "test", ArchLexer.class, ArchParserConstants.class));
-
-    /*
-     * Full list of tokens as collected by the token manager List<Token> tokens
-     * = new ArchLexer().parse(source, "test"); for (Token t: tokens) { if
-     * (!kindToName(t.kind).equals("WHITESPACE")){
-     * System.out.println(kindToName(t.kind)); } }
-     */
-
-        // Parsing attempt
-        /*
-        try {
-          Node start = wp.ArchDesc();
-          // ((SimpleNode) start).dump(">");
-          DeclCheckVisitor visitor = new DeclCheckVisitor();
-          visitor.visit((ASTArchDesc) start, null);
-        } catch (ParseException e) {
-          e.printStackTrace();
-        }
-
-        Token t = wp.getNextToken();
-        while (!kindToName(t.kind).equals("UNKNOWN(0)")) {
-          System.out.println(kindToName(t.kind));
-          t = wp.getNextToken();
-        }
-
-        System.out.println("~PARSING DONE~");
-        */
-
-  }
 }
 
 PARSER_END(ArchParser)
@@ -638,7 +577,7 @@ void PortDecl() :
   ASTPortDecl jjtn000 = new ASTPortDecl(JJTPORTDECL);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/ Token p; Token req = null; Token prov = null; Token startMark; }
+/*@egen*/ Token p; Token req ; Token prov ; Token startMark; }
 {/*@bgen(jjtree) PortDecl */
     try {
 /*@egen*/
@@ -693,14 +632,5 @@ String Segment()       :
     ( <DOT> t=<IDENTIFIER> { s = s + "." + t.image; } )* 
     { return s; }
 }
-
-
-
-
-
-
-
-
-
 
 

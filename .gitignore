@@ -44,6 +44,7 @@ tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.jj
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserTreeConstants.java
+tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserVisitor.java
 tools/out
 tools/src/wyvern/target/llvm/autom4te.cache/
 tools/src/wyvern/target/llvm/.libs/
