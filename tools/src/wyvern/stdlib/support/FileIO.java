@@ -19,20 +19,20 @@ public class FileIO {
 
     public BufferedReader openForRead(String path) throws IOException {
         FileReader fileReader = new FileReader(path);
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		
-		return new BufferedReader(bufferedReader);
-	}
-	
-	public String readFileIntoString(BufferedReader br) throws IOException {
-		
-		String line = "";
-		String message = "";
-		while((line = br.readLine()) != null){
-			message+= line;
-		}
-		
-		return message;
-	}
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+        return new BufferedReader(bufferedReader);
+    }
+
+    public String readFileIntoString(BufferedReader br) throws IOException {
+
+        String line = "";
+        String message = "";
+        while ((line = br.readLine()) != null) {
+            message += line;
+        }
+
+        return message;
+    }
 
 }

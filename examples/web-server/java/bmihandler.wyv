@@ -1,0 +1,18 @@
+module def bmihandler() : THttpHandler
+
+import bmi
+
+var responseFile:String = "bmi.html"
+val paramNum: Int = 3
+
+def sendResponse(dos:Dyn, age:Int, height:Float, weight:Float):Unit
+    // setHTML headers
+	// retrieve params from postprocessor
+	// send results via HTML file
+    val result:Float = bmi.calculateBmi(height, weight)
+    val classification:String = bmi.getBmiClassification(result)
+    dos.writeBytes("<html><h1>BMI Calculator Results</h1>")
+    dos.writeBytes("<h2>You are " + age +" years old</h2>")
+    dos.writeBytes("<h2>Your BMI Result is:" + result+" </h2>")
+    dos.writeBytes("<h2>You are " + classification+"</h2></html>\r\n")
+

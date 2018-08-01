@@ -1,0 +1,8 @@
+module def postprocessor(java:Java)
+import java:wyvern.stdlib.support.PostParameters.postparam
+
+type InputStream
+    def close():Unit
+
+def getPayload(is:Dyn):String
+    postparam.getPayload(is)

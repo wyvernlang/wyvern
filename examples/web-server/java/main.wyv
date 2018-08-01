@@ -1,10 +1,28 @@
 require java
-require stdout
+
+// require stdout
+import stdout
+
 import io
 import fileio
+
 import server
-val ioobj = io (java)
-val fileioobj = fileio (java)
+import httphandler
+import THttpHandler
+//import bmihandler
+import simplehandler
+
+import postprocessor
+
+val stdout = stdout(java)
+
+val handle = httphandler(simplehandlder)
+
+val ioobj = io(java)
+val fileioobj = fileio(java)
+val ppobj = postprocessor(java)
+
+val server = server(stdout) 
 
 val serverSocket = ioobj.makeServerSocket(1254)
 
@@ -18,7 +36,7 @@ val s1out = soc.getOutputStream()
 val dos = ioobj.makeDataOutputStream(s1out)
 server.sendHeaders(dos)
 
-val filename = "form.html"
+val filename = handle.file
 val bufferedReader = fileioobj.makeBufferedReader(filename)
 val msg = fileioobj.readFile(bufferedReader)
 server.sendHtmlFile(dos,msg)
@@ -28,9 +46,9 @@ stdout.print("Wrote to DataOutputStream\n")
 
 val soc2 = serverSocket.accept()
 val slin = soc2.getInputStream()
-val din = ioobj.makeDataInputStream(slin)
-val response = din.readLine()
-stdout.print(response)
+val params: Dyn = ppobj.getPayload(slin)
+
+
 
 
 // Close the connection but not the server socket

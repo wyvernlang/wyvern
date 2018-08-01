@@ -1,4 +1,4 @@
-module Server
+module def server(stdout:Stdout)
 
 def sendHeaders(dos:Dyn):Unit
     dos.writeBytes("HTTP/1.0 200 OK\r\n")
@@ -13,5 +13,3 @@ def flush(dos:Dyn):Unit
 	
 def sendHtmlFile(dos:Dyn, str: String):Unit
     dos.writeBytes(str)
-
-    

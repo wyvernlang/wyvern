@@ -1,0 +1,23 @@
+module bmi
+
+val under = "Underweight"
+val norm = "Normal"
+val over = "Overweight"
+val obese = "Obese"
+
+def calculateBmi(height:Float,weight:Float):Float
+    val normalizedHeight: Float = height/100.0
+    val pow: Float = normalizedHeight * normalizedHeight
+    weight/pow
+
+def getBmiClassification(bmi:Float):String
+    if (bmi < 18.5)
+        under
+      else
+          if (bmi > 18.5 && bmi < 25)
+              norm
+            else
+              if (bmi > 25 && bmi < 30)
+                  over
+                else
+                  obese	  

@@ -111,8 +111,9 @@ public class Server {
 	private static List<String> processPOST(String method) {
 
 		String request = method.substring(POST_HEADER_LENGTH);
-		//System.out.println(request);
+		System.out.println(request);
 		List<String> params = Arrays.asList( request.replaceAll("^.*?m\"", "").split("------.*?(m\"|$)"));
+		System.out.println("PARAMS" + params);
 		return params;
 	}
 

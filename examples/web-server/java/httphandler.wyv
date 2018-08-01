@@ -1,0 +1,4 @@
+module def httphandler(handler: THttpHandler)
+
+def file():String
+    handler.responseFile
