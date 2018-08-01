@@ -18,8 +18,9 @@ public class ILTestsWithPrelude {
 
     @Before
     public void setup() {
-        Globals.resetPrelude();
+        Globals.resetState();
     }
+    
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(ILTests.PATH);

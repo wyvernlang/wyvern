@@ -13,15 +13,11 @@ fi
 
 (
 cd src/
-rm -f main_js.wyb
-$WYBY main_js.wyv
+rm -f main.wyb
+$WYBY main.wyv
 )
 echo "Self-bootstrapping"
 echo -n "time: "
-time node boot.js src/main_js.wyb > selfboot.js || rm selfboot.js
-echo "Next boot"
-echo -n "time: "
-time node selfboot.js src/main_js.wyb > nextboot.js || rm selfboot.js nextboot.js
+time node boot.js src/main.wyb > selfboot.js
 mv boot.js boot.js.old
-mv nextboot.js boot.js
-rm selfboot.js
+mv selfboot.js boot.js

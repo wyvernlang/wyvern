@@ -81,7 +81,7 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
                 args.add(arg);
             }
 
-            return generator.genExprWithArgs(args, this);
+            return generator.genExprWithArgs(args, this, false);
         } else {
             return generator.genExpr(this.getLocation());
         }

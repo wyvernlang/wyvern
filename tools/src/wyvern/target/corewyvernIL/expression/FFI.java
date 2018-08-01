@@ -8,6 +8,7 @@ import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
@@ -57,7 +58,14 @@ public class FFI extends AbstractValue {
 
     @Override
     public BytecodeOuterClass.Expression emitBytecode() {
-        return BytecodeOuterClass.Expression.newBuilder().setLiteral(BytecodeOuterClass.Expression.Literal.newBuilder().setStringLiteral("FFI")).build();
+        return BytecodeOuterClass.Expression.newBuilder().setNewExpression(
+                BytecodeOuterClass.Expression.NewExpression.newBuilder().setType(type.emitBytecodeType()).setSelfName("unused").build()
+        ).build();
+    }
+
+    public Tag getTag(EvalContext ctx) {
+        NominalType nt = (NominalType) this.getType();
+        return nt.getTag(ctx);
     }
 
     public static Pair<VarBinding, GenContext> importURI(URI uri, GenContext ctx, HasLocation errorLocation) {

@@ -63,12 +63,12 @@ public class InvocationExprGenerator implements CallableExprGenerator {
     }
 
     @Override
-    public IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc) {
+    public IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc, boolean isTailCall) {
         if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
             IExpr e = genExpr(loc.getLocation());
-            return new MethodCall(e, Util.APPLY_NAME, args, loc);
+            return new MethodCall(e, Util.APPLY_NAME, args, loc, isTailCall);
         } else {
-            return new MethodCall(receiver, declType.getName(), args, loc);
+            return new MethodCall(receiver, declType.getName(), args, loc, isTailCall);
         }
     }
 

@@ -69,7 +69,7 @@ def visitStatement(s: wyb_ast.Statement): wyb_ast.Statement = match s:
 
 def visitDeclaration(d: wyb_ast.Declaration): wyb_ast.Declaration = match d:
     vd: wyb_ast.VariableDeclaration => wyb_ast.VariableDeclaration(vd.declarationType, renameVariable(vd.variable), visitType(vd.t), visitExpression(vd.initializer))
-    md: wyb_ast.MethodDeclaration => wyb_ast.MethodDeclaration(renameVariable(md.methodName), visitArguments(md.arguments), visitType(md.returnType), visitExpression(md.body))
+    md: wyb_ast.MethodDeclaration => wyb_ast.MethodDeclaration(renameVariable(md.methodName), visitArguments(md.arguments), visitType(md.returnType), visitExpression(md.body), md.tco)
     td: wyb_ast.TypeDeclaration => wyb_ast.TypeDeclaration(renameTypename(td.name), visitTypeDesc(td.typeDesc))
 
 def visitExpression(e: wyb_ast.Expression): wyb_ast.Expression = match e:
@@ -79,7 +79,8 @@ def visitExpression(e: wyb_ast.Expression): wyb_ast.Expression = match e:
     f: wyb_ast.FloatLiteral => f
     s: wyb_ast.StringLiteral => s
     ne: wyb_ast.NewExpression => wyb_ast.NewExpression(visitType(ne.t), renameVariable(ne.thisVariable), ne.declarations.map[wyb_ast.Declaration](d => visitDeclaration(d)))
-    ce: wyb_ast.CallExpression => wyb_ast.CallExpression(visitExpression(ce.receiver), renameVariable(ce.method), visitExpressions(ce.arguments))
+    ce: wyb_ast.CallExpression => wyb_ast.CallExpression(visitExpression(ce.receiver), renameVariable(ce.method), visitExpressions(ce.arguments), ce.isTailCall)
+    ii: wyb_ast.InlineIf => wyb_ast.InlineIf(visitExpression(ii.cond), visitExpression(ii.trueExpr), visitExpression(ii.falseExpr))
     pce: wyb_ast.StaticCallExpression => wyb_ast.StaticCallExpression(visitExpression(pce.receiver), pce.receiverType, pce.method, visitExpressions(pce.arguments))
     se: wyb_ast.SequenceExpression => wyb_ast.SequenceExpression(se.statements.map[wyb_ast.Statement](s => visitStatement(s)))
     me: wyb_ast.MatchExpression => visitMatch(me)

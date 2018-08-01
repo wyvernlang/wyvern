@@ -53,7 +53,7 @@ resource datatype Statement
 
 resource datatype Declaration
     VariableDeclaration(declarationType: Int, variable: String, t: Type, initializer: Expression)
-    MethodDeclaration(methodName: String, arguments: List[Argument], returnType: Type, body: Expression)
+    MethodDeclaration(methodName: String, arguments: List[Argument], returnType: Type, body: Expression, tco: Boolean)
     TypeDeclaration(name: String, typeDesc: TypeDesc)
 
 resource type MatchArm
@@ -73,8 +73,9 @@ resource datatype Expression
     StringLiteral(s: String)
     BooleanLiteral(b: Boolean)
     NewExpression(t: Type, thisVariable: String, declarations: List[Declaration])
-    CallExpression(receiver: Expression, method: String, arguments: List[Expression])
+    CallExpression(receiver: Expression, method: String, arguments: List[Expression], isTailCall: Boolean)
     StaticCallExpression(receiver: Expression, receiverType: String, method: String, arguments: List[Expression])
+    InlineIf(cond: Expression, trueExpr: Expression, falseExpr: Expression)
     SequenceExpression(statements: List[Statement])
     MatchExpression(e: Expression, arms: List[MatchArm], elseClause: Option[Expression])
     AccessExpression(e: Expression, field: String)

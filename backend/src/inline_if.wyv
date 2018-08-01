@@ -1,0 +1,67 @@
+module inline_if
+
+import wyvern.option
+import wyvern.collections.list
+
+import wyb_ast
+import util
+
+type List = list.List
+type Option = option.Option
+
+
+def visitStatement(s: wyb_ast.Statement): wyb_ast.Statement = match s:
+    e: wyb_ast.E => wyb_ast.E(visitExpression(e.expression))
+    d: wyb_ast.D => wyb_ast.D(visitDeclaration(d.declaration))
+
+def visitDeclaration(d: wyb_ast.Declaration): wyb_ast.Declaration = match d:
+    vd: wyb_ast.VariableDeclaration => wyb_ast.VariableDeclaration(vd.declarationType, vd.variable, vd.t, visitExpression(vd.initializer))
+    md: wyb_ast.MethodDeclaration => wyb_ast.MethodDeclaration(md.methodName, md.arguments, md.returnType, visitExpression(md.body), md.tco)
+    td: wyb_ast.TypeDeclaration => wyb_ast.TypeDeclaration(td.name, td.typeDesc)
+
+def inlineIf(args: List[wyb_ast.Expression]): wyb_ast.Expression
+    val cond = util.unwrap[wyb_ast.Expression](args.get(0))
+    val ifBlock: Dyn = util.unwrap[wyb_ast.Expression](args.get(1))
+    val trueExpr = util.unwrap[wyb_ast.MethodDeclaration](ifBlock.declarations.get(0)).body
+    val falseExpr = util.unwrap[wyb_ast.MethodDeclaration](ifBlock.declarations.get(1)).body
+    wyb_ast.InlineIf(cond, trueExpr, falseExpr)
+
+def visitCallExpression(ce: wyb_ast.CallExpression): wyb_ast.Expression
+    val r = visitExpression(ce.receiver)
+    val isIf = match r:
+        v: wyb_ast.Var => v.v == "if"
+        default => false
+    if (isIf)
+            val args = visitExpressions(ce.arguments)
+            inlineIf(args)
+        else
+            wyb_ast.CallExpression(r, ce.method, visitExpressions(ce.arguments), ce.isTailCall)
+
+def visitExpression(e: wyb_ast.Expression): wyb_ast.Expression = match e:
+    v: wyb_ast.Var => wyb_ast.Var(v.v)
+    i: wyb_ast.IntegerLiteral => i
+    b: wyb_ast.BooleanLiteral => b
+    f: wyb_ast.FloatLiteral => f
+    s: wyb_ast.StringLiteral => s
+    ne: wyb_ast.NewExpression => wyb_ast.NewExpression(ne.t, ne.thisVariable, ne.declarations.map[wyb_ast.Declaration](d => visitDeclaration(d)))
+    ce: wyb_ast.CallExpression => visitCallExpression(ce)
+    pce: wyb_ast.StaticCallExpression => wyb_ast.StaticCallExpression(visitExpression(pce.receiver), pce.receiverType, pce.method, visitExpressions(pce.arguments))
+    se: wyb_ast.SequenceExpression => wyb_ast.SequenceExpression(se.statements.map[wyb_ast.Statement](s => visitStatement(s)))
+    me: wyb_ast.MatchExpression => visitMatch(me)
+    ae: wyb_ast.AccessExpression => wyb_ast.AccessExpression(visitExpression(ae.e), ae.field)
+    ae: wyb_ast.AssignmentExpression => wyb_ast.AssignmentExpression(visitExpression(ae.e), ae.field, visitExpression(ae.v))
+
+def visitMatchArm(a: wyb_ast.MatchArm): wyb_ast.MatchArm
+    val v = a.variable
+    val p = a.path
+    val e = visitExpression(a.e)
+    wyb_ast.MatchArm(v, p, e)
+
+def visitMatch(me: wyb_ast.MatchExpression): wyb_ast.MatchExpression
+    val e = visitExpression(me.e)
+    val arms = me.arms.map[wyb_ast.MatchArm](a => visitMatchArm(a))
+    val elseClause = me.elseClause.map[wyb_ast.Expression](x => visitExpression(x))
+    wyb_ast.MatchExpression(e, arms, elseClause)
+
+def visitExpressions(expressions: List[wyb_ast.Expression]): List[wyb_ast.Expression]
+    expressions.map[wyb_ast.Expression](e => visitExpression(e))

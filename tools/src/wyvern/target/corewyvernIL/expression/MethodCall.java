@@ -38,15 +38,22 @@ public class MethodCall extends Expression {
     private String methodName;
     private List<? extends IExpr> args;
     private ValueType receiverType;
+    private boolean isTailCall;
 
     public MethodCall(IExpr receiverExpr, String methodName,
-            List<? extends IExpr> args2, HasLocation location) {
+                      List<? extends IExpr> args2, HasLocation location) {
+        this(receiverExpr, methodName, args2, location, false);
+    }
+
+    public MethodCall(IExpr receiverExpr, String methodName,
+            List<? extends IExpr> args2, HasLocation location, boolean isTailCall) {
         super(location != null ? location.getLocation() : null);
         //        if (getLocation() == null || getLocation().line == -1)
         //            throw new RuntimeException("missing location");
         this.objectExpr = receiverExpr;
         this.methodName = methodName;
         this.args = args2;
+        this.isTailCall = isTailCall;
         // sanity check
         if (args2.size() > 0 && args2.get(0) == null) {
             throw new NullPointerException("invariant: no null args");
@@ -87,6 +94,7 @@ public class MethodCall extends Expression {
         } else {
             BytecodeOuterClass.Expression.CallExpression.Builder ce = BytecodeOuterClass.Expression.CallExpression.newBuilder()
                     .setMethod(methodName)
+                    .setIsTailCall(isTailCall)
                     .setReceiver(((Expression) objectExpr).emitBytecode());
 
             for (IExpr expr : args) {

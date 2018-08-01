@@ -318,6 +318,6 @@ public class NominalType extends ValueType {
         if (decl.getSourceType() instanceof NominalType) {
             return ((NominalType) decl.getSourceType()).getTag(object.getEvalCtx());
         }
-        return new Tag(object, this.getTypeMember());
+        return new Tag(object, this.getTypeMember(), this.getPath().toString());
     }
 }

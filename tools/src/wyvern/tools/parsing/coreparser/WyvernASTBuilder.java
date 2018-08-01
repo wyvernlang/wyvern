@@ -328,8 +328,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST application(TypedAST function, List<TypedAST> arguments,
-            FileLocation loc, List<Type> generics) {
-        return new Application(function, arguments, loc != null ? loc : function.getLocation(), generics);
+            FileLocation loc, List<Type> generics, boolean recur) {
+        return new Application(function, arguments, loc != null ? loc : function.getLocation(), generics, recur);
     }
 
     @Override
@@ -371,7 +371,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             throw new RuntimeException();
         }
 
-        return new Application(function, args, app.getLocation(), generics);
+        return new Application(function, args, app.getLocation(), generics, app.isMarkedAsTailCall());
     }
 
     @Override

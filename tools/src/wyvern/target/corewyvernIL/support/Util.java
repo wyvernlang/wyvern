@@ -19,15 +19,15 @@ import wyvern.target.corewyvernIL.type.ValueType;
 
 public final class Util {
     private Util() { }
-    private static ValueType theBooleanType = new NominalType("system", "Boolean");
-    private static ValueType theEmptyType = new StructuralType("empty", new LinkedList<>());
-    private static ValueType theIntType = new NominalType("system", "Int");
-    private static ValueType theFloatType = new NominalType("system", "Float");
-    private static ValueType theCharType = new NominalType("system", "Character");
-    private static ValueType theStringType = new NominalType("system", "String");
-    private static ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
-    private static ValueType theDynType = new DynamicType();
-    private static ValueType theBottomType = new BottomType();
+    private static final ValueType theBooleanType = new NominalType("system", "Boolean");
+    private static final ValueType theEmptyType = new StructuralType("empty", new LinkedList<>());
+    private static final ValueType theIntType = new NominalType("system", "Int");
+    private static final ValueType theFloatType = new NominalType("system", "Float");
+    private static final ValueType theCharType = new NominalType("system", "Character");
+    private static final ValueType theStringType = new NominalType("system", "String");
+    private static final ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
+    private static final ValueType theDynType = new DynamicType();
+    private static final ValueType theBottomType = new BottomType();
 
     public static ValueType booleanType() {
         return theBooleanType;

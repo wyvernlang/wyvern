@@ -143,22 +143,22 @@ def numberToString(x : Number) : String
 def toString(t : Term) : String
   def productWrap(s : Term) : String
     match s:
-      s:Term => toString(s)
       s:Sum => "(" + toString(s) + ")"
+      s:Term => toString(s)
 
   match t:
     t:Constant => numberToString(t.value)
     t:Variable => t.name
     t:Sum => toString(t.u) + " + " + toString(t.v)
     t:Product => match t.u:
-                   u:Term => productWrap(t.u) + " * " + productWrap(t.v)
                    u:Constant => if (floatEq(u.value, -1.0))
                                    "-" + toString(t.v)
                                   else
                                    numberToString(u.value) + toString(t.v)
+                   u:Term => productWrap(t.u) + " * " + productWrap(t.v)
     t:Pow => match t.u:
-               u:Term => "(" + toString(t.u) + ")^" + numberToString(t.n)
                u:Variable => toString(t.u) + "^" + numberToString(t.n)
+               u:Term => "(" + toString(t.u) + ")^" + numberToString(t.n)
     t:Sin => "sin(" + toString(t.u) + ")"
     t:Cos => "cos(" + toString(t.u) + ")"
     t:Exp => numberToString(t.b) + "^(" + toString(t.u) + ")"
@@ -219,8 +219,8 @@ def trySimplify2(
 def simplify(t : Term) : TermStep
   def isConstant(a : Term, n : Number) : Boolean
     match a:
-      _:Term => false
       a:Constant => floatEq(a.value, n)
+      _:Term => false
 
   def isZero(a : Term) : Boolean
     isConstant(a, 0.0)
@@ -230,23 +230,23 @@ def simplify(t : Term) : TermStep
 
   def isSin2(a : Term) : Boolean
     match a:
-      _:Term => false
       a:Pow => if (floatEq(a.n, 2.0))
                  match a.u:
-                   _:Term => false
                    u:Sin => true
+                   _:Term => false
                 else
                  NoStep
+      _:Term => false
 
   def isCos2(a : Term) : Boolean
     match a:
-      _:Term => false
       a:Pow => if (floatEq(a.n, 2.0))
                  match a.u:
-                   _:Term => false
                    u:Cos => true
+                   _:Term => false
                 else
                  NoStep
+      _:Term => false
 
   def simplifySum(a : Term, b : Term) : TermStep
     def zeroSumRule() : TermStep
@@ -259,10 +259,10 @@ def simplify(t : Term) : TermStep
 
     def constantSumRule() : TermStep
       match a:
-        a:Term => NoStep
         a:Constant => match b:
-                        b:Term => NoStep
                         b:Constant => Step(Constant(a.value + b.value))
+                        b:Term => NoStep
+        a:Term => NoStep
 
     def pythagorasRule() : TermStep
       if (isSin2(a) && isCos2(b) || isCos2(a) && isSin2(b))
@@ -295,17 +295,17 @@ def simplify(t : Term) : TermStep
 
     def constantProductRule() : TermStep
       match a:
-        a:Term => NoStep
         a:Constant => match b:
-                        b:Term => NoStep
                         b:Constant => Step(Constant(a.value * b.value))
+                        b:Term => NoStep
+        a:Term => NoStep
 
     def leftConstantRule() : TermStep
       match a:
-        a:Term => match b:
-                    b:Term => NoStep
-                    b:Constant => Step(Product(b, a))
         a:Constant => NoStep
+        a:Term => match b:
+                    b:Constant => Step(Product(b, a))
+                    b:Term => NoStep
 
     firstMatch(zeroProductRule(),
       () => firstMatch(oneProductRule(),
@@ -353,11 +353,11 @@ def simplify(t : Term) : TermStep
 
     def expInverseRule() : TermStep
       match u:
-        u:Term => NoStep
         u:Log => if (floatEq(b, u.b))
                    Step(u.u)
                   else
                    NoStep
+        u:Term => NoStep
 
     firstMatch(expZeroPowRule(),
       () => firstMatch(expZeroBaseRule(),
@@ -388,9 +388,9 @@ def simplify(t : Term) : TermStep
 
     def bringDownRule() : TermStep
       match u:
-        u:Term => NoStep
         u:Pow => Step(Product(Constant(u.n), Log(b, u.u)))
         u:Exp => Step(Product(u.u, Log(b, Constant(u.b))))
+        u:Term => NoStep
 
     firstMatch(logOneArgRule(),
       () => firstMatch(logZeroBaseRule(),
