@@ -2,9 +2,7 @@ exports.index = function(l, i) {
     return l[i];
 }
 
-exports.length = function(l) {
-    if (l === undefined)
-        debugger;
+exports._length = function(l) {
     return l.length;
 }
 
