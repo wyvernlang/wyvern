@@ -117,7 +117,6 @@ public final class Globals {
             gettingPrelude = true;
             String preludeLocation = TestUtil.LIB_PATH + PRELUDE_NAME;
             File file = new File(preludeLocation);
-
             prelude = ModuleResolver.getLocal().loadPrelude(file);
             gettingPrelude = false;
         }

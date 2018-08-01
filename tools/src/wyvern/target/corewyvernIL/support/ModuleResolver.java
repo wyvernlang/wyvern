@@ -616,6 +616,7 @@ public class ModuleResolver {
         preludeModule = ModuleResolver.getLocal().load("<prelude>", file, true);
         prelude = ModuleResolver.getLocal().wrap(preludeModule.getExpression(), preludeModule.getDependencies());
         TailCallVisitor.annotate(prelude);
+        prelude.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
         return prelude;
     }
 
