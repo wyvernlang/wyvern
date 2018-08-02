@@ -12,9 +12,26 @@ type Option = option.Option
 def isKeyword(s: String): Boolean
     s == "this" || s == "if" || s == "arguments" || s == "return"
 
-// @Speed (also it's ugly)
+// @Speed
 def escapeVariable(s: String): String
-    util.replace(util.replace(util.replace(util.replace(s, "@", "at"), "-", "_"), "$", "_M_"), ".", "_DOT_")
+    var result: String = util.replace(s, ".", "_DOT_")
+    result = util.replace(result, "$", "_M_")
+    result = util.replace(result, "@", "at")
+    result = util.replace(result, "+", "_PLUS_")
+    result = util.replace(result, "-", "_HYPHEN_")
+    result = util.replace(result, "*", "_TIMES_")
+    result = util.replace(result, "/", "_DIVIDE_")
+    result = util.replace(result, "%", "_MOD_")
+    result = util.replace(result, "<", "_LESSTHAN_")
+    result = util.replace(result, ">", "_GREATERTHAN_")
+    result = util.replace(result, "=","_EQUAL_")
+    result = util.replace(result, "&","_AMPERSAND_")
+    result = util.replace(result, "|","_VERTICALBAR_")
+    result = util.replace(result, "!","_NOT_")
+    if (result == "length")
+            "_length"
+        else
+            result
 
 def renameVariable(s: String): String
     if (isKeyword(s))
