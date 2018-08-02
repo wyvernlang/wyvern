@@ -1,0 +1,44 @@
+require stdout
+
+type Number = Int
+
+def foo1(x: Number): Number
+    x + 3
+
+def foo2(x: Number): Int
+    x + 3
+
+def foo3(x: Number): Int
+    val y: Int = x
+    y * 2
+
+resource type Foo
+    var x: Int
+    var y: Number
+
+def Foo(): Foo = new
+    var x: Int = 1
+    var y: Number = 1
+
+
+def foo4(foo: Foo, x: Number): Int
+    foo.x = x
+    foo.y = 7
+    foo.y
+
+type StringLike
+    def length(): Int
+
+def foo5(s: StringLike): Int
+    s.length()
+
+stdout.printInt(foo1(3))
+stdout.println()
+stdout.printInt(foo2(3))
+stdout.println()
+stdout.printInt(foo3(3))
+stdout.println()
+stdout.printInt(foo4(Foo(), 3))
+stdout.println()
+stdout.printInt(foo5("Hello"))
+stdout.println()

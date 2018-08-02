@@ -419,24 +419,39 @@ public class ModuleResolver {
         return ctx;
     }
 
+    public SeqExpr addSystemObject(Expression expression) {
+        SeqExpr expr = new SeqExpr();
+        expr.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+        expr.merge(expression);
+        return expr;
+    }
+
     public SeqExpr buildPreludedExpression(Expression expression) {
         Module prelude = Globals.getPreludeModule();
         SeqExpr expr = new SeqExpr();
-        expr.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+        expr = addSystemObject(expr);
         expr.merge(prelude.getExpression());
         expr.merge(expression);
         return expr;
     }
 
-    public BytecodeOuterClass.Bytecode emitBytecode(Module module, List<TypedModuleSpec> dependencies) {
+    public BytecodeOuterClass.Bytecode emitBytecode(Module module) {
+        List<TypedModuleSpec> dependencies = module.getDependencies();
         BytecodeOuterClass.Bytecode.Builder wyb = BytecodeOuterClass.Bytecode.newBuilder();
         wyb.setVersion(BytecodeOuterClass.Bytecode.Version.newBuilder().setMagic(42)
                 .setMajor(0).setMinor(1))
-                .setPath("com.todo");
+                .setPath("");
 
         BytecodeOuterClass.Module.ValueModule.Builder v = BytecodeOuterClass.Module.ValueModule.newBuilder()
                 .setType(module.getSpec().getType().emitBytecodeType())
                 .setExpression(buildPreludedExpression(module.getExpression()).emitBytecode());
+
+//        Print CoreWyvernIL for debug
+//        try {
+//            System.out.println(module.getExpression().prettyPrint());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath("toplevel").setValueModule(v));
 
@@ -447,7 +462,7 @@ public class ModuleResolver {
             Module dep = resolveModule(spec.getQualifiedName());
             Expression e;
             if (prelude.getDependencies().contains(spec)) {
-                e = dep.getExpression();
+                e = addSystemObject(dep.getExpression());
             } else {
                 e = buildPreludedExpression(dep.getExpression());
             }
