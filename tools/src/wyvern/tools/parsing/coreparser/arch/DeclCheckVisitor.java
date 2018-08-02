@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 
-public class DeclCheckVisitor extends ArchParserVisitorAdapter {
+public class DeclCheckVisitor extends ArchParserDefaultVisitor {
     private InterpreterState state;
     private HashMap<String, ASTComponentTypeDecl> componentTypes = new HashMap<>();
     private HashSet<String> connectorTypes = new HashSet<>();

@@ -46,7 +46,7 @@ public class ASTConnectorTypeDecl extends SimpleNode {
     }
 
     public void collectVals() {
-        for (Node child : children) {
+        for (Node child : this.getChildren()) {
             if (child instanceof ASTValDecl) {
                 String name = ((ASTValDecl) child).getName();
                 String type = ((ASTValDecl) child).getType();
@@ -75,14 +75,14 @@ public class ASTConnectorTypeDecl extends SimpleNode {
                                         .getTypeMember();
                                 if (!vals.get(name).equals(type)) {
                                     ToolError.reportError(
-                                            ErrorMessage.CONNECTOR_VAL_INCONSISTENCY, location,
+                                            ErrorMessage.CONNECTOR_VAL_INCONSISTENCY, this.getLocation(),
                                             typeName);
                                 }
                             }
                             return true;
                         }
                     }
-                    ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, location,
+                    ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, this.getLocation(),
                             typeName);
                 }
             }

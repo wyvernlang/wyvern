@@ -64,7 +64,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
     }
 
     public void collectPorts() {
-        for (Node child : children) {
+        for (Node child : this.getChildren()) {
             if (child instanceof ASTPortDecl) {
                 String req = ((ASTPortDecl) child).getRequires();
                 String prov = ((ASTPortDecl) child).getProvides();
@@ -92,7 +92,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
             if (!expr.getType().toString().contains("apply(")) {
                 System.out.println(expr.getType().toString());
                 // throw error saying it's not a module def
-                ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, location,
+                ToolError.reportError(ErrorMessage.MODULE_DEF_NOT_FOUND, this.getLocation(),
                         typeName);
             }
 
@@ -104,7 +104,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
                         if (args.size() != reqs.size()) {
                             // inconsistent dependency errors
                             ToolError.reportError(
-                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
                                     typeName);
                         }
                         for (FormalArg f : args) {
@@ -113,7 +113,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
                             if (!reqs.get(name).equals(type)) {
                                 // inconsistent dependency error
                                 ToolError.reportError(
-                                        ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                        ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
                                         typeName);
                             }
                         }
@@ -140,7 +140,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
                         if (provs.get(name) == null || !provs.get(name).equals(t)) {
                             // inconsistent fields
                             ToolError.reportError(
-                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
                                     typeName);
                         } else {
                             checkCount++;
@@ -149,7 +149,7 @@ public class ASTComponentTypeDecl extends SimpleNode {
                     if (checkCount != valdecltypes.size()) {
                         // inconsistent fields
                         ToolError.reportError(
-                                ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, location,
+                                ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
                                 typeName);
                     }
                 }

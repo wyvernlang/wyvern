@@ -1,4 +1,0 @@
-#! /bin/bash
-
-jjtree ArchParser.jjt
-javacc ArchParser.jj
