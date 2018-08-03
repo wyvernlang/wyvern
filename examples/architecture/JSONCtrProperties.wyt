@@ -71,7 +71,7 @@ type JSONCtrProperties
 			val hostport = "40000"
 			
 			val client = "require stdout\nrequire java\nimport Client\nimport CSIface_requires_port\nimport CSIface\nimport JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\nval client_getInfo: CSIface = CSIface_requires_port(jsonCtrProps, java, stdout)\nval client = Client(client_getInfo)\n"
-			val server = "require io.io\nrequire java\nimport CSIface_provides_port\nimport Server\nval server = Server()\nval server_sendInfo = CSIface_provides_port(server.sendInfo, io.makeServerSocket("+hostport+"), java)\nval serverThread = server_sendInfo.getThread()\nserverThread.start()\n"
+			val server = "require java\nimport io.io\nimport CSIface_provides_port\nimport Server\nval io = io(java)\nval server = Server()\nval server_sendInfo = CSIface_provides_port(server.sendInfo, io.makeServerSocket("+hostport+"), java)\nval serverThread = server_sendInfo.getThread()\nserverThread.start()\n"
 
 			val clientAST : ast.AST = ast.parseExpressionNoContext(client)
 			val serverAST : ast.AST = ast.parseExpressionNoContext(server)

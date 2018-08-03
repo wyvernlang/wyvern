@@ -272,6 +272,9 @@ public class ModuleResolver {
 
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
+        } else if (ast instanceof New) {
+            System.out.println(((New) ast).getSelfName());
+            program = (IExpr) ast;
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
             if (decl instanceof ValDeclaration) {

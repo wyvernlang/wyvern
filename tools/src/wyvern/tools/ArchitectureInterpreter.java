@@ -227,7 +227,7 @@ public final class ArchitectureInterpreter {
     }
 
     private static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
-                                                 Path filepath, InterpreterState state) throws ParseException, FileNotFoundException {
+                                                  Path filepath, InterpreterState state) throws ParseException, FileNotFoundException {
         File f = new File(rootLoc + "/" + filepath.toString());
         BufferedReader source = new BufferedReader(new FileReader(f));
         ArchParser wp = new ArchParser(
@@ -263,7 +263,8 @@ public final class ArchitectureInterpreter {
                 for (Declaration decl : ((New) newAST).getDecls()) {
                     if (decl instanceof ModuleDeclaration) {
                         String moduleName = ((ModuleDeclaration) decl).getName();
-                        state.getResolver().addModuleAST(moduleName, newAST);
+                        state.addModuleAST(moduleName, newAST);
+                        // System.out.println(moduleName);
                     }
                 }
                 portInstances.add(newAST);

@@ -74,6 +74,8 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
 
+import static wyvern.target.corewyvernIL.support.InterpreterState.getLocalThreadInterpreter;
+
 public class AST {
     public static final AST utils = new AST();
 
@@ -332,7 +334,8 @@ public class AST {
                         "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
             }
             TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
-            InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(rootLoc), new File(wyvernPath));
+            InterpreterState state = getLocalThreadInterpreter();
+                    // new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(rootLoc), new File(wyvernPath));
             GenContext genContext = Globals.getGenContext(state);
             if (typAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
                 wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod =
@@ -343,7 +346,6 @@ public class AST {
                 l.add(moduleDecl);
                 New moduleExpression = new New(l, FileLocation.UNKNOWN);
                 return moduleExpression;
-//                return state.getResolver().wrap(moduleExpression, dependencies);
             } else if (typAST instanceof Script) {
                 Script script = (Script) typAST;
                 List<ImportDeclaration> importDecls = new ArrayList<>();
