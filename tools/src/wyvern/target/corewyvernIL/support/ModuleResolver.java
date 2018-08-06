@@ -60,7 +60,7 @@ public class ModuleResolver {
     private InterpreterState state;
     private File rootDir;
     private File libDir;
-    private HashMap<String, IExpr> modules;
+    private HashMap<String, wyvern.tools.typedAST.core.declarations.ModuleDeclaration> modules;
     private SeqExpr prelude = null;
     private Module preludeModule = null;
 
@@ -90,7 +90,7 @@ public class ModuleResolver {
         this.searchPath = searchPath;
     }
 
-    public void addModuleAST(String moduleName, IExpr moduleAST) {
+    public void addModuleAST(String moduleName, wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleAST) {
         if (modules.containsKey(moduleName)) {
             ToolError.reportError(ErrorMessage.DUPLICATE_GENERATED_MODULES, FileLocation.UNKNOWN, moduleName);
         } else {
@@ -170,7 +170,7 @@ public class ModuleResolver {
             File f = resolve(qualifiedName, false);
             modulesBeingResolved.add(qualifiedName);
             if (f == null || !f.exists()) {
-                IExpr moduleAST = modules.get(qualifiedName);
+                wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleAST = modules.get(qualifiedName);
                 if (moduleAST == null) {
                     ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "module", qualifiedName);
                 } else {
@@ -265,16 +265,12 @@ public class ModuleResolver {
         return f;
     }
 
-    public Module loadContinuation(File file, String qualifiedName, Object ast, boolean loadingType, boolean toplevel) {
+    public Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel) {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
-
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
-        } else if (ast instanceof New) {
-            System.out.println(((New) ast).getSelfName());
-            program = (IExpr) ast;
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
             if (decl instanceof ValDeclaration) {
@@ -343,13 +339,13 @@ public class ModuleResolver {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
-        if (platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
+        if (file != null && platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
             // if the type is in functor form
             if (moduleType instanceof StructuralType
                     && ((StructuralType) moduleType).getDeclTypes().size() == 1
                     && ((StructuralType) moduleType).getDeclTypes().get(0) instanceof DefDeclType
                     && ((StructuralType) moduleType).getDeclTypes().get(0).getName().equals("apply")
-                    && file != null) {
+                    ) {
                 DefDeclType appType = (DefDeclType) ((StructuralType) moduleType).getDeclTypes().get(0);
                 // if the functor takes a system.X object for current platform type X
                 ILFactory f = ILFactory.instance();

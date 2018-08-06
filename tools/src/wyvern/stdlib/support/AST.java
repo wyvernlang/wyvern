@@ -1,14 +1,11 @@
 package wyvern.stdlib.support;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +56,6 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.ArchitectureInterpreter;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -300,8 +296,6 @@ public class AST {
     public IExpr parseExpression(String input, GenContext ctx) throws ParseException {
         try {
             ExpressionAST ast = (ExpressionAST) TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
-            //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
-            // Extend parseTSL with a second argument (abstract type representing context)
             // TODO: Handle InterpreterState/GenContext
             return ast.generateIL(ctx, null, new LinkedList<TypedModuleSpec>());
         } catch (ParseException e) {
@@ -310,42 +304,13 @@ public class AST {
         }
     }
 
-    public IExpr parseExpressionNoContext(String input) throws ParseException {
+    public Object parseExpressionNoContext(String input) throws ParseException {
+        InterpreterState state = getLocalThreadInterpreter();
+        GenContext genContext = Globals.getGenContext(state);
         try {
-            String rootLoc;
-            if (ArchitectureInterpreter.wyvernRoot.get() != null) {
-                rootLoc = ArchitectureInterpreter.wyvernRoot.get();
-            } else {
-                rootLoc = System.getProperty("user.dir");
-            }
-            String wyvernPath = System.getenv("WYVERN_HOME");
-            if (wyvernPath == null) {
-                if (ArchitectureInterpreter.wyvernHome.get() != null) {
-                    wyvernPath = ArchitectureInterpreter.wyvernHome.get();
-                } else {
-                    System.err.println(
-                            "must set WYVERN_HOME environmental variable to wyvern project directory");
-                }
-            }
-            wyvernPath += "/stdlib/";
-            // sanity check: is the wyvernPath a valid directory?
-            if (!Files.isDirectory(Paths.get(wyvernPath))) {
-                System.err.println(
-                        "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
-            }
             TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
-            InterpreterState state = getLocalThreadInterpreter();
-                    // new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(rootLoc), new File(wyvernPath));
-            GenContext genContext = Globals.getGenContext(state);
             if (typAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
-                wyvern.tools.typedAST.core.declarations.ModuleDeclaration mod =
-                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) typAST;
-                List<TypedModuleSpec> dependencies = getDependencies(mod.getImports(), genContext);
-                ModuleDeclaration moduleDecl = (ModuleDeclaration) mod.topLevelGen(genContext, dependencies);
-                List<NamedDeclaration> l = new LinkedList<>();
-                l.add(moduleDecl);
-                New moduleExpression = new New(l, FileLocation.UNKNOWN);
-                return moduleExpression;
+                return (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) typAST;
             } else if (typAST instanceof Script) {
                 Script script = (Script) typAST;
                 List<ImportDeclaration> importDecls = new ArrayList<>();
@@ -356,7 +321,7 @@ public class AST {
                 expr = state.getResolver().wrap(expr, dependencies);
                 return expr;
             } else {
-                return null;
+                return parseExpression(input, genContext);
             }
         } catch (ParseException e) {
             System.err.println("Error when running parseExpression on input \"" + input + "\"");

@@ -263,7 +263,7 @@ public final class ArchitectureInterpreter {
                 for (Declaration decl : ((New) newAST).getDecls()) {
                     if (decl instanceof ModuleDeclaration) {
                         String moduleName = ((ModuleDeclaration) decl).getName();
-                        state.addModuleAST(moduleName, newAST);
+                        // state.addModuleAST(moduleName, newAST);
                         // System.out.println(moduleName);
                     }
                 }
@@ -271,6 +271,9 @@ public final class ArchitectureInterpreter {
             } else if (javaAST instanceof SeqExpr) {
                 SeqExpr seqAST = (SeqExpr) javaAST;
                 portInstances.add(seqAST);
+            } else if (javaAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
+                state.addModuleAST(((wyvern.tools.typedAST.core.declarations.ModuleDeclaration) javaAST).getName(),
+                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) javaAST);
             } else {
                 throw new RuntimeException("Unexpected expression in generated AST");
             }
