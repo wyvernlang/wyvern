@@ -4,7 +4,14 @@ NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true
 package wyvern.tools.parsing.coreparser.arch;
 
 public class ASTPortDecl extends SimpleNode {
-    private String requires, provides, port;
+    // "port" is the name of the port declared
+    private String port;
+    // "requires" is the name of the interface required by the port,
+    // or empty string if the port doesn't require any interface
+    private String requires;
+    // "provides" is the name of the interface provided by the port,
+    // or empty string if the port doesn't provide any interface
+    private String provides;
 
     public ASTPortDecl(int id) {
         super(id);

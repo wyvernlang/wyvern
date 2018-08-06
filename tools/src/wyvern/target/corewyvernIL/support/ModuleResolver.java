@@ -265,7 +265,7 @@ public class ModuleResolver {
         return f;
     }
 
-    public Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel) {
+    private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel) {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
@@ -344,8 +344,7 @@ public class ModuleResolver {
             if (moduleType instanceof StructuralType
                     && ((StructuralType) moduleType).getDeclTypes().size() == 1
                     && ((StructuralType) moduleType).getDeclTypes().get(0) instanceof DefDeclType
-                    && ((StructuralType) moduleType).getDeclTypes().get(0).getName().equals("apply")
-                    ) {
+                    && ((StructuralType) moduleType).getDeclTypes().get(0).getName().equals("apply")) {
                 DefDeclType appType = (DefDeclType) ((StructuralType) moduleType).getDeclTypes().get(0);
                 // if the functor takes a system.X object for current platform type X
                 ILFactory f = ILFactory.instance();

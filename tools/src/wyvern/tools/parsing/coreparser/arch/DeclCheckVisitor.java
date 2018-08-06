@@ -12,12 +12,18 @@ import wyvern.tools.errors.ToolError;
 
 public class DeclCheckVisitor extends ArchParserDefaultVisitor {
     private InterpreterState state;
-    private HashMap<String, ASTComponentTypeDecl> componentTypes = new HashMap<>();
     private HashSet<String> connectorTypes = new HashSet<>();
+    // "componentTypes" maps component type name to the component type declaration AST node
+    private HashMap<String, ASTComponentTypeDecl> componentTypes = new HashMap<>();
+    // components maps component instance name to the component declaration AST node
     private HashMap<String, ASTComponentDecl> components = new HashMap<>();
+    // "connectors" maps connector instance name to the connector type
     private HashMap<String, String> connectors = new HashMap<>();
+    // entrypoints maps entrypoint name to the corresponding component instance name
     private HashMap<String, String> entrypoints = new HashMap<>();
+    // attachments maps connector instance name to the component ports in the connection
     private HashMap<String, HashSet<String>> attachments = new HashMap<>();
+    // portdecls maps port name to the port declaration AST node
     private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
 
     public List<ASTComponentDecl> generateDependencyGraph() {
@@ -129,14 +135,14 @@ public class DeclCheckVisitor extends ArchParserDefaultVisitor {
             String port = portParts[1];
             // check component declaration exists
             // get component type
-            String type = components.get(component).getType();
-            if (type == null) {
+            ASTComponentDecl comp = components.get(component);
+            if (comp == null) {
                 ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
                         node.getLocation(), "component", component);
             }
             // check component of that type has port
             ASTComponentTypeDecl typeDecl = componentTypes
-                    .get(type);
+                    .get(comp.getType());
             if (!typeDecl.getReqs().containsKey(port)
                     && !typeDecl.getProvs().containsKey(port)) {
                 ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,

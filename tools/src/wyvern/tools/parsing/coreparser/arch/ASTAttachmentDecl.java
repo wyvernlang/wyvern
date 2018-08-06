@@ -6,6 +6,8 @@ package wyvern.tools.parsing.coreparser.arch;
 import java.util.HashSet;
 
 public class ASTAttachmentDecl extends SimpleNode {
+    // "ports" contains the names of the ports in a connection
+    // entries are in the form <component instance>.<port>
     private HashSet<String> ports = new HashSet<>();
     private String connector;
 

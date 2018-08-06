@@ -66,7 +66,7 @@ public final class ArchitectureInterpreter {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         if (args.length != 1) {
-            System.err.println("usage: wyvarch <filename>");
+            System.err.println("usage: wyarch <filename>");
             System.exit(1);
         }
         String filename = args[0];
@@ -87,16 +87,14 @@ public final class ArchitectureInterpreter {
                 if (wyvernHome.get() != null) {
                     wyvernPath = wyvernHome.get();
                 } else {
-                    System.err.println(
-                            "must set WYVERN_HOME environmental variable to wyvern project directory");
+                    System.err.println("must set WYVERN_HOME environmental variable to wyvern project directory");
                     return;
                 }
             }
             wyvernPath += "/stdlib/";
             // sanity check: is the wyvernPath a valid directory?
             if (!Files.isDirectory(Paths.get(wyvernPath))) {
-                System.err.println(
-                        "Error: WYVERN_HOME is not set to a valid Wyvern project directory");
+                System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
                 return;
             }
             // Construct interpreter state

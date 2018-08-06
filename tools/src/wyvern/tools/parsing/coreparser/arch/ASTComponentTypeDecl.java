@@ -24,7 +24,9 @@ import wyvern.tools.errors.ToolError;
 public class ASTComponentTypeDecl extends SimpleNode {
     private boolean isExternal = false;
     private String typeName;
+    // "reqs" maps port names to the fields they require
     private HashMap<String, String> reqs = new HashMap<>();
+    // "provs" maps port names to the fields they provide
     private HashMap<String, String> provs = new HashMap<>();
 
     public ASTComponentTypeDecl(int id) {

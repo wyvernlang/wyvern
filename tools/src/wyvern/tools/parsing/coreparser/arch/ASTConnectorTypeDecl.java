@@ -23,6 +23,7 @@ import wyvern.tools.errors.ToolError;
 
 public class ASTConnectorTypeDecl extends SimpleNode {
     private String typeName;
+    // "vals" maps val declarations to their types
     private HashMap<String, String> vals = new HashMap<>();
 
     public ASTConnectorTypeDecl(int id) {

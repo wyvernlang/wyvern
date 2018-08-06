@@ -304,14 +304,28 @@ public class AST {
         }
     }
 
-    public Object parseExpressionNoContext(String input) throws ParseException {
+    public wyvern.tools.typedAST.core.declarations.ModuleDeclaration parseGeneratedModule(String input) throws ParseException {
         InterpreterState state = getLocalThreadInterpreter();
         GenContext genContext = Globals.getGenContext(state);
         try {
-            TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "TSL Parse");
+            TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "Module generation");
             if (typAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
                 return (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) typAST;
-            } else if (typAST instanceof Script) {
+            } else {
+                throw new RuntimeException("Unexpected parsing input is not a module declaration: \"" + input + "\"");
+            }
+        } catch (ParseException e) {
+            System.err.println("Error when running parseExpression on input \"" + input + "\"");
+            throw e;
+        }
+    }
+
+    public IExpr parseExpressionNoContext(String input) throws ParseException {
+        InterpreterState state = getLocalThreadInterpreter();
+        GenContext genContext = Globals.getGenContext(state);
+        try {
+            TypedAST typAST = TestUtil.getNewAST(input.trim() + "\n", "Parse expressions");
+            if (typAST instanceof Script) {
                 Script script = (Script) typAST;
                 List<ImportDeclaration> importDecls = new ArrayList<>();
                 importDecls.addAll(script.getImports());
