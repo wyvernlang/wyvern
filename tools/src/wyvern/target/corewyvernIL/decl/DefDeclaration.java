@@ -132,7 +132,7 @@ public class DefDeclaration extends NamedDeclaration {
             bodyType.isSubtypeOf(resultType, methodCtx, r);
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE,
                     this,
-                    "method body's type " + bodyType.desugar(methodCtx),
+                    "Method body's type " + bodyType.desugar(methodCtx),
                     "declared type " + resultType.desugar(thisCtx),
                     r.getReason());
 

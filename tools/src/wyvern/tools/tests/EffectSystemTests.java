@@ -128,11 +128,14 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLogger() throws ParseException {
-        expectedException.expect(ToolError.class);
         /* A method has an effect annotation involving a globally available effect (system.ffiEffect)
          * in module but not in type. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
+        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
+                + "MOD$effects.Logger.Logger; declaration updateLog is not a subtype of the expected declaration at location file "
+                + Paths.get(PATH, "effects", "logger.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger", Util.intType(), new IntegerLiteral(5));
     }
 
@@ -148,10 +151,13 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLogger2() throws ParseException {
-        expectedException.expect(ToolError.class);
         /* A method has an effect annotation, involving a passed in resource, in module but not in type. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
+        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
+                + "MOD$effects.Logger2.Logger2; declaration updateLog is not a subtype of the expected declaration at location file "
+                + Paths.get(PATH, "effects", "logger2.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger2", Util.intType(), new IntegerLiteral(5));
     }
 
@@ -297,20 +303,25 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNetwork13() throws ParseException {
-        /* Nonexistent effect in method annotation in type (not in module,
-         * but error should be reported before module is evaluated). */
+        /* Nonexistent effect in method annotation in type (not in module);
+         * error should be reported before module is evaluated). */
         expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
+        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
+                + "MOD$effects.NetworkType13.NetworkType13; declaration receiveData is not a subtype of the expected declaration at location file "
+                + Paths.get(PATH, "effects", "network13.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork13", Util.stringType(), new StringLiteral("Network13 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNetwork14() throws ParseException {
-        /* Int included as effect in module annotation of type (not in module,
-         * but error should be reported before module is evaluated). */
+        /* A field is used in a method effect annotation in a type. */
         expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
+        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
+                + "MOD$effects.NetworkType14.NetworkType14; declaration receiveData is not a subtype of the expected declaration at location file "
+                + Paths.get(PATH, "effects", "network14.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork14", Util.stringType(), new StringLiteral("Network14 with effects"));
     }
 
