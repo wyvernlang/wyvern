@@ -119,4 +119,17 @@ public class EffectSet {
         }
         return new EffectSet(newSet);
     }
+
+    public boolean equalsByName(EffectSet other) {
+        HashSet<String> thisEffectSet = new HashSet<String>();
+        for (Effect e : effectSet) {
+            thisEffectSet.add(e.getName());
+        }
+        HashSet<String> otherEffectSet = new HashSet<String>();
+        for (Effect e : other.effectSet) {
+            otherEffectSet.add(e.getName());
+        }
+        return thisEffectSet.equals(otherEffectSet);
+    }
+
 }
