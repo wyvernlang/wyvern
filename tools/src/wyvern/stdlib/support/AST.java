@@ -118,7 +118,8 @@ public class AST {
         for (ObjectValue obj: typeParamObjs) {
             typeParams.add(getType(obj));
         }
-        return new RefinementType(typeParams, getType(base), base);
+        // TODO (@justinlubin) track effects?
+        return new RefinementType(typeParams, new LinkedList<>(), getType(base), base);
     }
 
     public Expression intLiteral(int i) {

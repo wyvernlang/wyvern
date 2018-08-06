@@ -12,6 +12,7 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -39,6 +40,7 @@ public class RefinementType extends ValueType {
         this.selfSite = old.selfSite;
         this.declTypes = old.declTypes;
         this.typeParams = old.typeParams;
+        this.effectParams = old.effectParams;
     }
 
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, BindingSite selfSite) {
@@ -47,16 +49,18 @@ public class RefinementType extends ValueType {
         this.selfSite = selfSite;
     }
 
-    public RefinementType(List<ValueType> typeParams, ValueType base, HasLocation hasLoc) {
+    public RefinementType(List<ValueType> typeParams, List<EffectSet> effectParams, ValueType base, HasLocation hasLoc) {
         super(hasLoc);
         this.base = base;
         this.typeParams = typeParams;
+        this.effectParams = effectParams;
     }
 
     private ValueType base;
     private BindingSite selfSite;
     private List<DeclType> declTypes = null; // may be computed lazily from typeParams
     private List<ValueType> typeParams;
+    private List<EffectSet> effectParams;
 
     private List<DeclType> getDeclTypes(TypeContext ctx) {
         if (declTypes == null) {
@@ -97,7 +101,12 @@ public class RefinementType extends ValueType {
     public ValueType adapt(View v) {
         ValueType newBase = base.adapt(v);
         if (declTypes == null) {
-            return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase, this);
+            return new RefinementType(
+                    typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()),
+                    effectParams,
+                    newBase,
+                    this
+            );
         }
         List<DeclType> newDTs = new LinkedList<DeclType>();
         for (DeclType dt : declTypes) {
@@ -113,7 +122,7 @@ public class RefinementType extends ValueType {
         ValueType newBase = base.doAvoid(varName, ctx, depth);
         if (declTypes == null) {
             List<ValueType> newTPs = typeParams.stream().map(p -> p.doAvoid(varName, ctx, depth)).collect(Collectors.toList());
-            return new RefinementType(newTPs, base, this);
+            return new RefinementType(newTPs, effectParams, base, this);
         }
         for (DeclType dt : declTypes) {
             DeclType newDT = dt.doAvoid(varName, ctx, depth + 1);

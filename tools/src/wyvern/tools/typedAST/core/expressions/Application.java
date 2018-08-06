@@ -6,10 +6,13 @@ import java.util.Map;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
+import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -22,17 +25,17 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.generics.GenericArgument;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Type;
 
 public class Application extends AbstractExpressionAST implements CoreAST {
     private ExpressionAST function;
     private List<TypedAST> arguments;
-    private List<Type> generics;
+    private List<GenericArgument> generics;
     private FileLocation location;
     private boolean markedAsTailCall;
 
@@ -42,15 +45,15 @@ public class Application extends AbstractExpressionAST implements CoreAST {
      * @param function the function that is called
      * @param arguments the arguments passed at the call site
      * @param location the location of the call site in the source file
-     * @param generics2 the vector of type parameters passed at the call site
+     * @param genericArguments the vector of generic arguments passed at the call site
      * @param markedAsTailCall is this a `recur` function call
      */
     public Application(TypedAST function, List<TypedAST> arguments,
-            FileLocation location, List<Type> generics2, boolean markedAsTailCall) {
+                       FileLocation location, List<GenericArgument> genericArguments, boolean markedAsTailCall) {
         this.function = (ExpressionAST) function;
         this.arguments = arguments == null ? new LinkedList<TypedAST>() : arguments;
         this.location = location;
-        this.generics = (generics2 != null) ? generics2 : new LinkedList<Type>();
+        this.generics = (genericArguments != null) ? genericArguments : new LinkedList<>();
         this.markedAsTailCall = markedAsTailCall;
     }
 
@@ -62,7 +65,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         return function;
     }
 
-    public List<Type> getGenerics() {
+    public List<GenericArgument> getGenerics() {
         return generics;
     }
 
@@ -135,22 +138,27 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         return count;
     }
 
-    private void addGenericToArgList(
-            String formalName,
-            Type generic,
-            List<IExpr> args,
-            GenContext ctx
-            ) {
+    private void addGenericToArgList(String formalName, GenericArgument generic, List<IExpr> args, GenContext ctx) {
+        final String genericName = formalName.substring(DefDeclaration.GENERIC_PREFIX.length());
+        final NamedDeclaration namedDeclaration;
 
-        String genericName = formalName
-                .substring(DefDeclaration.GENERIC_PREFIX.length());
+        switch (generic.getKind()) {
+            case TYPE:
+                ValueType vt = generic.getType().getILType(ctx);
+                namedDeclaration = new TypeDeclaration(genericName, vt, this.location);
+                break;
+            case EFFECT:
+                EffectSet effectSet = EffectSet.parseEffects(genericName, generic.getEffect(), false, this.location);
+                namedDeclaration = new EffectDeclaration(genericName, effectSet, this.location);
+                break;
+            default:
+                throw new RuntimeException("Unhandled generic argument kind: " + generic.getKind());
+        }
 
-        ValueType vt = generic.getILType(ctx);
-        args.add(
-                new wyvern.target.corewyvernIL.expression.New(
-                        new TypeDeclaration(genericName, vt, this.location)
-                        )
-                );
+
+        wyvern.target.corewyvernIL.expression.New newGeneric =
+                new wyvern.target.corewyvernIL.expression.New(namedDeclaration);
+        args.add(newGeneric);
     }
 
     private void generateILForTuples(
@@ -194,7 +202,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             // then we can simply add each of the actual generics to the argument's list
             for (int i = 0; i < count; i++) {
                 String formalName = formals.get(i).getName();
-                Type generic = this.generics.get(i);
+                GenericArgument generic = this.generics.get(i);
                 addGenericToArgList(formalName, generic, args, ctx);
             }
         } else {
@@ -280,7 +288,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             ) {
         for (int i = 0; i < this.generics.size(); i++) {
             String formalName = formals.get(i).getName();
-            Type generic = this.generics.get(i);
+            GenericArgument generic = this.generics.get(i);
             addGenericToArgList(formalName, generic, args, ctx);
         }
     }
