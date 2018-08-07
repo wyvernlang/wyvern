@@ -208,7 +208,6 @@ public class MethodCall extends Expression {
      * @return the declaration of the method.
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
-
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
         StructuralType receiverType = receiver.getStructuralType(ctx);
@@ -329,8 +328,14 @@ public class MethodCall extends Expression {
                 return defDeclType;
             }
         }
-
         // Couldn't find an appropriate method declaration. Build up a nice error message.
+        methodDeclarationNotFound(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
+        throw new RuntimeException("Tool error should be thrown");
+    }
+
+    private void methodDeclarationNotFound(
+            TypeContext ctx, List<DeclType> declarationTypes, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
+    ) {
         StringBuilder errMsg = new StringBuilder();
         //errMsg.append(methodName);
         //errMsg.append("(");
@@ -361,7 +366,5 @@ public class MethodCall extends Expression {
             errMsg.append("; argument subtyping failed because " + failureReason);
         }
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
-        return null;
     }
-
 }

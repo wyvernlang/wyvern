@@ -46,6 +46,7 @@ import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.generics.GenericArgument;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ILFactory;
@@ -113,13 +114,13 @@ public class AST {
         return new StructuralType("ignore$Me", declTypes);
     }
 
+    // TODO (@justinlubin) track effects?
     public ValueType refinementType(List<ObjectValue> typeParamObjs, ObjectValue base) {
-        List<ValueType> typeParams = new LinkedList<>();
-        for (ObjectValue obj: typeParamObjs) {
-            typeParams.add(getType(obj));
+        List<GenericArgument> genericArguments = new LinkedList<>();
+        for (ObjectValue obj : typeParamObjs) {
+            genericArguments.add(new GenericArgument(getType(obj)));
         }
-        // TODO (@justinlubin) track effects?
-        return new RefinementType(typeParams, new LinkedList<>(), getType(base), base);
+        return new RefinementType(genericArguments, getType(base), base);
     }
 
     public Expression intLiteral(int i) {

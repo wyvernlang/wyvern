@@ -109,8 +109,11 @@ public enum ErrorMessage {
     NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),
     METHODS_MUST_BE_INVOKED("Cannot access a method as if it were a field; use ()", 0),
     TSL_ERROR("Error in type-specific language: %ARG", 1),
-    CANNOT_APPLY_TYPE_PARAMETERS("Cannot apply type parameters: type %ARG is abstract", 1),
-    NO_TYPE_MEMBER("Cannot find enough type members to apply type parameters", 0),
+    CANNOT_APPLY_GENERIC_ARGUMENTS("Cannot apply generic arguments: type %ARG is abstract", 1),
+    NO_TYPE_MEMBER("Cannot find enough type members to apply type argument %ARG", 1),
+    NO_EFFECT_MEMBER("Cannot find enough effect members to apply effect argument %ARG", 1),
+    NON_TYPE_ARGUMENT("Cannot apply generic argument of kind %ARG to an abstract type", 1),
+    NON_EFFECT_ARGUMENT("Cannot apply generic argument of kind %ARG to an abstract effect", 1),
 
     // effects errors
     MISTAKEN_DSL("Invalid characters for effect--should not be a DSL block: \"effect %ARG = {%ARG}\"", 2),
