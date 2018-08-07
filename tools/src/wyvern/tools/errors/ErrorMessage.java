@@ -118,7 +118,8 @@ public enum ErrorMessage {
     EFFECT_NOT_IN_SCOPE("Effect \"%ARG\" not found in scope", 1),
     //    EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
     RECURSIVE_EFFECT("Effect \"%ARG\" is being defined recursively", 1),
-    UNKNOWN_EFFECT("Effects of method call \"%ARG\" are unknown", 1);
+    UNKNOWN_EFFECT("Effects of method call \"%ARG\" are unknown", 1),
+    UNNAMED_EFFECT("Effect \"%ARG\" must be attached to a named object", 1);
 
     ErrorMessage(String message, int numArgs) {
         errorMessage = message;

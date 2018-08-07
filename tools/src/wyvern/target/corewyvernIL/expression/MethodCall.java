@@ -298,6 +298,19 @@ public class MethodCall extends Expression {
                             if (e.getPath() == null) {
                                 e.setPath((Variable) objectExpr); // TODO: should not set path to objectExpr
                             }
+
+                            // If the effect is dependent on the arguments, set its path correctly
+                            for (int i = 0; i < args.size(); i++) {
+                                final FormalArg formalArg = formalArgs.get(i);
+                                if (e.getPath() != null && formalArg.getName().equals(e.getPath().toString())) {
+                                    final IExpr arg = args.get(i);
+                                    if (arg instanceof Variable) {
+                                        e.setPath((Variable) arg);
+                                    } else {
+                                        ToolError.reportError(ErrorMessage.UNNAMED_EFFECT, this, e.toString());
+                                    }
+                                }
+                            }
                         }
                         effectAccumulator.addEffects(methodCallE.getEffects());
                     }
