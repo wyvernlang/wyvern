@@ -1,11 +1,14 @@
 package wyvern.tools;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -15,10 +18,10 @@ import wyvern.target.corewyvernIL.expression.Value;
 
 public final class ReplServer {
     private static HashMap<String, REPL> map = new HashMap<String, REPL>();;
-    
+
     private ReplServer() {
     }
-    
+
     public static void main(String[] args) throws Exception {
         // create a java server and tell it to listen on port 8000
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -43,31 +46,79 @@ public final class ReplServer {
             isr.close();
             String response = "";
             if (t.getRequestMethod().equals("POST")) {
-                Value v = null;
-                System.out.println(buf.toString());
-                if (map.containsKey(t.getRequestHeaders().get("id").get(0))) {
-                    System.out.println("repl exist for this id");
-                    REPL requestREPL = map.get(t.getRequestHeaders().get("id").get(0));
-                    try {
-                        v = requestREPL.interpretREPL(buf.toString());
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                if (t.getRequestHeaders().get("operation").get(0).equals("closing")) {
+                    System.out.println("deleting program for id: " + t.getRequestHeaders().get("id").get(0));
+                    map.remove(t.getRequestHeaders().get("id").get(0));
+                } else if(t.getRequestHeaders().get("operation").get(0).equals("interpretREPL")){
+
+                    String v = null;
+
+                    System.out.println("Running code: " + buf.toString());
+                    System.out.println("For id: " + t.getRequestHeaders().get("id").get(0));
+                    if (map.containsKey(t.getRequestHeaders().get("id").get(0))) {
+                        REPL requestREPL = map.get(t.getRequestHeaders().get("id").get(0));
+                        try {
+                            v = requestREPL.interpretREPL(buf.toString());
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        REPL newProgram = new REPL();
+                        map.put(t.getRequestHeaders().get("id").get(0), newProgram);
+                        try {
+                            v = newProgram.interpretREPL(buf.toString());
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
                     }
 
-                } else {
-                    System.out.println("does not");
-                    REPL newProgram = new REPL();
-                    map.put(t.getRequestHeaders().get("id").get(0), newProgram);
+                    if (v != null) {
+                        response = v;
+                    } else {
+                        response = " ";
+                    }
+                } else if(t.getRequestHeaders().get("operation").get(0).equals("interpretModule")){
+                    System.out.println("running module");
+                } else if(t.getRequestHeaders().get("operation").get(0).equals("saveModule")){
+                    System.out.println("saving module");
+                } else if(t.getRequestHeaders().get("operation").get(0).equals("loadModule")){
+                    String moduleName = buf.toString();
+                    File file = new File("..\\tools\\src\\wyvern\\tools\\tests\\modules\\replModules\\" + moduleName + ".wyv");
+                    
+                    BufferedReader fileReader = new BufferedReader(new FileReader(file));
+                   
+                    String st;
+                    while ((st = fileReader.readLine()) != null) {
+                        response = response + st + "\n";
+                    }
+                } else if(t.getRequestHeaders().get("operation").get(0).equals("loadAllModule")){
                     try {
-                        v = newProgram.interpretREPL(buf.toString());
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
+                       
+                        File folder = new File("..\\tools\\src\\wyvern\\tools\\tests\\modules\\replModules");
+                        File[] listOfFiles = folder.listFiles();
+
+                        for (int i = 0; i < listOfFiles.length; i++) {
+                            if(listOfFiles[i].getName().endsWith(".wyv")) {
+                                response = response + listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length()-4) + " ";
+                            }
+                        }
+                        
+                    }catch(Exception e){
                         e.printStackTrace();
                     }
                 }
+            }
 
-                response = v.toString();
+            t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+
+            if (t.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
+                t.getResponseHeaders().add("Access-Control-Allow-Methods", "*");
+                t.getResponseHeaders().add("Access-Control-Allow-Headers",
+                        "Origin, X-Requested-With, Content-Type, Accept, Authorization, id, operation");
+                t.sendResponseHeaders(204, -1);
             }
 
             t.sendResponseHeaders(200, response.length());

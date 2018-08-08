@@ -9,6 +9,7 @@ import java.util.Scanner;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -21,6 +22,7 @@ import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernParserConstants;
+import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -39,6 +41,7 @@ public class REPL {
     private EvalContext programContext;
     private String tempCode = "";
     private GenContext genContext;
+    private String tempModuleCode = "";
 
     public REPL() {
 
@@ -51,7 +54,7 @@ public class REPL {
 
         while (true) {
             input = scanner.nextLine();
-            Value v = repl.interpretREPL(input);
+            String v = repl.interpretREPL(input);
             if (v != null) {
                 System.out.println(v);
             }
@@ -66,14 +69,14 @@ public class REPL {
      *            inputed code from the user.
      * @return The result of the code being interpreted.
      */
-    public Value interpretREPL(String userInput) {
+    public String interpretREPL(String userInput) {
         try {
             if (userInput.equals("exit")) {
                 System.exit(1);
             } else if (userInput.equals("genctx")) {
-                System.out.println(genContext);
+                return genContext.toString();
             } else if (userInput.equals("evalctx")) {
-                System.out.println(programContext);
+                return programContext.toString();
             } else if (userInput.equals("clear")) {
                 tempCode = "";
             } else if (userInput.equals("reset")) {
@@ -85,7 +88,7 @@ public class REPL {
             } else {
                 Value v = parse(userInput);
                 if (v != null) {
-                    return v;
+                    return v.toString();
                 }
             }
         } catch (Exception e) {
@@ -159,6 +162,10 @@ public class REPL {
             genContext = tlc.getContext();
             tempCode = "";
             return result.getFirst();
+        } else if((programContext != null && genContext != null) && !tempModuleCode.isEmpty()) {
+            InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(BASE_PATH), new File(LIB_PATH));
+            TypedAST ast = getNewAST(input, "test input");
+            return null;
         } else {
             // program already exists - extend existing context with new code
             ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
@@ -179,6 +186,21 @@ public class REPL {
 
             tempCode = "";
             return result.getFirst();
+        }
+    }
+    
+    /**
+     * Method for handling modules in REPL
+     * 
+     * @param the module to interpret
+     * 
+     * @return The result of the module
+     */
+    public Value interpretModule(String module) {
+        try {
+            return null;
+        }catch(Exception e){
+            return null;
         }
     }
 
