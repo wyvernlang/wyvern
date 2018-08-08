@@ -292,6 +292,7 @@ public class ModuleResolver {
                 // rename according to "apply"
                 DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(),
                         oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
+                // TODO[ql] here^ is where we want to put the polymorphism on the module functor itself?
                 // wrap in an object
                 program = new New(defDecl);
                 //program = wrap(program, dependencies);
