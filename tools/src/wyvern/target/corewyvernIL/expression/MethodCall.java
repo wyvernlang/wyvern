@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
@@ -292,26 +295,43 @@ public class MethodCall extends Expression {
 //                    if (methodCallE==null) {
 //                        ToolError.reportError(ErrorMessage.UNKNOWN_EFFECT, getLocation(), getMethodName());
 //                    }
-                    if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
-                        for (Effect e : methodCallE.getEffects()) {
-                            if (e.getPath() == null) {
-                                e.setPath((Variable) objectExpr); // TODO: should not set path to objectExpr
-                            }
 
+                    if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
+                        Set<Effect> concreteEffects = new HashSet<>();
+                        for (Effect e : methodCallE.getEffects()) {
                             // If the effect is dependent on the arguments, set its path correctly
+                            boolean dependent = false;
                             for (int i = 0; i < args.size(); i++) {
                                 final FormalArg formalArg = formalArgs.get(i);
-                                if (e.getPath() != null && formalArg.getName().equals(e.getPath().toString())) {
-                                    final IExpr arg = args.get(i);
-                                    if (arg instanceof Variable) {
-                                        e.setPath((Variable) arg);
-                                    } else {
-                                        ToolError.reportError(ErrorMessage.UNNAMED_EFFECT, this, e.toString());
+
+                                if (e.getPath() == null || !formalArg.getName().equals(e.getPath().toString())) {
+                                    continue;
+                                }
+                                dependent = true;
+
+                                final IExpr arg = args.get(i);
+
+                                if (arg instanceof Variable) {
+                                    // Normal dependent effect
+                                    concreteEffects.add(new Effect((Variable) arg, e.getName(), e.getLocation()));
+                                } else if (arg instanceof New) {
+                                    // Polymorphic dependent effect
+                                    for (Declaration d : ((New) arg).getDecls()) {
+                                        if (d instanceof EffectDeclaration && d.getName().equals(e.getName())) {
+                                            concreteEffects.addAll(((EffectDeclaration) d).getEffectSet().getEffects());
+                                        }
                                     }
                                 }
                             }
+                            // Otherwise, just add it
+                            if (!dependent) {
+                                if (e.getPath() == null) {
+                                    e.setPath((Variable) objectExpr); // TODO: should not set path to objectExpr
+                                }
+                                concreteEffects.add(e);
+                            }
                         }
-                        effectAccumulator.addEffects(methodCallE.getEffects());
+                        effectAccumulator.addEffects(concreteEffects);
                     }
                 }
 

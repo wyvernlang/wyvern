@@ -7,6 +7,7 @@ import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.PythonCompiler;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -87,6 +88,12 @@ public class ExampleTests {
   public void testLambdaCalculus() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "introductory.lambdaCalculusToJS",
         null, null);
+  }
+
+  @Test
+  public void testPolymorphicEffects() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "introductory.polymorphicEffects",
+            Util.stringType(), new StringLiteral("poly5"));
   }
 
   @Test

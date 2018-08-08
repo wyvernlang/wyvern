@@ -1,0 +1,47 @@
+type Generic
+  effect E
+
+val u : Generic[{system.ffiEffect}] = new
+  effect E = {system.ffiEffect}
+
+val r : Generic[{system.ffiEffect}] = new
+  effect E = {}
+
+val s : Generic[{}] = new
+  effect E = {}
+
+val t : Generic = new
+  effect E = {}
+
+def id1(g : Generic, x : String) : {g.E} String
+  x
+
+def id2[T, effect F](x : T) : {F} T
+  x
+
+def id3[effect L, S](x : S) : {L} S
+  x
+
+def stuff1(x : String) : {u.E} String
+   id1(u, x)
+   // Not inferrable if just id2(x) or id2[String](x)
+   id2[String, {u.E}](x)
+   // Not inferrable if just id2(x)
+   id3[{u.E}, String](x)
+   id3[{u.E}](x)
+   id3[{r.E}](x)
+
+def stuff2(x : String) : {s.E} String
+  // Won't effect check:
+  // id3[{u.E}](x)
+  // id3[{r.E}](x)
+  // id3[{t.E}](x) <-- even though t.E = {}, it's hidden (abstract)
+  id3[{s.E}](x)
+  id3[{}](x)
+
+stuff1("poly1")
+stuff2("poly2")
+
+id1(u, "poly3")
+id2[String, {u.E}]("poly4")
+id3[{u.E}]("poly5")
