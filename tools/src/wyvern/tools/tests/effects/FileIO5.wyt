@@ -1,0 +1,6 @@
+import effects.fileIOEffects as fEffects
+resource type FileIO2
+    effect readF = {fEffects.readF}
+    effect writeF = {fEffects.writeF}
+    def read(): {readF} Int
+    def write(x: Int): {writeF} Int

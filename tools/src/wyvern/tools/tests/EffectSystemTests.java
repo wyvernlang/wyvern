@@ -128,6 +128,14 @@ public class EffectSystemTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
+    public void testFileIO5() throws ParseException {
+        /* Effects defined in a pure module are used in effect definitions in both type and module.
+         * Pure module imported in type is renamed. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO5", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
     public void testLogger() throws ParseException {
         /* A method has an effect annotation involving a globally available effect (system.ffiEffect)
          * in module but not in type. */
