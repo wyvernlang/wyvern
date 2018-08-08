@@ -193,6 +193,12 @@ public class EffectSystemTests {
     }
 
     @Test
+    public void testLogger6() throws ParseException {
+        /* Uses a resource passed as a method argument in the method's effect annotation. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger6", Util.intType(), new IntegerLiteral(2));
+    }
+
+    @Test
     public void testNested() throws ParseException {
         /* An object in a module's immutable field defines an effect
          * and uses it in a method annotation inside that object. */
