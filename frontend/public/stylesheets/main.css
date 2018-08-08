@@ -1,0 +1,43 @@
+
+
+body{
+  margin: auto;
+  width: 90%;
+}
+
+.form-control {
+  height: 200px;
+}
+
+#console-editor-mirror {
+  border:1px solid black;
+  float: right;
+  width:50%;
+  max-height:80vh;
+  height:80vh;
+}
+
+#moduleBody {
+  border:1px solid black;
+  float: left;
+  width:50%;
+  max-height:80vh;
+  height: 80vh;
+}
+
+#module-editor-mirror {
+  max-height:73vh;
+  height: 73vh;
+}
+
+#moduleBody{
+  border:1px solid black;
+}
+
+button.btn.btn-primary.btn-lg {
+  width: 33%;
+}
+
+button.btn.btn-secondary.btn-lg {
+  width: 33%;
+}
