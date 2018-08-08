@@ -7,5 +7,6 @@ var file: FileIO = fileIO
 val x = 1
 if (x > 0)
   file = fileIO1
-val log = logger3(file)
+val file1 = file // workaround; remove when testLogger5 is fixed
+val log = logger3(file1)
 log.updateLog(1)

@@ -162,7 +162,7 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
+    // TODO: uses a workaround that should be removed once testLogger5 is fixed
     public void testLogger3() throws ParseException {
         /* The exact resource instance passed into a module functor is conditional
          * (i.e. it is decided by an if statement). */
@@ -174,6 +174,14 @@ public class EffectSystemTests {
         /* Globally available effect (system.ffiEffect) is used to annotate a method directly
          * without defining any local effects. */
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger4", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    // TODO: affects testLogger3, which uses a workaround for this issue; update testLogger3 once this is fixed
+    public void testLogger5() throws ParseException {
+        /* The resource instance to be passed into a module functor is stored in a variable. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger5", Util.intType(), new IntegerLiteral(2));
     }
 
     @Test
