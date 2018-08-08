@@ -256,17 +256,30 @@ public class RefinementType extends ValueType {
         if (!(obj instanceof RefinementType)) {
             return false;
         }
+
         RefinementType other = (RefinementType) obj;
-        if (declTypes == null && other.declTypes == null) {
-            return base.equals(other.base) && genericArguments.equals(other.genericArguments);
+
+        if (!base.equals(other.base)) {
+            return false;
         }
+
         if (declTypes == null || other.declTypes == null) {
-            if (!base.equals(other.base)) {
-                return false;
-            }
-            return countRefinements() == other.countRefinements() && getGenericArguments().equals(other.getGenericArguments());
+            return getGenericArguments().equals(other.getGenericArguments());
+        } else {
+            return declTypes.equals(other.declTypes);
         }
-        return base.equals(other.base) && declTypes.equals(other.declTypes);
+
+        // TODO (@justinlubin) messes things up because of lazy evaluation?
+        //
+        //        if (declTypes == null && other.declTypes == null) {
+        //            return base.equals(other.base) && genericArguments.equals(other.genericArguments);
+        //        }
+        //        if (declTypes == null || other.declTypes == null) {
+        //            if (!base.equals(other.base)) {
+        //                return false;
+        //            }
+        //            return countRefinements() == other.countRefinements() && getGenericArguments().equals(other.getGenericArguments());
+        //        }
     }
 
     private int countRefinements() {
