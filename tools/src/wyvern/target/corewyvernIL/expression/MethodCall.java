@@ -349,11 +349,12 @@ public class MethodCall extends Expression {
             }
         }
         // Couldn't find an appropriate method declaration. Build up a nice error message.
-        methodDeclarationNotFound(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
-        throw new RuntimeException("Tool error should be thrown");
+        String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
+        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
+        return null;
     }
 
-    private void methodDeclarationNotFound(
+    private String methodDeclarationNotFoundMsg(
             TypeContext ctx, List<DeclType> declarationTypes, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
     ) {
         StringBuilder errMsg = new StringBuilder();
@@ -385,6 +386,6 @@ public class MethodCall extends Expression {
         if (failureReason != null) {
             errMsg.append("; argument subtyping failed because " + failureReason);
         }
-        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
+        return errMsg.toString();
     }
 }

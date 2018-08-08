@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,16 +70,16 @@ public class RefinementType extends ValueType {
             base.checkWellFormed(ctx);
             StructuralType st = base.getStructuralType(ctx, null);
             if (st == null) {
-                // for debugging
-                base.checkWellFormed(ctx);
-
                 ToolError.reportError(ErrorMessage.CANNOT_APPLY_GENERIC_ARGUMENTS, getLocation(), base.toString());
             }
 
             final List<DeclType> stDeclTypes = st.getDeclTypes();
-            final Iterator<GenericArgument> genericArgumentIterator = genericArguments.iterator();
+            final Iterator<GenericArgument> genericArgumentIterator =
+                    genericArguments == null ? Collections.emptyIterator() : genericArguments.iterator();
 
             // Instantiate (make concrete) the abstract types with the arguments that are passed in
+            // Note: The case in which there are more generic arguments than declTypes in the structural type
+            //       is handled after the loop (in the if statement)
             for (DeclType dt : stDeclTypes) {
                 // Generic arguments are used up
                 if (!genericArgumentIterator.hasNext()) {
@@ -105,7 +106,7 @@ public class RefinementType extends ValueType {
                 declTypes.add(declTypeToAdd);
             }
 
-            // Too many generic arguments!
+            // ...too many generic arguments!
             if (genericArgumentIterator.hasNext()) {
                 final GenericArgument ga = genericArgumentIterator.next();
                 switch (ga.getKind()) {
@@ -133,7 +134,7 @@ public class RefinementType extends ValueType {
         ValueType newBase = base.adapt(v);
         if (declTypes == null) {
             return new RefinementType(
-                    genericArguments.stream().map(ga -> adaptArgument(v, ga)).collect(Collectors.toList()),
+                    genericArguments.stream().map(ga -> ga.adapt(v)).collect(Collectors.toList()),
                     newBase,
                     this
             );
@@ -145,17 +146,6 @@ public class RefinementType extends ValueType {
         return new RefinementType(newBase, newDTs, this, selfSite);
     }
 
-    private static GenericArgument adaptArgument(View v, GenericArgument ga) {
-        switch (ga.getKind()) {
-            case TYPE:
-                return new GenericArgument(ga.getType().adapt(v));
-            case EFFECT:
-                return new GenericArgument(ga.getEffect().adapt(v));
-            default:
-                throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + ga.getKind());
-        }
-    }
-
     @Override
     public ValueType doAvoid(String varName, TypeContext ctx, int depth) {
         List<DeclType> newDeclTypes = new LinkedList<DeclType>();
@@ -164,7 +154,7 @@ public class RefinementType extends ValueType {
         if (declTypes == null) {
             return new RefinementType(
                     genericArguments.stream()
-                            .map(ga -> doAvoidArgument(varName, ctx, depth, ga))
+                            .map(ga -> ga.doAvoid(varName, ctx, depth))
                             .collect(Collectors.toList()),
                     base,
                     this
@@ -181,17 +171,6 @@ public class RefinementType extends ValueType {
             return this;
         } else {
             return new RefinementType(newBase, newDeclTypes, this, selfSite);
-        }
-    }
-
-    private static GenericArgument doAvoidArgument(String varName, TypeContext ctx, int depth, GenericArgument ga) {
-        switch (ga.getKind()) {
-            case TYPE:
-                return new GenericArgument(ga.getType().doAvoid(varName, ctx, depth));
-            case EFFECT:
-                return new GenericArgument(ga.getEffect().doAvoid(varName, ctx, depth));
-            default:
-                throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + ga.getKind());
         }
     }
 
@@ -268,22 +247,6 @@ public class RefinementType extends ValueType {
         } else {
             return declTypes.equals(other.declTypes);
         }
-
-        // TODO (@justinlubin) messes things up because of lazy evaluation?
-        //
-        //        if (declTypes == null && other.declTypes == null) {
-        //            return base.equals(other.base) && genericArguments.equals(other.genericArguments);
-        //        }
-        //        if (declTypes == null || other.declTypes == null) {
-        //            if (!base.equals(other.base)) {
-        //                return false;
-        //            }
-        //            return countRefinements() == other.countRefinements() && getGenericArguments().equals(other.getGenericArguments());
-        //        }
-    }
-
-    private int countRefinements() {
-        return (declTypes != null) ? declTypes.size() : genericArguments.size();
     }
 
     private List<GenericArgument> getGenericArguments() {

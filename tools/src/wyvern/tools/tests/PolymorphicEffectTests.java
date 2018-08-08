@@ -96,7 +96,16 @@ public class PolymorphicEffectTests {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.subtype4", Util.stringType(), new StringLiteral("abc"));
     }
 
-// Rejected examples
+    // Rejected examples
+
+    @Test
+    public void testRejectedAbstractTypeRefinement() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "Cannot apply generic arguments: type myLogger.T is abstract"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejected-abstract-type-refinement", Util.stringType(), new StringLiteral("abcabc"));
+    }
 
     @Test
     public void testRejectedCombination1() throws ParseException {

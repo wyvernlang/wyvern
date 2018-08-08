@@ -114,7 +114,6 @@ public class AST {
         return new StructuralType("ignore$Me", declTypes);
     }
 
-    // TODO (@justinlubin) track effects?
     public ValueType refinementType(List<ObjectValue> typeParamObjs, ObjectValue base) {
         List<GenericArgument> genericArguments = new LinkedList<>();
         for (ObjectValue obj : typeParamObjs) {

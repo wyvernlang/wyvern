@@ -3,6 +3,8 @@ package wyvern.target.corewyvernIL.generics;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
@@ -87,6 +89,28 @@ public class GenericArgument {
             throw new RuntimeException("Access to EFFECT union member with mismatched kind " + this.kind);
         }
         return this.effect;
+    }
+
+    public GenericArgument adapt(View v) {
+        switch (this.getKind()) {
+            case TYPE:
+                return new GenericArgument(this.getType().adapt(v));
+            case EFFECT:
+                return new GenericArgument(this.getEffect().adapt(v));
+            default:
+                throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + this.getKind());
+        }
+    }
+
+    public GenericArgument doAvoid(String varName, TypeContext ctx, int depth) {
+        switch (this.getKind()) {
+            case TYPE:
+                return new GenericArgument(this.getType().doAvoid(varName, ctx, depth));
+            case EFFECT:
+                return new GenericArgument(this.getEffect().doAvoid(varName, ctx, depth));
+            default:
+                throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + this.getKind());
+        }
     }
 
     @Override

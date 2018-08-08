@@ -310,7 +310,6 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
                 member = new AbstractTypeMember(genericName);
                 break;
             case EFFECT:
-                // TODO (@justinlubin) null loc?
                 member = new EffectDeclType(genericName, null, null);
                 break;
             default:
