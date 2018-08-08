@@ -1,4 +1,4 @@
-resource type FileIO
+resource type FileIO4
     effect readF
     effect writeF = {system.ffiEffect}
     def read(): {readF} Int
