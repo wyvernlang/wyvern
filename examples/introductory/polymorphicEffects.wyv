@@ -45,3 +45,20 @@ stuff2("poly2")
 id1(u, "poly3")
 id2[String, {u.E}]("poly4")
 id3[{u.E}]("poly5")
+
+type Function
+  effect E
+  type A
+  type B
+  def apply(x : this.A) : {this.E} this.B
+
+def apply[effect E, A, B](f : Function[{E}, A, B], x : A) : B
+  f(x)
+
+val backToBack = new
+  effect E = {system.ffiEffect}
+  type A = String
+  type B = String
+  def apply(x : String) : {system.ffiEffect} String = x + x
+
+apply[{system.ffiEffect}, String, String](backToBack, "abc")

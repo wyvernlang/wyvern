@@ -93,7 +93,7 @@ public class ExampleTests {
   @Test
   public void testPolymorphicEffects() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "introductory.polymorphicEffects",
-            Util.stringType(), new StringLiteral("poly5"));
+            Util.stringType(), new StringLiteral("abcabc"));
   }
 
   @Test

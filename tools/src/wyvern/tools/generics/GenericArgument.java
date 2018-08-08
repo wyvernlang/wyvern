@@ -58,4 +58,16 @@ public class GenericArgument {
         }
         return this.effect;
     }
+
+    @Override
+    public String toString() {
+        switch (this.kind) {
+            case TYPE:
+                return "TYPE: " + this.getType().toString();
+            case EFFECT:
+                return "EFFECT: " + this.getEffect();
+            default:
+                throw new RuntimeException("Unhandled generic argument kind: " + this.kind);
+        }
+    }
 }
