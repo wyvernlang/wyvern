@@ -105,4 +105,16 @@ public class GenericArgument {
                 throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + kind);
         }
     }
+
+    @Override
+    public String toString() {
+        switch (this.kind) {
+            case TYPE:
+                return "TYPE: " + this.getType().toString();
+            case EFFECT:
+                return "EFFECT: " + this.getEffect().toString();
+            default:
+                throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + kind);
+        }
+    }
 }
