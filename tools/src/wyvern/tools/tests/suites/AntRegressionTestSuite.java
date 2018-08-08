@@ -20,6 +20,7 @@ import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
 import wyvern.tools.tests.OIRTests;
+import wyvern.tools.tests.PolymorphicEffectTests;
 import wyvern.tools.tests.ReflectionTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
@@ -56,6 +57,7 @@ import wyvern.tools.tests.TransformTests;
             ExampleTests.class,      // tests the examples
             ExamplesNoPrelude.class,      // tests the examples that don't require the prelude
             EffectSystemTests.class,
+            PolymorphicEffectTests.class,
             ModuleSystemTests.class,        // tests the new IL
         }
         )
