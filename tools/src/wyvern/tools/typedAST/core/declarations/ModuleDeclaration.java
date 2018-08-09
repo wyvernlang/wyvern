@@ -204,11 +204,20 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         separatePlatformDependencies(platformDependentImports, platformIndependentImports);
         Sequence normalSeq = (inner instanceof Sequence) ? ((DeclSequence) inner).filterNormal() : new Sequence(inner);
 
-        List<FormalArg> formalArgs;
+        List<FormalArg> formalArgs = new LinkedList<>();
+
+        // Add the generic parameters to the list of formal arguments, if they exist
+        if (this.generics != null) {
+            GenContext[] contexts = new GenContext[1];
+            contexts[0] = methodContext;
+            DefDeclaration.addGenericParameters(contexts, formalArgs, this.generics);
+            methodContext = contexts[0];
+        }
+
         List<Module> loadedTypes = new LinkedList<Module>();
-        formalArgs = getTypes(ctx, loadedTypes); // get the types of the module parameters
+        formalArgs.addAll(getTypes(methodContext, loadedTypes)); // get the types of the module parameters
         wyvern.target.corewyvernIL.type.ValueType ascribedValueType
-            = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
+            = ascribedType == null ? null : this.getType(methodContext, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
         for (Module lt : loadedTypes) {
             // include the declaration itself
             final BindingSite internalSite = lt.getSpec().getSite();

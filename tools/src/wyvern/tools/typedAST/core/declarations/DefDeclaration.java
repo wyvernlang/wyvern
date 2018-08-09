@@ -135,17 +135,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     private GenContext serializeArguments(List<FormalArg> args, GenContext ctx) {
         if (isGeneric()) {
-            for (GenericParameter gp : this.generics) {
-                String s = gp.getName();
-
-                ValueType type = DefDeclaration.genericStructuralType(s, gp.getKind());
-                String genName = GENERIC_PREFIX + s;
-                BindingSite argSite = new BindingSite(genName);
-                args.add(new FormalArg(argSite, type));
-
-                ctx = new TypeOrEffectGenContext(s, argSite, ctx);
-                ctx = ctx.extend(argSite, new Variable(argSite), type);
-            }
+            GenContext[] contexts = new GenContext[1];
+            contexts[0] = ctx;
+            addGenericParameters(contexts, args, generics);
+            ctx = contexts[0];
         }
 
         for (NameBinding b : argNames) {
@@ -175,20 +168,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
         List<FormalArg> args = new LinkedList<FormalArg>();
         GenContext methodContext = thisContext;
+
         if (isGeneric()) {
-            for (GenericParameter gp : this.generics) {
-                String s = gp.getName();
-
-                String genName = GENERIC_PREFIX + s;
-                BindingSite argSite = new BindingSite(genName);
-                ValueType type = DefDeclaration.genericStructuralType(s, gp.getKind());
-                args.add(new FormalArg(argSite, type));
-
-                methodContext = methodContext.extend(argSite, new Variable(argSite), type);
-                thisContext = thisContext.extend(argSite, new Variable(argSite), type);
-                methodContext = new TypeOrEffectGenContext(s, argSite, methodContext);
-                thisContext = new TypeOrEffectGenContext(s, argSite, thisContext); // TODO +s
-            }
+            GenContext[] contexts = new GenContext[2];
+            contexts[0] = methodContext;
+            contexts[1] = thisContext;
+            addGenericParameters(contexts, args, generics);
+            methodContext = contexts[0];
+            thisContext = contexts[1];
         }
 
         for (NameBinding b : argNames) {
@@ -298,6 +285,32 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         setterDecl = new DefDeclaration(setterName, unitType, setterArgs, setterBody, false, null); // may need to add effectSet?
         return setterDecl;
 
+    }
+
+    /**
+     * Adds a list of generic parameters to a list of formal arguments and updates the entries of an array of contexts
+     * with this new information.
+     *
+     * @param contexts The contexts to update (modified by method)
+     * @param formalArgs The list of formal arguments to which the new generic parameter arguments will be added (modified by method)
+     * @param generics The generic parameters to be added to the list of formal arguments (not modified by method)
+     */
+    public static void addGenericParameters(
+            GenContext[] contexts, List<FormalArg> formalArgs, List<GenericParameter> generics
+    ) {
+        for (GenericParameter gp : generics) {
+            String s = gp.getName();
+
+            String genName = GENERIC_PREFIX + s;
+            BindingSite argSite = new BindingSite(genName);
+            ValueType type = DefDeclaration.genericStructuralType(s, gp.getKind());
+            formalArgs.add(new FormalArg(argSite, type));
+
+            for (int i = 0; i < contexts.length; i++) {
+                contexts[i] = contexts[i].extend(argSite, new Variable(argSite), type);
+                contexts[i] = new TypeOrEffectGenContext(s, argSite, contexts[i]);
+            }
+        }
     }
 
     public static StructuralType genericStructuralType(String genericName, GenericKind kind) {
