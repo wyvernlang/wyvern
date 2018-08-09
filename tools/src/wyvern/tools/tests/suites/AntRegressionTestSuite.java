@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
+import wyvern.tools.tests.EffectAnnotationTests;
 import wyvern.tools.tests.EffectSystemTests;
 import wyvern.tools.tests.ExampleTests;
 import wyvern.tools.tests.ExamplesNoPrelude;
@@ -58,6 +59,7 @@ import wyvern.tools.tests.TransformTests;
             ExamplesNoPrelude.class,      // tests the examples that don't require the prelude
             EffectSystemTests.class,
             PolymorphicEffectTests.class,
+            EffectAnnotationTests.class,
             ModuleSystemTests.class,        // tests the new IL
         }
         )

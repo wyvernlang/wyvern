@@ -39,4 +39,13 @@ public abstract class DeclTypeWithResult extends DeclType {
         rawType.checkWellFormed(ctx);
     }
 
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return this.getRawResultType().isEffectAnnotated(ctx);
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return this.getRawResultType().isEffectUnannotated(ctx);
+    }
 }

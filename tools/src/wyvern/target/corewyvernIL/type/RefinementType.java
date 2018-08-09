@@ -392,4 +392,16 @@ public class RefinementType extends ValueType {
     public boolean isTagged(TypeContext ctx) {
         return base.isTagged(ctx);
     }
+
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return this.getBase().isEffectAnnotated(ctx);
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return this.getBase().isEffectUnannotated(ctx)
+                && this.getGenericArguments().stream().allMatch(ga -> ga.getKind() != GenericKind.EFFECT);
+    }
 }
