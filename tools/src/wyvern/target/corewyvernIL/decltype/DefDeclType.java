@@ -297,4 +297,18 @@ public class DefDeclType extends DeclTypeWithResult {
         }
         return false;
     }
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return super.isEffectAnnotated(ctx)
+                && this.getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectAnnotated(ctx))
+                && this.getEffectSet() != null;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return super.isEffectUnannotated(ctx)
+                && this.getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectUnannotated(ctx))
+                && this.getEffectSet() == null;
+    }
 }

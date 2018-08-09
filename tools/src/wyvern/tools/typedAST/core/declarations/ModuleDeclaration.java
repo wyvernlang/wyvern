@@ -245,12 +245,14 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         seqExpr.merge(body);
         body = seqExpr;
 
-        // TODO[ql] here is where we want to transform the body
-
         wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext, null);
         if (ascribedValueType != null) {
             returnType = ascribedValueType;
         }
+
+//        if (returnType.isEffectUnannotated(methodContext)) {
+            // TODO[ql] here is where we want to transform the body
+//        }
 
         if (platformDependentImports.size() > 0) {
             // We have platform-dependent dependencies, return a corewyvernIL ModuleDeclaration
