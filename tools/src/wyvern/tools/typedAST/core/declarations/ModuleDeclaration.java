@@ -250,10 +250,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
             returnType = ascribedValueType;
         }
 
-//        if (returnType.isEffectUnannotated(methodContext)) {
-            // TODO[ql] here is where we want to transform the body
-//        }
-
         if (platformDependentImports.size() > 0) {
             // We have platform-dependent dependencies, return a corewyvernIL ModuleDeclaration
             List<Pair<ImportDeclaration, ValueType>> moduleDependencies = new LinkedList<>();

@@ -325,9 +325,7 @@ public class MethodCall extends Expression {
                             }
                             // Otherwise, just add it
                             if (!dependent) {
-                                if (e.getPath() == null) {
-                                    e.setPath((Variable) objectExpr); // TODO: should not set path to objectExpr
-                                }
+                                setPathIfNecessary(e);
                                 concreteEffects.add(e);
                             }
                         }
@@ -352,6 +350,29 @@ public class MethodCall extends Expression {
         String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
         return null;
+    }
+
+    private void setPathIfNecessary(Effect e) {
+        if (e.getPath() == null) {
+            // TODO: should not set path to objectExpr
+            if (objectExpr instanceof Variable) {
+                e.setPath((Variable) objectExpr);
+            } else if (objectExpr instanceof MethodCall) {
+                // Accessing via getter
+                throw new RuntimeException("Setting effect path by getter not yet supported");
+//                final MethodCall mc = (MethodCall) objectExpr;
+//                final IExpr enclosingObjectExpr = mc.getObjectExpr();
+//                if (enclosingObjectExpr instanceof Variable) {
+//                    final Variable enclosingVariable = (Variable) enclosingObjectExpr;
+//                    final String methodName = mc.getMethodName();
+//                    final String varName = GetterAndSetterGeneration.getterToVarName(methodName);
+//                    if (!methodName.equals(varName)) {
+//                    }
+//                }
+            } else {
+                throw new RuntimeException("Cannot set path of effect '" + e + "'");
+            }
+        }
     }
 
     private String methodDeclarationNotFoundMsg(
