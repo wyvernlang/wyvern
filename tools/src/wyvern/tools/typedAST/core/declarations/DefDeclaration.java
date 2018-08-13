@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.MethodCall;
@@ -23,6 +24,8 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.generics.GenericKind;
+import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -47,14 +50,14 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
     private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
     private List<FormalArg> argILTypes = new LinkedList<FormalArg>(); // store to preserve IL arguments types and return types
     private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
-    private List<String> generics;
+    private List<GenericParameter> generics;
     private EffectSet effectSet;
 
     public static final String GENERIC_PREFIX = "__generic__";
     public static final String GENERIC_MEMBER = "T";
 
-    public DefDeclaration(String name, Type returnType, List<String> generics, List<NameBinding> argNames,
-            TypedAST body, boolean isClassDef, FileLocation location, String effects) {
+    public DefDeclaration(String name, Type returnType, List<GenericParameter> generics, List<NameBinding> argNames,
+                          TypedAST body, boolean isClassDef, FileLocation location, String effects) {
         if (argNames == null) {
             argNames = new LinkedList<NameBinding>();
         }
@@ -72,7 +75,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         this.isClass = isClassDef;
         this.location = location;
         this.effectSet = EffectSet.parseEffects(name, effects, false, location);
-        this.generics = (generics != null) ? generics : new LinkedList<String>();
+        this.generics = (generics != null) ? generics : new LinkedList<>();
     }
 
     public DefDeclaration(String name, Type returnType, List<NameBinding> argNames,
@@ -132,8 +135,10 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     private GenContext serializeArguments(List<FormalArg> args, GenContext ctx) {
         if (isGeneric()) {
-            for (String s : this.generics) {
-                ValueType type = DefDeclaration.genericStructuralType(s);
+            for (GenericParameter gp : this.generics) {
+                String s = gp.getName();
+
+                ValueType type = DefDeclaration.genericStructuralType(s, gp.getKind());
                 String genName = GENERIC_PREFIX + s;
                 BindingSite argSite = new BindingSite(genName);
                 args.add(new FormalArg(argSite, type));
@@ -171,11 +176,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         List<FormalArg> args = new LinkedList<FormalArg>();
         GenContext methodContext = thisContext;
         if (isGeneric()) {
+            for (GenericParameter gp : this.generics) {
+                String s = gp.getName();
 
-            for (String s : this.generics) {
                 String genName = GENERIC_PREFIX + s;
                 BindingSite argSite = new BindingSite(genName);
-                ValueType type = DefDeclaration.genericStructuralType(s);
+                ValueType type = DefDeclaration.genericStructuralType(s, gp.getKind());
                 args.add(new FormalArg(argSite, type));
 
                 methodContext = methodContext.extend(argSite, new Variable(argSite), type);
@@ -294,12 +300,24 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     }
 
-    public static StructuralType genericStructuralType(String genericName) {
+    public static StructuralType genericStructuralType(String genericName, GenericKind kind) {
         List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
-        bodyDecl.add(new AbstractTypeMember(genericName)); // the body contains only a abstract type member representing the generic type
 
-        StructuralType genType = new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
-        return genType;
+        // the body contains only a abstract type or effect member representing the generic type
+        final DeclType member;
+        switch (kind) {
+            case TYPE:
+                member = new AbstractTypeMember(genericName);
+                break;
+            case EFFECT:
+                member = new EffectDeclType(genericName, null, null);
+                break;
+            default:
+                throw new RuntimeException("Unhandled generic parameter kind: " + kind);
+        }
+        bodyDecl.add(member);
+
+        return new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
     }
 
     @Override

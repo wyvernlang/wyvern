@@ -18,6 +18,7 @@ import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
@@ -39,14 +40,14 @@ public class TypeVarDecl extends Declaration {
     private final FileLocation fileLocation;
     private BindingSite selfSite;
     private final TypedAST metadata;
-    private List<String> generics;
+    private List<GenericParameter> generics;
     private boolean resourceFlag = false;
     private final String defaultSelfName = "this";
     private String activeSelfName;
     private IExpr metadataExp = null;
 
     public TypeVarDecl(String name, DeclSequence body, TaggedInfo taggedInfo,
-            List<String> generics, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName) {
+                       List<GenericParameter> generics, TypedAST metadata, FileLocation fileLocation, boolean isResource, String selfName) {
         this.metadata = metadata;
         this.name = name;
         this.bodyOriginal = body;
@@ -99,8 +100,8 @@ public class TypeVarDecl extends Declaration {
     private wyvern.target.corewyvernIL.type.Type computeInternalILType(GenContext ctx) {
         TypeDeclaration td = this.body;
         GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfSite()), null);
-        for (String param : generics) {
-            localCtx = new TypeOrEffectGenContext(param, getSelfSite(), localCtx);
+        for (GenericParameter gp : generics) {
+            localCtx = new TypeOrEffectGenContext(gp.getName(), getSelfSite(), localCtx);
         }
         TaggedInfo taggedInfo = td.getTaggedInfo();
         StructuralType thisType = new StructuralType(getSelfSite(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
