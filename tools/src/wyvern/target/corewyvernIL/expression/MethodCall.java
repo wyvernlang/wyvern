@@ -357,20 +357,6 @@ public class MethodCall extends Expression {
             // TODO: should not set path to objectExpr
             if (objectExpr instanceof Variable) {
                 e.setPath((Variable) objectExpr);
-            } else if (objectExpr instanceof MethodCall) {
-                // Accessing via getter
-                throw new RuntimeException("Setting effect path by getter not yet supported");
-//                final MethodCall mc = (MethodCall) objectExpr;
-//                final IExpr enclosingObjectExpr = mc.getObjectExpr();
-//                if (enclosingObjectExpr instanceof Variable) {
-//                    final Variable enclosingVariable = (Variable) enclosingObjectExpr;
-//                    final String methodName = mc.getMethodName();
-//                    final String varName = GetterAndSetterGeneration.getterToVarName(methodName);
-//                    if (!methodName.equals(varName)) {
-//                    }
-//                }
-            } else {
-                throw new RuntimeException("Cannot set path of effect '" + e + "'");
             }
         }
     }

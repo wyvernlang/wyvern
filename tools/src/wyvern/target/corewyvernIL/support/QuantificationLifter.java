@@ -227,6 +227,20 @@ public final class QuantificationLifter {
         return new New(newDeclarations, oldNew.getSelfSite(), newType, oldNew.getLocation());
     }
 
+    public static boolean isMonomorphized(EffectSet effectSet) {
+        if (effectSet == null) {
+            return false;
+        }
+
+        final Set<Effect> effects = effectSet.getEffects();
+
+        if (effects.size() != 1) {
+            return false;
+        }
+
+        return effects.iterator().next().getName().equals(MONOMORPHIZED_EFFECT);
+    }
+
     private static final class State {
         private final NominalType nominalType;
 

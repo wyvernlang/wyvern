@@ -17,6 +17,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.FailureReason;
+import wyvern.target.corewyvernIL.support.QuantificationLifter;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -121,7 +122,7 @@ public class DefDeclaration extends NamedDeclaration {
 
         final ValueType bodyType = body.typeCheck(methodCtx, effectAccumulator);
 
-        if (effectSet != null) {
+        if (effectSet != null && !QuantificationLifter.isMonomorphized(effectSet)) {
             effectsCheck(methodCtx, effectAccumulator);
         }
 

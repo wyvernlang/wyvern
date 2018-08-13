@@ -73,6 +73,11 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    public void testEditor() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.editor", Util.stringType(), new StringLiteral("abcabc"));
+    }
+
+    @Test
     public void testFunction() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.function", Util.stringType(), new StringLiteral("abcabc"));
     }
@@ -146,6 +151,28 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    public void testRejectedEditor1() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(String.format(
+                "The callee method cannot accept actual arguments with types: 'Logger[{network.theEffect}]; "
+                        + "expected types resource type { this =>%n"
+                        + "  effect log = {logger1.log}%n"
+                        + "  def append(contents:system.String) : {log}system.Unit%n"
+                        + " }; argument subtyping failed because declaration log is not a subtype of the expected declaration'"
+        )));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejected-editor1", Util.stringType(), new StringLiteral("abcabc"));
+    }
+
+    @Test
+    public void testRejectedEditor2() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "Effect annotation {logger2.log} on method main is not a subtype of effects that method produces, which are [logger1.log];"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejected-editor2", Util.stringType(), new StringLiteral("abcabc"));
+    }
+
+    @Test
     public void testRejectedFunctionSubtype() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
@@ -207,5 +234,4 @@ public class PolymorphicEffectTests {
         ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejected-subtype", Util.stringType(), new StringLiteral("abc"));
     }
-
 }
