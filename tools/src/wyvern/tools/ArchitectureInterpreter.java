@@ -17,11 +17,10 @@ import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.stdlib.support.AST;
 import wyvern.target.corewyvernIL.VarBinding;
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -139,44 +138,53 @@ public final class ArchitectureInterpreter {
                         .getStructuralType(genCtx);
 
                 // Execute metadata
-                Value portCompatibility = null, connectorImpl = null,
-                        connectorInit = null;
+                String checkPortCompatibility = null, generateConnectorImpl = null,
+                        generateConnectorInit = null;
+                List<Value> testArgs = new LinkedList<Value>();
+                testArgs.add(javaToWyvernList(portObjs));
                 for (DeclType dt : metadataStructure.getDeclTypes()) {
                     if (dt instanceof DefDeclType) {
                         DefDeclType defdecl = (DefDeclType) dt;
                         String methodName = defdecl.getName();
-                        List<Value> testArgs = new LinkedList<Value>();
                         if (methodName.equals("checkPortCompatibility")) {
-                            testArgs.add(javaToWyvernList(portObjs));
-                            portCompatibility = ((Invokable) metadata)
-                                    .invoke(methodName, testArgs).executeIfThunk();
+                            checkPortCompatibility = methodName;
                         } else if (methodName.equals("generateConnectorImpl")) {
-                            testArgs.add(javaToWyvernList(portObjs));
-                            connectorImpl = ((Invokable) metadata)
-                                    .invoke(methodName, testArgs).executeIfThunk();
+                            generateConnectorImpl = methodName;
                         } else if (methodName.equals("generateConnectorInit")) {
-                            connectorInit = portCompatibility;
+                            generateConnectorInit = methodName;
                         } else {
                             ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
                                     FileLocation.UNKNOWN, connector);
                         }
                     }
                 }
-                if (portCompatibility == null || connectorImpl == null
-                        || connectorInit == null) {
+
+                if (checkPortCompatibility == null || generateConnectorImpl == null
+                        || generateConnectorInit == null) {
                     ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
                             FileLocation.UNKNOWN, connector);
                 }
-                int numPortAST = ((IntegerLiteral) portCompatibility).getValue(); // number of ASTs to expect
+
+                Value portCompatibility = ((Invokable) metadata)
+                        .invoke(checkPortCompatibility, testArgs).executeIfThunk();
+                if (!((BooleanLiteral) portCompatibility).getValue()) {
+                    ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_PORTS,
+                            FileLocation.UNKNOWN, connector);
+                }
+                Value connectorImpl = ((Invokable) metadata)
+                        .invoke(generateConnectorImpl, testArgs).executeIfThunk();
+
+
+                int numPortAST = portObjs.size();
                 List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state, evalCtx);
                 List<ASTComponentDecl> compOrder = visitor.generateDependencyGraph();
 
                 // generate initAST
-                List<Value> testArgs = new LinkedList<>();
+                testArgs = new LinkedList<>();
                 testArgs.add(javaToWyvernList(portInstances));
                 testArgs.add(javaToWyvernList(compOrder));
-                connectorInit = ((Invokable) metadata)
-                        .invoke("generateConnectorInit", testArgs).executeIfThunk();
+                Value connectorInit = ((Invokable) metadata)
+                        .invoke(generateConnectorInit, testArgs).executeIfThunk();
                 List<Expression> orderedInitASTs = makeASTOrder(compOrder,
                         unwrapGeneratedAST(numPortAST, connectorInit, state, evalCtx));
 
@@ -248,25 +256,19 @@ public final class ArchitectureInterpreter {
             List<Value> invokeArgs = new LinkedList<>();
             invokeArgs.add(new IntegerLiteral(i));
             Value fromIList = ((Invokable) value).invoke("get", invokeArgs).executeIfThunk();
-            // fromIList is another other
+            // fromIList is another option
             Value option2 = ((Invokable) fromIList).getField("value");
-            // a wyvern AST !!!
+            // a wyvern AST
             JavaValue ast = (JavaValue) ((Invokable) option2).getField("ast");
-            // a JavaValue !!!!!!!!!!!!!!!!
+            // a JavaValue
             JObject obj = (JObject) ast.getFObject();
             Object javaAST = obj.getWrappedValue();
             if (javaAST instanceof New) {
-                // Get module def ASTs from generateConnectorImpl
+                // module def ASTs from generateConnectorImpl
                 Expression newAST = (New) javaAST;
-                for (Declaration decl : ((New) newAST).getDecls()) {
-                    if (decl instanceof ModuleDeclaration) {
-                        String moduleName = ((ModuleDeclaration) decl).getName();
-                        // state.addModuleAST(moduleName, newAST);
-                        // System.out.println(moduleName);
-                    }
-                }
                 portInstances.add(newAST);
             } else if (javaAST instanceof SeqExpr) {
+                // seqexpr from generateConnectorInit
                 SeqExpr seqAST = (SeqExpr) javaAST;
                 portInstances.add(seqAST);
             } else if (javaAST instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {

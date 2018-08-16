@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import wyvern.tools.arch.lexing.LexerUtils;
+import wyvern.tools.lexing.LexerUtils;
 import wyvern.tools.parsing.coreparser.arch.ArchParserConstants;
 import wyvern.tools.parsing.coreparser.Token;
 

@@ -130,6 +130,7 @@ public enum ErrorMessage {
     ARCH_TYPE_NOT_DEFINED("%ARG type \"%ARG\" is not defined", 2),
     CONNECTOR_VAL_INCONSISTENCY("type properties and connector \"%ARG\" have inconsistent val declarations", 1),
     INVALID_CONNECTOR_METADATA("properties of connector \"%ARG\" contain invalid metadata", 1),
+    INVALID_CONNECTOR_PORTS("ports of connector\"%ARG\" are incompatible", 1),
     DUPLICATE_GENERATED_MODULES("multiple modules generated with name \"%ARG\"", 1);
 
     ErrorMessage(String message, int numArgs) {

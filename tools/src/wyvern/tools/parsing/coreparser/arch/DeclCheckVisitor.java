@@ -27,7 +27,8 @@ public class DeclCheckVisitor extends ArchParserDefaultVisitor {
     private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
 
     public List<ASTComponentDecl> generateDependencyGraph() {
-        // Assemble the dependency graph!
+        // FIXME
+        // Currently doesn't handle cycles correctly between port dependencies
         HashMap<String, DependencyGraphNode> nodes = new HashMap<>();
         ArrayList<DependencyGraphNode> noReqNodes = new ArrayList<>();
         List<ASTComponentDecl> ordered = new LinkedList<>();
@@ -202,10 +203,7 @@ public class DeclCheckVisitor extends ArchParserDefaultVisitor {
                     node.getLocation(), node.getTypeName());
         }
         node.collectPorts();
-        if (!node.checkModule(state)) {
-            // module def not found HANDLED IN CHECKMODULE
-            return super.visit(node, data);
-        } else {
+        if (node.checkModule(state)) {
             componentTypes.put(node.getTypeName(), node);
         }
         return super.visit(node, data);
@@ -218,10 +216,7 @@ public class DeclCheckVisitor extends ArchParserDefaultVisitor {
                     node.getLocation(), node.getTypeName());
         }
         node.collectVals();
-        if (!node.checkModule(state)) {
-            // module not found HANDLED IN CHECKMODULE
-            return super.visit(node, data);
-        } else {
+        if (node.checkModule(state)) {
             connectorTypes.add(node.getTypeName());
         }
         return super.visit(node, data);

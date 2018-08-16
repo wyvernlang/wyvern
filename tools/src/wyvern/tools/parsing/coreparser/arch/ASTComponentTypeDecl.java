@@ -24,9 +24,9 @@ import wyvern.tools.errors.ToolError;
 public class ASTComponentTypeDecl extends SimpleNode {
     private boolean isExternal = false;
     private String typeName;
-    // "reqs" maps port names to the fields they require
+    // "reqs" maps port names to the interfaces they require
     private HashMap<String, String> reqs = new HashMap<>();
-    // "provs" maps port names to the fields they provide
+    // "provs" maps port names to the interfaces they provide
     private HashMap<String, String> provs = new HashMap<>();
 
     public ASTComponentTypeDecl(int id) {
@@ -98,42 +98,35 @@ public class ASTComponentTypeDecl extends SimpleNode {
                         typeName);
             }
 
-            /* Check for only for dependencies passed as args to module def */
-            if (expr instanceof New) {
-                for (Declaration d : ((New) expr).getDecls()) {
-                    if (d instanceof DefDeclaration) {
-                        List<FormalArg> args = ((DefDeclaration) d).getFormalArgs();
-                        if (args.size() != reqs.size()) {
-                            // inconsistent dependency errors
-                            ToolError.reportError(
-                                    ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
-                                    typeName);
-                        }
-                        for (FormalArg f : args) {
-                            String name = f.getName();
-                            String type = ((NominalType) f.getType()).getTypeMember();
-                            if (!reqs.get(name).equals(type)) {
-                                // inconsistent dependency error
-                                ToolError.reportError(
-                                        ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
-                                        typeName);
-                            }
-                        }
-                    }
-                }
-            }
-
-            /* Check that it exposes the correct fields */
             List<Declaration> decls = ((New) expr).getDecls().stream()
                     .filter(p -> p instanceof DefDeclaration)
                     .collect(Collectors.toList());
-            for (Declaration d : decls) {
-                DefDeclaration dd = (DefDeclaration) d;
-                if (dd.getType() instanceof StructuralType) {
-                    List<DeclType> valdecltypes = ((StructuralType) (dd.getType()))
+            if (decls.size() == 1 && decls.get(0) instanceof DefDeclaration) {
+                DefDeclaration d = (DefDeclaration) decls.get(0);
+                /* Check for dependencies passed as args to module def */
+                List<FormalArg> args = ((DefDeclaration) d).getFormalArgs();
+                if (args.size() != reqs.size()) {
+                    // inconsistent dependency errors
+                    ToolError.reportError(
+                            ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
+                            typeName);
+                }
+                for (FormalArg f : args) {
+                    String name = f.getName();
+                    String type = ((NominalType) f.getType()).getTypeMember();
+                    if (reqs.get(name) == null || !reqs.get(name).equals(type)) {
+                        // inconsistent dependency error
+                        ToolError.reportError(
+                                ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
+                                typeName);
+                    }
+                }
+
+                /* Check that it exposes the correct fields */
+                if (d.getType() instanceof StructuralType) {
+                    List<DeclType> valdecltypes = ((StructuralType) (d.getType()))
                             .getDeclTypes().stream().filter(p -> p instanceof ValDeclType)
                             .collect(Collectors.toList());
-
                     for (DeclType dt : valdecltypes) {
                         ValDeclType vdtype = (ValDeclType) dt;
                         String name = vdtype.getName();
@@ -155,6 +148,10 @@ public class ASTComponentTypeDecl extends SimpleNode {
                                 typeName);
                     }
                 }
+            } else {
+                ToolError.reportError(
+                        ErrorMessage.COMPONENT_DEPENDENCY_INCONSISTENCY, this.getLocation(),
+                        typeName);
             }
 
         } catch (ToolError e) {
