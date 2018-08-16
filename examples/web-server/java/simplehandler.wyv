@@ -1,6 +1,7 @@
 module def simplehandler() : THttpHandler
 
-var responseFile: String = "form.html"
-val paramNum: Int = 3
+def responseFile(): String
+    "form.html"
 
 //manipulate params (say hello to person) and send response string/html
+def 

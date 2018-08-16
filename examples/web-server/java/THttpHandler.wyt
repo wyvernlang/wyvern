@@ -1,3 +1,3 @@
 resource type THttpHandler
-    var responseFile: String
-    //def sendResponse(dos:Dyn):Unit
+    def responseFile(): String
+    def sendResponse(dos:Dyn):Unit

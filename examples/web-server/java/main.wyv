@@ -7,7 +7,7 @@ import io
 import fileio
 
 import server
-import httphandler
+//import httphandler
 import THttpHandler
 //import bmihandler
 import simplehandler
@@ -16,7 +16,7 @@ import postprocessor
 
 val stdout = stdout(java)
 
-val handle = httphandler(simplehandlder)
+
 
 val ioobj = io(java)
 val fileioobj = fileio(java)
@@ -36,7 +36,7 @@ val s1out = soc.getOutputStream()
 val dos = ioobj.makeDataOutputStream(s1out)
 server.sendHeaders(dos)
 
-val filename = handle.file
+val filename = simplehandler.responseFile()
 val bufferedReader = fileioobj.makeBufferedReader(filename)
 val msg = fileioobj.readFile(bufferedReader)
 server.sendHtmlFile(dos,msg)

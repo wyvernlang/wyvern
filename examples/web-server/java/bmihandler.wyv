@@ -2,8 +2,9 @@ module def bmihandler() : THttpHandler
 
 import bmi
 
-var responseFile:String = "bmi.html"
-val paramNum: Int = 3
+def responseFile():String
+    "bmi.html"
+
 
 def sendResponse(dos:Dyn, age:Int, height:Float, weight:Float):Unit
     // setHTML headers
