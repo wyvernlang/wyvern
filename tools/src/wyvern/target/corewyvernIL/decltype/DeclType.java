@@ -54,4 +54,24 @@ public abstract class DeclType extends ASTNode implements IASTNode {
         System.out.println("emitBytecode not implemented for " + this.getClass().getName());
         throw new java.lang.UnsupportedOperationException("Not yet implemented");
     }
+
+    /**
+     * See the {@link wyvern.target.corewyvernIL.type.ValueType#isEffectAnnotated()} method documentation for a
+     * description of what counts as effect-annotated and what counts as effect-unannotated. In particular,
+     * !isEffectAnnotated() is NOT the same as isEffectUnannotated().
+     *
+     * @param ctx The type context to look in
+     * @return True if the type is effect-annotated, false otherwise.
+     */
+    public abstract boolean isEffectAnnotated(TypeContext ctx);
+
+    /**
+     * See the {@link wyvern.target.corewyvernIL.type.ValueType#isEffectAnnotated()} method documentation for a
+     * description of what counts as effect-annotated and what counts as effect-unannotated. In particular,
+     * !isEffectUnannotated() is NOT the same as isEffectAnnotated().
+     *
+     * @param ctx The type context to look in
+     * @return True if the type is effect-unannotated, false otherwise.
+     */
+    public abstract boolean isEffectUnannotated(TypeContext ctx);
 }

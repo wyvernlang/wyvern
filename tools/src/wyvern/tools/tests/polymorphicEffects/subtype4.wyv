@@ -1,0 +1,11 @@
+type Generic
+  effect E
+
+// Generic isn't passed any generic arguments, so E can be anything
+val u : Generic = new
+  effect E = {}
+
+val v : Generic = new
+  effect E = {system.ffiEffect}
+
+"abc"

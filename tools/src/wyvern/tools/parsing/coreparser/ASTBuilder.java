@@ -4,33 +4,38 @@ import java.net.URI;
 import java.util.List;
 
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.generics.GenericArgument;
+import wyvern.tools.generics.GenericParameter;
 
 interface ASTBuilder<AST, Type> {
     AST sequence(AST t1, AST t2, boolean inModule);
 
     AST script(List<AST> requires, List<AST> imports, AST body);
-    AST moduleDecl(String name, List<AST> imports, List args, AST ast, Type type, FileLocation loc, boolean isResource);
+    AST moduleDecl(String name, List<AST> imports, List<GenericParameter> generics,
+                   List args, AST ast, Type type, FileLocation loc, boolean isResource);
     AST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata);
     /** if type is null, it will be inferred*/
     AST valDecl(String name, Type type, AST exp, FileLocation loc);
     AST varDecl(String name, Type type, AST exp, FileLocation loc);
-    AST defDecl(String name, Type type, List<String> generics, List args, AST body, boolean isClassDef, FileLocation loc, String effects);
+    AST defDecl(String name, Type type, List<GenericParameter> generics, List args, AST body, boolean isClassDef, FileLocation loc, String effects);
     AST typeDecl(String name, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
 
-    AST datatypeDecl(String name, List<String> generics, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName);
+    AST datatypeDecl(
+            String name, List<GenericParameter> generics, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName
+    );
 
     AST delegateDecl(Type type, AST exp, FileLocation loc);
     AST effectDecl(String name, String effects, FileLocation loc);
     AST assertion(String description, AST exp, FileLocation loc);
 
 
-    AST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc, String effects);
+    AST defDeclType(String name, Type type, List<GenericParameter> generics, List args, FileLocation loc, String effects);
     AST valDeclType(String name, Type type, FileLocation loc);
     AST varDeclType(String name, Type type, FileLocation loc);
     AST typeAbbrevDecl(String alias, Type reference, AST metadata, FileLocation loc);
     AST effectDeclType(String name, String effects, FileLocation loc);
 
-    AST constructDeclType(String name, List<String> generics, List args, FileLocation loc);
+    AST constructDeclType(String name, List<GenericParameter> generics, List args, FileLocation loc);
 
     Object formalArg(String name, Type type);
     AST fn(List args, AST body, FileLocation loc);
@@ -40,7 +45,7 @@ interface ASTBuilder<AST, Type> {
     AST integerLit(int value, FileLocation loc);
     AST booleanLit(boolean value, FileLocation loc);
     AST invocation(AST receiver, String name, AST argument, FileLocation loc);
-    AST application(AST function, List<AST> arguments, FileLocation loc, List<Type> generics, boolean recur);
+    AST application(AST function, List<AST> arguments, FileLocation loc, List<GenericArgument> genericArguments, boolean recur);
     AST addArguments(AST application, List<String> names, List<AST> arguments) throws ParseException;
     AST assignment(AST lhs, AST rhs, FileLocation loc);
     AST unitValue(FileLocation loc);
@@ -53,7 +58,7 @@ interface ASTBuilder<AST, Type> {
 
     Type nominalType(String name, FileLocation loc);
     Type arrowType(List<Type> arguments, Type result, boolean isResource);
-    Type parameterizedType(Type base, List<Type> arguments, FileLocation loc);
+    Type parameterizedType(Type base, List<GenericArgument> genericArguments, FileLocation loc);
 
     Type qualifiedType(AST base, String name);
 

@@ -1,0 +1,27 @@
+type Generic
+  effect E
+
+val u : Generic = new
+  effect E = {system.ffiEffect}
+
+type Function
+  effect E
+  type A
+  type B
+  def apply(x : this.A) : {E} this.B
+
+val repeatFunction = new
+  effect E = {u.E}
+  type A = String
+  type B = String
+  def apply(x : String) : {this.E} String
+    x + x
+
+def useFunction[effect E, A, B](f : Function[{E}, A, B], x : A) : {E} B
+  f(x)
+
+// Rejected because {u.E} is abstract
+def run() : {} String
+  useFunction[{u.E}, String, String](repeatFunction, "abc")
+
+run()

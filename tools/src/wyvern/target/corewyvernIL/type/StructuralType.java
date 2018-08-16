@@ -328,4 +328,24 @@ public class StructuralType extends ValueType {
         }
         return ret + "]";
     }*/
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        for (DeclType dt : this.getDeclTypes()) {
+            if (!dt.isEffectAnnotated(ctx)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        for (DeclType dt : this.getDeclTypes()) {
+            if (!dt.isEffectUnannotated(ctx)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

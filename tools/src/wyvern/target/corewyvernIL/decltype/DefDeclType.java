@@ -193,10 +193,14 @@ public class DefDeclType extends DeclTypeWithResult {
     @Override
     public DeclType doAvoid(String varName, TypeContext ctx, int count) {
         boolean changed = false;
+
+        // Return type
         ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
         if (!(t.equals(this.getRawResultType()))) {
             changed = true;
         }
+
+        // Argument
         List<FormalArg> newArgs = new LinkedList<FormalArg>();
         for (FormalArg arg : args) {
             ValueType argT = arg.getType().doAvoid(varName, ctx, count);
@@ -205,10 +209,19 @@ public class DefDeclType extends DeclTypeWithResult {
             }
             newArgs.add(new FormalArg(arg.getSite(), argT));
         }
+
+        // Effects
+        EffectSet oldEffectSet = getEffectSet();
+        EffectSet newEffectSet = oldEffectSet == null ? null : oldEffectSet.doAvoid(varName, ctx, count);
+        if (newEffectSet != null && !newEffectSet.equals(oldEffectSet)) {
+            changed = true;
+        }
+
+        // Avoided type
         if (!changed) {
             return this;
         } else {
-            return new DefDeclType(this.getName(), t, newArgs, getEffectSet());
+            return new DefDeclType(this.getName(), t, newArgs, newEffectSet);
         }
     }
 
@@ -283,5 +296,19 @@ public class DefDeclType extends DeclTypeWithResult {
             return mem.equals(identifier);
         }
         return false;
+    }
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return super.isEffectAnnotated(ctx)
+                && this.getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectAnnotated(ctx))
+                && this.getEffectSet() != null;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return super.isEffectUnannotated(ctx)
+                && this.getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectUnannotated(ctx))
+                && this.getEffectSet() == null;
     }
 }

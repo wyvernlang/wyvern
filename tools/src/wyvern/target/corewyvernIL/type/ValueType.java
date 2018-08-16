@@ -172,4 +172,63 @@ public abstract class ValueType extends Type implements IASTNode {
     public Tag getTag(EvalContext ctx) {
         throw new RuntimeError("internal error: getTag not implemented for things other than nominal types");
     }
+
+    /**
+     * If a type annotates all of its methods, it is considered effect-annotated. If a type does not annotate any of its
+     * methods AND it does not declare any new effects or reference any existing effects, it is considered
+     * effect-unannotated. These conditions are not mutually exclusive. For example:
+     *
+     * Some types that are effect-annotated and not effect-unannotated:
+     *
+     *   type T
+     *     def foo() : {system.ffiEffect} Unit
+     *
+     *   type U
+     *     effect E [ = ... ]
+     *
+     * A type that is effect-unannotated and not effect-annotated:
+     *
+     *   type T
+     *     def bar() : Unit
+     *
+     * A type that is both effect-annotated and effect-unannotated:
+     *
+     *   type T
+     *     val x : Int
+     *
+     * Some types that are neither effect-annotated nor effect-unannotated
+     *
+     *   type T
+     *     def foo() : {system.ffiEffect} Unit
+     *     def bar() : Unit
+     *
+     *   type U
+     *     def bar() : Unit
+     *     effect E [ = ... ]
+     *
+     * As such, !isEffectAnnotated() is NOT the same as isEffectUnannotated().
+     *
+     * TODO: Craig et al. import semantics
+     *   We allow effect-unannotated types to reference effect-annotated types. To ensure that this is safe, we must
+     *   implement Craig et al.'s import semantics so that the effect-unannotated code cannot violate the type
+     *   signatures of any of the effect-annotated code. For now, we assume that these import semantics hold.
+     *
+     * TODO: Quantification lifting
+     *   All references to effect-unannotated types in an effect-annotated type will undergo quantification lifting,
+     *   thus ensuring that the effect-unannotated types can safely be treated as effect-annotated.
+     *
+     * @param ctx The type context to look in
+     * @return True if the type is effect-annotated, false otherwise.
+     */
+    public abstract boolean isEffectAnnotated(TypeContext ctx);
+
+    /**
+     * See the {@link #isEffectAnnotated()} method documentation for a description of what counts as effect-annotated
+     * and what counts as effect-unannotated. In particular, !isEffectUnannotated() is NOT the same as
+     * isEffectAnnotated().
+     *
+     * @param ctx The type context to look in
+     * @return True if the type is effect-unannotated, false otherwise.
+     */
+    public abstract boolean isEffectUnannotated(TypeContext ctx);
 }
