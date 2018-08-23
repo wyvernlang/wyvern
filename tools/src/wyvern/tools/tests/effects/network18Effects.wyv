@@ -1,0 +1,6 @@
+module network18Effects
+effect sendFx = {}
+effect receiveFx = {}
+
+def f(): {sendFx} String
+  "Network18 with effects"

@@ -381,6 +381,25 @@ public class EffectSystemTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
+    /* TODO: Notably, if the content on testNetwork18.wyv is substituted with the following this test passes:
+     * import effects.network18Effects as fx
+     * fx.f()
+     */
+    public void testNetwork18() throws ParseException {
+        /* An effect defined in a pure module is used in a method annotation in the same module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork18", Util.stringType(), new StringLiteral("Network18 with effects"));
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    // TODO: May be related to the issue in testNetwork18.
+    public void testNetwork19() throws ParseException {
+        /* An effect defined in a pure module is used in another effect definition in the same module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork19", Util.stringType(), new StringLiteral("Network19 with effects"));
+    }
+
+    @Test
     public void testObjNetwork() throws ParseException {
         /* Object with effect annotations. */
         TestUtil.doTestScriptModularly(PATH, "effects.objNetwork", Util.stringType(), new StringLiteral("ObjNetwork with effects"));
