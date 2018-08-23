@@ -27,7 +27,7 @@ public class SeqExpr extends Expression {
     private LinkedList<HasLocation> elements; // either a VarBinding or an Expression
 
     public SeqExpr() {
-        //setExprType(Util.unitType()); // default to Unit
+        // setExprType(Util.unitType()); // default to Unit
         elements = new LinkedList<HasLocation>();
     }
 
@@ -36,7 +36,8 @@ public class SeqExpr extends Expression {
         setExprType(expectedType);
     }
 
-    /** Side-effects the current SeqExpr to add an expression.
+    /**
+     * Side-effects the current SeqExpr to add an expression.
      *
      * @param expr
      * @return this
@@ -49,6 +50,7 @@ public class SeqExpr extends Expression {
     public void addBindingLast(VarBinding binding) {
         addBinding(binding, true);
     }
+
     public void addBinding(VarBinding binding, boolean isLast) {
         if (isLast) {
             elements.addLast(binding);
@@ -56,13 +58,14 @@ public class SeqExpr extends Expression {
             elements.addFirst(binding);
         }
     }
+
     public void addBindingLast(BindingSite site, ValueType type, IExpr toReplace) {
         addBinding(site, type, toReplace, true);
     }
+
     public void addBinding(BindingSite site, ValueType type, IExpr toReplace, boolean isLast) {
         addBinding(new VarBinding(site, type, toReplace), isLast);
     }
-
 
     public List<HasLocation> getElements() {
         return Collections.unmodifiableList(elements);
@@ -72,6 +75,7 @@ public class SeqExpr extends Expression {
     public ValueType typecheckNoAvoidance(TypeContext ctx, EffectAccumulator effectAccumulator) {
         return typecheckWithCtx(ctx, effectAccumulator).getSecond();
     }
+
     public Pair<TypeContext, ValueType> typecheckWithCtx(TypeContext ctx, EffectAccumulator effectAccumulator) {
         TypeContext extendedCtx = ctx;
         ValueType result = Util.unitType();
@@ -79,7 +83,7 @@ public class SeqExpr extends Expression {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
                 extendedCtx = binding.typecheck(extendedCtx, effectAccumulator);
-                //TODO: make this Unit
+                // TODO: make this Unit
                 result = binding.getType(); // Util.unitType();
             } else if (elem instanceof Expression) {
                 result = ((Expression) elem).typeCheck(extendedCtx, effectAccumulator);
@@ -98,7 +102,8 @@ public class SeqExpr extends Expression {
         FailureReason r = new FailureReason();
         if (this.getType() != null) {
             if (!result.isSubtypeOf(getType(), extendedCtx, r)) {
-                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getType().toString(), r.getReason());
+                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getType().toString(),
+                        r.getReason());
             }
             return getType();
         }
@@ -161,27 +166,29 @@ public class SeqExpr extends Expression {
         for (HasLocation elem : elements) {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
-                extendedCtx = binding.interpret(extendedCtx);
-                // TODO: return unit
-                result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
+                //if (!ctx.isPresent(binding.getVarName(), true)) {
+                    extendedCtx = binding.interpret(extendedCtx);
+                    // TODO: return unit
+                    result = extendedCtx.lookupValue(binding.getVarName()); // Util.unitValue();
+                //}
             } else if (elem instanceof Expression) {
                 result = ((Expression) elem).interpret(extendedCtx);
             } else {
                 throw new RuntimeException("invariant broken");
             }
         }
-
         return new Pair<Value, EvalContext>(result, extendedCtx);
     }
 
     @Override
     public BytecodeOuterClass.Expression emitBytecode() {
-        BytecodeOuterClass.Expression.SequenceExpression.Builder sequence = BytecodeOuterClass.Expression.SequenceExpression.newBuilder();
+        BytecodeOuterClass.Expression.SequenceExpression.Builder sequence = BytecodeOuterClass.Expression.SequenceExpression
+                .newBuilder();
         for (HasLocation elem : elements) {
-            BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.Builder builder =
-                    BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.newBuilder();
+            BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.Builder builder 
+                = BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.newBuilder();
             if (elem instanceof VarBinding) {
-                VarBinding binding = (VarBinding)  elem;
+                VarBinding binding = (VarBinding) elem;
                 builder.setDeclaration(binding.emitBytecode());
             } else if (elem instanceof Expression) {
                 Expression e = (Expression) elem;
@@ -218,8 +225,11 @@ public class SeqExpr extends Expression {
         return freeVars;
     }
 
-    /** Works like addExpr, except that if body is a SeqExpr then the elements of the other SeqExpr are appended to this one.
-     * This allows us to avoid nested SeqExprs, which makes for a more understandable IL. */
+    /**
+     * Works like addExpr, except that if body is a SeqExpr then the elements of the
+     * other SeqExpr are appended to this one. This allows us to avoid nested
+     * SeqExprs, which makes for a more understandable IL.
+     */
     public void merge(IExpr body) {
         if (body instanceof SeqExpr) {
             SeqExpr bodySE = (SeqExpr) body;

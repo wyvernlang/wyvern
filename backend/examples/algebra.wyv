@@ -9,6 +9,7 @@ import wyvern.option
 // Types
 //------------------------------------------------------------------------------
 
+type Number = Float
 type Map = map.Map
 type Option = option.Option
 
@@ -42,7 +43,7 @@ def intPow(x : Float, n : Float) : Float
     if (m < 0.1)
       total
      else
-      lp(x * total, m - 1.0)
+      recur lp(x * total, m - 1.0)
   lp(1.0, n)
 
 def fac(n : Float) : Float
@@ -50,7 +51,7 @@ def fac(n : Float) : Float
     if (m < 0.1)
       total
      else
-      lp(total * m, m - 1.0)
+      recur lp(total * m, m - 1.0)
   lp(1.0, n)
 
 def summation(start : Float, end : Float, term : Float -> Float) : Float
@@ -58,7 +59,7 @@ def summation(start : Float, end : Float, term : Float -> Float) : Float
     if (n > end + 0.1)
       total
      else
-      lp(total + term(n), n + 1.0)
+      recur lp(total + term(n), n + 1.0)
   lp(0.0, start)
 
 // Works well for x in [-15, 15]
@@ -85,9 +86,9 @@ def logBase(base : Float, x : Float) : Float
 // Returns x "mod" 2pi
 def trigNormalize(x : Float) : Float
   if (x < 0.0)
-    trigNormalize(x + 2.0 * pi)
+    recur trigNormalize(x + 2.0 * pi)
    elif (x > 2.0 * pi)
-    trigNormalize(x - 2.0 * pi)
+    recur trigNormalize(x - 2.0 * pi)
    else
     x
 
@@ -108,32 +109,32 @@ def cos(x : Float) : Float
 //------------------------------------------------------------------------------
 
 datatype Term
-  Constant(value : Float)
+  Constant(value : Number)
   Variable(name : String)
   Sum(u : Term, v : Term)
   Product(u : Term, v : Term)
-  Pow(u : Term, n : Float)
+  Pow(u : Term, n : Number)
   Sin(u : Term)
   Cos(u : Term)
-  Exp(b : Float, u : Term)
-  Log(b : Float, u : Term)
+  Exp(b : Number, u : Term)
+  Log(b : Number, u : Term)
 
 // Wrappers to pass the functions around and for typechecking
-val Constant : Float => Term = value : Float => Constant(value)
+val Constant : Number => Term = value : Number => Constant(value)
 val Variable : String => Term = name : String => Variable(name)
 val Sum : Term * Term => Term = (u : Term, v : Term) => Sum(u, v)
 val Product : Term * Term => Term = (u : Term, v : Term) => Product(u, v)
-val Pow : Term * Float => Term = (u : Term, n : Float) => Pow(u, n)
+val Pow : Term * Number => Term = (u : Term, n : Number) => Pow(u, n)
 val Sin : Term => Term = u : Term => Sin(u)
 val Cos : Term => Term = u : Term => Cos(u)
-val Exp : Float * Term => Term = (b : Float, u : Term) => Exp(b, u)
-val Log : Float * Term => Term = (b : Float, u : Term) => Log(b, u)
+val Exp : Number * Term => Term = (b : Number, u : Term) => Exp(b, u)
+val Log : Number * Term => Term = (b : Number, u : Term) => Log(b, u)
 
 //------------------------------------------------------------------------------
 // String conversion
 //------------------------------------------------------------------------------
 
-def numberToString(x : Float) : String
+def numberToString(x : Number) : String
   if (isProbablyInt(x))
     String.ofInt(round(x))
    else
@@ -216,7 +217,7 @@ def trySimplify2(
                   b:NoStep => otherwise()
 
 def simplify(t : Term) : TermStep
-  def isConstant(a : Term, n : Float) : Boolean
+  def isConstant(a : Term, n : Number) : Boolean
     match a:
       a:Constant => floatEq(a.value, n)
       _:Term => false
@@ -314,7 +315,7 @@ def simplify(t : Term) : TermStep
       )
     )
 
-  def simplifyPow(u : Term, n : Float) : TermStep
+  def simplifyPow(u : Term, n : Number) : TermStep
     def powerZeroRule() : TermStep
       if (floatEq(n, 0.0))
         Step(Constant(1.0))
@@ -331,7 +332,7 @@ def simplify(t : Term) : TermStep
       () => powerOneRule()
     )
 
-  def simplifyExp(b : Float, u : Term) : TermStep
+  def simplifyExp(b : Number, u : Term) : TermStep
     def expZeroPowRule() : TermStep
       if (isZero(u))
         Step(Constant(1.0))
@@ -366,7 +367,7 @@ def simplify(t : Term) : TermStep
       )
     )
 
-  def simplifyLog(b : Float, u : Term) : TermStep
+  def simplifyLog(b : Number, u : Term) : TermStep
     def logOneArgRule() : TermStep
       if (isOne(u))
         Step(Constant(0.0))
@@ -426,14 +427,14 @@ def simplify(t : Term) : TermStep
 
 def fullySimplify(t : Term) : Term
   match simplify(t):
-    a:Step => fullySimplify(a.term)
+    a:Step => recur fullySimplify(a.term)
     a:NoStep => t
 
 //------------------------------------------------------------------------------
 // Evaluation
 //------------------------------------------------------------------------------
 
-def eval(bindings : Map, t : Term) : Float = match t:
+def eval(bindings : Map, t : Term) : Number = match t:
   t:Constant => t.value
   t:Variable => bindings.get(t.name).getOrElse(() => nan)
   t:Sum => eval(bindings, t.u) + eval(bindings, t.v)
@@ -461,7 +462,7 @@ def printSmallDivider() : Unit
   stdout.print(smallDivider)
   stdout.println()
 
-def printInfo(t : Term, xVal : Float, yVal : Float) : Unit
+def printInfo(t : Term, xVal : Number, yVal : Number) : Unit
   val xString : String = numberToString(xVal)
   val yString : String = numberToString(yVal)
 

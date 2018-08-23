@@ -320,4 +320,16 @@ public class NominalType extends ValueType {
         }
         return new Tag(object, this.getTypeMember(), this.getPath().toString());
     }
+
+    // Safely true because of quantification lifting
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return true;
+    }
+
+    // Safely true because of Craig et al.'s import semantics
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return true;
+    }
 }

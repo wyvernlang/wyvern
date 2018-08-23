@@ -1,0 +1,11 @@
+import polymorphicEffects.parametricLib
+
+val u = new
+  effect E = {system.ffiEffect}
+
+val lib = parametricLib[String, {u.E}]()
+
+def run() : {u.E} String
+  lib.id("abc")
+
+run()
