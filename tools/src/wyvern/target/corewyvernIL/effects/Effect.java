@@ -14,6 +14,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 
 public class Effect {
     private Path path;
@@ -136,7 +137,7 @@ public class Effect {
     }
 
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
-        if (path.getFreeVariables().contains(varName)) {
+        if (varName.startsWith(DefDeclaration.GENERIC_PREFIX) && path.getFreeVariables().contains(varName)) {
             final EffectDeclType dt = findEffectDeclType(ctx);
             if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1

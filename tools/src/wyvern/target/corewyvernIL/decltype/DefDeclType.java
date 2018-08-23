@@ -203,7 +203,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public DeclType doAvoid(String varName, TypeContext ctx, int count) {
         boolean changed = false;
 
-        //Return type
+        // Return type
         ValueType t = getRawResultType().doAvoid(varName, ctx, count);
         if (!t.equals(getRawResultType())) {
             changed = true;
@@ -230,7 +230,7 @@ public class DefDeclType extends DeclTypeWithResult {
         if (!changed) {
             return this;
         } else {
-            return new DefDeclType(getName(), t, newArgs, getEffectSet());
+            return new DefDeclType(getName(), t, newArgs, newEffectSet);
         }
     }
 
