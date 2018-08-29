@@ -170,7 +170,6 @@ public class EffectSystemTests {
     }
 
     @Test
-    // TODO: uses a workaround that should be removed once testLogger5 is fixed
     public void testLogger3() throws ParseException {
         /* The exact resource instance passed into a module functor is conditional
          * (i.e. it is decided by an if statement). */
@@ -185,10 +184,12 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
-    // TODO: affects testLogger3, which uses a workaround for this issue; update testLogger3 once this is fixed
     public void testLogger5() throws ParseException {
-        /* The resource instance to be passed into a module functor is stored in a variable. */
+        /* The resource instance to be passed into a module functor is stored in a global variable.
+         * Must be an error since we don't allow capabilities to be stored in a global state. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"fio.writeF\" not found in scope at location file "
+                + Paths.get(PATH, "effects", "logger3.wyv").toAbsolutePath().toString() + " on line 2 column 8"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger5", Util.intType(), new IntegerLiteral(2));
     }
 
