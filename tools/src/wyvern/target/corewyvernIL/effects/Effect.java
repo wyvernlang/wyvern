@@ -137,7 +137,7 @@ public class Effect {
     }
 
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
-        if (varName.startsWith(DefDeclaration.GENERIC_PREFIX) && path.getFreeVariables().contains(varName)) {
+        if (varName.startsWith(DefDeclaration.GENERIC_PREFIX) && path != null && path.getFreeVariables().contains(varName)) {
             final EffectDeclType dt = findEffectDeclType(ctx);
             if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1

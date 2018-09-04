@@ -38,7 +38,8 @@ public final class GetterAndSetterGeneration {
      * From the name of a getter method, return the name of the variable it is accessing.
      */
     public static String getterToVarName(String s) {
-        return s.replaceFirst("_get", "");
+        final String ending = s.replaceFirst("_get", "");
+        return Character.toLowerCase(ending.charAt(0)) + ending.substring(1);
     }
 
 }

@@ -289,13 +289,25 @@ public class ModuleResolver {
                 }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
-                // rename according to "apply"
-                DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(),
-                        oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
-                // TODO[ql] here^ is where we want to put the polymorphism on the module functor itself?
-                // wrap in an object
+
+                // Rename according to "apply"
+                DefDeclaration defDecl = new DefDeclaration(
+                        Util.APPLY_NAME,
+                        oldDefDecl.getFormalArgs(),
+                        oldDefDecl.getType(),
+                        oldDefDecl.getBody(),
+                        oldDefDecl.getLocation()
+                );
+
+                // Wrap in an object
                 program = new New(defDecl);
-                //program = wrap(program, dependencies);
+
+                // Perform quantification lifting if possible
+                final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
+                final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program);
+                if (liftResult != null) {
+                    program = liftResult;
+                }
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);
             } else {
@@ -464,14 +476,30 @@ public class ModuleResolver {
      * @return
      */
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
-        SeqExpr seqProg = new SeqExpr();
+        final SeqExpr seqProg = new SeqExpr();
         seqProg.merge(program);
-        List<TypedModuleSpec> noDups = sortDependencies(dependencies);
+
+        final List<TypedModuleSpec> noDups = sortDependencies(dependencies);
+
         for (TypedModuleSpec spec : noDups) {
-            Module m = resolveModule(spec.getQualifiedName());
-            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
-            seqProg.addBinding(m.getSpec().getSite(), m.getSpec().getType(), m.getExpression(), false);
+            final Module m = resolveModule(spec.getQualifiedName());
+            final Expression liftResult = null; // TODO (@justinlubin)
+
+            final BindingSite bindingSite = m.getSpec().getSite();
+            final Expression expression;
+            final ValueType valueType;
+
+            if (liftResult != null) {
+                expression = liftResult;
+                valueType = liftResult.getType();
+            } else {
+                expression = m.getExpression();
+                valueType = m.getSpec().getType();
+            }
+
+            seqProg.addBinding(bindingSite, valueType, expression, false);
         }
+
         return seqProg;
     }
 
