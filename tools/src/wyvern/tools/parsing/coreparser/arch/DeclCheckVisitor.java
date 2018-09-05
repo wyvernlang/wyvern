@@ -8,6 +8,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 
 public class DeclCheckVisitor extends ArchParserDefaultVisitor {
@@ -26,28 +27,39 @@ public class DeclCheckVisitor extends ArchParserDefaultVisitor {
     // portdecls maps port name to the port declaration AST node
     private HashMap<String, ASTPortDecl> portdecls = new HashMap<>();
 
+    public boolean endOfFileCheck() {
+        for (String connector : attachments.keySet()) {
+            if (!connectors.containsKey(connector)) {
+                // connector not declared
+                ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
+                        FileLocation.UNKNOWN, "connector", connector);
+            }
+        }
+        return true;
+    }
+
     public List<ASTComponentDecl> generateDependencyGraph() {
         // FIXME
         // Currently doesn't handle cycles correctly between port dependencies
         HashMap<String, DependencyGraphNode> nodes = new HashMap<>();
         ArrayList<DependencyGraphNode> noReqNodes = new ArrayList<>();
         List<ASTComponentDecl> ordered = new LinkedList<>();
-        for (String connector : attachments.keySet()) {
+        for (String connector : attachments.keySet()) {                                 //for all connector attachments
             HashSet<String> fullports = attachments.get(connector);
-            for (String fullport : fullports) {
-                String component = fullport.substring(0, fullport.indexOf("."));
-                ASTComponentDecl compObj = components.get(component);
-                ASTComponentTypeDecl compType = componentTypes.get(compObj.getType());
-                if (!nodes.containsKey(component)) {
-                    DependencyGraphNode compNode = new DependencyGraphNode(compObj);
+            for (String fullport : fullports) {                                         //for each component port in an attachment
+                String component = fullport.substring(0, fullport.indexOf("."));        //get component instance name
+                ASTComponentDecl compObj = components.get(component);                   //get component instance AST Node
+                ASTComponentTypeDecl compType = componentTypes.get(compObj.getType());  //get component instance type
+                if (!nodes.containsKey(component)) {                                    //if it's not in the visited list
+                    DependencyGraphNode compNode = new DependencyGraphNode(compObj);    //  put it in there
                     nodes.put(component, compNode);
                 }
                 DependencyGraphNode compNode = nodes.get(component);
-                if (compType.getReqs().size() == 0) {
-                    noReqNodes.add(compNode);
+                if (compType.getReqs().size() == 0) {                                   //if it doesn't have incoming edges
+                    noReqNodes.add(compNode);                                           //  add it to the noReqNodes list
                 }
-                for (String reqs : compType.getReqs().values()) {
-                    for (String innerfullport : fullports) {
+                for (String reqs : compType.getReqs().values()) {                       //for all of its incoming edges; get required interfaces
+                    for (String innerfullport : fullports) {                            //look through ports of the attachment
                         String innercomponent = innerfullport.substring(0, innerfullport.indexOf("."));
                         ASTComponentDecl innercompObj = components.get(innercomponent);
                         ASTComponentTypeDecl innercompType = componentTypes.get(innercompObj.getType());
@@ -118,17 +130,11 @@ public class DeclCheckVisitor extends ArchParserDefaultVisitor {
     public Object visit(ASTAttachmentDecl node, Object data) {
         String connector = node.getConnector();
         HashSet<String> ports = node.getAllPorts();
-        if (!connectors.containsKey(connector)) {
-            // connector not declared
-            ToolError.reportError(ErrorMessage.MEMBER_NOT_DECLARED,
-                    node.getLocation(), "connector", connector);
-        }
         if (attachments.putIfAbsent(connector, ports) != null) {
             // duplicate connector use
             ToolError.reportError(ErrorMessage.DUPLICATE_CONNECTOR_USE,
                     node.getLocation(), connector);
         }
-
         /* Check if ports are improperly declared */
         for (String portFull : ports) {
             String[] portParts = portFull.split("\\.", 2);

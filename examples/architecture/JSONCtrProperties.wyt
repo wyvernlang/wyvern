@@ -74,4 +74,3 @@ type JSONCtrProperties
 			astList.append(serverAST)
 			astList.append(clientAST)
 			astList
-

@@ -243,6 +243,7 @@ public final class ArchitectureInterpreter {
         Node start = wp.ArchDesc();
         DeclCheckVisitor visitor = new DeclCheckVisitor(state);
         visitor.visit((ASTArchDesc) start, null);
+        visitor.endOfFileCheck();
         return visitor;
     }
 
