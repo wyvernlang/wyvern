@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -39,8 +40,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
     private final List<NameBindingImpl> args;
 
     private final List<ImportDeclaration> imports;
+    private final List<GenericParameter> generics;
 
-    public ModuleDeclaration(String name, List imports, List<NameBindingImpl> args, TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
+    public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
+                             TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
         this.name = name;
         this.inner = inner;
         this.location = location;
@@ -48,6 +51,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         ascribedType = type;
         this.args = args;
         this.imports = imports;
+        this.generics = generics;
     }
 
 
@@ -201,11 +205,20 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         separatePlatformDependencies(platformDependentImports, platformIndependentImports);
         Sequence normalSeq = (inner instanceof Sequence) ? ((DeclSequence) inner).filterNormal() : new Sequence(inner);
 
-        List<FormalArg> formalArgs;
+        List<FormalArg> formalArgs = new LinkedList<>();
+
+        // Add the generic parameters to the list of formal arguments, if they exist
+        if (this.generics != null) {
+            GenContext[] contexts = new GenContext[1];
+            contexts[0] = methodContext;
+            DefDeclaration.addGenericParameters(contexts, formalArgs, this.generics);
+            methodContext = contexts[0];
+        }
+
         List<Module> loadedTypes = new LinkedList<Module>();
-        formalArgs = getTypes(ctx, loadedTypes); // get the types of the module parameters
+        formalArgs.addAll(getTypes(methodContext, loadedTypes)); // get the types of the module parameters
         wyvern.target.corewyvernIL.type.ValueType ascribedValueType
-            = ascribedType == null ? null : this.getType(ctx, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
+            = ascribedType == null ? null : this.getType(methodContext, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
         for (Module lt : loadedTypes) {
             // include the declaration itself
             final BindingSite internalSite = lt.getSpec().getSite();
@@ -232,10 +245,15 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(/*ctxWithPlatDeps*/methodContext, dependencies);
         seqExpr.merge(body);
         body = seqExpr;
+
         wyvern.target.corewyvernIL.type.ValueType returnType = body.typeCheck(tempContext, null);
         if (ascribedValueType != null) {
             returnType = ascribedValueType;
         }
+
+//        if (returnType.isEffectUnannotated(methodContext)) {
+            // TODO[ql] here is where we want to transform the body
+//        }
 
         if (platformDependentImports.size() > 0) {
             // We have platform-dependent dependencies, return a corewyvernIL ModuleDeclaration

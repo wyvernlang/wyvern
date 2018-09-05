@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
+import wyvern.tools.tests.EffectAnnotationTests;
 import wyvern.tools.tests.EffectSystemTests;
 import wyvern.tools.tests.ExampleTests;
 import wyvern.tools.tests.ExamplesNoPrelude;
@@ -20,6 +21,7 @@ import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
 import wyvern.tools.tests.OIRTests;
+import wyvern.tools.tests.PolymorphicEffectTests;
 import wyvern.tools.tests.ReflectionTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
@@ -56,6 +58,8 @@ import wyvern.tools.tests.TransformTests;
             ExampleTests.class,      // tests the examples
             ExamplesNoPrelude.class,      // tests the examples that don't require the prelude
             EffectSystemTests.class,
+            PolymorphicEffectTests.class,
+            EffectAnnotationTests.class,
             ModuleSystemTests.class,        // tests the new IL
         }
         )

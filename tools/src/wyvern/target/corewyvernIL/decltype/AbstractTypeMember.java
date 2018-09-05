@@ -69,4 +69,15 @@ public class AbstractTypeMember extends DeclType implements IASTNode {
     public boolean isTypeOrEffectDecl() {
         return true;
     }
+
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return true;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return true;
+    }
 }
