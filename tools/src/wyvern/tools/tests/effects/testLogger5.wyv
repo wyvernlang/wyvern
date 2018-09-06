@@ -1,7 +1,0 @@
-require effects.fileIO
-import effects.FileIO
-import effects.logger3
-
-var file: FileIO = fileIO
-val log = logger3(file)
-log.updateLog(1)
