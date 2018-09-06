@@ -170,16 +170,16 @@ public class EffectSystemTests {
     }
 
     @Test
+    public void testLogger3() throws ParseException {
+        /* Uses a resource passed as a method argument in the method's effect annotation. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger3", Util.intType(), new IntegerLiteral(2));
+    }
+
+    @Test
     public void testLogger4() throws ParseException {
         /* Globally available effect (system.ffiEffect) is used to annotate a method directly
          * without defining any local effects. */
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger4", Util.intType(), new IntegerLiteral(5));
-    }
-
-    @Test
-    public void testLogger6() throws ParseException {
-        /* Uses a resource passed as a method argument in the method's effect annotation. */
-        TestUtil.doTestScriptModularly(PATH, "effects.testLogger6", Util.intType(), new IntegerLiteral(2));
     }
 
     @Test
