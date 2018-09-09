@@ -81,12 +81,16 @@ public final class ReplServer {
                         response = " ";
                     }
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("interpretModule")){
-                    System.out.println("running module");
+                    System.out.println(buf.toString());
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("saveModule")){
-                    System.out.println("saving module");
+                    String[] moduleData = buf.toString().split("=:=");
+                    String moduleName = moduleData[0];
+                    String moduleCode = moduleData[1];
+                    System.out.println("Module Name: \n" + moduleName + "\n");
+                    System.out.println("Module Name: \n" + moduleCode);
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("loadModule")){
                     String moduleName = buf.toString();
-                    File file = new File("..\\tools\\src\\wyvern\\tools\\tests\\modules\\replModules\\" + moduleName + ".wyv");
+                    File file = new File("../tools/src/wyvern/tools/tests/modules/replModules/" + moduleName + ".wyv");
                     
                     BufferedReader fileReader = new BufferedReader(new FileReader(file));
                    
@@ -97,7 +101,7 @@ public final class ReplServer {
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("loadAllModule")){
                     try {
                        
-                        File folder = new File("..\\tools\\src\\wyvern\\tools\\tests\\modules\\replModules");
+                        File folder = new File("../tools/src/wyvern/tools/tests/modules/replModules");
                         File[] listOfFiles = folder.listFiles();
 
                         for (int i = 0; i < listOfFiles.length; i++) {

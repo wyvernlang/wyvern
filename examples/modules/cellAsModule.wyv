@@ -1,4 +1,8 @@
-module def cellAsModule():modules.TCellAsModule
+resource type TCellAsModule
+    def get():Int
+	def set(newValue:Int):Unit
+
+module def cellAsModule():TCellAsModule
 
 var value : Int = 0
 def set(newValue:Int):Unit
