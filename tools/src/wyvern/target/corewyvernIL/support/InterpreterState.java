@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.support;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
+import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,5 +59,9 @@ public class InterpreterState {
 
     public static void resetThreadLocalInterpreter() {
         localInterpreter.set(null);
+    }
+
+    public void addModuleAST(String moduleName, ModuleDeclaration newAST) {
+        this.resolver.addModuleAST(moduleName, newAST);
     }
 }

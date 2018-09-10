@@ -83,7 +83,7 @@ public class Serializer {
     }
 
     private void recStringToJSONMap(String key, String val,
-            HashMap<String, Object> jmap) {
+                                    HashMap<String, Object> jmap) {
         key = key.trim();
         val = val.trim();
         if (val.indexOf("{") == 0 && val.lastIndexOf("}") == val.length() - 1) {
@@ -151,7 +151,7 @@ public class Serializer {
     }
 
     private void recToJSONString(HashMap<String, Object> hashmap,
-            StringBuffer json, int indent) {
+                                 StringBuffer json, int indent) {
         json.append("{");
         int size = hashmap.size();
         int count = 1;

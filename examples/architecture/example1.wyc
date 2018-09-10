@@ -1,0 +1,25 @@
+component Client
+	port getInfo: requires CSIface
+
+component Server
+	port sendInfo: provides CSIface
+
+connector JSONCtr
+	val host: String
+	val prt: Int
+
+architecture ClientServer
+	components
+		Client client
+		Server server
+
+	connectors
+		JSONCtr jsonCtr
+
+	attachments
+		connect client.getInfo and server.sendInfo with jsonCtr
+
+	entryPoints
+		client: start
+		server: start
+

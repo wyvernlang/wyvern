@@ -121,7 +121,20 @@ public enum ErrorMessage {
     EFFECT_NOT_IN_SCOPE("Effect \"%ARG\" not found in scope", 1),
     //    EFFECT_OF_VAR_NOT_FOUND("Effect \"%ARG\" not found for variable \"%ARG\"", 2),
     RECURSIVE_EFFECT("Effect \"%ARG\" is being defined recursively", 1),
-    UNKNOWN_EFFECT("Effects of method call \"%ARG\" are unknown", 1);
+    UNKNOWN_EFFECT("Effects of method call \"%ARG\" are unknown", 1),
+
+    //ARCHITECTURE ERRORS
+    DUPLICATE_MEMBER_NAMES("multiple members declared with name \"%ARG\"", 1),
+    DUPLICATE_TYPE_DEFINITIONS("multiple types defined with name \"%ARG\"", 1),
+    COMPONENT_DEPENDENCY_INCONSISTENCY("module def and component \"%ARG\" have inconsistent dependencies/fields and ports", 1),
+    MODULE_DEF_NOT_FOUND("module def \"%ARG\" not found in current Wyvern path or the standard library", 1),
+    DUPLICATE_CONNECTOR_USE("connector \"%ARG\" has been used in multiple attachments", 1),
+    MEMBER_NOT_DECLARED("%ARG \"%ARG\" has not been declared", 2),
+    ARCH_TYPE_NOT_DEFINED("%ARG type \"%ARG\" is not defined", 2),
+    CONNECTOR_VAL_INCONSISTENCY("type properties and connector \"%ARG\" have inconsistent val declarations", 1),
+    INVALID_CONNECTOR_METADATA("properties of connector \"%ARG\" contain invalid metadata", 1),
+    INVALID_CONNECTOR_PORTS("ports of connector\"%ARG\" are incompatible", 1),
+    DUPLICATE_GENERATED_MODULES("multiple modules generated with name \"%ARG\"", 1);
 
     ErrorMessage(String message, int numArgs) {
         errorMessage = message;

@@ -1,0 +1,4 @@
+module def Client(getInfo : CSIface) : TCPClient
+
+def start() : String
+	getInfo.getVal("key")

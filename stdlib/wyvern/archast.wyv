@@ -1,0 +1,21 @@
+module archast
+
+type ComponentDecl	
+	def getType() : String
+	def getName() : String
+
+type PortDecl
+	def getProvides() : String
+	def getRequires() : String
+
+val NoneComponent : ComponentDecl = new
+	def getType() : String
+		"Nil"
+	def getName() : String
+		"Nil"
+
+val NonePort : PortDecl = new
+	def getProvides() : String
+		"Nil"
+	def getRequires() : String
+		"Nil"

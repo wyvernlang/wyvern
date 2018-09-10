@@ -1,11 +1,11 @@
-import static wyvern.tools.parsing.coreparser.ArchParserConstants.*;
+import static wyvern.tools.parsing.coreparser.arch.ArchParserConstants.*;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
 import wyvern.tools.lexing.LexerUtils;
-import wyvern.tools.parsing.coreparser.ArchParserConstants;
+import wyvern.tools.parsing.coreparser.arch.ArchParserConstants;
 import wyvern.tools.parsing.coreparser.Token;
 
 %%
@@ -40,7 +40,6 @@ import wyvern.tools.parsing.coreparser.Token;
     terminal Token portKwd_t ::= /port/ in (keywords) {: RESULT = token(PORT, lexeme); :};
     terminal Token providesKwd_t ::= /provides/ in (keywords) {: RESULT = token(PROVIDES, lexeme); :};
     terminal Token requiresKwd_t ::= /requires/ in (keywords) {: RESULT = token(REQUIRES, lexeme); :};
-    terminal Token targetKwd_t ::= /target/ in (keywords) {: RESULT = token(TARGET, lexeme); :};
     terminal Token connectorKwd_t ::= /connector/ in (keywords) {: RESULT = token(CONNECTOR, lexeme); :};
     terminal Token valKwd_t ::= /val/ in (keywords) {: RESULT = token(VAL, lexeme); :};
     terminal Token architectureKwd_t ::= /architecture/ in (keywords) {: RESULT = token(ARCHITECTURE, lexeme); :};
@@ -68,6 +67,7 @@ import wyvern.tools.parsing.coreparser.Token;
 
     terminal Token colon_t ::= /:/ {: RESULT = token(COLON, lexeme); :};
     terminal Token dot_t ::= /\./ {: RESULT = token(DOT, lexeme); :};
+    terminal Token comma_t ::= /,/ {: RESULT = token(COMMA, lexeme); :};
 %lex}
 
 %cf{
@@ -127,14 +127,14 @@ import wyvern.tools.parsing.coreparser.Token;
                        | keyword:t {: RESULT = LexerUtils.makeList(t); :};
 
     operator ::= colon_t:t {: RESULT = t; :}
-               | dot_t:t {: RESULT = t; :};
+               | dot_t:t {: RESULT = t; :}
+	       | comma_t:t {: RESULT = t; :};
 
     keyword ::= componentKwd_t:t {: RESULT = t; :}
               | externalKwd_t:t {: RESULT = t; :}
               | portKwd_t:t {: RESULT = t; :}
               | providesKwd_t:t {: RESULT = t; :}
               | requiresKwd_t:t {: RESULT = t; :}
-              | targetKwd_t:t {: RESULT = t; :}
               | connectorKwd_t:t {: RESULT = t; :}
               | valKwd_t:t {: RESULT = t; :}
               | architectureKwd_t:t {: RESULT = t; :}
