@@ -1,4 +1,4 @@
-module def String(java:Java)
+module def stringhelper(java:Java): TStringHelper
 
 import java:wyvern.stdlib.support.StringHelper.utils
 

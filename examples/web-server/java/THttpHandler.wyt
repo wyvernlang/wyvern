@@ -1,3 +1,5 @@
 resource type THttpHandler
+    val numParam: Int
     def responseFile(): String
-    def sendResponse(dos:Dyn):Unit
+    def sendResponse():String
+    def setParams(postParams:String): Unit

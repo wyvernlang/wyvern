@@ -1,19 +1,33 @@
-module def bmihandler() : THttpHandler
+module def bmihandler(params : wyvern.TPostProcessor, str : TStringHelper) : THttpHandler
 
 import bmi
+import wyvern.Float
+
+val numParam: Int = 3
+var age: String = ""
+var weight: Float = 0.0
+var height: Float = 0.0
 
 def responseFile():String
     "bmi.html"
 
-
-def sendResponse(dos:Dyn, age:Int, height:Float, weight:Float):Unit
+def sendResponse():String
     // setHTML headers
 	// retrieve params from postprocessor
 	// send results via HTML file
     val result:Float = bmi.calculateBmi(height, weight)
     val classification:String = bmi.getBmiClassification(result)
-    dos.writeBytes("<html><h1>BMI Calculator Results</h1>")
-    dos.writeBytes("<h2>You are " + age +" years old</h2>")
-    dos.writeBytes("<h2>Your BMI Result is:" + result+" </h2>")
-    dos.writeBytes("<h2>You are " + classification+"</h2></html>\r\n")
+    val msg1: String = "<html><h1>BMI Calculator Results</h1><h2>You are "
+    val ageVal: String = str.concatenate(msg1, age)
+    val ageVal2:String = str.concatenate(ageVal, " years old</h2><h2>Your BMI Result is: ")
+    val bmiVal: String = str.concatenate(ageVal2,str.ofFloat(result))
+    val bmiVal2: String = str.concatenate(bmiVal," </h2><h2>You are ")
+    val classVal: String = str.concatenate(bmiVal2, classification)
+    val classVal2: String = str.concatenate(classVal," </h2></html>\r\n")
+    classVal2
+
+def setParams(postParams:String): Unit
+    age = params.getParamByIndex(postParams,0)
+    height = Float.from(params.getParamByIndex(postParams,1))
+    weight = Float.from(params.getParamByIndex(postParams,2))
 

@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 public class PostParameters {
     public static final PostParameters postparam = new PostParameters();
 
-    public Map<String,String> getPayload(InputStream is) throws IOException {
+    public String getPayload(InputStream is) throws IOException {
         InputStreamReader isReader = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isReader);
         
@@ -38,7 +38,7 @@ public class PostParameters {
 	
     }
 	
-	public Map<String,String> processPostBody(String request){
+	public String processPostBody(String request){
 
 		Map<String, String> params = new LinkedHashMap<String, String>();
 		
@@ -63,22 +63,31 @@ public class PostParameters {
 		}
 		
 		String last = paramValues.get(paramValues.size() - 1);
-		paramValues.remove(last);
 		last =  paramNames.get(paramNames.size() - 1);
-		paramNames.remove(last);
+		
+		String paramResult = "";
 		
 		if(paramValues.size() == paramNames.size()){
 			for(int i = 0; i < paramValues.size(); i++){
 				String key = paramNames.get(i);
 				String value = paramValues.get(i);
-				params.put(key, value);
+				
+				if(i == paramValues.size()-1){
+					paramResult+=value;
+				}else{
+					paramResult+= value+",";
+				}
 				
 			}
 		
-		}
-
-		return params;
+		} 
+		
+		return paramResult;
 	
+	}
+	
+	public String getParamByIndex(String params, int index){
+		return Arrays.asList(params.split(",")).get(index);
 	}
 	
 

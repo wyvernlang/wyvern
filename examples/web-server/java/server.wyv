@@ -1,15 +1,15 @@
-module def server(stdout:Stdout)
+module def server(dos:Dyn)
 
-def sendHeaders(dos:Dyn):Unit
+def sendHeaders():Unit
     dos.writeBytes("HTTP/1.0 200 OK\r\n")
     dos.writeBytes("Content-Type: text/html\r\n")
     dos.writeBytes("\r\n")
 
-def welcomeMsg(dos:Dyn):Unit
+def welcomeMsg():Unit
     dos.writeBytes("<html><h1>Welcome to the Wyvern Server</h1></html>\r\n")
 
-def flush(dos:Dyn):Unit
+def flush():Unit
     dos.flush()
 	
-def sendHtmlFile(dos:Dyn, str: String):Unit
+def sendHtmlFile(str: String):Unit
     dos.writeBytes(str)

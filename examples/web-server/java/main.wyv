@@ -1,28 +1,34 @@
 require java
 
-// require stdout
+// module for printing and debugging
 import stdout
 
+// input-output for files and network access
 import io
 import fileio
 
 import server
-//import httphandler
-import THttpHandler
-//import bmihandler
+import httphandler
+import bmihandler
 import simplehandler
 
+//import wyvern.TPostProcessor
 import postprocessor
+import stringhelper
 
+
+//instantiated java dependent module objects - can now use to call proper functions
 val stdout = stdout(java)
-
-
-
 val ioobj = io(java)
 val fileioobj = fileio(java)
 val ppobj = postprocessor(java)
+val stringObj = stringhelper(java)
 
-val server = server(stdout) 
+val handler = httphandler(simplehandler(ppobj, stringObj))
+//val handler = httphandler(bmihandler(ppobj, stringObj))
+
+
+// begin/execute program
 
 val serverSocket = ioobj.makeServerSocket(1254)
 
@@ -31,28 +37,41 @@ stdout.print("Waiting for a client connection...\n")
 val soc = serverSocket.accept()
 stdout.print("Accepted a connection.\n")
 
-// Get a communication stream associated with the socket
+// Get a communication stream associated with the socket and set Headers
 val s1out = soc.getOutputStream()
 val dos = ioobj.makeDataOutputStream(s1out)
-server.sendHeaders(dos)
+val serverObj = server(dos) 
+serverObj.sendHeaders()
 
-val filename = simplehandler.responseFile()
-val bufferedReader = fileioobj.makeBufferedReader(filename)
+val bufferedReader = fileioobj.makeBufferedReader(handler.responseFile())
 val msg = fileioobj.readFile(bufferedReader)
-server.sendHtmlFile(dos,msg)
+serverObj.sendHtmlFile(msg)
 
 stdout.print("Sent Form to Client\n")
 stdout.print("Wrote to DataOutputStream\n")
 
 val soc2 = serverSocket.accept()
 val slin = soc2.getInputStream()
-val params: Dyn = ppobj.getPayload(slin)
+val params: String = ppobj.getPayload(slin)
+
+val s2out = soc2.getOutputStream()
+val dos2 = ioobj.makeDataOutputStream(s2out)
+val serverObj2 = server(dos2)
+stdout.print(params)
+//send response to request
+handler.setParams(params)
+serverObj2.sendHeaders()
+val serverResponse: String = handler.sendResponse()
+serverObj2.sendHtmlFile(serverResponse)
+
+
+
 
 
 
 
 // Close the connection but not the server socket
-//dos.close()
+dos.close()
 // Call to "s1out.close()" causes an error.
 // This call is not necessary, but was provided in the example cited.
-//soc.close()
+soc.close()

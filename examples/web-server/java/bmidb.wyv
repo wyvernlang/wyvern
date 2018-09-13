@@ -1,0 +1,18 @@
+module def bmidb()
+
+var lowerLimit: Float = 18.5
+var middleLimit: Float = 25.0
+var upperLimit: Float = 30.0
+
+var under: String = "Underweight"
+var norm: String = "Normal"
+var over: String = "Overweight"
+var obese: String = "Obese"
+
+def getLowerLimit():Float = lowerLimit
+def getUpperLimit():Float = upperLimit
+def getMiddleLimit():Float = middleLimit
+def getUnderClass():String = under
+def getNormalClass():String = norm
+def getOverClass():String = over
+def getObeseClass():String = obese
