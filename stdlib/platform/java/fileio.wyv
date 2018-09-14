@@ -28,3 +28,6 @@ def getBufferedReader(filename: String): BufferedReader
 	
 def readFile(br:Dyn): String
     file.readFileIntoString(br)
+
+def writeFile(content:String, filename:String):Unit
+    file.writeStringIntoFile(content,filename)

@@ -7,15 +7,15 @@ import stdout
 import io
 import fileio
 
+// modules for Web-Server-Client Interaction
 import server
 import httphandler
 import bmihandler
 import simplehandler
 
-//import wyvern.TPostProcessor
+// helper modules 
 import postprocessor
 import stringhelper
-
 
 //instantiated java dependent module objects - can now use to call proper functions
 val stdout = stdout(java)
@@ -24,16 +24,14 @@ val fileioobj = fileio(java)
 val ppobj = postprocessor(java)
 val stringObj = stringhelper(java)
 
-val handler = httphandler(simplehandler(ppobj, stringObj))
-//val handler = httphandler(bmihandler(ppobj, stringObj))
+//val handler = httphandler(simplehandler(ppobj, stringObj))
+val handler = httphandler(bmihandler(ppobj, stringObj))
 
 
 // begin/execute program
 
 val serverSocket = ioobj.makeServerSocket(1254)
-
 stdout.print("Waiting for a client connection...\n")
-
 val soc = serverSocket.accept()
 stdout.print("Accepted a connection.\n")
 
@@ -53,6 +51,8 @@ stdout.print("Wrote to DataOutputStream\n")
 val soc2 = serverSocket.accept()
 val slin = soc2.getInputStream()
 val params: String = ppobj.getPayload(slin)
+stdout.print("Received Client Request\n")
+stdout.print("Processing Parameters...\n")
 
 val s2out = soc2.getOutputStream()
 val dos2 = ioobj.makeDataOutputStream(s2out)
@@ -64,11 +64,10 @@ serverObj2.sendHeaders()
 val serverResponse: String = handler.sendResponse()
 serverObj2.sendHtmlFile(serverResponse)
 
+fileioobj.writeFile(serverResponse,"saved-file.txt")
 
-
-
-
-
+stdout.print("Successfully Posted Form Data to Client\n")
+stdout.print("Saved Form Data text\n")
 
 // Close the connection but not the server socket
 dos.close()

@@ -34,5 +34,11 @@ public class FileIO {
 
         return message;
     }
+	
+	public void writeStringIntoFile(String content, String filename) throws IOException {
+		PrintWriter writer = new PrintWriter(filename, "UTF-8");
+		writer.println(content);
+		writer.close();		
+	}
 
 }
