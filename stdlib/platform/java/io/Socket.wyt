@@ -1,0 +1,7 @@
+import io.OutputStream
+import io.InputStream
+
+type Socket
+	def getOutputStream() : OutputStream
+	def getInputStream() : InputStream
+	def close() : Unit

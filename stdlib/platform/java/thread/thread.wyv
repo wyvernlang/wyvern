@@ -1,26 +1,9 @@
 module def thread(java : Java)
 
 import java:wyvern.stdlib.support.ThreadWrapper.threadwrapper
-import platform.java.thread.Runnable
-import platform.java.thread.ThreadGroup
-
-type Thread
-	val thread : Dyn
-	def start() : Unit
-	def join() : Unit
-	def activeCount() : Int
-	def getId() : Int
-	def getName() : String
-	def getPriority() : Int
-	def getThreadGroup() : ThreadGroup
-	def interrupt() : Unit
-	def isAlive() : Boolean
-	def isDaemon() : Boolean
-	def isInterrupted() : Boolean
-	def setDaemon(d : Boolean) : Unit
-	def setName(name : String) : Unit
-	def setPriority(n : Int) : Unit
-	def toString() : String
+import thread.Runnable
+import thread.ThreadGroup
+import thread.Thread
 
 def sleep(time : Int) : Unit
 	threadwrapper.sleep(threadwrapper.bigIntToLong(time))

@@ -45,8 +45,9 @@ import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 
-/** Resolves abstract module paths to concrete files, then parses the files into modules.
- *  Knows the root directory
+/**
+ * Resolves abstract module paths to concrete files, then parses the files into modules.
+ * Knows the root directory
  *
  * @author aldrich
  */
@@ -59,6 +60,7 @@ public class ModuleResolver {
     private InterpreterState state;
     private File rootDir;
     private File libDir;
+    private HashMap<String, wyvern.tools.typedAST.core.declarations.ModuleDeclaration> modules;
     private SeqExpr prelude = null;
     private Module preludeModule = null;
 
@@ -66,7 +68,9 @@ public class ModuleResolver {
         this.platform = platform;
         this.rootDir = rootDir;
         this.libDir = libDir;
+        this.modules = new HashMap<>();
         this.platformPath = new ArrayList<>();
+
         ArrayList<File> searchPath = new ArrayList<File>();
         if (rootDir != null && !rootDir.isDirectory()) {
             throw new RuntimeException("the root path \"" + rootDir + "\" for the module resolver must be a directory");
@@ -84,6 +88,14 @@ public class ModuleResolver {
         }
         searchPath.addAll(platformPath.stream().map(path -> path.toFile()).collect(Collectors.toList()));
         this.searchPath = searchPath;
+    }
+
+    public void addModuleAST(String moduleName, wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleAST) {
+        if (modules.containsKey(moduleName)) {
+            ToolError.reportError(ErrorMessage.DUPLICATE_GENERATED_MODULES, FileLocation.UNKNOWN, moduleName);
+        } else {
+            modules.put(moduleName, moduleAST);
+        }
     }
 
     public void setInterpreterState(InterpreterState s) {
@@ -119,7 +131,6 @@ public class ModuleResolver {
         //return new LoadedType(typeName, typeDefiningModule);
         return typeDefiningModule;
         /*return new ContextBinding(generatedVariableName, typeDefiningObject, typeName) {
-
             @Override
             public GenContext extendContext(GenContext ctx) {
                 return new TypeGenContext(typeName, generatedVariableName, ctx);
@@ -140,11 +151,13 @@ public class ModuleResolver {
         return ctx;
     }
 
-    /** The main utility function for the ModuleResolver.
-     *  Accepts a string argument of the module name to import
-     *  Loads a module expression from the file (or looks it up in a cache)
-     *  Returns the uninstantiated module (a function to be applied,
-     *  or an expression to be evaluated)
+    /**
+     * The main utility function for the ModuleResolver.
+     * Accepts a string argument of the module name to import
+     * Loads a module expression from the file (or looks it up in a cache)
+     * Returns the uninstantiated module (a function to be applied,
+     * or an expression to be evaluated)
+     *
      * @throws ParseException
      */
     public Module resolveModule(String qualifiedName) {
@@ -156,7 +169,17 @@ public class ModuleResolver {
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, false);
             modulesBeingResolved.add(qualifiedName);
-            moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+            if (f == null || !f.exists()) {
+                wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleAST = modules.get(qualifiedName);
+                if (moduleAST == null) {
+                    ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "module", qualifiedName);
+                } else {
+                    Module m = loadContinuation(null, qualifiedName, moduleAST, false, toplevel);
+                    moduleCache.put(qualifiedName, m);
+                }
+            } else {
+                moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+            }
             modulesBeingResolved.remove(qualifiedName);
         }
         return moduleCache.get(qualifiedName);
@@ -164,8 +187,9 @@ public class ModuleResolver {
 
     /**
      * Check if trying to resolve the specified module would introduce a cyclic dependency on itself.
+     *
      * @param qualifiedName: the name of the module to resolve.
-     * @throws ToolError of type ErrorMessage.IMPORT_CYCLE: if there is a cyclic dependency. 
+     * @throws ToolError of type ErrorMessage.IMPORT_CYCLE: if there is a cyclic dependency.
      */
     private void checkNoCyclicDependencies(String qualifiedName) {
         if (modulesBeingResolved.contains(qualifiedName)) {
@@ -181,10 +205,10 @@ public class ModuleResolver {
                 }
             }
             errorMessage.append(qualifiedName);
-            ToolError.reportError(ErrorMessage.IMPORT_CYCLE,  HasLocation.UNKNOWN, errorMessage.toString());
+            ToolError.reportError(ErrorMessage.IMPORT_CYCLE, HasLocation.UNKNOWN, errorMessage.toString());
         }
     }
-    
+
     /**
      * Turns dots into directory slashes.
      * Adds a .wyv at the end, and the root to the beginning
@@ -206,9 +230,6 @@ public class ModuleResolver {
                 String lastName = names[names.length - 1];
                 names[names.length - 1] = lastName.substring(0, lastName.length() - 4) + ".wyt";
                 f = findFile2(names);
-            }
-            if (f == null || !f.exists()) {
-                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, (FileLocation) null, isType ? "type" : "module", qualifiedName);
             }
         }
         return f;
@@ -244,30 +265,7 @@ public class ModuleResolver {
         return f;
     }
 
-    /**
-     * Reads the file.
-     * Parses it, generates IL, and typechecks it.
-     * In the process, loads other modules as necessary.
-     * Returns the resulting module expression.
-     *
-     * @param file
-     * @param state
-     * @return
-     */
-    public Module load(String qualifiedName, File file, boolean toplevel) {
-        boolean loadingType = file.getName().endsWith(".wyt");
-        TypedAST ast = null;
-        try {
-            ast = TestUtil.getNewAST(file);
-        } catch (ParseException e) {
-            if (e.getCurrentToken() != null) {
-                 ToolError.reportError(ErrorMessage.PARSE_ERROR,
-                 new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
-            } else {
-                 ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
-            }
-        }
-
+    private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel) {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
@@ -289,13 +287,25 @@ public class ModuleResolver {
                 }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
-                // rename according to "apply"
-                DefDeclaration defDecl = new DefDeclaration(Util.APPLY_NAME, oldDefDecl.getFormalArgs(),
-                        oldDefDecl.getType(), oldDefDecl.getBody(), oldDefDecl.getLocation());
-                // TODO[ql] here^ is where we want to put the polymorphism on the module functor itself?
-                // wrap in an object
+
+                // Rename according to "apply"
+                DefDeclaration defDecl = new DefDeclaration(
+                        Util.APPLY_NAME,
+                        oldDefDecl.getFormalArgs(),
+                        oldDefDecl.getType(),
+                        oldDefDecl.getBody(),
+                        oldDefDecl.getLocation()
+                );
+
+                // Wrap in an object
                 program = new New(defDecl);
-                //program = wrap(program, dependencies);
+
+                // Perform quantification lifting if possible
+                final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
+                final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program);
+                if (liftResult != null) {
+                    program = liftResult;
+                }
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);
             } else {
@@ -310,13 +320,39 @@ public class ModuleResolver {
         return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel, loadingType);
     }
 
+    /**
+     * Reads the file.
+     * Parses it, generates IL, and typechecks it.
+     * In the process, loads other modules as necessary.
+     * Returns the resulting module expression.
+     *
+     * @param file
+     * @param state
+     * @return
+     */
+    public Module load(String qualifiedName, File file, boolean toplevel) {
+        boolean loadingType = file.getName().endsWith(".wyt");
+        TypedAST ast = null;
+        try {
+            ast = TestUtil.getNewAST(file);
+        } catch (ParseException e) {
+            if (e.getCurrentToken() != null) {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
+            } else {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
+            }
+        }
+        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel);
+    }
+
     private Module createAdaptedModule(File file, String qualifiedName,
-            final List<TypedModuleSpec> dependencies, IExpr program,
-            TypeContext ctx, boolean toplevel, boolean loadingType) {
+                                       final List<TypedModuleSpec> dependencies, IExpr program,
+                                       TypeContext ctx, boolean toplevel, boolean loadingType) {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
-        if (platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
+        if (file != null && platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
             // if the type is in functor form
             if (moduleType instanceof StructuralType
                     && ((StructuralType) moduleType).getDeclTypes().size() == 1
@@ -454,36 +490,53 @@ public class ModuleResolver {
         return wyb.build();
     }
 
-    /** Wraps this program with all its dependencies.  Unlike wrapWitCtx, we do not cache values as we add dependencies.
+    /**
+     * Wraps this program with all its dependencies.  Unlike wrapWitCtx, we do not cache values as we add dependencies.
      *
      * @param program
      * @param dependencies The modules this program depends on.
-     * Duplicate modules are OK; duplicates will be eliminated, and
-     * dependencies will be sorted, before the program is linked.
-     *
+     *                     Duplicate modules are OK; duplicates will be eliminated, and
+     *                     dependencies will be sorted, before the program is linked.
      * @return
      */
     public SeqExpr wrap(IExpr program, List<TypedModuleSpec> dependencies) {
-        SeqExpr seqProg = new SeqExpr();
+        final SeqExpr seqProg = new SeqExpr();
         seqProg.merge(program);
-        List<TypedModuleSpec> noDups = sortDependencies(dependencies);
+
+        final List<TypedModuleSpec> noDups = sortDependencies(dependencies);
+
         for (TypedModuleSpec spec : noDups) {
-            Module m = resolveModule(spec.getQualifiedName());
-            //program = new Let(m.getSpec().getInternalName(), m.getSpec().getType(), m.getExpression(), program);
-            seqProg.addBinding(m.getSpec().getSite(), m.getSpec().getType(), m.getExpression(), false);
+            final Module m = resolveModule(spec.getQualifiedName());
+            final Expression liftResult = null; // TODO (@justinlubin)
+
+            final BindingSite bindingSite = m.getSpec().getSite();
+            final Expression expression;
+            final ValueType valueType;
+
+            if (liftResult != null) {
+                expression = liftResult;
+                valueType = liftResult.getType();
+            } else {
+                expression = m.getExpression();
+                valueType = m.getSpec().getType();
+            }
+
+            seqProg.addBinding(bindingSite, valueType, expression, false);
         }
+
         return seqProg;
     }
 
-    /** Wraps this program with all its dependencies.  The dependencies are
+    /**
+     * Wraps this program with all its dependencies.  The dependencies are
      * evaluated to values using the ctx, and the values are cached in
      * order to reduce duplicate evaluation.
+     *
      * @param program
      * @param dependencies The modules this program depends on.
-     * Duplicate modules are OK; duplicates will be eliminated, and
-     * dependencies will be sorted, before the program is linked.
-     *
-     * @param ctx The evaluation context to use; should include the prelude if it is needed
+     *                     Duplicate modules are OK; duplicates will be eliminated, and
+     *                     dependencies will be sorted, before the program is linked.
+     * @param ctx          The evaluation context to use; should include the prelude if it is needed
      * @return
      */
     public SeqExpr wrapWithCtx(IExpr program, List<TypedModuleSpec> dependencies, EvalContext ctx) {
@@ -501,14 +554,15 @@ public class ModuleResolver {
         return seqProg;
     }
 
-    /** Constructs an executable SeqExpr consisting of the following:
-     *  - The dependencies of the prelude
-     *  - The prelude itself
-     *  - The dependencies of the main program (with the prelude's dependencies removed)
-     *  - The main program
-     *
-     *  It differs from wrap()/wrapWithCtx() mainly in that it does not turn everything into values,
-     *  which seems to create problems when exporting to Python.
+    /**
+     * Constructs an executable SeqExpr consisting of the following:
+     * - The dependencies of the prelude
+     * - The prelude itself
+     * - The dependencies of the main program (with the prelude's dependencies removed)
+     * - The main program
+     * <p>
+     * It differs from wrap()/wrapWithCtx() mainly in that it does not turn everything into values,
+     * which seems to create problems when exporting to Python.
      */
     public SeqExpr wrapForPython(IExpr program, List<TypedModuleSpec> dependencies) {
         SeqExpr seqProg = new SeqExpr();
@@ -523,8 +577,10 @@ public class ModuleResolver {
         return seqProg;
     }
 
-    /** Does not modify deps.
-     * Adds deduplicated deps to seqProg, in order from last to first. */
+    /**
+     * Does not modify deps.
+     * Adds deduplicated deps to seqProg, in order from last to first.
+     */
     private void addDeps(SeqExpr seqProg, List<TypedModuleSpec> deps) {
         List<TypedModuleSpec> noDups = sortDependencies(deps);
         for (int i = noDups.size() - 1; i >= 0; --i) {
@@ -534,7 +590,9 @@ public class ModuleResolver {
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
     }
-    /** Returns a fresh list, with duplicates eliminated.
+
+    /**
+     * Returns a fresh list, with duplicates eliminated.
      * The last occurrence of each element is left in the returned list.
      */
     private LinkedList<TypedModuleSpec> deDuplicate(List<TypedModuleSpec> dependencies) {
@@ -567,7 +625,9 @@ public class ModuleResolver {
         return libDir;
     }
 
-    /** de-duplicates dependencies and sorts them so that if A depends on B, A comes earlier in the list */
+    /**
+     * de-duplicates dependencies and sorts them so that if A depends on B, A comes earlier in the list
+     */
     public List<TypedModuleSpec> sortDependencies(List<TypedModuleSpec> dependencies) {
         LinkedList<TypedModuleSpec> noDups = deDuplicate(dependencies);
         noDups.sort(new Comparator<TypedModuleSpec>() {
@@ -600,7 +660,7 @@ public class ModuleResolver {
         TailCallVisitor.annotate(prelude);
         prelude.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
         return prelude;
-}
+    }
 
     public Module getPreludeModule() {
         if (prelude == null) {

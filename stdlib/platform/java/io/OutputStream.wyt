@@ -1,0 +1,2 @@
+type OutputStream
+	def close() : Unit

@@ -48,6 +48,7 @@ public class RefinementType extends ValueType {
     }
 
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, BindingSite selfSite) {
+        super(hasLoc);
         this.base = base;
         this.declTypes = declTypes;
         this.selfSite = selfSite;

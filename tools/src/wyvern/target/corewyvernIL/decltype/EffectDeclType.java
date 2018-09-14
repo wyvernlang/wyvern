@@ -63,6 +63,9 @@ public class EffectDeclType extends DeclType implements IASTNode {
         /* this.getEffectSet()==null only if edt.getEffectSet()==null
          * (the reverse isn't necessarily true) */
         if ((edt.getEffectSet() != null) && (edt.getEffectSet().getEffects() != null)) {
+            if (getEffectSet() == null) {
+                return false;
+            }
             Set<Effect> thisEffects = recursiveEffectCheck(ctx, getEffectSet().getEffects());
             Set<Effect> edtEffects =  recursiveEffectCheck(ctx, edt.getEffectSet().getEffects());
             if (!edtEffects.containsAll(thisEffects)) {

@@ -325,9 +325,7 @@ public class MethodCall extends Expression {
                             }
                             // Otherwise, just add it
                             if (!dependent) {
-                                if (e.getPath() == null) {
-                                    e.setPath((Variable) objectExpr); // TODO: should not set path to objectExpr
-                                }
+                                setPathIfNecessary(e);
                                 concreteEffects.add(e);
                             }
                         }
@@ -352,6 +350,15 @@ public class MethodCall extends Expression {
         String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
         return null;
+    }
+
+    private void setPathIfNecessary(Effect e) {
+        if (e.getPath() == null) {
+            // TODO: should not set path to objectExpr
+            if (objectExpr instanceof Variable) {
+                e.setPath((Variable) objectExpr);
+            }
+        }
     }
 
     private String methodDeclarationNotFoundMsg(
