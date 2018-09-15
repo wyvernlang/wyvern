@@ -2,6 +2,7 @@ package wyvern.stdlib.support;
 
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,20 +26,20 @@ public class FileIO {
     }
 
     public String readFileIntoString(BufferedReader br) throws IOException {
-
         String line = "";
         String message = "";
         while ((line = br.readLine()) != null) {
             message += line;
         }
-
         return message;
     }
-	
-	public void writeStringIntoFile(String content, String filename) throws IOException {
-		PrintWriter writer = new PrintWriter(filename, "UTF-8");
-		writer.println(content);
-		writer.close();		
-	}
+
+    public void writeStringIntoFile(String content, String filename) throws IOException {
+        File file = new File(filename + "-files/" + filename + "" + System.currentTimeMillis() + ".txt");
+        file.getParentFile().mkdirs();
+        PrintWriter writer = new PrintWriter(file);
+        writer.println(content);
+        writer.close();
+    }
 
 }

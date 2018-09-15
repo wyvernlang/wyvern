@@ -9,3 +9,6 @@ def sendResponse(): String
 
 def setParams(postParams:String): Unit
     handler.setParams(postParams)
+
+def getFormData():String
+    handler.getFormData()

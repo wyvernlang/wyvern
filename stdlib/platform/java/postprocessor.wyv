@@ -6,3 +6,9 @@ def getPayload(is:Dyn):String
 
 def getParamByIndex(params:String,index:Int):String
     postparam.getParamByIndex(params,index)
+
+def getParamNameByIndex(index:Int):String
+    postparam.getParamNameByIndex(index)
+
+def getParamMappingToString():String
+    postparam.getParamMappingToString()

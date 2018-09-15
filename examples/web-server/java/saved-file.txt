@@ -1,2 +1,0 @@
-<html><h1>BMI Calculator Results</h1><h2>You are 21 years old</h2><h2>Your BMI Result is: 26.171874999999996 </h2><h2>You are Overweight </h2></html>
-

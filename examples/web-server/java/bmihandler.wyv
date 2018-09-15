@@ -31,3 +31,6 @@ def setParams(postParams:String): Unit
     height = Float.from(params.getParamByIndex(postParams,1))
     weight = Float.from(params.getParamByIndex(postParams,2))
 
+def getFormData():String
+    params.getParamMappingToString()
+

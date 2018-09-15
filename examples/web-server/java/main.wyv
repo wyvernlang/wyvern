@@ -57,17 +57,20 @@ stdout.print("Processing Parameters...\n")
 val s2out = soc2.getOutputStream()
 val dos2 = ioobj.makeDataOutputStream(s2out)
 val serverObj2 = server(dos2)
-stdout.print(params)
+//stdout.print(params)
 //send response to request
 handler.setParams(params)
 serverObj2.sendHeaders()
 val serverResponse: String = handler.sendResponse()
+val paramMappings: String = handler.getFormData()
 serverObj2.sendHtmlFile(serverResponse)
 
-fileioobj.writeFile(serverResponse,"saved-file.txt")
+val filename = "bmi"
 
-stdout.print("Successfully Posted Form Data to Client\n")
-stdout.print("Saved Form Data text\n")
+fileioobj.writeFile(paramMappings,filename)
+
+stdout.print("Successfully Manipulated and Displayed Posted Form Data to Client\n")
+stdout.print("Saved Client parameter information\n")
 
 // Close the connection but not the server socket
 dos.close()

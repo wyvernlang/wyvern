@@ -25,3 +25,6 @@ def setParams(postParams:String): Unit
     db.setLastName(params.getParamByIndex(postParams,1))
     db.setAge(params.getParamByIndex(postParams,2))
     db.setCountry(params.getParamByIndex(postParams,3))
+
+def getFormData():String
+    params.getParamMappingToString()

@@ -3,3 +3,4 @@ resource type THttpHandler
     def responseFile(): String
     def sendResponse():String
     def setParams(postParams:String): Unit
+    def getFormData():String
