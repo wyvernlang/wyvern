@@ -114,7 +114,14 @@ public class REPL {
                         "    value = newValue\r\n" + 
                         "def get():Int = value");
                 System.out.println("initialparse FINISHED:" + result);
-            } else {
+            }else if (userInput.contains("declare module type")) {
+                System.out.println("initialparse CALLING DECLARINGMODULE:");
+                Value result = updateCode("resource type TCellAsModule\r\n" + 
+                        "    def get():Int\r\n" + 
+                        "    def set(newValue:Int):Unit");
+                System.out.println("initialparse FINISHED:" + result);
+            }
+            else {
                 Value v = parse(userInput);
                 if (v != null) {
                     return v.toString();
