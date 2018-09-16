@@ -2,6 +2,7 @@ package wyvern.tools;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -86,8 +87,13 @@ public final class ReplServer {
                     String[] moduleData = buf.toString().split("=:=");
                     String moduleName = moduleData[0];
                     String moduleCode = moduleData[1];
-                    System.out.println("Module Name: \n" + moduleName + "\n");
-                    System.out.println("Module Name: \n" + moduleCode);
+                    
+                    File file = new File("../tools/src/wyvern/tools/tests/modules/replModules/" + moduleName + ".wyv");
+                    OutputStream fileWriter = new FileOutputStream(file);
+                    fileWriter.write(moduleCode.getBytes());
+                    fileWriter.flush();
+                    fileWriter.close();
+                    file.createNewFile();
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("loadModule")){
                     String moduleName = buf.toString();
                     File file = new File("../tools/src/wyvern/tools/tests/modules/replModules/" + moduleName + ".wyv");

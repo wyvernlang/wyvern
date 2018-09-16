@@ -15,7 +15,24 @@
 <div id="moduleBody">
     <div id="module-task-bar">
         <button type="button" class="btn btn-primary btn-lg" onclick="runModule()">Run</button>
-        <button type="button" class="btn btn-secondary btn-lg" onclick="saveModule()">Save to Server</button>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#exampleModalCenter">
+            Save to Server
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="padding: 10px;">
+                        <div class="form-group">
+                            <label for="moduleName">Module name</label>
+                            <input type="text" class="form-control" id="moduleName"style="height: auto;">
+                        </div>
+                        <button onclick="saveModule();reload()" class="btn btn-primary" data-dismiss="modal">Submit</button>
+
+                </div>
+            </div>
+        </div>
         <select id="ModuleSelector" onchange="loadModule(value)">
 
         </select>

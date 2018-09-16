@@ -1,0 +1,16 @@
+require stdout
+
+import TCellAsModule
+
+import cellAsModule
+
+val m1:TCellAsModule = cellAsModule()
+val m2:TCellAsModule = cellAsModule()
+
+m1.set(42)
+m2.set(36)
+
+stdout.printInt(m1.get())
+stdout.printInt(m2.get())
+
+stdout.print("Finished")

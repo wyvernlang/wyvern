@@ -17,12 +17,12 @@ def get():Int = value
 /*
 require stdout
 
-val m1:TCellAsModule = cellAsModule()
-val m2:TCellAsModule = cellAsModule()
+var m1:TCellAsModule = new cellAsModule()
+var m2:TCellAsModule = new cellAsModule()
 
 m1.set(42);
 m2.set(36);
 
 stdout.printInt(m1.get())
-stdout.printInt(m2.get())
+stdout.printInt(m1.get())
 */

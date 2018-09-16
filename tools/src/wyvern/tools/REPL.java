@@ -215,6 +215,11 @@ public class REPL {
             final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 
             TopLevelContext tlc = ((Script) ast).generateTLC(genContext, null, dependencies);
+            
+//            if (mdHACK != null) {
+//                System.out.println("ONLY ONCE:");
+//                tlc.addModuleDecl(mdHACK, mdHACK.getType());
+//            }
 
             SeqExpr program = (SeqExpr) tlc.getExpression();
             program = genContext.getInterpreterState().getResolver().wrap(program, dependencies);
@@ -231,6 +236,8 @@ public class REPL {
             return result.getFirst();
         }
     }
+    
+    //wyvern.tools.typedAST.core.declarations.ModuleDeclaration mdHACK;
     
     /**
      * Method for handling modules in REPL
@@ -259,26 +266,15 @@ public class REPL {
             
             SeqExpr program = state.getResolver().wrap(module1.getExpression(), module1.getDependencies());
             
-            // TODO Update ModuleResover map to add this new module here!
-            
-            TopLevelContext tlc = null;
-            
-            if (ast instanceof Script) {
-                System.out.println("ERROR TO FIX11111111111111111111111");
-                System.out.println(ast);
-                System.out.println("ERROR TO FIX111111111111111111111111111111");
-                tlc = ((Script) ast).generateTLC(genContext, null, dependencies);
-            } else if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
-                System.out.println("Where to store this mod decl: " + ast);
-            } else {
-                System.out.println("ERROR TO FIX");
-            }
 
             program  = (SeqExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", genContext);
             
-            Pair<Value, EvalContext> result = program.interpretCtx(programContext);
+            Pair<Value, EvalContext> result = program.interpretCtx(programContext); // updates the eval context
             
             programContext = result.getSecond();
+            genContext = state.getGenContext(); // gen context should be updated it currently does not get updated in the state
+            mr = state.getResolver();
+         // TODO Update genContext to add this new module here!
             
             return result.getFirst();
         }catch(Exception e){
