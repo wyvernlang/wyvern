@@ -271,7 +271,7 @@ public class REPL {
             TypedAST ast = getNewAST(module, "currentCode");
             final Module module1 = resolveModule(ast, state, dependencies);
             
-            SeqExpr program = state.getResolver().wrap(module1.getExpression(), module1.getDependencies());
+            SeqExpr program = state.getResolver().wrap(module1.getBinding(), module1.getDependencies());
             
 
             program  = (SeqExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", genContext);
@@ -279,7 +279,7 @@ public class REPL {
             Pair<Value, EvalContext> result = program.interpretCtx(programContext); // updates the eval context
             
             programContext = result.getSecond();
-            genContext = state.getGenContext(); // gen context should be updated it currently does not get updated in the state
+            genContext = state.getGenContext().extend(module1.getBindingSite(), module1.getSpec().getType());
             mr = state.getResolver();
          // TODO Update genContext to add this new module here!
             
@@ -294,11 +294,13 @@ public class REPL {
     private Module resolveModule(TypedAST ast, InterpreterState state, LinkedList<TypedModuleSpec> dependencies) {
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
+        String name = "test_expression";
         
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
+            name = decl.getName();
             if (decl instanceof ValDeclaration) {
                 program = ((ValDeclaration) decl).getDefinition();
                 //program = wrap(program, dependencies);
@@ -330,7 +332,7 @@ public class REPL {
 
         TypeContext ctx = extendContext(genCtx, dependencies); // Globals.getStandardTypeContext()
 
-        return createAdaptedModule("test", dependencies, program, ctx, false, false, state);
+        return createAdaptedModule(name, dependencies, program, ctx, false, false, state);
         
     }
     
