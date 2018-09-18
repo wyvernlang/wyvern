@@ -155,10 +155,6 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(String.format(
                 "The callee method cannot accept actual arguments with types: 'Logger[{network.theEffect}]; "
-                        + "expected types resource type { this =>%n"
-                        + "  effect log = {logger1.log}%n"
-                        + "  def append(contents:system.String) : {log}system.Unit%n"
-                        + " }; argument subtyping failed because declaration log is not a subtype of the expected declaration'"
         )));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedEditor1", Util.stringType(), new StringLiteral("abcabc"));
     }
