@@ -24,6 +24,7 @@ public class EffectDeclaration extends Declaration {
     private String name;
     private EffectSet effectSet;
     private FileLocation loc;
+    private boolean adapted = false;
 
     public EffectDeclaration(String name, String effects, FileLocation fileLocation) {
         this.name = name;
@@ -56,13 +57,17 @@ public class EffectDeclaration extends Declaration {
         return name;
     }
 
-    public EffectSet getEffectSet() {
+    public EffectSet getEffectSetInContext(GenContext ctx) {
+        if (!adapted && effectSet != null) {
+            effectSet = effectSet.contextualize(ctx);
+            adapted = true;
+        }
         return effectSet;
     }
 
     @Override
     public DeclType genILType(GenContext ctx) {
-        return new EffectDeclType(getName(), getEffectSet(), getLocation());
+        return new EffectDeclType(getName(), getEffectSetInContext(ctx), getLocation());
     }
 
     @Override
@@ -71,7 +76,7 @@ public class EffectDeclaration extends Declaration {
             effectSet.addPaths(ctx);
             effectSet.verifyInType(ctx);
         }
-        return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSet(), getLocation());
+        return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSetInContext(ctx), getLocation());
     }
 
     @Override

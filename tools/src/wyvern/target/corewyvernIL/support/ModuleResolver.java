@@ -117,6 +117,9 @@ public class ModuleResolver {
         Module typeDefiningModule;
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, true);
+            if (f == null || !f.exists()) {
+                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "type", qualifiedName);
+            }
             typeDefiningModule = load(qualifiedName, f, toplevel);
             moduleCache.put(qualifiedName, typeDefiningModule);
         } else {
