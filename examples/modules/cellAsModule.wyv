@@ -7,7 +7,6 @@ resource type TCellAsModule
 
 // FILE 2:
 module def cellAsModule():TCellAsModule
-
 var value : Int = 0
 def set(newValue:Int):Unit
     value = newValue
@@ -17,12 +16,30 @@ def get():Int = value
 /*
 require stdout
 
-val m1:TCellAsModule = cellAsModule()
 val m2:TCellAsModule = cellAsModule()
 
-m1.set(42);
-m2.set(36);
+m2.set(36)
+*/
+///////////////////////////////////////////////////////////////////////////////
+// FILE 1:
+/*
+resource type TestModule
+    def get():Int
+    def set(newValue:Int):Unit
+*/
 
-stdout.printInt(m1.get())
-stdout.printInt(m2.get())
+// FILE 2:
+module def Module():TestModule
+var value : Int = 0
+def set(newValue:Int):Unit
+    value = newValue
+def get():Int = value
+
+// FILE 3:
+/*
+require stdout
+
+val m1:TestModule = Module()
+
+m1.set(42)
 */

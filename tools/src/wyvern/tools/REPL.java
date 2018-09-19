@@ -60,8 +60,12 @@ public class REPL {
     private EvalContext programContext;
     private String tempCode = "";
     private GenContext genContext;
-    private String tempModuleCode = "";
+    private String tempModuleType = "";
+    private String tempModule = "";
     private ModuleResolver mr;
+    private boolean defineModuleType = false;
+    private boolean defineModule = false;
+    private String lastInput = "";
 
     public REPL() {
 
@@ -90,48 +94,66 @@ public class REPL {
      * @return The result of the code being interpreted.
      */
     public String interpretREPL(String userInput) {
+        lastInput = userInput;
         try {
-            if (userInput.equals("exit")) {
-                System.exit(1);
-            } else if (userInput.equals("genctx")) {
-                return genContext.toString();
-            } else if (userInput.equals("evalctx")) {
-                return programContext.toString();
-            } else if (userInput.equals("clear")) {
-                tempCode = "";
-            } else if (userInput.equals("reset")) {
-                programContext = null;
-                genContext = null;
-                tempCode = "";
-            } else if (userInput.equals("code")) {
-                System.out.println(tempCode);
-            } else if (userInput.contains("module def")) {
-                System.out.println("initialparse CALLING INTERPRETMODULE:");
-                Value result = interpretModule("module def cellAsModule():TCellAsModule\r\n" + 
-                        "\r\n" + 
-                        "var value : Int = 0\r\n" + 
-                        "def set(newValue:Int):Unit\r\n" + 
-                        "    value = newValue\r\n" + 
-                        "def get():Int = value");
-                System.out.println("initialparse FINISHED:" + result);
-            }else if (userInput.contains("declare module type")) {
-                System.out.println("initialparse CALLING DECLARINGMODULE:");
-                Value result = updateCode("resource type TCellAsModule\r\n" + 
-                        "    def get():Int\r\n" + 
-                        "    def set(newValue:Int):Unit");
-                System.out.println("initialparse FINISHED:" + result);
+            if(defineModuleType) {
+                if(userInput.equals("") && lastInput.equals("")) {
+                    
+                    Value result = updateCode(tempModuleType);
+                    tempModuleType = "";
+                    defineModuleType = false;
+                    return result.toString();
+                }else{
+                    tempModuleType = tempModuleType + userInput + "\n";
+                    //System.out.println(">>");
+                }
             }
-            else {
-                Value v = parse(userInput);
-                if (v != null) {
-                    return v.toString();
+            else if(defineModule) {
+                System.out.println("got here1111");
+                if(userInput.equals("") && lastInput.equals("")) {
+                    System.out.println("got here");
+                    Value result = interpretModule(tempModule);
+                    tempModule = "";
+                    defineModule = false;
+                    return result.toString();
+                }else{
+                    tempModule = tempModule + userInput + "\n";
+                    //System.out.println(">>");
+                }
+            }else {
+                if (userInput.equals("exit")) {
+                    System.exit(1);
+                } else if (userInput.equals("genctx")) {
+                    return genContext.toString();
+                } else if (userInput.equals("evalctx")) {
+                    return programContext.toString();
+                } else if (userInput.equals("clear")) {
+                    tempCode = "";
+                } else if (userInput.equals("reset")) {
+                    programContext = null;
+                    genContext = null;
+                    tempCode = "";
+                } else if (userInput.equals("code")) {
+                    System.out.println(tempCode);
+                } else if (userInput.contains("module def")) {
+                    defineModule = true;
+                    //System.out.println(">>");
+                } else if (userInput.contains("define mType")) {
+                    defineModuleType = true;
+                    //System.out.println(">>");
+                }
+                else {
+                    Value v = parse(userInput);
+                    if (v != null) {
+                        return v.toString();
+                    }
                 }
             }
         } catch (Exception e) {
             // if error is thrown, code is stored and re-run until a
             // correct line of code in entered to conplete a block, e.g functions
             tempCode = tempCode + userInput + "\n";
-            e.printStackTrace();
+            System.out.println("Invalid code, input clear to clear the buffer and start over.\n");
         }
         return null;
     }
@@ -158,7 +180,7 @@ public class REPL {
                     }
                 } catch (Exception e) {
                     tempCode = tempCode + s + "\n";
-                    e.printStackTrace();
+                    System.out.println("Invalid code, input clear to clear the buffer and start over.\n");
                 }
             }
         }
@@ -173,7 +195,9 @@ public class REPL {
      * @return The result of the code
      */
     public Value updateCode(String input) throws ParseException {
+        System.out.println("got here");
         if (input.length() == 0) {
+            System.out.println("got here");
             // sanity check
             return null;
         }
@@ -205,28 +229,12 @@ public class REPL {
             genContext = tlc.getContext();
             tempCode = "";
             return result.getFirst();
-        } else if((programContext != null && genContext != null) && !tempModuleCode.isEmpty()) {
-//            System.out.println("CALLING INTERPRETMODULE:");
-//            Value result = interpretModule("module def cellAsModule():TCellAsModule\r\n" + 
-//                    "\r\n" + 
-//                    "var value : Int = 0\r\n" + 
-//                    "def set(newValue:Int):Unit\r\n" + 
-//                    "    value = newValue\r\n" + 
-//                    "def get():Int = value");
-//            System.out.println("FINISHED");
-//            return result;
-            return null;
-        } else {
+        }else {
             // program already exists - extend existing context with new code
             ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
             final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
 
             TopLevelContext tlc = ((Script) ast).generateTLC(genContext, null, dependencies);
-            
-//            if (mdHACK != null) {
-//                System.out.println("ONLY ONCE:");
-//                tlc.addModuleDecl(mdHACK, mdHACK.getType());
-//            }
 
             SeqExpr program = (SeqExpr) tlc.getExpression();
             program = genContext.getInterpreterState().getResolver().wrap(program, dependencies);
@@ -287,6 +295,7 @@ public class REPL {
         }catch(Exception e){
             //System.out.println("Except: " + e);
             e.printStackTrace();
+            System.out.println("Invalid Module, input clear to clear the buffer and start over.\n");
             return null;
         }
     }

@@ -16,6 +16,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.tools.parsing.coreparser.ParseException;
 
 public final class ReplServer {
     private static HashMap<String, REPL> map = new HashMap<String, REPL>();;
@@ -82,7 +83,38 @@ public final class ReplServer {
                         response = " ";
                     }
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("interpretModule")){
-                    System.out.println(buf.toString());
+                    String[] moduleData = buf.toString().split("module def");
+                    String resourceType = moduleData[0];
+                    String module = "module def" + moduleData[1];
+                    if (map.containsKey(t.getRequestHeaders().get("id").get(0))) {
+                        REPL requestREPL = map.get(t.getRequestHeaders().get("id").get(0));
+                        Value v1 = null;
+                        Value v2 = null;
+                        try {
+                            System.out.println("we got here");
+                            v1 = requestREPL.updateCode(resourceType);
+                            System.out.println("got here");
+                            v2 = requestREPL.interpretModule(module);
+                            response =  v1.toString() + "\n" + v2.toString();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        REPL newProgram = new REPL();
+                        map.put(t.getRequestHeaders().get("id").get(0), newProgram);
+                        Value v1 = null;
+                        Value v2 = null;
+                        try {
+                            System.out.println("we got here");
+                            v1 = newProgram.updateCode(resourceType);
+                            System.out.println("got here");
+                            v2 = newProgram.interpretModule(module);
+                            response = v1.toString() + "\n" + v2.toString();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } else if(t.getRequestHeaders().get("operation").get(0).equals("saveModule")){
                     String[] moduleData = buf.toString().split("=:=");
                     String moduleName = moduleData[0];
