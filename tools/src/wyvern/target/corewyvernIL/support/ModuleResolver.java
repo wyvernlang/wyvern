@@ -122,6 +122,12 @@ public class ModuleResolver {
             }
             typeDefiningModule = load(qualifiedName, f, toplevel);
             moduleCache.put(qualifiedName, typeDefiningModule);
+            
+            final String fileName = f.getName();
+            final String typeName1 = typeDefiningModule.getSpec().getDefinedTypeName();
+            if (!fileName.startsWith(typeName1)) {
+                ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, FileLocation.UNKNOWN, typeName1);
+            }
         } else {
             typeDefiningModule = moduleCache.get(qualifiedName);
         }
@@ -181,7 +187,13 @@ public class ModuleResolver {
                     moduleCache.put(qualifiedName, m);
                 }
             } else {
-                moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+                Module module = load(qualifiedName, f, toplevel);
+                moduleCache.put(qualifiedName, module);
+                final String fileName = f.getName();
+                final String modName = module.getSpec().getValueName();
+                if (modName != null && !fileName.startsWith(modName)) {
+                    ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, FileLocation.UNKNOWN, modName);
+                }
             }
             modulesBeingResolved.remove(qualifiedName);
         }
@@ -272,6 +284,7 @@ public class ModuleResolver {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
+        String valueName = null;
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
@@ -281,6 +294,7 @@ public class ModuleResolver {
                 //program = wrap(program, dependencies);
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
+                valueName = decl.getName();
                 if (oldModuleDecl.getFormalArgs().size() == 0) {
                     program = oldModuleDecl.getBody();
                 } else {
@@ -290,6 +304,7 @@ public class ModuleResolver {
                 }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
+                valueName = decl.getName();
 
                 // Rename according to "apply"
                 DefDeclaration defDecl = new DefDeclaration(
@@ -320,7 +335,7 @@ public class ModuleResolver {
 
         TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
 
-        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel, loadingType);
+        return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType);
     }
 
     /**
@@ -349,7 +364,7 @@ public class ModuleResolver {
         return loadContinuation(file, qualifiedName, ast, loadingType, toplevel);
     }
 
-    private Module createAdaptedModule(File file, String qualifiedName,
+    private Module createAdaptedModule(File file, String qualifiedName, String valueName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
                                        TypeContext ctx, boolean toplevel, boolean loadingType) {
 
@@ -403,7 +418,7 @@ public class ModuleResolver {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
+        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName);
         return new Module(spec, program, dependencies);
     }
 

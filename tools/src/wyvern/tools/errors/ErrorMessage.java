@@ -95,6 +95,7 @@ public enum ErrorMessage {
     ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2), // end of error list
 
     MODULE_TYPE_ERROR("%ARG not a correct module type\n", 1),
+    MODULE_NAME_ERROR("%ARG should be in a file of the same name", 1),
 
     PARSE_ERROR("Parse error: %ARG", 1),
     READ_FILE_ERROR("Could not read file %ARG", 1),
