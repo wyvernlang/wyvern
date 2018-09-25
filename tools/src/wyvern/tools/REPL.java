@@ -41,7 +41,6 @@ import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.Token;
 import wyvern.tools.parsing.coreparser.WyvernParser;
 import wyvern.tools.parsing.coreparser.WyvernParserConstants;
-import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
@@ -96,29 +95,28 @@ public class REPL {
     public String interpretREPL(String userInput) {
         lastInput = userInput;
         try {
-            if(defineModuleType) {
-                if(userInput.equals("") && lastInput.equals("")) {
+            if (defineModuleType) {
+                if (userInput.equals("") && lastInput.equals("")) {
                     
                     Value result = updateCode(tempModuleType);
                     tempModuleType = "";
                     defineModuleType = false;
                     return result.toString();
-                }else{
+                } else {
                     tempModuleType = tempModuleType + userInput + "\n";
                     //System.out.println(">>");
                 }
-            }
-            else if(defineModule) {
-                if(userInput.equals("") && lastInput.equals("")) {
+            } else if (defineModule) {
+                if (userInput.equals("") && lastInput.equals("")) {
                     Value result = interpretModule(tempModule);
                     tempModule = "";
                     defineModule = false;
                     return result.toString();
-                }else{
+                } else {
                     tempModule = tempModule + userInput + "\n";
 
                 }
-            }else {
+            } else {
                 if (userInput.equals("exit")) {
                     System.exit(1);
                 } else if (userInput.equals("genctx")) {
@@ -139,8 +137,7 @@ public class REPL {
                 } else if (userInput.contains("resource type")) {
                     defineModuleType = true;
                     tempModuleType = tempModuleType + userInput + "\n";
-                }
-                else {
+                } else {
                     Value v = parse(userInput);
                     if (v != null) {
                         return v.toString();
@@ -225,7 +222,7 @@ public class REPL {
             genContext = tlc.getContext();
             tempCode = "";
             return result.getFirst();
-        }else {
+        } else {
             // program already exists - extend existing context with new code
             ExpressionAST ast = (ExpressionAST) getNewAST(input, "test input");
             final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
@@ -285,7 +282,7 @@ public class REPL {
             mr = state.getResolver();
             
             return result.getFirst();
-        }catch(Exception e){
+        } catch (Exception e) {
             //System.out.println("Except: " + e);
             e.printStackTrace();
             System.out.println("Invalid Module, input clear to clear the buffer and start over.\n");

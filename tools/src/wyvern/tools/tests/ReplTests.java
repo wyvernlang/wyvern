@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.tools.REPL;
 import wyvern.tools.parsing.coreparser.ParseException;
 

@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -55,8 +54,7 @@ public final class ReplServer {
                 if (t.getRequestHeaders().get("operation").get(0).equals("closing")) {
                     System.out.println("deleting program for id: " + t.getRequestHeaders().get("id").get(0));
                     map.remove(t.getRequestHeaders().get("id").get(0));
-                } else if(t.getRequestHeaders().get("operation").get(0).equals("interpretREPL")){
-
+                } else if (t.getRequestHeaders().get("operation").get(0).equals("interpretREPL")) {
                     String v = null;
 
                     System.out.println("Running code: " + buf.toString());
@@ -86,7 +84,7 @@ public final class ReplServer {
                     } else {
                         response = " ";
                     }
-                } else if(t.getRequestHeaders().get("operation").get(0).equals("interpretModule")){
+                } else if (t.getRequestHeaders().get("operation").get(0).equals("interpretModule")) {
                     String[] moduleData = buf.toString().split("module def");
                     String resourceType = moduleData[0];
                     String module = "module def" + moduleData[1];
@@ -117,7 +115,7 @@ public final class ReplServer {
                             e.printStackTrace();
                         }
                     }
-                } else if(t.getRequestHeaders().get("operation").get(0).equals("saveModule")){
+                } else if (t.getRequestHeaders().get("operation").get(0).equals("saveModule")) {
                     String[] moduleData = buf.toString().split("=:=");
                     String moduleName = moduleData[0];
                     String moduleCode = moduleData[1];
@@ -128,7 +126,7 @@ public final class ReplServer {
                     fileWriter.flush();
                     fileWriter.close();
                     file.createNewFile();
-                } else if(t.getRequestHeaders().get("operation").get(0).equals("loadModule")){
+                } else if (t.getRequestHeaders().get("operation").get(0).equals("loadModule")) {
                     String moduleName = buf.toString();
                     File file = new File("../tools/src/wyvern/tools/tests/modules/replModules/" + moduleName + ".wyv");
                     
@@ -138,19 +136,18 @@ public final class ReplServer {
                     while ((st = fileReader.readLine()) != null) {
                         response = response + st + "\n";
                     }
-                } else if(t.getRequestHeaders().get("operation").get(0).equals("loadAllModule")){
+                } else if (t.getRequestHeaders().get("operation").get(0).equals("loadAllModule")) {
                     try {
                        
                         File folder = new File("../tools/src/wyvern/tools/tests/modules/replModules");
                         File[] listOfFiles = folder.listFiles();
 
                         for (int i = 0; i < listOfFiles.length; i++) {
-                            if(listOfFiles[i].getName().endsWith(".wyv")) {
-                                response = response + listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length()-4) + " ";
+                            if (listOfFiles[i].getName().endsWith(".wyv")) {
+                                response = response + listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length() - 4) + " ";
                             }
                         }
-                        
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
