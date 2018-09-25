@@ -1,39 +1,36 @@
-# node-js-getting-started
+# Wyvern REPL
 
-A barebones Node.js app using [Express 4](http://expressjs.com/).
-
-This application supports the [Getting Started with Node on Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs) article - check it out.
+A REPL for the Qyvern programing language crated using Node.js using [Express 4](http://expressjs.com/).
 
 ## Running Locally
 
-Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
+### REPL/Server
+
+Make sure you have [Node.js](http://nodejs.org/) 
+Once you have cloned the repository, make sure you have Wyvern added to your path.
+A tutorial for this can be found here: 
+https://raw.githubusercontent.com/wyvernlang/docs/master/tooldoc/wyvern-tool-architecture.mdk
+
+From here, you can run the REPL through the command line using the command below
 
 ```sh
-$ git clone git@github.com:heroku/node-js-getting-started.git # or clone your own fork
-$ cd node-js-getting-started
+$ wyrepl
+```
+
+To run the backend server for the REPL webapp use the command below.
+
+```sh
+$ wyrepl
+```
+
+### Front end
+
+Navigate to the front end directory of the repository.
+from here make sure the REPL server is running and run the following commands
+
+```sh
 $ npm install
 $ npm start
 ```
 
-Your app should now be running on [localhost:5000](http://localhost:5000/).
-
-## Deploying to Heroku
-
-```
-$ heroku create
-$ git push heroku master
-$ heroku open
-```
-or
-
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-## Documentation
-
-For more information about using Node.js on Heroku, see these Dev Center articles:
-
-- [Getting Started with Node.js on Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
-- [Heroku Node.js Support](https://devcenter.heroku.com/articles/nodejs-support)
-- [Node.js on Heroku](https://devcenter.heroku.com/categories/nodejs)
-- [Best Practices for Node.js Development](https://devcenter.heroku.com/articles/node-best-practices)
-- [Using WebSockets on Heroku with Node.js](https://devcenter.heroku.com/articles/node-websockets)
+The application should now be running on localhost:3000
