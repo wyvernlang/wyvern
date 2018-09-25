@@ -109,16 +109,14 @@ public class REPL {
                 }
             }
             else if(defineModule) {
-                System.out.println("got here1111");
                 if(userInput.equals("") && lastInput.equals("")) {
-                    System.out.println("got here");
                     Value result = interpretModule(tempModule);
                     tempModule = "";
                     defineModule = false;
                     return result.toString();
                 }else{
                     tempModule = tempModule + userInput + "\n";
-                    //System.out.println(">>");
+
                 }
             }else {
                 if (userInput.equals("exit")) {
@@ -134,13 +132,13 @@ public class REPL {
                     genContext = null;
                     tempCode = "";
                 } else if (userInput.equals("code")) {
-                    System.out.println(tempCode);
+                    return tempCode;
                 } else if (userInput.contains("module def")) {
                     defineModule = true;
-                    //System.out.println(">>");
-                } else if (userInput.contains("define mType")) {
+                    tempModule = tempModule + userInput + "\n";
+                } else if (userInput.contains("resource type")) {
                     defineModuleType = true;
-                    //System.out.println(">>");
+                    tempModuleType = tempModuleType + userInput + "\n";
                 }
                 else {
                     Value v = parse(userInput);
@@ -195,9 +193,7 @@ public class REPL {
      * @return The result of the code
      */
     public Value updateCode(String input) throws ParseException {
-        System.out.println("got here");
         if (input.length() == 0) {
-            System.out.println("got here");
             // sanity check
             return null;
         }
@@ -255,7 +251,7 @@ public class REPL {
     //wyvern.tools.typedAST.core.declarations.ModuleDeclaration mdHACK;
     
     /**
-     * Method for handling modules in REPL
+     * Method for interpreting modules in REPL
      * 
      * @param the module to interpret
      * 
@@ -263,8 +259,6 @@ public class REPL {
      */
     public Value interpretModule(String module) {        
         try {
-            // print context
-            // System.out.println("genContext = " + genContext);
             String rootLoc = System.getenv("WYVERN_ROOT");
             if (wyvernRoot.get() != null) {
                 rootLoc = wyvernRoot.get();
@@ -289,7 +283,6 @@ public class REPL {
             programContext = result.getSecond();
             genContext = state.getGenContext().extend(module1.getBindingSite(), module1.getSpec().getType());
             mr = state.getResolver();
-         // TODO Update genContext to add this new module here!
             
             return result.getFirst();
         }catch(Exception e){
@@ -300,6 +293,17 @@ public class REPL {
         }
     }
     
+    /**
+     * Method for resolving an interpreted module
+     * 
+     * @param TypedAST - the ast that was generated from interpreting the module
+     * 
+     * @param InterpreterState - state of the program
+     * 
+     * @param LinkedList<TypedModuleSpec> a list of dependencies.
+     * 
+     * @return Module created from the inputed params.
+     */
     private Module resolveModule(TypedAST ast, InterpreterState state, LinkedList<TypedModuleSpec> dependencies) {
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;

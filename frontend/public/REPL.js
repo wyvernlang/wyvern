@@ -68,6 +68,7 @@ function runModule(){
     fetch('http://localhost:8000/', {
         method: 'post',
         headers: {
+            'id': id,
             'operation': "interpretModule"
         },
         body: code

@@ -30,7 +30,7 @@ public final class ReplServer {
         server.createContext("/", new MyHandler());
         server.setExecutor(null); // creates a default executor
         server.start();
-        System.out.println("started server");
+        System.out.println("started server: " + server.getAddress());
     }
 
     static class MyHandler implements HttpHandler {
@@ -47,7 +47,11 @@ public final class ReplServer {
             br.close();
             isr.close();
             String response = "";
+            if (t.getRequestMethod().equals("GET")) {
+                System.out.println("got here");
+            }
             if (t.getRequestMethod().equals("POST")) {
+                System.out.println("got here");
                 if (t.getRequestHeaders().get("operation").get(0).equals("closing")) {
                     System.out.println("deleting program for id: " + t.getRequestHeaders().get("id").get(0));
                     map.remove(t.getRequestHeaders().get("id").get(0));
@@ -91,9 +95,7 @@ public final class ReplServer {
                         Value v1 = null;
                         Value v2 = null;
                         try {
-                            System.out.println("we got here");
                             v1 = requestREPL.updateCode(resourceType);
-                            System.out.println("got here");
                             v2 = requestREPL.interpretModule(module);
                             response =  v1.toString() + "\n" + v2.toString();
                         } catch (ParseException e) {
