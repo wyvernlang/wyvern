@@ -400,7 +400,7 @@ public class REPL {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
+        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, "type name");
         return new Module(spec, program, dependencies);
     }
     
