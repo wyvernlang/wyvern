@@ -1,5 +1,0 @@
-require stdout
-import effects.dummyDef
-
-val d = dummyDef()
-d.m3()

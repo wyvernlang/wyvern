@@ -19,6 +19,10 @@ public class Let extends Expression {
         this(new VarBinding(varName, type, toReplace), inExpr);
     }
 
+    public Let(BindingSite varSite, ValueType type, IExpr toReplace, IExpr inExpr) {
+        this(new VarBinding(varSite, type, toReplace), inExpr);
+    }
+
     public Let(VarBinding binding, IExpr inExpr) {
         super();
         this.binding = binding;

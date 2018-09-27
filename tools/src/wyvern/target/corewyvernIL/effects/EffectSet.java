@@ -27,9 +27,9 @@ public class EffectSet {
             } else if (Pattern.compile("[^a-zA-Z0-9_,. ]").matcher(effects).find()) { // found any non-effect-related chars --> probably an actual DSL block
                 ToolError.reportError(ErrorMessage.MISTAKEN_DSL, fileLocation, name, effects);
             } else {
-                Set<Effect> temp = new HashSet<Effect>();
-                for (String e : effects.split(", *")) {
-                    Effect newE = parseEffect(e, name, effectDecl, fileLocation);
+                final Set<Effect> temp = new HashSet<Effect>();
+                for (final String e : effects.split(", *")) {
+                    final Effect newE = parseEffect(e, name, effectDecl, fileLocation);
                     temp.add(newE);
                 }
                 effectSet = new EffectSet(temp);
@@ -44,7 +44,7 @@ public class EffectSet {
         e = e.trim(); // remove leading/trailing spaces
 
         if (e.contains(".")) { // effect from another object
-            String[] pathAndID = e.split("\\.");
+            final String[] pathAndID = e.split("\\.");
             return new Effect(new Variable(pathAndID[0]), pathAndID[1], fileLocation);
         } else { // effect defined in the same type or module def
             if (effectDecl && name.equals(e)) { // recursive definition (ex. "effect process = {send, process}")
@@ -54,7 +54,7 @@ public class EffectSet {
         }
     }
 
-    private Set<Effect> effectSet;
+    private final Set<Effect> effectSet;
     public EffectSet(Set<Effect> effectSet) {
         this.effectSet = effectSet;
     }
@@ -98,24 +98,35 @@ public class EffectSet {
 
     @Override
     public String toString() {
-        return effectSet == null ? "" : effectSet.toString().replace("[", "{").replace("]", "} ");
+        return effectSet == null ? "" : effectSet.toString().replace("[", "{").replace("]", "}");
     }
 
     public EffectSet doAvoid(String varName, TypeContext ctx, int count) {
         if (effectSet.isEmpty()) {
             return this;
         }
-        Set<Effect> newSet = new HashSet<Effect>();
-        for (Effect e:effectSet) {
+        final Set<Effect> newSet = new HashSet<Effect>();
+        for (final Effect e:effectSet) {
             newSet.addAll(e.doAvoid(varName, ctx, count));
         }
         return new EffectSet(newSet);
     }
 
     public EffectSet adapt(View v) {
-        Set<Effect> newSet = new HashSet<Effect>();
-        for (Effect e:effectSet) {
+        final Set<Effect> newSet = new HashSet<Effect>();
+        for (final Effect e:effectSet) {
             newSet.add(e.adapt(v));
+        }
+        return new EffectSet(newSet);
+    }
+
+    public EffectSet contextualize(GenContext ctx) {
+        if (effectSet.isEmpty()) {
+            return this;
+        }
+        final Set<Effect> newSet = new HashSet<Effect>();
+        for (final Effect e:effectSet) {
+            newSet.add(e.adaptVariables(ctx));
         }
         return new EffectSet(newSet);
     }

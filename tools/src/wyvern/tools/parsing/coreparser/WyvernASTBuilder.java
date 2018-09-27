@@ -11,6 +11,9 @@ import java.util.Optional;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.generics.GenericArgument;
+import wyvern.tools.generics.GenericKind;
+import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.tests.TestUtil;
 import wyvern.tools.typedAST.core.Script;
@@ -70,8 +73,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public TypedAST moduleDecl(String name, List<TypedAST> imports, List args, TypedAST ast, Type type, FileLocation loc, boolean isResource) {
-        return new ModuleDeclaration(name, imports, args, ast, (NamedType) type, loc, isResource);
+    public TypedAST moduleDecl(String name, List<TypedAST> imports, List<GenericParameter> generics,
+                               List args, TypedAST ast, Type type, FileLocation loc, boolean isResource) {
+        return new ModuleDeclaration(name, imports, generics, args, ast, (NamedType) type, loc, isResource);
     }
 
     @Override
@@ -90,8 +94,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public TypedAST defDecl(String name, Type type, List<String> generics, List args,
-            TypedAST body, boolean isClassDef, FileLocation loc, String effects) {
+    public TypedAST defDecl(String name, Type type, List<GenericParameter> generics, List args,
+                            TypedAST body, boolean isClassDef, FileLocation loc, String effects) {
         return new DefDeclaration(name, type, generics, args, body, isClassDef, loc, effects);
     }
 
@@ -101,7 +105,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public TypedAST defDeclType(String name, Type type, List<String> generics, List args, FileLocation loc, String effects) {
+    public TypedAST defDeclType(String name, Type type, List<GenericParameter> generics, List args, FileLocation loc, String effects) {
         return new DefDeclaration(name, type, generics, args, null, false, loc, effects);
     }
 
@@ -121,8 +125,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public TypedAST constructDeclType(String name, List<String> generics, List args, FileLocation loc) {
-
+    public TypedAST constructDeclType(String name, List<GenericParameter> generics, List args, FileLocation loc) {
         TypedAST body;
         if (args == null) {
             args = new LinkedList<>();
@@ -137,13 +140,24 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             exps.add(constructArgs);
         }
         if (generics != null) {
-            for (String typeName : generics) {
-                TypedAST typeDecl = typeAbbrevDecl(typeName, null, null, loc);
-                exps.add(typeDecl);
+            for (GenericParameter gp : generics) {
+                String parameterName = gp.getName();
+                final TypedAST parameter;
+                switch (gp.getKind()) {
+                    case TYPE:
+                        parameter = typeAbbrevDecl(parameterName, null, null, loc);
+                        break;
+                    case EFFECT:
+                        parameter = effectDecl(parameterName, null, loc);
+                        break;
+                    default:
+                        throw new RuntimeException("Unhandled generic parameter kind: " + gp.getKind());
+                }
+                exps.add(parameter);
             }
         }
         body = new DeclSequence(exps);
-        return new TypeVarDecl(name,  (DeclSequence) body, null, null, null, loc, true, null);
+        return new TypeVarDecl(name, (DeclSequence) body, null, null, null, loc, true, null);
     }
 
     @Override
@@ -166,7 +180,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST datatypeDecl(String name,
-                                 List<String> generics,
+                                 List<GenericParameter> generics,
                                  TypedAST body,
                                  Object tagInfo,
                                  TypedAST metadata,
@@ -208,18 +222,29 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             String nameCons = ((TypeVarDecl) elem).getName();
             DeclSequence bodyCons = ((TypeVarDecl) elem).getBody();
             LinkedList<Object> args = new LinkedList<>();
-            LinkedList<String> constructorGenerics = new LinkedList<>();
+            LinkedList<GenericParameter> constructorGenerics = new LinkedList<>();
             Type constructorType = this.nominalType(nameCons, loc);
             if (generics != null) {
                 // act as if these generics were added to the body of this constructor
                 LinkedList<TypedAST> newExps = makeGenericDecls(generics, loc);
-                LinkedList<Type> paramTypes = new LinkedList<>();
                 bodyCons.forEach(d -> newExps.add(d));
                 bodyCons = new DeclSequence(newExps);
-                for (String p : generics) {
-                    paramTypes.add(nominalType(p, loc));
+
+                LinkedList<GenericArgument> genericArguments = new LinkedList<>();
+                for (GenericParameter gp : generics) {
+                    String parameterName = gp.getName();
+                    switch (gp.getKind()) {
+                        case TYPE:
+                            genericArguments.add(new GenericArgument(nominalType(parameterName, loc)));
+                            break;
+                        case EFFECT:
+                            genericArguments.add(new GenericArgument(parameterName));
+                            break;
+                        default:
+                            throw new RuntimeException("Unhandled generic parameter kind: " + gp.getKind());
+                    }
                 }
-                constructorType = parameterizedType(constructorType, paramTypes, loc);
+                constructorType = parameterizedType(constructorType, genericArguments, loc);
             }
             TypedAST newBody = null;
             for (TypedAST ast : bodyCons) {
@@ -230,7 +255,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
                     newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
                 } else if (ast instanceof TypeAbbrevDeclaration) {
                     TypeAbbrevDeclaration td = (TypeAbbrevDeclaration) ast;
-                    constructorGenerics.add(td.getName());
+                    constructorGenerics.add(new GenericParameter(GenericKind.TYPE, td.getName()));
                     TypedAST decl = typeAbbrevDecl(td.getName(), nominalType(td.getName(), td.getLocation()), null, td.getLocation());
                     newBody = (newBody == null) ? decl : this.sequence(newBody, decl, true);
                 } else {
@@ -241,7 +266,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             this.setNewBody(defBody, newBody);
             TypedAST valueConstructor = this.defDecl(nameCons, constructorType, constructorGenerics, args, defBody, false, loc, null);
             ctors.add(valueConstructor);
-            
+
             /* The type constructor */
             TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, null, isResource, null);
             exps.add(cons);
@@ -254,11 +279,22 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         return body;
     }
 
-    private LinkedList<TypedAST> makeGenericDecls(List<String> generics, FileLocation loc) {
+    private LinkedList<TypedAST> makeGenericDecls(List<GenericParameter> generics, FileLocation loc) {
         LinkedList<TypedAST> newExps = new LinkedList<>();
-        for (String typeName : generics) {
-            TypedAST typeDecl = typeAbbrevDecl(typeName, null, null, loc);
-            newExps.add(typeDecl);
+        for (GenericParameter gp : generics) {
+            String name = gp.getName();
+            final TypedAST decl;
+            switch (gp.getKind()) {
+                case TYPE:
+                    decl = typeAbbrevDecl(name, null, null, loc);
+                    break;
+                case EFFECT:
+                    decl = effectDecl(name, null, loc);
+                    break;
+                default:
+                    throw new RuntimeException("Unhandled generic parameter kind: " + gp.getKind());
+            }
+            newExps.add(decl);
         }
         return newExps;
     }
@@ -284,8 +320,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public Type parameterizedType(Type base, List<Type> arguments, FileLocation loc) {
-        return new TypeExtension(base, arguments, loc);
+    public Type parameterizedType(Type base, List<GenericArgument> genericArguments, FileLocation loc) {
+        return new TypeExtension(base, genericArguments, loc);
     }
 
     @Override
@@ -303,7 +339,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public TypedAST stringLit(String value, FileLocation loc) {
         return new StringConstant(value, loc);
     }
-    
+
     @Override
     public TypedAST characterLit(char value, FileLocation loc) {
         return new CharacterConstant(value, loc);
@@ -328,8 +364,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST application(TypedAST function, List<TypedAST> arguments,
-            FileLocation loc, List<Type> generics) {
-        return new Application(function, arguments, loc != null ? loc : function.getLocation(), generics);
+            FileLocation loc, List<GenericArgument> genericArguments, boolean recur) {
+        return new Application(function, arguments, loc != null ? loc : function.getLocation(), genericArguments, recur);
     }
 
     @Override
@@ -347,7 +383,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             ToolError.reportError(ErrorMessage.ILLEGAL_JUXTAPOSITION, application);
         }
         Application app = (Application) application;
-        List<Type> generics = app.getGenerics();
+        List<GenericArgument> generics = app.getGenerics();
         List<TypedAST> args = new LinkedList<TypedAST>(app.getArguments());
         TypedAST function = app.getFunction();
         StringBuilder name = new StringBuilder();
@@ -371,7 +407,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             throw new RuntimeException();
         }
 
-        return new Application(function, args, app.getLocation(), generics);
+        return new Application(function, args, app.getLocation(), generics, app.isMarkedAsTailCall());
     }
 
     @Override

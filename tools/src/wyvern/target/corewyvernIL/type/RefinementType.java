@@ -2,6 +2,8 @@ package wyvern.target.corewyvernIL.type;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,8 +14,12 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
+import wyvern.target.corewyvernIL.generics.GenericArgument;
+import wyvern.target.corewyvernIL.generics.GenericKind;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
@@ -38,25 +44,26 @@ public class RefinementType extends ValueType {
         this.base = base;
         this.selfSite = old.selfSite;
         this.declTypes = old.declTypes;
-        this.typeParams = old.typeParams;
+        this.genericArguments = old.genericArguments;
     }
 
     public RefinementType(ValueType base, List<DeclType> declTypes, HasLocation hasLoc, BindingSite selfSite) {
+        super(hasLoc);
         this.base = base;
         this.declTypes = declTypes;
         this.selfSite = selfSite;
     }
 
-    public RefinementType(List<ValueType> typeParams, ValueType base, HasLocation hasLoc) {
+    public RefinementType(List<GenericArgument> genericArguments, ValueType base, HasLocation hasLoc) {
         super(hasLoc);
         this.base = base;
-        this.typeParams = typeParams;
+        this.genericArguments = genericArguments;
     }
 
     private ValueType base;
     private BindingSite selfSite;
-    private List<DeclType> declTypes = null; // may be computed lazily from typeParams
-    private List<ValueType> typeParams;
+    private List<DeclType> declTypes = null; // may be computed lazily from genericArguments
+    private List<GenericArgument> genericArguments;
 
     private List<DeclType> getDeclTypes(TypeContext ctx) {
         if (declTypes == null) {
@@ -64,25 +71,55 @@ public class RefinementType extends ValueType {
             base.checkWellFormed(ctx);
             StructuralType st = base.getStructuralType(ctx, null);
             if (st == null) {
-                // for debugging
-                base.checkWellFormed(ctx);
-
-                ToolError.reportError(ErrorMessage.CANNOT_APPLY_TYPE_PARAMETERS, this.getLocation(), base.toString());
+                ToolError.reportError(ErrorMessage.CANNOT_APPLY_GENERIC_ARGUMENTS, getLocation(), base.toString());
             }
-            int index = 0;
-            int declCount = st.getDeclTypes().size();
-            for (ValueType vt : typeParams) {
-                // advance the index to an AbstractTypeMember
-                while (index < declCount && !(st.getDeclTypes().get(index) instanceof AbstractTypeMember)) {
-                    index++;
+
+            final List<DeclType> stDeclTypes = st.getDeclTypes();
+            final Iterator<GenericArgument> genericArgumentIterator =
+                    genericArguments == null ? Collections.emptyIterator() : genericArguments.iterator();
+
+            // Instantiate (make concrete) the abstract types with the arguments that are passed in
+            // Note: The case in which there are more generic arguments than declTypes in the structural type
+            //       is handled after the loop (in the if statement)
+            for (DeclType dt : stDeclTypes) {
+                // Generic arguments are used up
+                if (!genericArgumentIterator.hasNext()) {
+                    break;
                 }
-                // add a corresponding ConcreteTypeMember
-                if (index >= declCount) {
-                    ToolError.reportError(ErrorMessage.NO_TYPE_MEMBER, this.getLocation());
+
+                final GenericArgument ga = genericArgumentIterator.next();
+
+                final DeclType declTypeToAdd;
+                if (dt instanceof AbstractTypeMember) {
+                    if (ga.getKind() != GenericKind.TYPE) {
+                        ToolError.reportError(ErrorMessage.NON_TYPE_ARGUMENT, getLocation(), ga.getKind().toString());
+                    }
+                    declTypeToAdd = new ConcreteTypeMember(dt.getName(), ga.getType());
+                } else if (dt instanceof EffectDeclType) {
+                    if (ga.getKind() != GenericKind.EFFECT) {
+                        ToolError.reportError(ErrorMessage.NON_EFFECT_ARGUMENT, getLocation(), ga.getKind().toString());
+                    }
+                    declTypeToAdd = new EffectDeclType(dt.getName(), ga.getEffect(), dt.getLocation());
+                } else {
+                    continue;
                 }
-                AbstractTypeMember m = (AbstractTypeMember) st.getDeclTypes().get(index);
-                declTypes.add(new ConcreteTypeMember(m.getName(), vt));
-                index++;
+
+                declTypes.add(declTypeToAdd);
+            }
+
+            // ...too many generic arguments!
+            if (genericArgumentIterator.hasNext()) {
+                final GenericArgument ga = genericArgumentIterator.next();
+                switch (ga.getKind()) {
+                    case TYPE:
+                        ToolError.reportError(ErrorMessage.NO_TYPE_MEMBER, getLocation(), ga.getType().toString());
+                        break;
+                    case EFFECT:
+                        ToolError.reportError(ErrorMessage.NO_EFFECT_MEMBER, getLocation(), ga.getEffect().toString());
+                        break;
+                    default:
+                        throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + ga.getKind());
+                }
             }
         }
         return declTypes;
@@ -97,7 +134,11 @@ public class RefinementType extends ValueType {
     public ValueType adapt(View v) {
         ValueType newBase = base.adapt(v);
         if (declTypes == null) {
-            return new RefinementType(typeParams.stream().map(t -> t.adapt(v)).collect(Collectors.toList()), newBase, this);
+            return new RefinementType(
+                    genericArguments.stream().map(ga -> ga.adapt(v)).collect(Collectors.toList()),
+                    newBase,
+                    this
+            );
         }
         List<DeclType> newDTs = new LinkedList<DeclType>();
         for (DeclType dt : declTypes) {
@@ -112,8 +153,13 @@ public class RefinementType extends ValueType {
         boolean changed = false;
         ValueType newBase = base.doAvoid(varName, ctx, depth);
         if (declTypes == null) {
-            List<ValueType> newTPs = typeParams.stream().map(p -> p.doAvoid(varName, ctx, depth)).collect(Collectors.toList());
-            return new RefinementType(newTPs, base, this);
+            return new RefinementType(
+                    genericArguments.stream()
+                            .map(ga -> ga.doAvoid(varName, ctx, depth))
+                            .collect(Collectors.toList()),
+                    base,
+                    this
+            );
         }
         for (DeclType dt : declTypes) {
             DeclType newDT = dt.doAvoid(varName, ctx, depth + 1);
@@ -145,7 +191,7 @@ public class RefinementType extends ValueType {
         }
         return selfSite.getName();
     }
-    
+
     /** Returns the base type of this refinement */
     public ValueType getBase() {
         return base;
@@ -174,7 +220,7 @@ public class RefinementType extends ValueType {
             newDTs = getDeclTypes(ctx);
         }
 
-        return new StructuralType(baseST.getSelfName(), newDTs, isResource(ctx));
+        return new StructuralType(baseST.getSelfSite(), newDTs, isResource(ctx));
     }
     @Override
     public boolean isResource(TypeContext ctx) {
@@ -190,32 +236,36 @@ public class RefinementType extends ValueType {
         if (!(obj instanceof RefinementType)) {
             return false;
         }
+
         RefinementType other = (RefinementType) obj;
-        if (declTypes == null && other.declTypes == null) {
-            return base.equals(other.base) && typeParams.equals(other.typeParams);
+
+        if (!base.equals(other.base)) {
+            return false;
         }
+
         if (declTypes == null || other.declTypes == null) {
-            if (!base.equals(other.base)) {
-                return false;
-            }
-            return countRefinements() == other.countRefinements() && getParamList().equals(other.getParamList());
+            return getGenericArguments().equals(other.getGenericArguments());
+        } else {
+            return declTypes.equals(other.declTypes);
         }
-        return base.equals(other.base) && declTypes.equals(other.declTypes);
     }
 
-    private int countRefinements() {
-        return (declTypes != null) ? declTypes.size() : typeParams.size();
-    }
-
-    private List<ValueType> getParamList() {
-        if (typeParams != null) {
-            return typeParams;
+    private List<GenericArgument> getGenericArguments() {
+        if (genericArguments != null) {
+            return genericArguments;
         }
-        LinkedList<ValueType> result = new LinkedList<ValueType>();
+        LinkedList<GenericArgument> result = new LinkedList<>();
         for (DeclType dt : declTypes) {
             if (dt instanceof ConcreteTypeMember) {
                 ConcreteTypeMember ctm = (ConcreteTypeMember) dt;
-                result.addLast(ctm.getRawResultType());
+                result.addLast(new GenericArgument(ctm.getRawResultType()));
+            } else if (dt instanceof EffectDeclType) {
+                EffectDeclType edt = (EffectDeclType) dt;
+                EffectSet effectSet = edt.getEffectSet();
+                // The effect member is concrete
+                if (effectSet != null) {
+                    result.addLast(new GenericArgument(edt.getEffectSet()));
+                }
             }
         }
         return result;
@@ -264,26 +314,43 @@ public class RefinementType extends ValueType {
     @Override
     public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
         base.doPrettyPrint(dest, indent, ctx);
-        dest.append("[");
-        int count = 0;
+        dest.append('[');
+
         if (declTypes != null) {
-            for (DeclType ctm: declTypes) {
-                // limitation: would be better to actually print the DeclTypes that aren't ConcreteTypeMembers as part of the underlying type
-                if (ctm instanceof ConcreteTypeMember) {
-                    ((ConcreteTypeMember) ctm).getRawResultType().doPrettyPrint(dest, indent, ctx);
+            // limitation: would be better to actually print the DeclTypes that aren't ConcreteTypeMembers as part of the underlying type
+
+            String delim = "";
+            for (DeclType dt : declTypes) {
+                dest.append(delim);
+
+                if (dt instanceof ConcreteTypeMember) {
+                    ((ConcreteTypeMember) dt).getRawResultType().doPrettyPrint(dest, indent, ctx);
+                } else if (dt instanceof EffectDeclType) {
+                    dest.append(((EffectDeclType) dt).getEffectSet().toString());
                 }
-                if (++count < declTypes.size()) {
-                    dest.append(", ");
-                }
+
+                delim = ", ";
             }
         } else {
-            for (ValueType vt: typeParams) {
-                vt.doPrettyPrint(dest, indent, ctx);
-                if (++count < typeParams.size()) {
-                    dest.append(", ");
+            String delim = "";
+            for (GenericArgument ga : genericArguments) {
+                dest.append(delim);
+
+                switch (ga.getKind()) {
+                    case TYPE:
+                        ga.getType().doPrettyPrint(dest, indent, ctx);
+                        break;
+                    case EFFECT:
+                        dest.append(ga.getEffect().toString());
+                        break;
+                    default:
+                        throw new RuntimeException("Unhandled corewyvernIL generic argument kind: " + ga.getKind());
                 }
+
+                delim = ", ";
             }
         }
+
         dest.append(']');
     }
 
@@ -325,5 +392,17 @@ public class RefinementType extends ValueType {
     @Override
     public boolean isTagged(TypeContext ctx) {
         return base.isTagged(ctx);
+    }
+
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return this.getBase().isEffectAnnotated(ctx);
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return this.getBase().isEffectUnannotated(ctx)
+                && this.getGenericArguments().stream().allMatch(ga -> ga.getKind() != GenericKind.EFFECT);
     }
 }

@@ -58,25 +58,18 @@ public final class BytecodeCompiler {
             final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVASCRIPT, rootDir, new File(wyvernPath));
             Module m = state.getResolver().load("unknown", filepath.toFile(), true);
 
-            BytecodeOuterClass.Bytecode wyb = state.getResolver().emitBytecode(m, m.getDependencies());
+            BytecodeOuterClass.Bytecode wyb = state.getResolver().emitBytecode(m);
 
             // Good enough
             String outputFile = filename.replace(".wyv", ".wyb");
 
-            try {
-                wyb.writeTo(new FileOutputStream(outputFile));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-
-            // Do we need this for bytecode generation?
-            // program = state.getResolver().wrap(program, m.getDependencies());
-            // program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", Globals.getGenContext(state));
-
+            wyb.writeTo(new FileOutputStream(outputFile));
         } catch (ToolError e) {
             System.err.println(e.getMessage());
             System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(2);
         }
     }
 

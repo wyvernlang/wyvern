@@ -1,0 +1,3 @@
+type DataInputStream
+	def readUTF() : String
+	def close() : Unit

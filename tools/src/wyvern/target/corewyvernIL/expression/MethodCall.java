@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
+import wyvern.target.corewyvernIL.decl.Declaration;
+import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
@@ -38,15 +41,22 @@ public class MethodCall extends Expression {
     private String methodName;
     private List<? extends IExpr> args;
     private ValueType receiverType;
+    private boolean isTailCall;
 
     public MethodCall(IExpr receiverExpr, String methodName,
-            List<? extends IExpr> args2, HasLocation location) {
+                      List<? extends IExpr> args2, HasLocation location) {
+        this(receiverExpr, methodName, args2, location, false);
+    }
+
+    public MethodCall(IExpr receiverExpr, String methodName,
+            List<? extends IExpr> args2, HasLocation location, boolean isTailCall) {
         super(location != null ? location.getLocation() : null);
         //        if (getLocation() == null || getLocation().line == -1)
         //            throw new RuntimeException("missing location");
         this.objectExpr = receiverExpr;
         this.methodName = methodName;
         this.args = args2;
+        this.isTailCall = isTailCall;
         // sanity check
         if (args2.size() > 0 && args2.get(0) == null) {
             throw new NullPointerException("invariant: no null args");
@@ -87,6 +97,7 @@ public class MethodCall extends Expression {
         } else {
             BytecodeOuterClass.Expression.CallExpression.Builder ce = BytecodeOuterClass.Expression.CallExpression.newBuilder()
                     .setMethod(methodName)
+                    .setIsTailCall(isTailCall)
                     .setReceiver(((Expression) objectExpr).emitBytecode());
 
             for (IExpr expr : args) {
@@ -200,7 +211,6 @@ public class MethodCall extends Expression {
      * @return the declaration of the method.
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
-
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
         StructuralType receiverType = receiver.getStructuralType(ctx);
@@ -285,13 +295,41 @@ public class MethodCall extends Expression {
 //                    if (methodCallE==null) {
 //                        ToolError.reportError(ErrorMessage.UNKNOWN_EFFECT, getLocation(), getMethodName());
 //                    }
+
                     if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
+                        Set<Effect> concreteEffects = new HashSet<>();
                         for (Effect e : methodCallE.getEffects()) {
-                            if (e.getPath() == null) {
-                                e.setPath((Variable) objectExpr); // TODO: should not set path to objectExpr
+                            // If the effect is dependent on the arguments, set its path correctly
+                            boolean dependent = false;
+                            for (int i = 0; i < args.size(); i++) {
+                                final FormalArg formalArg = formalArgs.get(i);
+
+                                if (e.getPath() == null || !formalArg.getName().equals(e.getPath().toString())) {
+                                    continue;
+                                }
+                                dependent = true;
+
+                                final IExpr arg = args.get(i);
+
+                                if (arg instanceof Variable) {
+                                    // Normal dependent effect
+                                    concreteEffects.add(new Effect((Variable) arg, e.getName(), e.getLocation()));
+                                } else if (arg instanceof New) {
+                                    // Polymorphic dependent effect
+                                    for (Declaration d : ((New) arg).getDecls()) {
+                                        if (d instanceof EffectDeclaration && d.getName().equals(e.getName())) {
+                                            concreteEffects.addAll(((EffectDeclaration) d).getEffectSet().getEffects());
+                                        }
+                                    }
+                                }
+                            }
+                            // Otherwise, just add it
+                            if (!dependent) {
+                                setPathIfNecessary(e);
+                                concreteEffects.add(e);
                             }
                         }
-                        effectAccumulator.addEffects(methodCallE.getEffects());
+                        effectAccumulator.addEffects(concreteEffects);
                     }
                 }
 
@@ -308,8 +346,24 @@ public class MethodCall extends Expression {
                 return defDeclType;
             }
         }
-
         // Couldn't find an appropriate method declaration. Build up a nice error message.
+        String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
+        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
+        return null;
+    }
+
+    private void setPathIfNecessary(Effect e) {
+        if (e.getPath() == null) {
+            // TODO: should not set path to objectExpr
+            if (objectExpr instanceof Variable) {
+                e.setPath((Variable) objectExpr);
+            }
+        }
+    }
+
+    private String methodDeclarationNotFoundMsg(
+            TypeContext ctx, List<DeclType> declarationTypes, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
+    ) {
         StringBuilder errMsg = new StringBuilder();
         //errMsg.append(methodName);
         //errMsg.append("(");
@@ -339,8 +393,6 @@ public class MethodCall extends Expression {
         if (failureReason != null) {
             errMsg.append("; argument subtyping failed because " + failureReason);
         }
-        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errMsg.toString());
-        return null;
+        return errMsg.toString();
     }
-
 }

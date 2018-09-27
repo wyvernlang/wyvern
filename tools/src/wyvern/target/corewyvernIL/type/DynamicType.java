@@ -63,4 +63,14 @@ public class DynamicType extends ValueType {
     public boolean isTagged(TypeContext ctx) {
         return false;
     }
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return true;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return true;
+    }
 }

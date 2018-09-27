@@ -1,0 +1,3 @@
+resource type NetworkType2		
+  def sendData(sd: String): {} Unit
+  def receiveData(): {} String

@@ -1,4 +1,0 @@
-// dummy.wyv
-module def dummy(java: Java): effects.Dummy
-def nop(): Int
-    1

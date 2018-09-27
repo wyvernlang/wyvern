@@ -1,0 +1,351 @@
+options
+{
+    //BUILD_PARSER = false;
+	MULTI = true;
+	VISITOR = true;
+    STATIC = false;
+    USER_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(ArchParser)
+
+package wyvern.tools.parsing.coreparser.arch;
+
+
+import wyvern.tools.parsing.coreparser.TokenManager;
+import wyvern.tools.parsing.coreparser.Token;
+import wyvern.tools.parsing.coreparser.ParseException;
+
+public class ArchParser   { 
+
+    public String fname;
+    public static String kindToName(int kind) {
+      switch (kind) {
+      case MULTI_LINE_COMMENT: return "MULTI_LINE_COMMENT";
+      case COMMA: return "COMMA";
+      case ATTACHMENTS: return "ATTACHMENTS";
+      case IS: return "IS";
+      case BINDINGS: return "BINDINGS";
+      case ENTRYPOINTS: return "ENTRYPOINTS";
+      case CONNECT: return "CONNECT";
+      case DOT: return "DOT";
+      case AND: return "AND";
+      case WITH: return "WITH";
+      case CONNECTORS: return "CONNECTORS";
+      case COMPONENTS: return "COMPONENTS";
+      case ARCHITECTURE: return "ARCHITECTURE";
+      case VAL: return "VAL";
+      case CONNECTOR: return "CONNECTOR";
+      case COMPONENT: return "COMPONENT";
+      case PORT: return "PORT";
+      case COLON: return "COLON";
+      case IDENTIFIER: return "IDENTIFIER";
+      case WHITESPACE: return "WHITESPACE";
+      case DEDENT: return "DEDENT";
+      case INDENT: return "INDENT";
+      case NEWLINE: return "NEWLINE";
+      case PROVIDES: return "PROVIDES";
+      case REQUIRES: return "REQUIRES";
+      default: return "UNKNOWN(" + kind + ")";
+      }
+    }
+}
+
+PARSER_END(ArchParser)
+
+SPECIAL_TOKEN : /* Comments and whitespace */
+{
+  <SINGLE_LINE_COMMENT>
+| <MULTI_LINE_COMMENT>
+| <WHITESPACE>
+}
+
+TOKEN : /* Keywords */
+{
+  <COMPONENT: "component">
+| <EXTERNAL: "external">
+| <PORT: "port">
+| <PROVIDES: "provides">
+| <REQUIRES: "requires">
+| <CONNECTOR: "connector">
+| <VAL: "val">
+| <ARCHITECTURE: "architecture">
+| <COMPONENTS: "components">
+| <CONNECTORS: "connectors">
+| <ATTACHMENTS: "attachments">
+| <CONNECT: "connect">
+| <AND: "and">
+| <WITH: "with">
+| <ENTRYPOINTS: "entryPoints">
+| <BINDINGS: "bindings">
+| <IS: "is">
+}
+
+TOKEN : /* Logical Formatting */
+{
+  <DEDENT>
+| <INDENT>
+| <NEWLINE>
+}
+
+TOKEN : /* Identifiers */
+{
+  <IDENTIFIER>
+}
+
+TOKEN : /* Symbols */
+{
+  <COLON: ":">
+| <DOT: ".">
+| <COMMA: ",">
+}
+
+/** Root production. */
+SimpleNode ArchDesc() :
+{  }
+{
+    ArchTypeDeclSeq()
+    { jjtThis.setLocation(fname, 0, 0); }
+    { return jjtThis; }
+}
+
+void ArchTypeDeclSeq() #void: 
+{ }
+{
+    ArchTypeDecls() 
+    ( ArchTypeDecls() )*
+|
+    <EOF>
+}
+
+void ArchTypeDecls() #void : 
+{ }
+{
+    ComponentTypeDecl()       
+|
+    ConnectorTypeDecl()       
+|
+    ArchitectureTypeDecl()    
+}
+
+void ComponentTypeDecl() : 
+{ Token name; }
+{
+    [ <EXTERNAL> { jjtThis.setExternal(true); } ] <COMPONENT> name=<IDENTIFIER>
+    <NEWLINE> <INDENT> ComponentTypeDeclBody()
+            ( ComponentTypeDeclBody() {  } )*
+            <DEDENT>
+    { jjtThis.setTypeName(name.image); }
+    { jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
+}
+
+
+void ComponentTypeDeclBody() #void : 
+{  }
+{
+    MemberDecls()         
+|
+    ArchTypeDecls()         
+|
+    BindingDecls()           
+
+}
+
+void ConnectorTypeDecl() : 
+{ Token name; }
+{
+    <CONNECTOR> name=<IDENTIFIER>
+    <NEWLINE> <INDENT> ValDecl()
+    (ValDecl())*
+            <DEDENT>
+    { jjtThis.setTypeName(name.image); }
+    { jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
+}
+
+/*Errors*/
+void ArchitectureTypeDecl() : 
+{ Token name; }
+{
+    <ARCHITECTURE> name=<IDENTIFIER>
+    <NEWLINE> <INDENT> ArchElemDeclSeq()
+            <DEDENT>
+    { jjtThis.setTypeName(name.image); }
+}
+
+void ArchElemDeclSeq() #void : 
+{  }
+{
+    ArchElemDecls() 
+    (ArchElemDecls() )*
+}
+
+void ArchElemDecls() #void : 
+{  }
+{
+    ComponentDecls()      
+|
+    ConnectorDecls()      
+|
+    AttachmentDecls()     
+|
+    EntryPointDecls()     
+}
+
+void ComponentDecls() #void :
+{  }
+{
+    <COMPONENTS>
+    <NEWLINE> <INDENT> 
+            ComponentDeclAux()
+            (ComponentDeclAux())*
+            <DEDENT>
+}
+
+void ComponentDeclAux() #void : 
+{ String type = null; }
+{
+    type=ComponentDecl("")
+    (ComponentDecl(type))* <NEWLINE>
+}
+
+String ComponentDecl(String t) :
+{ Token type; Token name; }
+{
+    type=<IDENTIFIER> name=<IDENTIFIER>     { jjtThis.setType(type.image); 
+                                              jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
+                                              return type.image; }
+|
+    <COMMA> name=<IDENTIFIER>               { jjtThis.setType(t); 
+                                              jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
+                                              return t; }
+}
+
+void ConnectorDecls() #void : 
+{  }
+{
+    <CONNECTORS> 
+    <NEWLINE> <INDENT> 
+            ConnectorDeclAux()
+            (ConnectorDeclAux())*
+            <DEDENT>
+}
+
+void ConnectorDeclAux() #void : 
+{ String type = null; }
+{
+    type=ConnectorDecl("")
+    (ConnectorDecl(type))* <NEWLINE>
+}
+
+String ConnectorDecl(String t) :
+{ Token type; Token name; }
+{
+    type=<IDENTIFIER> name=<IDENTIFIER>     { jjtThis.setType(type.image); 
+                                              jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
+                                              return type.image; }
+|
+    <COMMA> name=<IDENTIFIER>               { jjtThis.setType(t); 
+                                              jjtThis.setName(name.image); 
+                                              jjtThis.setLocation(fname, name.beginLine, name.beginColumn);
+                                              return t; }
+}
+
+void AttachmentDecls() #void : 
+{  }
+{
+    <ATTACHMENTS>
+    <NEWLINE> <INDENT> 
+    <CONNECT> AttachmentDecl()
+                (AttachmentDecl())*
+            <DEDENT>
+}
+
+void AttachmentDecl() :
+{ String p1; String p2; Token cntr; }
+{
+    p1=Segment() <AND> p2=Segment() { jjtThis.addPort(p1); jjtThis.addPort(p2); }
+    ( <AND> p2=Segment() { jjtThis.addPort(p2); } )* <WITH> cntr=<IDENTIFIER> <NEWLINE>
+    { jjtThis.setConnector(cntr.image); }
+    { jjtThis.setLocation(fname, cntr.beginLine, cntr.beginColumn); }
+}
+
+void BindingDecls() #void :
+{  }
+{
+    <BINDINGS>
+    <NEWLINE> <INDENT> 
+        BindingDecl()
+        (BindingDecl())*
+    <DEDENT>
+}
+
+/*Errors?*/
+void BindingDecl() :
+{ Token name; String target; }
+{
+    name=<IDENTIFIER> <IS> target=Segment() <NEWLINE>
+    { jjtThis.setName(name.image); 
+      jjtThis.setTarget(target);
+      jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
+}
+
+void EntryPointDecls() #void : 
+{  }
+{
+    <ENTRYPOINTS>
+    <NEWLINE> <INDENT>
+         EntryPointDecl()
+        (EntryPointDecl())* 
+            <DEDENT>
+}
+
+/*Errors?*/
+void EntryPointDecl() :
+{ Token name; Token action; }
+{
+    name=<IDENTIFIER> <COLON> action=<IDENTIFIER> <NEWLINE>
+    { jjtThis.setName(name.image); 
+      jjtThis.setAction(action.image);
+      jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
+}
+
+void MemberDecls() #void :
+{  }
+{
+    ValDecl() 
+| 
+    PortDecl() 
+}
+
+/*Errors?*/
+void PortDecl() :
+{ Token p; Token req ; Token prov ; Token startMark; }
+{
+    <PORT> p=<IDENTIFIER> <COLON> (<REQUIRES> req=<IDENTIFIER> { jjtThis.setRequires(req.image); }| 
+                        <PROVIDES> prov=<IDENTIFIER> { jjtThis.setProvides(prov.image); }) <NEWLINE>
+    { jjtThis.setPort(p.image); }
+    { jjtThis.setLocation(fname, p.beginLine, p.beginColumn); }
+}
+
+/*Errors?*/
+void ValDecl() :
+{ Token t; Token name; Token startMark; }
+{
+    <VAL> name=<IDENTIFIER> <COLON> t=<IDENTIFIER> <NEWLINE>
+    { jjtThis.setName(name.image); 
+      jjtThis.setType(t.image); 
+      jjtThis.setLocation(fname, name.beginLine, name.beginColumn); }
+}
+
+String Segment() #void : 
+{ String s; Token t; }
+{
+    t=<IDENTIFIER> { s = t.image; }
+    ( <DOT> t=<IDENTIFIER> { s = s + "." + t.image; } )* 
+    { return s; }
+}
+
+

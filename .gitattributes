@@ -26,6 +26,7 @@
 
 # Make sure the unix scripts stay with LF endings
 bin/* eol=lf
+backend/*.sh eol=lf
 
 
 # Not sure why this is important, but leaving it for now

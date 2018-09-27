@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.Effect;
@@ -33,6 +34,14 @@ public class EffectDeclType extends DeclType implements IASTNode {
         return effectSet;
     }
 
+    @Override
+    public BytecodeOuterClass.DeclType emitBytecode() {
+        // stub
+        return BytecodeOuterClass.DeclType.newBuilder().setOpaqueTypeDecl(
+                BytecodeOuterClass.DeclType.OpaqueTypeDecl.newBuilder().setName(getName()).setStateful(false)
+        ).build();
+    }
+
     /** Conduct semantics check, by decomposing the effect sets of the two
      * (effect)DeclTypes before comparing them.
      */
@@ -54,6 +63,9 @@ public class EffectDeclType extends DeclType implements IASTNode {
         /* this.getEffectSet()==null only if edt.getEffectSet()==null
          * (the reverse isn't necessarily true) */
         if ((edt.getEffectSet() != null) && (edt.getEffectSet().getEffects() != null)) {
+            if (getEffectSet() == null) {
+                return false;
+            }
             Set<Effect> thisEffects = recursiveEffectCheck(ctx, getEffectSet().getEffects());
             Set<Effect> edtEffects =  recursiveEffectCheck(ctx, edt.getEffectSet().getEffects());
             if (!edtEffects.containsAll(thisEffects)) {
@@ -163,5 +175,15 @@ public class EffectDeclType extends DeclType implements IASTNode {
     @Override
     public boolean isTypeOrEffectDecl() {
         return true;
+    }
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return true;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return false;
     }
 }

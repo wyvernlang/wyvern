@@ -5,11 +5,13 @@ import wyvern.target.corewyvernIL.type.ValueType;
 public class TypedModuleSpec extends ModuleSpec {
     private final ValueType type;
     private final String definedTypeName;
+    private final String definedValueName;
 
-    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName) {
+    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName) {
         super(qualifiedName);
         this.type = type;
         this.definedTypeName = typeName;
+        this.definedValueName = valueName;
     }
 
     /** Returns the signature of this module.
@@ -26,6 +28,10 @@ public class TypedModuleSpec extends ModuleSpec {
      */
     public String getDefinedTypeName() {
         return definedTypeName;
+    }
+
+    public String getValueName() {
+        return definedValueName;
     }
 
 }

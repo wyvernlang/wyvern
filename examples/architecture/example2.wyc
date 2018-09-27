@@ -1,0 +1,51 @@
+component Client
+	port getInfo: requires CSIface
+
+component Server
+	port sendInfo: provides CSIface
+
+	component RequestHandler
+		port sendInfo: provides CSIface
+		port dbIface: requires DBModule
+
+	external component DB
+		port dbIface: provides DBModule
+
+	connector JDBCCtr
+		val connectionString: String
+
+	architecture ServerArch
+		components
+			RequestHandler rh
+			DB db
+
+		connectors
+			JDBCCtr jdbcCtr
+
+		attachments
+			connect rh.dbIface and db.dbIface with jdbcCtr
+
+		entryPoints
+			rh: start
+
+	bindings
+		sendInfo is ServerArch.rh.sendInfo
+
+connector JSONCtr
+	val host: IPAddress
+	val prt: Int
+
+architecture NTier
+	components
+		Client client
+		Server server
+
+	connectors
+		JSONCtr jsonCtr
+
+	attachments
+		connect client.getInfo and server.sendInfo with jsonCtr
+
+	entryPoints
+		client: start
+

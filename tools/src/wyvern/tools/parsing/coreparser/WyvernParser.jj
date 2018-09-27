@@ -35,6 +35,7 @@ import wyvern.tools.typedAST.core.expressions.*;
 import wyvern.tools.typedAST.core.declarations.*;
 import wyvern.tools.errors.*;
 import wyvern.tools.lexing.LexerUtils;
+import wyvern.tools.generics.*;
 
 import java.net.URI;
 import java.util.*;
@@ -119,6 +120,7 @@ TOKEN : /* Keywords */
 | < INSTANTIATE : "instantiate" >
 | < AS : "as" >
 | < EFFECT : "effect" >
+| < RECUR : "recur" >
 }
 
 TOKEN : /* Logical Formatting */
@@ -200,15 +202,15 @@ void ImportDecls(LinkedList<AST> decls) :
 }
 
 AST ModuleDecl(LinkedList<AST> imports) :
-{ AST exp; Token id; Type type = null; List moduleArgs = new LinkedList(); boolean isResource = false; }
+{ AST exp; Token id; Type type = null; List<GenericParameter> generics = null; List moduleArgs = new LinkedList(); boolean isResource = false; }
 {
   LOOKAHEAD(2)
-  <MODULE> <DEF> id = <IDENTIFIER> moduleArgs = Formals() [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	   return build.moduleDecl(id.image, imports, moduleArgs, exp, type, loc(id), true);
+  <MODULE> <DEF> id = <IDENTIFIER> [ generics = GenericsDecl() ] moduleArgs = Formals() [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
+	   return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), true);
   }
 |
   <MODULE> id = <IDENTIFIER> [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	return build.moduleDecl(id.image, imports, moduleArgs, exp, type, loc(id), isResource);
+	return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), isResource);
   }
 }
 
@@ -316,7 +318,7 @@ AST Declaration(boolean inModule) :
 }
 
 AST DefDeclaration() :
-{ Type resultType; Token name; AST body; List args; List<String> gentypes = null; Token effects = null; }
+{ Type resultType; Token name; AST body; List args; List<GenericParameter> gentypes = null; Token effects = null; }
 {
   <DEF> (name=<IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effects = <DSL_LITERAL>] resultType = Type() body=DefBody() {
 	if (effects==null) {
@@ -424,7 +426,7 @@ AST TaggedTypeDeclaration() :
 
 AST DatatypeDeclaration() :
 { Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
-  Token selfName = null; List<String> gentypes = null;
+  Token selfName = null; List<GenericParameter> gentypes = null;
   Object tagInfo = null; boolean isResource = false;
 }
 {
@@ -473,7 +475,7 @@ AST DeclType() :
 }
 
 AST DefDeclType() :
-{ Type resultType; Token name; List args; List<String> gentypes=null; Token effects = null; }
+{ Type resultType; Token name; List args; List<GenericParameter> gentypes=null; Token effects = null; }
 {
   <DEF> (name = <IDENTIFIER> | name = OverrideOperator()) [gentypes = GenericsDecl()] args = Formals() <COLON> [effects = <DSL_LITERAL>] resultType = Type() <NEWLINE> {
 	if (effects==null) {
@@ -511,7 +513,7 @@ AST EffectDeclType() :
 }
 
 AST ConstructDeclType() :
-{ Type resultType; Token name; List args = null; List<String> gentypes=null; Token effects = null;}
+{ Type resultType; Token name; List args = null; List<GenericParameter> gentypes=null; Token effects = null;}
 {
   (name = <IDENTIFIER>) [gentypes = GenericsDecl()] [args = Formals()] <NEWLINE> {
     return build.constructDeclType(name.image, gentypes, args, loc(name));
@@ -740,7 +742,7 @@ Type Type() :
 }
 
 Type NonArrowType() :
-{ Token id = null; Token id2 = null; AST exp = null; List<Type> generics = null; Type t; }
+{ Token id = null; Token id2 = null; AST exp = null; List<GenericArgument> generics = null; Type t; }
 {
   <LPAREN> t=Type() <RPAREN> {
       return t;
@@ -828,9 +830,11 @@ AST UnaryExpression(ExpFlags flags) :
 AST PrimaryExpression(ExpFlags flags) :
 { AST exp; Token t; Token selfName = null;
   LinkedList<String> names = new LinkedList<String>();
-  LinkedList<AST> args = new LinkedList<AST>(); }
+  LinkedList<AST> args = new LinkedList<AST>();
+  Token r = null;
+}
 {
-  exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags) )* ( Extension(names, args) )*  {
+   [ r = <RECUR> ] { boolean recur = r != null; } exp = PrimaryPrefix(flags) ( exp = PrimarySuffix(exp,flags, recur) )* ( Extension(names, args) )*  {
     if (names.size() + args.size() > 0) {
       exp = build.addArguments(exp,names,args);
     }
@@ -865,11 +869,11 @@ void Extension(LinkedList<String> names, LinkedList<AST> args) :
 }
 
 AST PrimaryPrefix(ExpFlags flags) :
-{ AST exp; Token t; }
+{ AST exp; Token t; boolean recur = false; }
 {
   exp = Literal() { return exp; }
 |
-  t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
+  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |
@@ -902,13 +906,13 @@ AST Literal() :
   <RATIONAL_LITERAL>
 }
 
-AST PrimarySuffix(AST lhs, ExpFlags flags) :
-{ List<AST> rhs; Token t; List<Type> gentypes = null;}
+AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :
+{ List<AST> rhs; Token t; List<GenericArgument> generics = null;}
 {
   <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
 |
-  [gentypes = Generics()] rhs = Arguments(flags) {
-    return build.application(lhs, rhs, null, gentypes);
+  [generics = Generics()] rhs = Arguments(flags) {
+    return build.application(lhs, rhs, null, generics, recur);
   }
 }
 
@@ -975,11 +979,11 @@ List Generics() :
 }
 
 List GenericList() :
-{ LinkedList<Type> genList = new LinkedList<Type>(); Type t1, t2; }
+{ LinkedList<GenericArgument> genList = new LinkedList<GenericArgument>(); GenericArgument t1, t2; }
 {
 
-  t1 = Type()
-  ( <COMMA> t2 = Type() {
+  t1 = GenericArgument()
+  ( <COMMA> t2 = GenericArgument() {
     genList.addLast(t2);
   }
   )* {
@@ -987,6 +991,13 @@ List GenericList() :
     return genList;
   }
 }
+
+GenericArgument GenericArgument() :
+{ Type type; Token effect; }
+{ type = Type() { return new GenericArgument(GenericKind.TYPE, type); }
+| effect = <DSL_LITERAL> { return new GenericArgument(effect.image); }
+}
+
 
 List GenericsDecl() :
 { List gens = null; }
@@ -997,15 +1008,20 @@ List GenericsDecl() :
 }
 
 List GenericListDecl() :
-{ LinkedList<String> genList = new LinkedList<String>(); Token t1, t2; }
+{ LinkedList<GenericParameter> genList = new LinkedList<GenericParameter>(); GenericParameter t1, t2; }
 {
-
-  t1 = <IDENTIFIER>
-  ( <COMMA> t2 = <IDENTIFIER> {
-    genList.addLast(t2.image);
+  t1 = GenericParameter()
+  ( <COMMA> t2 = GenericParameter() {
+    genList.addLast(t2);
   }
   )* {
-    genList.addFirst(t1.image);
+    genList.addFirst(t1);
     return genList;
   }
+}
+
+GenericParameter GenericParameter() :
+{ Token t; }
+{ <EFFECT> t = <IDENTIFIER> { return new GenericParameter(GenericKind.EFFECT, t.image); }
+| t = <IDENTIFIER> { return new GenericParameter(GenericKind.TYPE, t.image); }
 }

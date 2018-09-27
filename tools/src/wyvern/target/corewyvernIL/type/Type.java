@@ -34,7 +34,6 @@ public abstract class Type extends ASTNode implements IASTNode {
     public abstract void checkWellFormed(TypeContext ctx);
 
     public BytecodeOuterClass.TypeDesc emitBytecodeTypeDesc() {
-
         System.out.println("emitBytecode not implemented for " + this.getClass().getName());
         throw new java.lang.UnsupportedOperationException("Not yet implemented");
     }

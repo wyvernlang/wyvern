@@ -1,0 +1,12 @@
+require stdout
+
+def id(n: Int): Int
+    def count(n: Int, acc: Int): Int
+        if (n == 0)
+                acc
+            else
+                recur count(n - 1, acc + 1)
+    count(n, 0)
+
+stdout.printInt(id(10000))
+stdout.println()

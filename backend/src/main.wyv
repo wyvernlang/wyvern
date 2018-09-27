@@ -1,18 +1,47 @@
-module def compile(stdout: Stdout, support: PlatformSupport)
+require platform
+require stdout
 
+import support
 import from_protobuf
 import wyb_ast
 import rename
 import emit_js
 import util
+import mark_tco
+import inline_if
+
+val support = support.apply(platform)
 
 val from_protobuf = from_protobuf.apply(support)
 
-def compileExpression(e: wyb_ast.Expression): String
-    val r = rename.visitExpression(e)
-    emit_js.visitExpression(r)
+def compileModule(modulePath: String, e: wyb_ast.Expression): String
+    val i = inline_if.visitExpression(e)
+    val t = mark_tco.visitExpression(i)
+    val r = rename.visitExpression(t)
+    val e = emit_js.visitExpression(r)
+    e.lifting + "let " + rename.renameVariable(modulePath) + " = " + e.expr + ";"
 
 def compile(wyb: Dyn): Unit
+    stdout.print("(function(){\"use strict\";")
+    stdout.print("Number.prototype._PLUS_ = function(x) { return this + x; };")
+    stdout.print("Number.prototype._HYPHEN_ = function(x) { return this - x; };")
+    stdout.print("Number.prototype._TIMES_ = function(x) { return this * x; };")
+    stdout.print("Number.prototype._DIVIDE_ = function(x) { return this / x; };")
+    stdout.print("Number.prototype._MOD_ = function(x) { return this % x; };")
+    stdout.print("Number.prototype._LESSTHAN_ = function(x) { return this < x; };")
+    stdout.print("Number.prototype._GREATERTHAN_ = function(x) { return this > x; };")
+    stdout.print("Number.prototype._EQUAL__EQUAL_ = function(x) { return this == x; };")
+    stdout.print("Number.prototype.negate = function() { return -this; };")
+    stdout.print("Number.prototype.floor = function() { return Math.floor(this); };")
+    stdout.print("Boolean.prototype.ifTrue = function(t, f) { return this ? t.apply() : f.apply(); };")
+    stdout.print("Boolean.prototype._AMPERSAND__AMPERSAND_ = function(x) { return this && x; };")
+    stdout.print("Boolean.prototype._VERTICALBAR__VERTICALBAR_ = function(x) { return this || x; };")
+    stdout.print("Boolean.prototype._NOT_ = function() { return !this; };")
+    stdout.print("String.prototype._LESSTHAN_ = function(x) { return this < x; };")
+    stdout.print("String.prototype._GREATERTHAN_ = function(x) { return this > x; };")
+    stdout.print("String.prototype._EQUAL__EQUAL_ = function(x) { return this == x; };")
+    stdout.print("String.prototype._PLUS_ = function(x) { return this + x; };")
+    stdout.print("String.prototype._length = function(x) { return this.length; };")
     def importLoop(i: Int, c: Int): Unit
         if (i < c)
             val imp = wyb.getImports(i)
@@ -21,7 +50,7 @@ def compile(wyb: Dyn): Unit
             // Undesirable coupling with rename?
             stdout.print("const " + rename.renameVariable("FFI_" + n) + " = require(process.env.WYVERN_HOME + \"/backend/" + util.replace(p, ".", "/") + "\");")
             stdout.println()
-            importLoop(i + 1, c)
+            recur importLoop(i + 1, c)
     val c: Int = wyb.getImportsCount()
     importLoop(0, c)
 
@@ -30,13 +59,13 @@ def compile(wyb: Dyn): Unit
         val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
         val p = "MOD$" + m.getPath()
         // Undesirable coupling with rename?
-        stdout.print("let " + rename.renameVariable(p) + " = " + compileExpression(e) + ";")
+        stdout.print(compileModule(p, e))
         if (i > 0)
-            moduleLoop(i - 1)
+            recur moduleLoop(i - 1)
     val m: Int = wyb.getModulesCount()
     moduleLoop(m - 1)
+    stdout.print("})();")
 
-def main(): Unit
-    val filename = support.getFirstCommandLineArg()
-    val wyb = support.loadBytecode(filename)
-    compile(wyb)
+val filename = support.getFirstCommandLineArg()
+val wyb = support.loadBytecode(filename)
+compile(wyb)

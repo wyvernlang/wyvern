@@ -8,8 +8,10 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
+import wyvern.tools.tests.EffectAnnotationTests;
 import wyvern.tools.tests.EffectSystemTests;
 import wyvern.tools.tests.ExampleTests;
+import wyvern.tools.tests.ExamplesNoPrelude;
 import wyvern.tools.tests.FFITests;
 import wyvern.tools.tests.Figures;
 import wyvern.tools.tests.FreeVars;
@@ -19,6 +21,7 @@ import wyvern.tools.tests.Illustrations;
 import wyvern.tools.tests.LexingTests;
 import wyvern.tools.tests.ModuleSystemTests;
 import wyvern.tools.tests.OIRTests;
+import wyvern.tools.tests.PolymorphicEffectTests;
 import wyvern.tools.tests.ReflectionTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
@@ -40,7 +43,7 @@ import wyvern.tools.tests.TransformTests;
             // CURRENTLY IMPORTANT TESTS HERE
             LexingTests.class,      // tests the new lexer
             CoreParserTests.class,  // tests the new parser
-            ILTests.class,          // tests the new IL
+            ILTests.class,          // tests the new IL, not using the prelude
             ILTestsWithPrelude.class,          // tests the new IL and the standard prelude
             RossettaCodeTests.class, // a few of these are out of date, but some use new everything
             FFITests.class,
@@ -53,7 +56,10 @@ import wyvern.tools.tests.TransformTests;
             FreeVars.class,
             StdlibTests.class,      // tests the standard library with the new IL
             ExampleTests.class,      // tests the examples
+            ExamplesNoPrelude.class,      // tests the examples that don't require the prelude
             EffectSystemTests.class,
+            PolymorphicEffectTests.class,
+            EffectAnnotationTests.class,
             ModuleSystemTests.class,        // tests the new IL
         }
         )

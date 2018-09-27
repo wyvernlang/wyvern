@@ -1,10 +1,7 @@
-module def dataProcessor7(net : effects.NetworkType01, stdout : Stdout)
+module def dataProcessor7(net: effects.NetworkType)
 effect genN = {}
-def genNum() : { genN } Int
+def genNum(): { genN } Int
     3
-def processData() : {genN, net.send, net.receive} Unit // overcompensate
-    stdout.print("dataProcessor7 w/ multiple layers of effect abstraction: \n")
-    val n : Int = genNum() // {genN}
+def processData(): {genN, net.send, net.receive} String // more effects than actually produces
+    val n: Int = genNum() // {genN}
     net.receiveData() // {net.receive}
-    stdout.print("data processed\n")
-    stdout.print("dataProcessor7 done!\n")

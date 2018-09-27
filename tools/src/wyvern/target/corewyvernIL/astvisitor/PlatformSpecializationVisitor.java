@@ -173,7 +173,7 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         IExpr toReplace = (IExpr) let.getToReplace().acceptVisitor(this, state);
         IExpr inExpr = (IExpr) let.getInExpr().acceptVisitor(this, state);
 
-        Let result = new Let(let.getVarName(), let.getVarType(), toReplace, inExpr);
+        Let result = new Let(let.getSite(), let.getVarType(), toReplace, inExpr);
         result.copyMetadata(let);
         return result;
     }
@@ -211,7 +211,14 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
     public ASTNode visit(PSVState state, DefDeclaration defDecl) {
         ASTNode resultBody = (ASTNode) defDecl.getBody().acceptVisitor(this, state);
-        DefDeclaration result = new DefDeclaration(defDecl.getName(), defDecl.getFormalArgs(), defDecl.getType(), (IExpr) resultBody, defDecl.getLocation());
+        DefDeclaration result = new DefDeclaration(
+                defDecl.getName(),
+                defDecl.getFormalArgs(),
+                defDecl.getType(),
+                (IExpr) resultBody,
+                defDecl.getLocation(),
+                defDecl.getEffectSet()
+        );
         result.copyMetadata(defDecl);
         return result;
     }

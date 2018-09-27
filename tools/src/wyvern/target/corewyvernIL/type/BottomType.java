@@ -2,6 +2,7 @@ package wyvern.target.corewyvernIL.type;
 
 import java.io.IOException;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -39,6 +40,11 @@ public class BottomType extends ValueType {
     }
 
     @Override
+    public BytecodeOuterClass.Type emitBytecodeType() {
+        return BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Nothing).build();
+    }
+
+    @Override
     public ValueType adapt(View v) {
         return this;
     }
@@ -56,5 +62,15 @@ public class BottomType extends ValueType {
     @Override
     public boolean isTagged(TypeContext ctx) {
         return false;
+    }
+
+    @Override
+    public boolean isEffectAnnotated(TypeContext ctx) {
+        return true;
+    }
+
+    @Override
+    public boolean isEffectUnannotated(TypeContext ctx) {
+        return true;
     }
 }

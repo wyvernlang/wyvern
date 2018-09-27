@@ -30,6 +30,11 @@ import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
+/** TODO: all of these are currently broken
+ * 
+ * @author aldrich
+ *
+ */
 public class TransformTests {
 
     public static final String LIB_PATH = "../stdlib/";

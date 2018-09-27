@@ -1,0 +1,25 @@
+require stdout
+require json
+
+val c : String = "Hello"
+stdout.print("Original: ")
+stdout.print(c)
+stdout.println()
+
+// serialize to JSON and print as JSON
+val jsonfile : json.JSON = json.serializeToJSON(c)
+stdout.print(jsonfile.toString())
+stdout.println()
+
+// get the string representation of JSON
+val jsonString : String = jsonfile.toString()
+
+// remake JSON from string
+val fromString : json.JSON = json.stringToJSON(jsonString)
+stdout.print(fromString.toString())
+stdout.println()
+
+val deserialized : String = json.deserializeFromJSON(fromString)
+stdout.print("Deserialized: ")
+stdout.print(deserialized)
+stdout.println()

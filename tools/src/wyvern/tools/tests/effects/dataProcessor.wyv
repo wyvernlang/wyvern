@@ -1,6 +1,4 @@
-module def dataProcessor(net : effects.NetworkType01, stdout : Stdout)
+module def dataProcessor(net: effects.NetworkType)
 effect process = {net.receive}
-def processData() : {process} Unit
-    stdout.print("Data processor w/ effect abstraction: \n")
+def processData(): {process} String
     net.receiveData()
-    stdout.print("data processed\n")

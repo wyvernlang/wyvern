@@ -1,0 +1,2 @@
+type InputStream
+	def close() : Unit
