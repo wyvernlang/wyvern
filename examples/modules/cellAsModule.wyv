@@ -1,45 +1,6 @@
-// FILE 1:
-/*
-resource type TCellAsModule
-    def get():Int
-    def set(newValue:Int):Unit
-*/
+module def cellAsModule():modules.TCellAsModule
 
-// FILE 2:
-module def cellAsModule():TCellAsModule
 var value : Int = 0
 def set(newValue:Int):Unit
     value = newValue
 def get():Int = value
-
-// FILE 3:
-/*
-require stdout
-
-val m2:TCellAsModule = cellAsModule()
-
-m2.set(36)
-*/
-///////////////////////////////////////////////////////////////////////////////
-// FILE 1:
-/*
-resource type TestModule
-    def get():Int
-    def set(newValue:Int):Unit
-*/
-
-// FILE 2:
-module def Module():TestModule
-var value : Int = 0
-def set(newValue:Int):Unit
-    value = newValue
-def get():Int = value
-
-// FILE 3:
-/*
-require stdout
-
-val m1:TestModule = Module()
-
-m1.set(42)
-*/
