@@ -113,6 +113,7 @@ TOKEN : /* Keywords */
 | < TAGGED: "tagged" >
 | < MATCH: "match" >
 | < IMPORT: "import" >
+| < LIFTED: "lifted" >
 | < DEFLT: "default" >
 //| < : "" >
 // more here
@@ -257,7 +258,11 @@ AST RequireDecl() :
 AST ImportDecl() :
 { URI uri; Token t; Token name = null; Token meta = null; }
 {
+  LOOKAHEAD(2)
   t=<IMPORT> [meta=<METADATA>] uri = Uri() [<AS> name=<IDENTIFIER>] <NEWLINE>
+    { return build.importDecl(uri, loc(t), name, false, meta != null); }
+|
+  t=<IMPORT> <LIFTED> [meta=<METADATA>] uri = Uri() [<AS> name=<IDENTIFIER>] <NEWLINE>
     { return build.importDecl(uri, loc(t), name, false, meta != null); }
 }
 

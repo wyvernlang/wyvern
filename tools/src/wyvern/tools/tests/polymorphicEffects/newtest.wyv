@@ -1,0 +1,24 @@
+import lifted polymorphicEffects.reversePlugin
+
+type Resource
+  effect theEffect
+
+val file : Resource = new
+  effect theEffect = {system.ffiEffect}
+
+val network : Resource = new
+  effect theEffect = {system.ffiEffect}
+
+val logger1 : Logger[{file.theEffect}] = new
+  effect log = {file.theEffect}
+  def append(contents : String) : {this.log} Unit
+    unit
+
+val logger2 : Logger[{network.theEffect}] = new
+  effect log = {network.theEffect}
+  def append(contents : String) : {this.log} Unit
+    unit
+
+val plugin = reversePlugin[{logger1.log}]("archive")
+
+plugin.setLogger(logger1)
