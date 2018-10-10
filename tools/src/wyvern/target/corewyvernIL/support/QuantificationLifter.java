@@ -57,7 +57,7 @@ public final class QuantificationLifter {
      * @return The result of applying the quantification lifting transformation to the expression that was passed in, if
      * possible, or null if the transformation is not possible
      */
-    public static New liftIfPossible(final GenContext ctx, final IExpr expression) {
+    public static New liftIfPossible(final GenContext ctx, final IExpr expression, boolean isLifted) {
         if (!(expression instanceof New)) {
             return null;
         }
@@ -93,7 +93,14 @@ public final class QuantificationLifter {
         final FormalArg oldLastArg = oldFormalArgs.get(oldFormalArgs.size() - 1);
         final ValueType oldLastArgStructuralType = oldLastArg.getType().getStructuralType(ctx);
 
+
+        System.out.println("QuantificationLfiter: " + isLifted);
+        /*
         if (!"__MONOMORPHIZE__".equals(oldLastArg.getName()) || !Util.unitType().equals(oldLastArgStructuralType)) {
+            return null;
+        }
+        */
+        if (!isLifted || !Util.unitType().equals(oldLastArgStructuralType)) {
             return null;
         }
 

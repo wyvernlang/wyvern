@@ -41,9 +41,10 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
 
     private final List<ImportDeclaration> imports;
     private final List<GenericParameter> generics;
+    private final boolean isLifted;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
-                             TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
+                             TypedAST inner, NamedType type, FileLocation location, boolean isResource, boolean isLifted) {
         this.name = name;
         this.inner = inner;
         this.location = location;
@@ -52,6 +53,12 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         this.args = args;
         this.imports = imports;
         this.generics = generics;
+        this.isLifted = isLifted;
+    }
+
+
+    public boolean isLifted() {
+        return isLifted;
     }
 
 

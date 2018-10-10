@@ -170,10 +170,13 @@ public class ModuleResolver {
      * @throws ParseException
      */
     public Module resolveModule(String qualifiedName) {
-        return resolveModule(qualifiedName, false);
+        return resolveModule(qualifiedName, false, false);
+    }
+    public Module resolveModule(String qualifiedName, boolean isLifted) {
+        return resolveModule(qualifiedName, false, isLifted);
     }
 
-    public Module resolveModule(String qualifiedName, boolean toplevel) {
+    public Module resolveModule(String qualifiedName, boolean toplevel, boolean isLifted) {
         checkNoCyclicDependencies(qualifiedName);
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, false);
@@ -187,7 +190,7 @@ public class ModuleResolver {
                     moduleCache.put(qualifiedName, m);
                 }
             } else {
-                Module module = load(qualifiedName, f, toplevel);
+                Module module = load(qualifiedName, f, toplevel, isLifted);
                 moduleCache.put(qualifiedName, module);
                 final String fileName = f.getName();
                 final String modName = module.getSpec().getValueName();
@@ -281,6 +284,9 @@ public class ModuleResolver {
     }
 
     private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel) {
+        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel, false);
+    }
+    private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel, boolean isLifted) {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
@@ -306,6 +312,7 @@ public class ModuleResolver {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 valueName = decl.getName();
 
+
                 // Rename according to "apply"
                 DefDeclaration defDecl = new DefDeclaration(
                         Util.APPLY_NAME,
@@ -320,7 +327,7 @@ public class ModuleResolver {
 
                 // Perform quantification lifting if possible
                 final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
-                final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program);
+                final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program, isLifted);
                 if (liftResult != null) {
                     program = liftResult;
                 }
@@ -362,6 +369,22 @@ public class ModuleResolver {
             }
         }
         return loadContinuation(file, qualifiedName, ast, loadingType, toplevel);
+    }
+
+    public Module load(String qualifiedName, File file, boolean toplevel, boolean isLifted) {
+        boolean loadingType = file.getName().endsWith(".wyt");
+        TypedAST ast = null;
+        try {
+            ast = TestUtil.getNewAST(file);
+        } catch (ParseException e) {
+            if (e.getCurrentToken() != null) {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
+            } else {
+                ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
+            }
+        }
+        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel, isLifted);
     }
 
     private Module createAdaptedModule(File file, String qualifiedName, String valueName,

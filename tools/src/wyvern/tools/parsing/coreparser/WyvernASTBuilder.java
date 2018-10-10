@@ -2,10 +2,11 @@ package wyvern.tools.parsing.coreparser;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Optional;
 
 import wyvern.tools.errors.ErrorMessage;
@@ -72,15 +73,32 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         }
     }
 
+    private static HashSet<String> liftedModules = new HashSet<>();
+
     @Override
     public TypedAST moduleDecl(String name, List<TypedAST> imports, List<GenericParameter> generics,
                                List args, TypedAST ast, Type type, FileLocation loc, boolean isResource) {
-        return new ModuleDeclaration(name, imports, generics, args, ast, (NamedType) type, loc, isResource);
+        boolean isLifted = false;
+        if (liftedModules.contains(name)) {
+            isLifted = true;
+        }
+        return new ModuleDeclaration(name, imports, generics, args, ast, (NamedType) type, loc, isResource, isLifted);
     }
 
     @Override
-    public TypedAST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata) {
-        return new ImportDeclaration(uri, loc, (name == null) ? null : name.image, isRequire, isMetadata);
+    public TypedAST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata, boolean isLifted) {
+        String moduleName = "";
+        for (int i = uri.toString().length() - 1; i >= 0; i--) {
+            if (uri.toString().charAt(i) == '.') {
+                break;
+            } else {
+               moduleName = uri.toString().charAt(i) + moduleName;
+            }
+        }
+        if (isLifted) {
+            liftedModules.add(moduleName);
+        }
+        return new ImportDeclaration(uri, loc, (name == null) ? null : name.image, isRequire, isMetadata, isLifted);
     }
 
     @Override
