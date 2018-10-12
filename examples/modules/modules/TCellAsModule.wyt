@@ -1,3 +1,0 @@
-resource type TCellAsModule
-    def set(newValue:Int):Unit
-    def get():Int

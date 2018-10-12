@@ -106,9 +106,7 @@ public final class ReplServer {
                         Value v1 = null;
                         Value v2 = null;
                         try {
-                            System.out.println("we got here");
                             v1 = newProgram.updateCode(resourceType);
-                            System.out.println("got here");
                             v2 = newProgram.interpretModule(module);
                             response = v1.toString() + "\n" + v2.toString();
                         } catch (ParseException e) {

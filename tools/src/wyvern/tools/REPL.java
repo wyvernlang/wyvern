@@ -57,6 +57,7 @@ public class REPL {
     public static final String EXAMPLES_PATH = WYVERN_HOME == null ? "../examples/" : WYVERN_HOME + "/examples/";
 
     private EvalContext programContext;
+    private String tempObjCode = "";
     private String tempCode = "";
     private GenContext genContext;
     private String tempModuleType = "";
@@ -64,6 +65,7 @@ public class REPL {
     private ModuleResolver mr;
     private boolean defineModuleType = false;
     private boolean defineModule = false;
+    private boolean defineObject = false;
     private String lastInput = "";
 
     public REPL() {
@@ -96,8 +98,7 @@ public class REPL {
         lastInput = userInput;
         try {
             if (defineModuleType) {
-                if (userInput.equals("") && lastInput.equals("")) {
-                    
+                if (userInput.equals("") && lastInput.equals("")) {             
                     Value result = updateCode(tempModuleType);
                     tempModuleType = "";
                     defineModuleType = false;
@@ -114,6 +115,15 @@ public class REPL {
                     return result.toString();
                 } else {
                     tempModule = tempModule + userInput + "\n";
+                }
+            } else if (defineObject) {
+                if (userInput.equals("") && lastInput.equals("")) {
+                    Value result = updateCode(tempObjCode);
+                    tempObjCode = "";
+                    defineObject = false;
+                    return result.toString();
+                } else {
+                    tempObjCode = tempObjCode + userInput + "\n";
 
                 }
             } else {
@@ -137,6 +147,9 @@ public class REPL {
                 } else if (userInput.contains("resource type")) {
                     defineModuleType = true;
                     tempModuleType = tempModuleType + userInput + "\n";
+                } else if (userInput.contains("new")) {
+                    defineObject = true;
+                    tempObjCode = tempObjCode + userInput + "\n";
                 } else {
                     Value v = parse(userInput);
                     if (v != null) {

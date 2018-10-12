@@ -44,6 +44,7 @@ tools/src/wyvern/tools/parsing/coreparser/arch/ParseException.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.jj
 tools/src/wyvern/tools/parsing/coreparser/ArchParserConstants.java
+tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserTreeConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/Node.java
 tools/src/wyvern/tools/parsing/coreparser/arch/JJTArchParserState.java
