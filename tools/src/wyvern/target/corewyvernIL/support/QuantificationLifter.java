@@ -94,13 +94,7 @@ public final class QuantificationLifter {
         final ValueType oldLastArgStructuralType = oldLastArg.getType().getStructuralType(ctx);
 
 
-        System.out.println("QuantificationLfiter: " + isLifted);
-        /*
-        if (!"__MONOMORPHIZE__".equals(oldLastArg.getName()) || !Util.unitType().equals(oldLastArgStructuralType)) {
-            return null;
-        }
-        */
-        if (!isLifted || !Util.unitType().equals(oldLastArgStructuralType)) {
+       if (!isLifted) {
             return null;
         }
 
