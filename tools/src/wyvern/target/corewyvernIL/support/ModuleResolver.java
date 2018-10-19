@@ -172,9 +172,6 @@ public class ModuleResolver {
     public Module resolveModule(String qualifiedName) {
         return resolveModule(qualifiedName, false, false);
     }
-    public Module resolveModule(String qualifiedName, boolean isLifted) {
-        return resolveModule(qualifiedName, false, isLifted);
-    }
 
     public Module resolveModule(String qualifiedName, boolean toplevel, boolean isLifted) {
         checkNoCyclicDependencies(qualifiedName);

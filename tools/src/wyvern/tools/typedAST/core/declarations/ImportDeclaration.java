@@ -243,7 +243,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         } else if (scheme.equals("wyv")) {
             // TODO: need to add types for non-java imports
             String moduleName = this.getUri().getSchemeSpecificPart();
-            final Module module = resolver.resolveModule(moduleName, isLifted);
+            final Module module = resolver.resolveModule(moduleName, false, isLifted);
             final String internalName = module.getSpec().getInternalName();
             if (this.metadataFlag) {
                 if (module.getSpec().getType().isResource(ctx)) {
