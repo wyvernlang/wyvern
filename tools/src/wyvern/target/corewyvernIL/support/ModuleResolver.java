@@ -353,22 +353,10 @@ public class ModuleResolver {
      * @return
      */
     public Module load(String qualifiedName, File file, boolean toplevel) {
-        boolean loadingType = file.getName().endsWith(".wyt");
-        TypedAST ast = null;
-        try {
-            ast = TestUtil.getNewAST(file);
-        } catch (ParseException e) {
-            if (e.getCurrentToken() != null) {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR,
-                        new FileLocation(file.getPath(), e.getCurrentToken().beginLine, e.getCurrentToken().beginColumn), e.getMessage());
-            } else {
-                ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
-            }
-        }
-        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel);
+        return load(qualifiedName, file, toplevel, false);
     }
 
-    public Module load(String qualifiedName, File file, boolean toplevel, boolean isLifted) {
+    private Module load(String qualifiedName, File file, boolean toplevel, boolean isLifted) {
         boolean loadingType = file.getName().endsWith(".wyt");
         TypedAST ast = null;
         try {
