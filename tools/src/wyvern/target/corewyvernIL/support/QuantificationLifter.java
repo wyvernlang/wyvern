@@ -90,10 +90,6 @@ public final class QuantificationLifter {
             return null;
         }
 
-        final FormalArg oldLastArg = oldFormalArgs.get(oldFormalArgs.size() - 1);
-        final ValueType oldLastArgStructuralType = oldLastArg.getType().getStructuralType(ctx);
-
-
        if (!isLifted) {
             return null;
         }
