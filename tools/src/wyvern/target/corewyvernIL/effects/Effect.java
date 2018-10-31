@@ -163,4 +163,19 @@ public class Effect {
         s.add(this);
         return s;
     }
+
+    public Effect adaptVariables(GenContext ctx) {
+        if (path == null) {
+            path = ctx.getContainerForTypeAbbrev(name);
+        }
+        if (path == null) {
+            ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, loc, name);
+        }
+        Path newPath = path.adaptVariables(ctx);
+        if (newPath == path) {
+            return this;
+        } else {
+            return new Effect(newPath, name, loc);
+        }
+    }
 }

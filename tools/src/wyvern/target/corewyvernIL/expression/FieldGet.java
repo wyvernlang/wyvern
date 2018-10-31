@@ -11,6 +11,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
@@ -137,5 +138,18 @@ public class FieldGet extends Expression implements Path {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Path adaptVariables(GenContext ctx) {
+        if (!(objectExpr instanceof Path)) {
+            throw new RuntimeException("invariant violated");
+        }
+        Path newPath = ((Path) objectExpr).adaptVariables(ctx);
+        if (newPath == objectExpr) {
+            return this;
+        } else {
+            return new FieldGet(newPath, fieldName, getLocation());
+        }
     }
 }

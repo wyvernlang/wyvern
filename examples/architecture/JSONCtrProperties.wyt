@@ -1,0 +1,76 @@
+import wyvern.collections.list
+import wyvern.archast
+import wyvern.ast
+import wyvern.option
+
+type JSONCtrProperties
+	val host : String
+	val prt : Int
+	metadata new
+		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Boolean
+			val length = l.length()
+			type PortDecl = archast.PortDecl
+			var p1 : PortDecl = archast.NonePort
+			var p2 : PortDecl = archast.NonePort
+			if (l.length() == 2)	
+					val op1 : option.Option[PortDecl] = l.get(0)
+					val op2 : option.Option[PortDecl] = l.get(1)
+					if (op1.isDefined && op2.isDefined)
+							p1 = op1.getOrElse(() => p1)
+							p1 = op2.getOrElse(() => p1)
+						else 
+							false
+					var requires : String = ""
+					var provides : String = ""
+					if (p1.getRequires() == "")
+							if (p1.getProvides() == "")
+									-1
+								else
+									provides = p1.getProvides()
+						else
+							requires = p1.getRequires()
+					if (requires == "")	
+							requires = p2.getRequires()
+						else	
+							provides = p2.getProvides()
+								
+					if (requires == provides)
+							length
+						else
+							false
+					true
+				else
+					false
+
+		def generateConnectorImpl(l : list.List[archast.PortDecl]) : list.List[ast.AST]
+				var connectorIface : String = ""
+				val portDecl = l.get(0).getOrElse(() => archast.NonePort)
+				if (portDecl.getRequires() =="")
+						connectorIface = portDecl.getProvides()
+					else
+						connectorIface = portDecl.getRequires()	
+				val portList = list.make[ast.AST]()	
+				val CSIface_requires_port = "module def " + connectorIface + "_requires_port(jsonCtrProps : JSONCtrProperties, java : Java, stdout: Stdout) : " + connectorIface+ "\nimport io.io\nimport json\nimport io.Socket\nval io = io(java)\nval json = json(java)\ndef getVal(key : String) : String\n\tval tcpClient : Socket = io.makeSocket(jsonCtrProps.host, jsonCtrProps.prt)\n\tval out = tcpClient.getOutputStream()\n\tval in = tcpClient.getInputStream()\n\tval outData = io.makeDataOutputStream(out)\n\tval inData = io.makeDataInputStream(in)\n\tstdout.print(\"Requesting '\")\n\tstdout.print(key)\n\tstdout.print(\"' from server...\n\")\n\toutData.writeUTF((json.serializeToJSON(key)).toString())\n\tval returnData = inData.readUTF()\n\tstdout.print(\"...received '\")\n\tstdout.print(returnData)\n\tstdout.print(\"' from server\n\")\n\treturnData"
+				val CSIface_provides_port = "module def "+ connectorIface + "_provides_port(port : " + connectorIface + ", tcpServer : io.ServerSocket, java : Java)\nimport thread.thread\nimport thread.Thread\nimport io.io\nimport io.Socket\nimport io.DataInputStream\nimport io.DataOutputStream\nimport json\nval thread = thread(java)\nval io = io(java)\nval json = json(java)\ndef run() : Unit\n\tval socket : Socket = tcpServer.accept()\n\tval outData : DataOutputStream = io.makeDataOutputStream(socket.getOutputStream())\n\tval inData : DataInputStream = io.makeDataInputStream(socket.getInputStream())\n\tval key : json.JSON = json.stringToJSON(inData.readUTF())\n\toutData.writeUTF(port.getVal(json.deserializeFromJSON(key)))\n\trun()\nval runningThread : Thread = thread.make(() => run())\ndef getThread() : Thread\n\trunningThread\n"
+					
+				val requiresAST = ast.parseGeneratedModule(CSIface_requires_port)
+				val providesAST = ast.parseGeneratedModule(CSIface_provides_port)
+				
+				portList.append(requiresAST)
+				portList.append(providesAST)
+				portList
+
+		def generateConnectorInit(portInstances : list.List[ast.AST], compInstances : list.List[archast.ComponentDecl]) : list.List[ast.AST]
+			val astList = list.make[ast.AST]()
+			// in the future these should be retrieved from a deployment AST
+			val hostIP = "\"localhost\""
+			val hostport = "40000"
+			
+			val client = "require stdout\nrequire java\nimport Client\nimport CSIface_requires_port\nimport CSIface\nimport JSONCtrProperties\nval jsonCtrProps : JSONCtrProperties = new\n\tval host : String = " + hostIP + "\n\tval prt : Int = " + hostport + "\nval client_getInfo: CSIface = CSIface_requires_port(jsonCtrProps, java, stdout)\nval client = Client(client_getInfo)\n"
+			val server = "require java\nimport io.io\nimport CSIface_provides_port\nimport Server\nval io = io(java)\nval server = Server()\nval server_sendInfo = CSIface_provides_port(server.sendInfo, io.makeServerSocket("+hostport+"), java)\nval serverThread = server_sendInfo.getThread()\nserverThread.start()\n"
+
+			val clientAST : ast.AST = ast.parseExpressionNoContext(client)
+			val serverAST : ast.AST = ast.parseExpressionNoContext(server)
+			astList.append(serverAST)
+			astList.append(clientAST)
+			astList

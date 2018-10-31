@@ -75,15 +75,6 @@ public final class Globals {
         javascriptWhiteList.add("stdlib.support.float");
     }
 
-    static {
-        // the whitelist that anyone can import without requiring javascript or becoming a resource module
-        // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
-        javascriptWhiteList.add("stdlib.support.runtime");
-        javascriptWhiteList.add("stdlib.support.jsinterop");
-        javascriptWhiteList.add("stdlib.support.string");
-        javascriptWhiteList.add("stdlib.support.float");
-    }
-
     private static boolean gettingPrelude = false;
     private static boolean usePrelude = true;
 
@@ -270,7 +261,7 @@ public final class Globals {
 
     public static EvalContext getStandardEvalContext() {
         EvalContext ctx = EvalContext.empty();
-        //ctx = ctx.extend(system, Globals.getSystemValue());
+        ctx = ctx.extend(system, Globals.getSystemValue());
         SeqExpr sexpr = getPreludeIfPresent();
         if (sexpr != null) {
             ctx = sexpr.interpretCtx(ctx).getSecond();

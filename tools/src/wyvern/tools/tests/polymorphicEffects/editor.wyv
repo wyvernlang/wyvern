@@ -1,5 +1,5 @@
 import polymorphicEffects.Logger
-import polymorphicEffects.repeaterPlugin
+import lifted polymorphicEffects.newRepeaterPlugin
 
 // Resources
 
@@ -27,7 +27,7 @@ val logger2 : Logger[{network.theEffect}] = new
 
 // Core editor
 
-val plugin = repeaterPlugin[{logger1.log}](logger1, unit)
+val plugin = newRepeaterPlugin[{logger1.log}](logger1)
 
 def main() : {logger1.log} String
   // Succeeds because {logger1.log} is a subset of the effect that we chose when

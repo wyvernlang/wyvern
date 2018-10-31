@@ -132,4 +132,14 @@ public class EffectSet {
         return thisEffectSet.equals(otherEffectSet);
     }
 
+    public EffectSet contextualize(GenContext ctx) {
+        if (effectSet.isEmpty()) {
+            return this;
+        }
+        final Set<Effect> newSet = new HashSet<Effect>();
+        for (final Effect e:effectSet) {
+            newSet.add(e.adaptVariables(ctx));
+        }
+        return new EffectSet(newSet);
+    }
 }

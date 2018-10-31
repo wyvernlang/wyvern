@@ -1,4 +1,4 @@
-module def doublePlugin(defaultLogger : polymorphicEffects.Logger, __MONOMORPHIZE__ : Unit)
+module def repeaterPlugin(defaultLogger : polymorphicEffects.Logger, __MONOMORPHIZE__ : Unit)
 
 import polymorphicEffects.Logger
 

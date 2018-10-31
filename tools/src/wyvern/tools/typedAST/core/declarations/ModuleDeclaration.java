@@ -38,6 +38,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
     private NamedType ascribedType;
     private boolean resourceFlag;
     private final List<NameBindingImpl> args;
+
     private final List<ImportDeclaration> imports;
     private final List<GenericParameter> generics;
 
@@ -52,7 +53,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         this.imports = imports;
         this.generics = generics;
     }
-
 
     @Override
     public String getName() {
@@ -269,5 +269,9 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         }
         /* resource module translated into method */
         return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
+    }
+
+    public List<ImportDeclaration> getImports() {
+        return imports;
     }
 }

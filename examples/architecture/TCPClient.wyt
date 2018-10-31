@@ -1,0 +1,2 @@
+resource type Client
+	def start() : Unit

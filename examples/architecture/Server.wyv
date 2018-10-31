@@ -1,0 +1,15 @@
+module def Server() : TCPServer
+
+import CSIface
+import dataStructures.hashmap
+val hashmap = hashmap()
+var hmap : hashmap.HashMap[String,String] = hashmap.make[String,String]()
+hmap.put("key", "value")
+
+val sendInfo : CSIface = new
+	def getVal(key : String) : String
+		val result = hmap.get(key)
+		result 
+
+def start() : Unit
+	unit

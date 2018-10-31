@@ -1,0 +1,19 @@
+component Publisher
+    port publish: requires PubSubIface
+
+component Subscriber
+    port subscribe: provides PubSubIface
+
+connector ROSTopic
+    val name: String
+
+architecture PubSub
+    components
+        Publisher p1, p2
+        Subscriber s1, s2
+
+    connectors
+        ROSTopic t
+
+    attachments
+        connect p1.publish and p2.publish and s1.subscribe and s2.subscribe with t

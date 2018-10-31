@@ -1,6 +1,6 @@
-require dataStructures.hashmap
 require stdout
-
+import dataStructures.hashmap
+val hashmap = hashmap()
 var hmap : hashmap.HashMap[String,Int] = hashmap.make[String,Int]()
 
 def record(entry : String) : Unit
