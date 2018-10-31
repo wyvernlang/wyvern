@@ -115,7 +115,6 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testFileIO2() throws ParseException {
         /* Effects defined in a pure module are used in effect definitions in both type and module. */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
