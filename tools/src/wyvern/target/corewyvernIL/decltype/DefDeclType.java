@@ -89,7 +89,7 @@ public class DefDeclType extends DeclTypeWithResult {
             otherRawResultType = otherRawResultType.adapt(adaptationView);
         }
         if (rawEffectSet != null && otherEffectSet != null) {
-            return rawEffectSet.equalsByName(otherEffectSet) && rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
+            return otherEffectSet.containsAll(rawEffectSet) && rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
         }
         return rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
     }
