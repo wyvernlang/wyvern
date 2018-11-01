@@ -29,9 +29,13 @@ val handler = httphandler(bmihandler(ppobj, stringObj))
 
 
 // begin/execute program
+val port = 1254
 
-val serverSocket = ioobj.makeServerSocket(1254)
+val serverSocket = ioobj.makeServerSocket(port)
 stdout.print("Waiting for a client connection...\n")
+stdout.print("Server is on port: ")
+stdout.printInt(port)
+stdout.println()
 val soc = serverSocket.accept()
 stdout.print("Accepted a connection.\n")
 

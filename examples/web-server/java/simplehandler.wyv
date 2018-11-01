@@ -28,3 +28,4 @@ def setParams(postParams:String): Unit
 
 def getFormData():String
     params.getParamMappingToString()
+
