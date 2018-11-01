@@ -182,6 +182,12 @@ public class EffectSystemTests {
     }
 
     @Test
+    public void testLogger5() throws ParseException {
+        /* Effect subtyping: accepting a module with fewer effects than in the expected type. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger5", Util.intType(), new IntegerLiteral(6));
+    }
+
+    @Test
     public void testNested() throws ParseException {
         /* An object in a module's immutable field defines an effect
          * and uses it in a method annotation inside that object. */
