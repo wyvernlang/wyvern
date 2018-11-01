@@ -127,7 +127,6 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testFileIO5() throws ParseException {
         /* Effects defined in a pure module are used in effect definitions in both type and module.
          * Pure module imported in type is renamed. */
