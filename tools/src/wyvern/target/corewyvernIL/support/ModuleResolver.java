@@ -55,7 +55,8 @@ public class ModuleResolver {
     private List<File> searchPath;
     private List<Path> platformPath;
     private String platform;
-    private Map<String, Module> moduleCache = new HashMap<String, Module>();
+    private Map<String, Module> unliftedModuleCache = new HashMap<>();
+    private Map<String, Module> liftedModuleCache = new HashMap<>();
     private Deque<String> modulesBeingResolved = new ArrayDeque<>();
     private InterpreterState state;
     private File rootDir;
@@ -115,13 +116,13 @@ public class ModuleResolver {
 
     private Module resolveType(String qualifiedName, boolean toplevel) {
         Module typeDefiningModule;
-        if (!moduleCache.containsKey(qualifiedName)) {
+        if (!unliftedModuleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, true);
             if (f == null || !f.exists()) {
                 ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "type", qualifiedName);
             }
             typeDefiningModule = load(qualifiedName, f, toplevel);
-            moduleCache.put(qualifiedName, typeDefiningModule);
+            unliftedModuleCache.put(qualifiedName, typeDefiningModule);
             
             final String fileName = f.getName();
             final String typeName1 = typeDefiningModule.getSpec().getDefinedTypeName();
@@ -129,7 +130,7 @@ public class ModuleResolver {
                 ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, FileLocation.UNKNOWN, typeName1);
             }
         } else {
-            typeDefiningModule = moduleCache.get(qualifiedName);
+            typeDefiningModule = unliftedModuleCache.get(qualifiedName);
         }
         /*Expression typeDefiningObject = typeDefiningModule.getExpression();
         TypeContext ctx = Globals.getStandardTypeContext();
@@ -175,6 +176,7 @@ public class ModuleResolver {
 
     public Module resolveModule(String qualifiedName, boolean toplevel, boolean isLifted) {
         checkNoCyclicDependencies(qualifiedName);
+        Map<String, Module> moduleCache = isLifted ? liftedModuleCache : unliftedModuleCache;
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, false);
             modulesBeingResolved.add(qualifiedName);
@@ -496,7 +498,7 @@ public class ModuleResolver {
         dependencies.addAll(prelude.getDependencies());
         List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (TypedModuleSpec spec : noDups) {
-            Module dep = resolveModule(spec.getQualifiedName());
+            Module dep = spec.getModule();
             Expression e;
             if (prelude.getDependencies().contains(spec)) {
                 e = addSystemObject(dep.getExpression());
@@ -532,7 +534,7 @@ public class ModuleResolver {
         final List<TypedModuleSpec> noDups = sortDependencies(dependencies);
 
         for (TypedModuleSpec spec : noDups) {
-            final Module m = resolveModule(spec.getQualifiedName());
+            final Module m = spec.getModule();
             final Expression liftResult = null; // TODO (@justinlubin)
 
             final BindingSite bindingSite = m.getSpec().getSite();
@@ -570,7 +572,7 @@ public class ModuleResolver {
         List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
-            Module m = resolveModule(spec.getQualifiedName());
+            Module m = spec.getModule();
             Value v = m.getAsValue(ctx);
             ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
@@ -611,7 +613,7 @@ public class ModuleResolver {
         List<TypedModuleSpec> noDups = sortDependencies(deps);
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
-            Module m = resolveModule(spec.getQualifiedName());
+            Module m = spec.getModule();
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
@@ -660,8 +662,8 @@ public class ModuleResolver {
 
             @Override
             public int compare(TypedModuleSpec o1, TypedModuleSpec o2) {
-                Module m1 = resolveModule(o1.getQualifiedName());
-                Module m2 = resolveModule(o2.getQualifiedName());
+                Module m1 = o1.getModule();
+                Module m2 = o2.getModule();
                 // if o1 depends on o2 then o1 should come first; wrapping will proceed from the end of the list
                 if (m1.dependsOn(o2)) {
                     return -1;
