@@ -6,6 +6,7 @@ public class TypedModuleSpec extends ModuleSpec {
     private final ValueType type;
     private final String definedTypeName;
     private final String definedValueName;
+    private Module module = null;
 
     public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName) {
         super(qualifiedName);
@@ -34,4 +35,14 @@ public class TypedModuleSpec extends ModuleSpec {
         return definedValueName;
     }
 
+    public Module getModule() {
+        return this.module;
+    }
+
+    public void setModule(Module module) {
+        if (this.module != null) {
+            throw new IllegalStateException("Assign multiple modules to a TypedModuleSpec");
+        }
+        this.module = module;
+    }
 }
