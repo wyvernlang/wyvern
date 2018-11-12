@@ -370,7 +370,7 @@ public class EffectSystemTests {
 
     @Test
     @Category(CurrentlyBroken.class)
-    /* TODO: Notably, if the content on testNetwork18.wyv is substituted with the following this test passes:
+    /* TODO: Notably, if the content in testNetwork18.wyv is substituted with the following this test passes:
      * import effects.network18Effects as fx
      * fx.f()
      */
