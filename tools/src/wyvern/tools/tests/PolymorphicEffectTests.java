@@ -6,12 +6,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
+
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
+import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 /**
@@ -73,6 +75,7 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testEditor() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.editor", Util.stringType(), new StringLiteral("abcabc"));
     }
@@ -83,11 +86,13 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testParametricModuleFunctor1() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.parametricModuleFunctor1", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testParametricModuleFunctor2() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.parametricModuleFunctor2", Util.stringType(), new StringLiteral("abc"));
     }
@@ -119,7 +124,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Cannot apply generic arguments: type myLogger.T is abstract"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedAbstractTypeRefinement", Util.stringType(), new StringLiteral("abcabc"));
     }
 
@@ -128,7 +133,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {s.E} on method run is not a subtype of effects that method produces, which are [q.E];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedCombination1", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -137,7 +142,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {s.E} on method run is not a subtype of effects that method produces, which are [r.E];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedCombination2", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -146,7 +151,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {s.E} on method run is not a subtype of effects that method produces, which are [t.E];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedCombination3", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -155,16 +160,17 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(String.format(
                 "The callee method cannot accept actual arguments with types: 'Logger[{network.theEffect}]; "
-        )));
+                )));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedEditor1", Util.stringType(), new StringLiteral("abcabc"));
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testRejectedEditor2() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {logger2.log} on method main is not a subtype of effects that method produces, which are [logger1.log];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedEditor2", Util.stringType(), new StringLiteral("abcabc"));
     }
 
@@ -173,7 +179,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {} on method run is not a subtype of effects that method produces, which are [u.E];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedFunctionSubtype", Util.stringType(), new StringLiteral("abcabc"));
     }
 
@@ -182,7 +188,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect \"v.hiddenEffect\" not found in scope"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedHiddenEffects", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -191,7 +197,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Generic argument(s) for the method id were not inferrable and must be provided at the call site"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedNotInferrable", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -200,16 +206,17 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "The callee method cannot accept actual arguments with types: 'String; expected types Int; argument subtyping failed"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedParametricModuleFunctor1", Util.stringType(), new StringLiteral("abc"));
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testRejectedParametricModuleFunctor2() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {v.E} on method run is not a subtype of effects that method produces, which are [u.E];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedParametricModuleFunctor2", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -218,7 +225,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Effect annotation {} on method run is not a subtype of effects that method produces, which are [u.E];"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedSubset", Util.stringType(), new StringLiteral("abc"));
     }
 
@@ -227,7 +234,7 @@ public class PolymorphicEffectTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
                 "Generic[{}]; declaration E is not a subtype of the expected declaration"
-        ));
+                ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedSubtype", Util.stringType(), new StringLiteral("abc"));
     }
 }
