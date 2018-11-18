@@ -188,6 +188,7 @@ public class REPL {
                     }
                 } catch (Exception e) {
                     tempCode = tempCode + s + "\n";
+                    e.printStackTrace();
                     System.out.println("Invalid code, input clear to clear the buffer and start over.\n");
                 }
             }
