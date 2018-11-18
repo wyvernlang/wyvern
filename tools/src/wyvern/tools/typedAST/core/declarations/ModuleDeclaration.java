@@ -54,7 +54,6 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         this.generics = generics;
     }
 
-
     @Override
     public String getName() {
         return name;

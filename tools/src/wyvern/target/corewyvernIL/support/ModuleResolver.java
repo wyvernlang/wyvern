@@ -55,7 +55,8 @@ public class ModuleResolver {
     private List<File> searchPath;
     private List<Path> platformPath;
     private String platform;
-    private Map<String, Module> moduleCache = new HashMap<String, Module>();
+    private Map<String, Module> unliftedModuleCache = new HashMap<>();
+    private Map<String, Module> liftedModuleCache = new HashMap<>();
     private Deque<String> modulesBeingResolved = new ArrayDeque<>();
     private InterpreterState state;
     private File rootDir;
@@ -115,12 +116,21 @@ public class ModuleResolver {
 
     private Module resolveType(String qualifiedName, boolean toplevel) {
         Module typeDefiningModule;
-        if (!moduleCache.containsKey(qualifiedName)) {
+        if (!unliftedModuleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, true);
+            if (f == null || !f.exists()) {
+                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "type", qualifiedName);
+            }
             typeDefiningModule = load(qualifiedName, f, toplevel);
-            moduleCache.put(qualifiedName, typeDefiningModule);
+            unliftedModuleCache.put(qualifiedName, typeDefiningModule);
+            
+            final String fileName = f.getName();
+            final String typeName1 = typeDefiningModule.getSpec().getDefinedTypeName();
+            if (!fileName.startsWith(typeName1)) {
+                ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, FileLocation.UNKNOWN, typeName1);
+            }
         } else {
-            typeDefiningModule = moduleCache.get(qualifiedName);
+            typeDefiningModule = unliftedModuleCache.get(qualifiedName);
         }
         /*Expression typeDefiningObject = typeDefiningModule.getExpression();
         TypeContext ctx = Globals.getStandardTypeContext();
@@ -161,11 +171,12 @@ public class ModuleResolver {
      * @throws ParseException
      */
     public Module resolveModule(String qualifiedName) {
-        return resolveModule(qualifiedName, false);
+        return resolveModule(qualifiedName, false, false);
     }
 
-    public Module resolveModule(String qualifiedName, boolean toplevel) {
+    public Module resolveModule(String qualifiedName, boolean toplevel, boolean isLifted) {
         checkNoCyclicDependencies(qualifiedName);
+        Map<String, Module> moduleCache = isLifted ? liftedModuleCache : unliftedModuleCache;
         if (!moduleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, false);
             modulesBeingResolved.add(qualifiedName);
@@ -178,7 +189,13 @@ public class ModuleResolver {
                     moduleCache.put(qualifiedName, m);
                 }
             } else {
-                moduleCache.put(qualifiedName, load(qualifiedName, f, toplevel));
+                Module module = load(qualifiedName, f, toplevel, isLifted);
+                moduleCache.put(qualifiedName, module);
+                final String fileName = f.getName();
+                final String modName = module.getSpec().getValueName();
+                if (modName != null && !fileName.startsWith(modName)) {
+                    ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, FileLocation.UNKNOWN, modName);
+                }
             }
             modulesBeingResolved.remove(qualifiedName);
         }
@@ -266,9 +283,13 @@ public class ModuleResolver {
     }
 
     private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel) {
+        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel, false);
+    }
+    private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel, boolean isLifted) {
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
+        String valueName = null;
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
@@ -278,6 +299,7 @@ public class ModuleResolver {
                 //program = wrap(program, dependencies);
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
+                valueName = decl.getName();
                 if (oldModuleDecl.getFormalArgs().size() == 0) {
                     program = oldModuleDecl.getBody();
                 } else {
@@ -287,6 +309,8 @@ public class ModuleResolver {
                 }
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
+                valueName = decl.getName();
+
 
                 // Rename according to "apply"
                 DefDeclaration defDecl = new DefDeclaration(
@@ -302,7 +326,7 @@ public class ModuleResolver {
 
                 // Perform quantification lifting if possible
                 final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
-                final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program);
+                final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program, isLifted);
                 if (liftResult != null) {
                     program = liftResult;
                 }
@@ -317,7 +341,7 @@ public class ModuleResolver {
 
         TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
 
-        return createAdaptedModule(file, qualifiedName, dependencies, program, ctx, toplevel, loadingType);
+        return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType);
     }
 
     /**
@@ -331,6 +355,10 @@ public class ModuleResolver {
      * @return
      */
     public Module load(String qualifiedName, File file, boolean toplevel) {
+        return load(qualifiedName, file, toplevel, false);
+    }
+
+    private Module load(String qualifiedName, File file, boolean toplevel, boolean isLifted) {
         boolean loadingType = file.getName().endsWith(".wyt");
         TypedAST ast = null;
         try {
@@ -343,10 +371,10 @@ public class ModuleResolver {
                 ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
             }
         }
-        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel);
+        return loadContinuation(file, qualifiedName, ast, loadingType, toplevel, isLifted);
     }
 
-    private Module createAdaptedModule(File file, String qualifiedName,
+    private Module createAdaptedModule(File file, String qualifiedName, String valueName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
                                        TypeContext ctx, boolean toplevel, boolean loadingType) {
 
@@ -400,7 +428,7 @@ public class ModuleResolver {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName);
+        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName);
         return new Module(spec, program, dependencies);
     }
 
@@ -470,7 +498,7 @@ public class ModuleResolver {
         dependencies.addAll(prelude.getDependencies());
         List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (TypedModuleSpec spec : noDups) {
-            Module dep = resolveModule(spec.getQualifiedName());
+            Module dep = spec.getModule();
             Expression e;
             if (prelude.getDependencies().contains(spec)) {
                 e = addSystemObject(dep.getExpression());
@@ -506,7 +534,7 @@ public class ModuleResolver {
         final List<TypedModuleSpec> noDups = sortDependencies(dependencies);
 
         for (TypedModuleSpec spec : noDups) {
-            final Module m = resolveModule(spec.getQualifiedName());
+            final Module m = spec.getModule();
             final Expression liftResult = null; // TODO (@justinlubin)
 
             final BindingSite bindingSite = m.getSpec().getSite();
@@ -544,7 +572,7 @@ public class ModuleResolver {
         List<TypedModuleSpec> noDups = sortDependencies(dependencies);
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
-            Module m = resolveModule(spec.getQualifiedName());
+            Module m = spec.getModule();
             Value v = m.getAsValue(ctx);
             ctx = ctx.extend(m.getSpec().getSite(), v);
             ValueType type = m.getSpec().getType();
@@ -585,7 +613,7 @@ public class ModuleResolver {
         List<TypedModuleSpec> noDups = sortDependencies(deps);
         for (int i = noDups.size() - 1; i >= 0; --i) {
             TypedModuleSpec spec = noDups.get(i);
-            Module m = resolveModule(spec.getQualifiedName());
+            Module m = spec.getModule();
             ValueType type = m.getSpec().getType();
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
@@ -634,8 +662,8 @@ public class ModuleResolver {
 
             @Override
             public int compare(TypedModuleSpec o1, TypedModuleSpec o2) {
-                Module m1 = resolveModule(o1.getQualifiedName());
-                Module m2 = resolveModule(o2.getQualifiedName());
+                Module m1 = o1.getModule();
+                Module m2 = o2.getModule();
                 // if o1 depends on o2 then o1 should come first; wrapping will proceed from the end of the list
                 if (m1.dependsOn(o2)) {
                     return -1;

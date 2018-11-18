@@ -9,6 +9,7 @@ import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -131,6 +132,18 @@ public class Variable extends Expression implements Path {
                 System.out.flush();
             }*/
             this.site = site2;
+        }
+    }
+    @Override
+    public Path adaptVariables(GenContext ctx) {
+        IExpr expr = ctx.lookupExp(name, this.getLocation());
+        if (!(expr instanceof Path)) {
+            throw new RuntimeException("invariant violated");
+        }
+        if (expr.equals(this)) {
+            return this;
+        } else {
+            return (Path) expr;
         }
     }
 }

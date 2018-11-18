@@ -2,10 +2,10 @@ package wyvern.tools.parsing.coreparser;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Optional;
 
 import wyvern.tools.errors.ErrorMessage;
@@ -72,6 +72,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         }
     }
 
+
     @Override
     public TypedAST moduleDecl(String name, List<TypedAST> imports, List<GenericParameter> generics,
                                List args, TypedAST ast, Type type, FileLocation loc, boolean isResource) {
@@ -79,8 +80,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public TypedAST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata) {
-        return new ImportDeclaration(uri, loc, (name == null) ? null : name.image, isRequire, isMetadata);
+    public TypedAST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata, boolean isLifted) {
+        return new ImportDeclaration(uri, loc, (name == null) ? null : name.image, isRequire, isMetadata, isLifted);
     }
 
     @Override
