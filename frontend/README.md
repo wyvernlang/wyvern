@@ -1,6 +1,6 @@
 # Wyvern REPL
 
-A REPL for the Qyvern programing language crated using Node.js using [Express 4](http://expressjs.com/).
+A REPL for the Wyvern programing language crated using Node.js using [Express 4](http://expressjs.com/).
 
 ## Running Locally
 
