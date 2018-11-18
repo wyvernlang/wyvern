@@ -20,7 +20,7 @@ $ wyrepl
 To run the backend server for the REPL webapp use the command below.
 
 ```sh
-$ wyrepl
+$ wyreplserver
 ```
 
 ### Front end
