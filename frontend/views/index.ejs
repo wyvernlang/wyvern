@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wyvern</title>
+    <% include partials/header %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.39.2/codemirror.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.39.2/codemirror.js"></script>
+    <link rel="stylesheet" href="https://codemirror.net/theme/material.css">
+
+</head>
+<body>
+<br><br><br><br>
+<div id="console-editor-mirror">
+</div>
+<div id="moduleBody">
+    <div id="module-task-bar">
+        <button type="button" class="btn btn-primary btn-lg" onclick="runModule()">Run</button>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#exampleModalCenter">
+            Save to Server
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="padding: 10px;">
+                        <div class="form-group">
+                            <label for="moduleName">Module name</label>
+                            <input type="text" class="form-control" id="moduleName"style="height: auto;">
+                        </div>
+                        <button onclick="saveModule();reload()" class="btn btn-primary" data-dismiss="modal">Submit</button>
+
+                </div>
+            </div>
+        </div>
+        <select id="ModuleSelector" onchange="loadModule(value)">
+            <option value="" selected disabled hidden>Choose Module</option>
+        </select>
+    </div>
+    <div id="module-editor-mirror">
+    </div>
+</div>
+
+<script>
+    window.onbeforeunload = function () {
+        fetch('http://localhost:8000/', {
+            method: 'post',
+            headers: {
+                'id': id,
+                'operation': "closing"
+            }
+        })
+    };
+
+    var readOnlyLines = [];
+    var result = " ";
+    var lastUpdated = 0
+    var id = "<%- sessionId %>";
+    var consoleCodeMirror = CodeMirror(document.getElementById("console-editor-mirror"), {
+        theme: 'material',
+        mode: "javascript",
+        lineNumbers: true,
+        extraKeys: {
+            "Enter": function (cm) {
+                var code = consoleCodeMirror.getRange({
+                    line: lastUpdated,
+                    ch: 0
+                }, {line: consoleCodeMirror.lastLine() + 1, ch: 0});
+
+                if(code == "cls"){
+                    console.log("sdafkjsadf");
+                    consoleCodeMirror.setValue("");
+                    readOnlyLines = [];
+                }else {
+                    consoleCodeMirror.replaceSelection("\n", "end");
+                    fetch('http://localhost:8000/', {
+                        method: 'post',
+                        headers: {
+                            'id': id,
+                            'operation': "interpretREPL"
+                        },
+                        body: code
+                    }).then(response => response.text())
+                        .then((body) => {
+                            result = body;
+                            console.log(body)
+                        }).then(a => {
+                        if (result.endsWith("\n")) {
+                            consoleCodeMirror.replaceRange("----------------Output----------------\n", CodeMirror.Pos(consoleCodeMirror.lastLine()));
+                            consoleCodeMirror.replaceRange(result.substring(0, result.length - 1), CodeMirror.Pos(consoleCodeMirror.lastLine()));
+                            consoleCodeMirror.replaceSelection("\n", "end");
+                            consoleCodeMirror.replaceRange("--------------------------------------\n", CodeMirror.Pos(consoleCodeMirror.lastLine()));
+                        } else if (result != " ") {
+                            consoleCodeMirror.replaceRange("----------------Output----------------\n", CodeMirror.Pos(consoleCodeMirror.lastLine()));
+                            consoleCodeMirror.replaceRange(result, CodeMirror.Pos(consoleCodeMirror.lastLine()));
+                            consoleCodeMirror.replaceSelection("\n", "end");
+                            consoleCodeMirror.replaceRange("--------------------------------------\n", CodeMirror.Pos(consoleCodeMirror.lastLine()));
+
+                        }
+                        lastUpdated = consoleCodeMirror.lastLine();
+                    }).then(a => {
+                        readOnlyLines.push(consoleCodeMirror.lastLine() - 1);
+                    });
+                    //console.log(consoleCodeMirror.getLine(consoleCodeMirror.lastLine()));
+                }
+            }
+        }
+    });
+    consoleCodeMirror.on('beforeChange', function (cm, change) {
+        console.log("got here")
+        if (~readOnlyLines.indexOf(change.from.line)) {
+            change.cancel();
+        }
+    })
+    consoleCodeMirror.setSize(null, "100%");
+
+    var moduleCodeMirror = CodeMirror(document.getElementById("module-editor-mirror"), {
+        theme: 'default',
+        mode: "javascript",
+        lineNumbers: true
+    });
+
+    moduleCodeMirror.setSize(null, "100%");
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.39.2/mode/xml/xml.js"></script>
+<script type="text/javascript" src="/REPL.js"></script>
+
+</body>
+</html>

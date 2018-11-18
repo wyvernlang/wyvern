@@ -1,0 +1,6 @@
+{
+  "name": "Wyvern REPL",
+  "description": "Wyvern REPL frontend app ",
+  "repository": "https://github.com/tudinh23/MYOB-challange-2018.git",
+  "keywords": ["node", "express", "wyvern"]
+}
