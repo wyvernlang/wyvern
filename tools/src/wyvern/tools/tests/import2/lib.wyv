@@ -1,6 +1,0 @@
-module def lib(f : import2.File)
-
-import import2.File
-
-def functionWithEffect() : Unit
-    f.writeToFile()

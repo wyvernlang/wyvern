@@ -230,4 +230,13 @@ public class PolymorphicEffectTests {
         ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedSubtype", Util.stringType(), new StringLiteral("abc"));
     }
+
+    @Test
+    public void testImport2() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(String.format(
+                "The callee method cannot accept actual arguments with types: 'File[{system.ffiEffect}]; "
+        )));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import2Client", Util.stringType(), new StringLiteral("abcabc"));
+    }
 }

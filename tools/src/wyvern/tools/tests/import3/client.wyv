@@ -7,7 +7,7 @@ import lifted import3.lib
 val g : Go [{}] = new
     // x should be a function without effect
     def go (x : Unit -> Unit) : {} Unit
-        unit
+        x()
 
 val file : File[{system.ffiEffect}] = new
     effect write = {system.ffiEffect}

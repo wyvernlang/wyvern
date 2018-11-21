@@ -1,6 +1,6 @@
 //This shows that the import2 rule is implemented
-import import2.File
-import lifted import2.lib
+import polymorphicEffects.File
+import lifted polymorphicEffects.lib
 
 val file : File[{system.ffiEffect}] = new
     effect write = {system.ffiEffect}

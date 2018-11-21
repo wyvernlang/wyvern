@@ -4,5 +4,5 @@ import import3.File
 import import3.Go
 
 g.go(() => unit)
-//g.go(f.writeToFile)
+//g.go(() => f.writeToFile())
 

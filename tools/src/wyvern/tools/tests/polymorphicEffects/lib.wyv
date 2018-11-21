@@ -1,0 +1,6 @@
+module def lib(f : polymorphicEffects.File)
+
+import polymorphicEffects.File
+
+def functionWithEffect() : Unit
+    f.writeToFile()
