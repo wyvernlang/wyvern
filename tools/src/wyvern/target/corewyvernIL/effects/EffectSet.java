@@ -130,18 +130,4 @@ public class EffectSet {
         }
         return new EffectSet(newSet);
     }
-
-    public boolean containsAll(EffectSet other) {
-        final Set<String> thisEffectSet = new HashSet<String>();
-        for (final Effect e : effectSet) {
-            // effect equality is based on the effect's name only
-            thisEffectSet.add(e.getName());
-        }
-        final Set<String> otherEffectSet = new HashSet<String>();
-        for (final Effect e : other.effectSet) {
-            // effect equality is based on the effect's name only
-            otherEffectSet.add(e.getName());
-        }
-        return thisEffectSet.containsAll(otherEffectSet);
-    }
 }

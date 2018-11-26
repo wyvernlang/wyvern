@@ -88,9 +88,6 @@ public class DefDeclType extends DeclTypeWithResult {
         if (adaptationView != null) {
             otherRawResultType = otherRawResultType.adapt(adaptationView);
         }
-        if (rawEffectSet != null && otherEffectSet != null) {
-            return otherEffectSet.containsAll(rawEffectSet) && rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
-        }
         return rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
     }
 
@@ -203,7 +200,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public DeclType doAvoid(String varName, TypeContext ctx, int count) {
         boolean changed = false;
 
-        //Return type
+        // Return type
         ValueType t = getRawResultType().doAvoid(varName, ctx, count);
         if (!t.equals(getRawResultType())) {
             changed = true;
@@ -230,7 +227,7 @@ public class DefDeclType extends DeclTypeWithResult {
         if (!changed) {
             return this;
         } else {
-            return new DefDeclType(getName(), t, newArgs, getEffectSet());
+            return new DefDeclType(getName(), t, newArgs, newEffectSet);
         }
     }
 
