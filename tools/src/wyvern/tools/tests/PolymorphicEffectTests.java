@@ -13,7 +13,6 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 
 /**
@@ -75,7 +74,6 @@ public class PolymorphicEffectTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testEditor() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.editor", Util.stringType(), new StringLiteral("abcabc"));
     }
@@ -86,13 +84,11 @@ public class PolymorphicEffectTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testParametricModuleFunctor1() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.parametricModuleFunctor1", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testParametricModuleFunctor2() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.parametricModuleFunctor2", Util.stringType(), new StringLiteral("abc"));
     }
@@ -165,7 +161,6 @@ public class PolymorphicEffectTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testRejectedEditor2() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
@@ -211,7 +206,6 @@ public class PolymorphicEffectTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testRejectedParametricModuleFunctor2() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
