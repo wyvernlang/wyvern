@@ -313,6 +313,7 @@ public class EffectSystemTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testNetwork13() throws ParseException {
         /* Nonexistent effect in method annotation in type (not in module);
          * error should be reported before module is evaluated). */
@@ -325,6 +326,7 @@ public class EffectSystemTests {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void testNetwork14() throws ParseException {
         /* A field is used in a method effect annotation in a type. */
         expectedException.expect(ToolError.class);
