@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
@@ -206,11 +207,62 @@ public class MethodCall extends Expression {
     }
 
     /**
+     * Check if the imported capabilities are expecting effects given by the unannotated code
+     */
+    public void checkHigherOrderEffect(List<ValueType> actualArgTypes, List<FormalArg> formalArgs) {
+        // Checking higher order effects
+        if (actualArgTypes.size() >= 1) {
+            ValueType firstArgType = actualArgTypes.get(0);
+            if (firstArgType instanceof StructuralType) {
+                StructuralType t = (StructuralType) firstArgType;
+                List<DeclType> declTypes = t.getDeclTypes();
+                // The first argument is a effect
+                if (declTypes.size() > 0 && declTypes.get(0) instanceof EffectDeclType) {
+                    EffectDeclType first = (EffectDeclType) declTypes.get(0);
+                    // Check the capabilities passed into the functor
+                    for (int i = 1; i < formalArgs.size(); i++) {
+                        FormalArg formalArg = formalArgs.get(i);
+                        if (formalArg.getType() instanceof  StructuralType) {
+                            StructuralType type = (StructuralType) formalArg.getType();
+                            List<DeclType> declTypeList = type.getDeclTypes();
+                            for (DeclType declaration : declTypeList) {
+                                if (declaration instanceof DefDeclType) {
+                                    DefDeclType def = (DefDeclType) declaration;
+                                    // def is a definition of a function
+                                    // compute the higher order effects of function arguments
+                                    List<FormalArg> args = def.getFormalArgs();
+                                    for (FormalArg arg : args) {
+                                        ValueType argType = arg.getType();
+                                        if (argType instanceof StructuralType) {
+                                            // The argument is function, so the function is higher-order
+                                            StructuralType structuralType = (StructuralType) argType;
+                                            if (first.getEffectSet().getEffects().isEmpty()) {
+                                                // There is no higher-order effect
+                                                return;
+                                            } else {
+                                                ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
+                                                        "Higher order effect mismatch");
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return;
+    }
+
+    /**
      * Type the declaration for the method being invoked.
      * @param ctx: ctx in which invocation happens.
      * @return the declaration of the method.
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        boolean isTarget = false;
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
         StructuralType receiverType = receiver.getStructuralType(ctx);
@@ -224,6 +276,7 @@ public class MethodCall extends Expression {
         // Go through all declarations, typechecking against the actual types passed in...
         List<ValueType> actualArgTypes = getArgTypes(ctx);
         List<ValueType> formalArgTypes = null;
+
 
         // ...use this context to do that.
         TypeContext newCtx = null;
@@ -246,6 +299,9 @@ public class MethodCall extends Expression {
                 continue;
             }
 
+            // Typecheck higher order effects
+            checkHigherOrderEffect(actualArgTypes, formalArgs);
+
             // Typecheck actual args against formal args of this declaration.
             boolean argsTypechecked = true;
             View v = View.from(objectExpr, newCtx);
@@ -264,6 +320,7 @@ public class MethodCall extends Expression {
                 formalArgTypes.add(formalArgType);
                 String formalArgName = formalArg.getName();
                 ValueType actualArgType = actualArgTypes.get(i);
+
 
                 // Check actual argument type accords with formal argument type.
                 FailureReason r = new FailureReason();

@@ -1,8 +1,0 @@
-module def lib(f : import3.File, g : import3.Go)
-
-import import3.File
-import import3.Go
-
-g.go(() => unit)
-//g.go(() => f.writeToFile())
-

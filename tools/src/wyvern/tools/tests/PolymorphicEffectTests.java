@@ -112,7 +112,23 @@ public class PolymorphicEffectTests {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.subtype4", Util.stringType(), new StringLiteral("abc"));
     }
 
+    @Test
+    public void import0() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.client", Util.stringType(), new StringLiteral("abc"));
+    }
+
+
+
+
     // Rejected examples
+    @Test
+    public void import3() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "Higher order effect mismatch"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
 
     @Test
     public void testRejectedAbstractTypeRefinement() throws ParseException {
