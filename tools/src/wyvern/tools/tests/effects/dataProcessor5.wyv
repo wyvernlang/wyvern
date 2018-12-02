@@ -3,7 +3,7 @@ effect send = {}
 effect process = {net.receive, send}
 effect receive = {} // to add confusion to the mix
 effect genN = {}
-def genNum(): { genN, receive } Int
+def genNum(): {genN, receive} Int
     3
 def processData(): {process, genN, receive} String
     val n: Int = genNum()
