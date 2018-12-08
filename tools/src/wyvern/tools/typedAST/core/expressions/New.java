@@ -30,6 +30,7 @@ public class New extends AbstractExpressionAST implements CoreAST {
     private boolean isGeneric = false;
     private DeclSequence seq;
     private String selfName;
+    private BindingSite site;
 
     /**
      * Makes a New expression with the provided mapping, file location, and self name.
@@ -99,14 +100,16 @@ public class New extends AbstractExpressionAST implements CoreAST {
             List<TypedModuleSpec> dependencies
             ) {
 
-        StructuralType structuralType = seq.inferStructuralType(ctx, this.self());
+        if (site == null) {
+            site = new BindingSite(this.self());
+        }
+        StructuralType structuralType = seq.inferStructuralType(ctx, site);
         /* We need access to both the structural contents of the object and
          * the expected type. The object can have extra decls on top of the
          * expected type it has been ascribed to, and typechecking requires
          * use of both.
          */
         ValueType type = null;
-        BindingSite site = structuralType.getSelfSite();
         if (expectedType != null) {
             if (expectedType.isTagged(ctx)) {
                 List<DeclType> declTypes = structuralType.getDeclTypes();
@@ -120,8 +123,8 @@ public class New extends AbstractExpressionAST implements CoreAST {
 
         // Translate the declarations.
         GenContext thisContext = ctx.extend(
-                this.self(),
-                new wyvern.target.corewyvernIL.expression.Variable(this.self()),
+                site,
+                new wyvern.target.corewyvernIL.expression.Variable(site),
                 type
                 );
         List<wyvern.target.corewyvernIL.decl.Declaration> decls =

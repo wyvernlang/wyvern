@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -70,8 +71,15 @@ public class FieldGet extends Expression implements Path {
         if (!(dt instanceof ValDeclType || dt instanceof VarDeclType)) {
             ToolError.reportError(ErrorMessage.OPERATOR_DOES_NOT_APPLY, this, dt.getName(), objectExpr.toString());
         }
-        this.setExprType(((DeclTypeWithResult) dt).getResultType(View.from(objectExpr, ctx)));
-        return getType();
+        ValueType resultType = ((DeclTypeWithResult) dt).getResultType(View.from(objectExpr, ctx)); 
+        if (!objectExpr.isPath()) {
+            // adaptation for the receiver couldn't have worked, so try avoiding "this"
+            StructuralType receiverType = vt.getStructuralType(ctx);
+            TypeContext calleeCtx = ctx.extend(receiverType.getSelfSite(), vt);
+            resultType = resultType.avoid(receiverType.getSelfName(), calleeCtx);
+        }
+        this.setExprType(resultType);
+        return resultType;
     }
 
     @Override

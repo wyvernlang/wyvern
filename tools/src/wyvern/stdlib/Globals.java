@@ -106,7 +106,7 @@ public final class Globals {
     public static SeqExpr getPrelude() {
         if (!usePrelude) {
             SeqExpr result = new SeqExpr();
-            result.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+            result.addBinding(system, Globals.getSystemType(), Globals.getSystemValue(), false);
             return result;
         }
         SeqExpr prelude = getPreludeIfPresent();

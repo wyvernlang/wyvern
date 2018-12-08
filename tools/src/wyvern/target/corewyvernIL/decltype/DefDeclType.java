@@ -68,10 +68,10 @@ public class DefDeclType extends DeclTypeWithResult {
             FormalArg theirArg = ddt.args.get(i);
             ValueType theirType = theirArg.getType();
             if (adaptationView == null) {
-                adaptationView = new ReceiverView(new Variable(theirArg.getName()), new Variable(myArg.getName()));
+                adaptationView = new ReceiverView(new Variable(theirArg.getSite()), new Variable(myArg.getSite()));
             } else {
                 theirType = theirType.adapt(adaptationView);
-                adaptationView = new ViewExtension(new Variable(theirArg.getName()), new Variable(myArg.getName()), adaptationView);
+                adaptationView = new ViewExtension(new Variable(theirArg.getSite()), new Variable(myArg.getSite()), adaptationView);
             }
             if (!(theirType.isSubtypeOf(myArg.getType(), ctx, reason))) {
                 return false;

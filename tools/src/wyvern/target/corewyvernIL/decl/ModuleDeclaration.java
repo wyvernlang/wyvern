@@ -41,7 +41,7 @@ public class ModuleDeclaration extends DefDeclaration {
 
     public Pair<Declaration, List<TypedModuleSpec>> specialize(String platform, GenContext ctx) {
         ModuleResolver interpResolver = ModuleResolver.getLocal();
-        ModuleResolver resolver = new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
+        ModuleResolver resolver = interpResolver; //new ModuleResolver(platform, interpResolver.getRootDir(), interpResolver.getLibDir());
         resolver.setInterpreterState(InterpreterState.getLocalThreadInterpreter());
 
         List<TypedModuleSpec> recursiveDependencies = new ArrayList<>();

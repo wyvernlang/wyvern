@@ -225,12 +225,11 @@ public class DeclSequence extends Sequence {
      * @param ctx: context to evaluate in.
      * @return structural type of this sequence.
      */
-    public StructuralType inferStructuralType(GenContext ctx, String selfName) {
+    public StructuralType inferStructuralType(GenContext ctx, BindingSite site) {
         boolean isResource = false;
-        BindingSite site = new BindingSite(selfName);
 
         // Fake an appropriate context.
-        GenContext ctxTemp = ctx.extend(site, new Variable(selfName), null);
+        GenContext ctxTemp = ctx.extend(site, new Variable(site), null);
 
         // Store the types for each declaration in this list.
         List<DeclType> declTypes = new LinkedList<DeclType>();
@@ -268,6 +267,6 @@ public class DeclSequence extends Sequence {
             }
         }
 
-        return new StructuralType(selfName, declTypes, isResource);
+        return new StructuralType(site, declTypes, isResource);
     }
 }
