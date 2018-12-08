@@ -3,8 +3,11 @@ package wyvern.target.corewyvernIL.modules;
 import java.util.List;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
@@ -14,11 +17,13 @@ public class Module {
     private final IExpr expr;
     private final List<TypedModuleSpec> dependencies;
     private Value cachedValue;
+    private BindingSite site;
 
     public Module(TypedModuleSpec spec, IExpr program, List<TypedModuleSpec> dependencies) {
         this.spec = spec;
         this.expr = program;
         this.dependencies = dependencies;
+        spec.setModule(this);
     }
 
     public TypedModuleSpec getSpec() {
@@ -33,6 +38,29 @@ public class Module {
      */
     public Expression getExpression() {
         return (Expression) expr;
+    }
+
+    /** Returns the binding site related to this module.
+     * 
+     * @return
+     */
+    public BindingSite getBindingSite() {
+        if (site == null) {
+            site = new BindingSite(spec.getQualifiedName());
+        }
+        
+        return site;
+    }
+
+    /** Returns a binding representing this module or module def.  This is the same as getExpression(), except
+     * it returns a SeqExpr that binds the expression to the module's name.
+     * 
+     * @return
+     */
+    public SeqExpr getBinding() {
+        SeqExpr result = new SeqExpr();
+        result.addBindingLast(new VarBinding(getBindingSite(), spec.getType(), expr));
+        return result;
     }
 
     /** Returns a transitive, but not necessarily carefully ordered,

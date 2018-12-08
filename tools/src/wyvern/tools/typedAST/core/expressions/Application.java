@@ -194,6 +194,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
             List<TypedModuleSpec> deps
             ) {
         int count = countFormalGenerics(formals);
+
         if (count < this.generics.size()) {
             // then the number of actual generics is greater than the number of formal generics
             // this is not permitted.

@@ -200,7 +200,7 @@ public class AST {
                                                ObjectValue body, List<String> dependencyURIs) throws URISyntaxException {
         List<Pair<ImportDeclaration, ValueType>> dependencies = new LinkedList<>();
         for (String dependency : dependencyURIs) {
-            ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false);
+            ImportDeclaration imp = new ImportDeclaration(new URI(dependency), null, null, false, false, false);
             Pair<VarBinding, GenContext> bindingCtx = imp.genBinding(Globals.getStandardGenContext(), new LinkedList<TypedModuleSpec>());
             dependencies.add(new Pair<ImportDeclaration, ValueType>(imp, bindingCtx.getFirst().getType()));
         }

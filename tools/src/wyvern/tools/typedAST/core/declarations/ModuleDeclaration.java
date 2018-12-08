@@ -53,7 +53,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.generics = generics;
     }
 
-
     @Override
     public String getName() {
         return name;

@@ -1,11 +1,4 @@
 require effects.fileIO
-require effects.fileIO1
-import effects.FileIO
 import effects.logger3
 
-var file: FileIO = fileIO
-val x = 1
-if (x > 0)
-  file = fileIO1
-val log = logger3(file)
-log.updateLog(1)
+logger3.updateLog(fileIO, 1)

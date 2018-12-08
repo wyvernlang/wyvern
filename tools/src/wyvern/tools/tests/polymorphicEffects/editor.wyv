@@ -1,7 +1,7 @@
 require java
 
 import polymorphicEffects.Logger
-import polymorphicEffects.repeaterPlugin
+import lifted polymorphicEffects.newRepeaterPlugin
 import polymorphicEffects.Resource
 import polymorphicEffects.file
 import polymorphicEffects.network
@@ -16,7 +16,7 @@ val networkLogger : Logger[{network.wr}] = logger(network)
 
 // Core editor
 
-val plugin = repeaterPlugin[{fileLogger.log}](fileLogger, unit)
+val plugin = newRepeaterPlugin[{fileLogger.log}](fileLogger, unit)
 
 def main() : {fileLogger.log} String
   // Succeeds because {fileLogger.log} is a subset of the effect that we chose when

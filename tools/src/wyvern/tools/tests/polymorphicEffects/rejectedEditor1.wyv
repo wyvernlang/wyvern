@@ -1,5 +1,5 @@
 import polymorphicEffects.Logger
-import polymorphicEffects.repeaterPlugin
+import lifted polymorphicEffects.repeaterPlugin
 
 // Resources
 

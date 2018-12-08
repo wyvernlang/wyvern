@@ -42,13 +42,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     private boolean requireFlag;
     private boolean metadataFlag;
     private String asName;
+    private boolean isLifted;
 
-    public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire, boolean isMetadata) {
+    public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire, boolean isMetadata, boolean isLifted) {
         this.uri = inputURI;
         this.location = location;
         this.requireFlag = isRequire;
         this.metadataFlag = isMetadata;
         this.asName = image;
+        this.isLifted = isLifted;
     }
 
     @Override
@@ -77,6 +79,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
     public URI getUri() {
         return uri;
+    }
+
+    public boolean isLifted() {
+        return isLifted;
     }
 
     @Override
@@ -238,7 +244,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         } else if (scheme.equals("wyv")) {
             // TODO: need to add types for non-java imports
             String moduleName = this.getUri().getSchemeSpecificPart();
-            final Module module = resolver.resolveModule(moduleName);
+            final Module module = resolver.resolveModule(moduleName, false, isLifted);
             final String internalName = module.getSpec().getInternalName();
             final BindingSite site = module.getSpec().getSite();
             if (this.metadataFlag) {

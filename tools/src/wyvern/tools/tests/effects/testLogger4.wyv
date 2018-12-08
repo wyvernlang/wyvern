@@ -1,0 +1,5 @@
+require effects.fileIO4
+import effects.logger4
+
+val log = logger4(fileIO4)
+log.updateLog(4)
