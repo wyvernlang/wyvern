@@ -16,7 +16,7 @@ val networkLogger : Logger[{network.wr}] = logger(network)
 
 // Core editor
 
-val plugin = newRepeaterPlugin[{fileLogger.log}](fileLogger, unit)
+val plugin = newRepeaterPlugin[{fileLogger.log}](fileLogger)
 
 def main() : {fileLogger.log} String
   // Succeeds because {fileLogger.log} is a subset of the effect that we chose when
