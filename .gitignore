@@ -31,7 +31,6 @@ tools/out/artifacts/wyvern_jar/asm-debug-all-5.0.1.jar
 tools/tools.iml
 tools/src/wyvern/tools/lexing/WyvernLexer.java
 tools/src/wyvern/tools/arch/lexing/ArchLexer.java
-tools/src/wyvern/tools/lexing/archlexer/ArchLexer.java
 tools/src/wyvern/tools/parsing/coreparser/Token.java
 tools/src/wyvern/tools/parsing/coreparser/TokenManager.java
 tools/src/wyvern/tools/parsing/coreparser/TokenMgrError.java
@@ -43,7 +42,6 @@ tools/src/wyvern/tools/parsing/coreparser/arch/TokenMgrError.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ParseException.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParser.jj
-tools/src/wyvern/tools/parsing/coreparser/ArchParserConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserTreeConstants.java
 tools/src/wyvern/tools/parsing/coreparser/arch/Node.java

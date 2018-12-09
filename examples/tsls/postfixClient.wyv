@@ -1,6 +1,10 @@
 require stdout
 
+import metadata wyvern.collections.list
 import metadata tsls.postfix
+
+val fibonacci : list.List = { 1, 1, 2, 3, 5, 8 }
+
 
 def run(expr:postfix.PostfixExpr):Int
 	expr.eval()

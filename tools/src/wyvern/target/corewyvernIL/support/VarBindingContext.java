@@ -35,20 +35,20 @@ public class VarBindingContext extends TypeContext {
     
     @Override
     public ValueType lookupTypeOf(Variable v) {
-        /*if (v.getSite() != null) {
+        if (v.getSite() != null) {
             if (v.getSite() == binding) {
                 return type;
             } else {
                 return getNext().lookupTypeOf(v);
             }
-        } else {*/
+        } else {
             if (v.getName().equals(binding.getName())) {
                 v.siteFound(binding);
                 return type;
             } else {
                 return getNext().lookupTypeOf(v);
             }
-        //}
+        }
     }
 
     @Override

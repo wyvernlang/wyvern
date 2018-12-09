@@ -23,6 +23,7 @@ public class Module {
         this.spec = spec;
         this.expr = program;
         this.dependencies = dependencies;
+        spec.setModule(this);
     }
 
     public TypedModuleSpec getSpec() {

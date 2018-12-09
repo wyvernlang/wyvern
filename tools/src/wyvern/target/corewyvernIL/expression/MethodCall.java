@@ -250,16 +250,21 @@ public class MethodCall extends Expression {
             boolean argsTypechecked = true;
             View v = View.from(objectExpr, newCtx);
             for (int i = 0; i < args.size(); ++i) {
-
                 // Get info about the formal arguments.
                 FormalArg formalArg = formalArgs.get(i);
                 ValueType formalArgType = formalArg.getType();
                 if (objectExpr.isPath()) {
                     formalArgType = formalArgType.adapt(v);
                 } else {
-                    //TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
                     // adaptation for the receiver won't work, so try avoiding "this"
-                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), calleeCtx);
+                    try {
+                        formalArgType = formalArgType.avoid(receiverType.getSelfName(), calleeCtx);
+                    } catch (RuntimeException e) {
+                        if (!e.getMessage().contains("not found")) {
+                            throw e;
+                        }
+                        // else: avoiding didn't succeed, but just try to continue for now
+                    }
                 }
                 formalArgTypes.add(formalArgType);
                 String formalArgName = formalArg.getName();
@@ -267,12 +272,20 @@ public class MethodCall extends Expression {
 
                 // Check actual argument type accords with formal argument type.
                 FailureReason r = new FailureReason();
-                if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
-                    argsTypechecked = false;
-                    if (failureReason == null) {
-                        failureReason = r.getReason();
+                try {
+                    if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
+                        argsTypechecked = false;
+                        if (failureReason == null) {
+                            failureReason = r.getReason();
+                        }
+                        break;
                     }
-                    break;
+                } catch (RuntimeException e) {
+                    if (e.getMessage().contains("not found")) {
+                        argsTypechecked = false;
+                    } else {
+                        throw e;
+                    }
                 }
 
                 // Update context and view.
@@ -290,11 +303,6 @@ public class MethodCall extends Expression {
                 // accumulate effects from method calls
                 if (effectAccumulator != null) {
                     EffectSet methodCallE = defDeclType.getEffectSet();
-
-//                    for ambiguous effects: need primitive operations and etc. to have effects implemented or specifically ignored
-//                    if (methodCallE==null) {
-//                        ToolError.reportError(ErrorMessage.UNKNOWN_EFFECT, getLocation(), getMethodName());
-//                    }
 
                     if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
                         Set<Effect> concreteEffects = new HashSet<>();

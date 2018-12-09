@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.stdlib.Globals;
+import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -41,13 +42,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
     private boolean requireFlag;
     private boolean metadataFlag;
     private String asName;
+    private boolean isLifted;
 
-    public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire, boolean isMetadata) {
+    public ImportDeclaration(URI inputURI, FileLocation location, String image, boolean isRequire, boolean isMetadata, boolean isLifted) {
         this.uri = inputURI;
         this.location = location;
         this.requireFlag = isRequire;
         this.metadataFlag = isMetadata;
         this.asName = image;
+        this.isLifted = isLifted;
     }
 
     @Override
@@ -76,6 +79,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
 
     public URI getUri() {
         return uri;
+    }
+
+    public boolean isLifted() {
+        return isLifted;
     }
 
     @Override
@@ -237,8 +244,9 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         } else if (scheme.equals("wyv")) {
             // TODO: need to add types for non-java imports
             String moduleName = this.getUri().getSchemeSpecificPart();
-            final Module module = resolver.resolveModule(moduleName);
+            final Module module = resolver.resolveModule(moduleName, false, isLifted);
             final String internalName = module.getSpec().getInternalName();
+            final BindingSite site = module.getSpec().getSite();
             if (this.metadataFlag) {
                 if (module.getSpec().getType().isResource(ctx)) {
                     ToolError.reportError(ErrorMessage.NO_METADATA_FROM_RESOURCE, this);
@@ -251,15 +259,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             }
             ctx = resolver.extendGenContext(ctx, module.getDependencies());
             if (!ctx.isPresent(internalName, true)) {
-                ctx = ctx.extend(internalName, new Variable(internalName), type);
+                ctx = ctx.extend(module.getSpec().getSite(), new Variable(site), type);
             }
-            importExp = new Variable(internalName);
+            importExp = new Variable(site);
             dependencies.add(module.getSpec());
             dependencies.addAll(module.getDependencies());
             if (module.getSpec().getDefinedTypeName() != null) {
                 ctx = new TypeOrEffectGenContext(importName, (Variable) importExp, ctx);
             } else {
-                ctx = ctx.extend(this.asName == null ? importName : this.asName, new Variable(internalName), type);
+                ctx = ctx.extend(this.asName == null ? importName : this.asName, new Variable(site), type);
             }
         } else {
             ToolError.reportError(ErrorMessage.SCHEME_NOT_RECOGNIZED, this, scheme);

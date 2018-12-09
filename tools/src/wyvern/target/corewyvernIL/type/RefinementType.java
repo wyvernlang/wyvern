@@ -157,7 +157,7 @@ public class RefinementType extends ValueType {
                     genericArguments.stream()
                             .map(ga -> ga.doAvoid(varName, ctx, depth))
                             .collect(Collectors.toList()),
-                    base,
+                    newBase,
                     this
             );
         }
