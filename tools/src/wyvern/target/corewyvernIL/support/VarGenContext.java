@@ -33,9 +33,6 @@ public class VarGenContext extends GenContext {
         this.site = null;
         this.expr = expr;
         this.type = type;
-        if (varName.equals("MOD$stdout")) {
-            System.out.println();
-        }
     }
 
     @Override
