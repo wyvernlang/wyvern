@@ -14,7 +14,7 @@ https://raw.githubusercontent.com/wyvernlang/docs/master/tooldoc/wyvern-tool-arc
 From here, you can run the REPL through the command line using the command below
 
 ```sh
-$ wyrepl
+$ wyreplserver
 ```
 
 To run the backend server for the REPL webapp use the command below.
