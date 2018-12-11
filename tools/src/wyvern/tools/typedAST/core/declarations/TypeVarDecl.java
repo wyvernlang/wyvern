@@ -105,7 +105,7 @@ public class TypeVarDecl extends Declaration {
         }
         GenContext localCtx = ctxWithParams.extend(getSelfName(), new Variable(getSelfSite()), null);
         TaggedInfo taggedInfo = td.getTaggedInfo();
-        StructuralType thisType = new StructuralType(getSelfSite(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+        StructuralType thisType = new StructuralType(getSelfSite(), td.genDeclTypeSeq(localCtx), this.resourceFlag, this.getLocation());
         if (taggedInfo == null) {
             return thisType;
         } else {
@@ -151,6 +151,7 @@ public class TypeVarDecl extends Declaration {
 
     private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
         wyvern.target.corewyvernIL.type.Type type = computeInternalILType(ctx);
+        type.checkWellFormed(ctx);
         return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
     }
 

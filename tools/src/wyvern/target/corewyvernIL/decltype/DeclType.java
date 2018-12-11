@@ -23,6 +23,14 @@ public abstract class DeclType extends ASTNode implements IASTNode {
     public abstract boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason);
 
     public abstract DeclType adapt(View v);
+    /**
+     * 
+     * @param ctx
+     * @return true iff this is a var, or if this is a val that is of resource type
+     */
+    public boolean containsResource(TypeContext ctx) {
+        return false;
+    }
 
     /**
      * Evaluates any metadata that might be present in this type to a value

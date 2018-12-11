@@ -169,12 +169,14 @@ public class DeclSequence extends Sequence {
         // build up a context that has all the elements in this recursive block
         GenContext newCtx = tlc.getContext();
 
+        // newCtx has renamings: originalName -> newName.originalName
         for (TypedAST seqAST : getDeclIterator()) {
             Declaration d = (Declaration) seqAST;
             // TODO: refactor to make rec a method of Declaration
             newCtx = newCtx.rec(site, d); // extend the environment
         }
 
+        // declts holds the IL types of all members
         for (TypedAST seqAST : getDeclIterator()) {
             ValueType type = new StructuralType(site, declts);
             GenContext incrCtx = newCtx.extend(site, new Variable(newName), type);
@@ -182,7 +184,9 @@ public class DeclSequence extends Sequence {
             declts.add(d.genILType(incrCtx));
         }
 
+        // compute a type (provisionally pure) for this sequence block
         ValueType type = new StructuralType(site, declts);
+        // fill in the decls list
         updateTLC(tlc, newName, site, decls, newCtx, type);
 
         // determine if we need to be a resource type
