@@ -1,0 +1,32 @@
+module bmi
+
+import bmidb
+
+val db = bmidb()
+
+val under = db.getUnderClass()
+val norm = db.getNormalClass()
+val over = db.getOverClass()
+val obese = db.getOverClass()
+
+val lowerLimit = db.getLowerLimit()
+val middleLimit = db.getMiddleLimit()
+val upperLimit = db.getUpperLimit()
+
+def calculateBmi(height:Float,weight:Float):Float
+    val normalizedHeight: Float = height/100.0
+    val pow: Float = normalizedHeight * normalizedHeight
+    weight/pow
+
+def getBmiClassification(bmi:Float):String
+    if (bmi < lowerLimit)
+        under
+      else
+          if (bmi > lowerLimit && bmi < middleLimit)
+              norm
+            else
+              if (bmi > middleLimit && bmi < upperLimit)
+                  over
+                else
+                  obese	  
+

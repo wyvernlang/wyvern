@@ -1,0 +1,14 @@
+module def httphandler(handler: THttpHandler)
+
+def responseFile(): String
+    handler.responseFile()
+
+//manipulate params (say hello to person) and send response string/html
+def sendResponse(): String
+    handler.sendResponse()
+
+def setParams(postParams:String): Unit
+    handler.setParams(postParams)
+
+def getFormData():String
+    handler.getFormData()

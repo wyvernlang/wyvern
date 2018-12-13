@@ -1,0 +1,4 @@
+AgeParam : 21
+HeightParam : 160
+WeightParam : 67
+
