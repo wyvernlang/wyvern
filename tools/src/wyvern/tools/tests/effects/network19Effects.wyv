@@ -1,0 +1,3 @@
+module network19Effects
+effect sendFx = {}
+effect receiveFx = {sendFx}

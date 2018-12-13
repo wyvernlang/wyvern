@@ -111,7 +111,8 @@ public final class QuantificationLifter {
 
         final String genericName = wyvern.tools.typedAST.core.declarations.DefDeclaration.GENERIC_PREFIX + MONOMORPHIZED_EFFECT;
         final BindingSite genericArgSite = new BindingSite(genericName);
-        final ValueType genericType = wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, GenericKind.EFFECT);
+        final ValueType genericType =
+                wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, GenericKind.EFFECT);
         final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 

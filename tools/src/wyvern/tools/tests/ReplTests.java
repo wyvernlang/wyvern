@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.tools.REPL;
 import wyvern.tools.parsing.coreparser.ParseException;
 
@@ -12,12 +11,12 @@ public class ReplTests {
     private REPL repl = new REPL();
 
     @Test
-    public void testIdentityREPL() throws ParseException {
+    public void testAnonymous() throws ParseException {
         repl.interpretREPL("reset");
         String input = "((x: Int) => x)(3)";
-        Value v = repl.interpretREPL(input);
+        String v = repl.interpretREPL(input);
         // REPL.interpret("exit");
-        assertEquals(v.toString(), "3");
+        assertEquals(v, "3");
     }
 
     @Test
@@ -26,8 +25,8 @@ public class ReplTests {
         String input = "var y:Int = 5";
         String input1 = "y";
         repl.interpretREPL(input);
-        Value v = repl.interpretREPL(input1);
-        assertEquals(v.toString(), "5");
+        String v = repl.interpretREPL(input1);
+        assertEquals(v, "5");
     }
 
     @Test
@@ -36,8 +35,8 @@ public class ReplTests {
         String input = "val v = 6";
         String input1 = "v";
         repl.interpretREPL(input);
-        Value v = repl.interpretREPL(input1);
-        assertEquals(v.toString(), "6");
+        String v = repl.interpretREPL(input1);
+        assertEquals(v, "6");
     }
 
     @Test
@@ -53,8 +52,8 @@ public class ReplTests {
         repl.interpretREPL(input2);
         repl.interpretREPL(input3);
         repl.interpretREPL(input4);
-        Value v = repl.interpretREPL("factorial(6)");
-        assertEquals(v.toString(), "720");
+        String v = repl.interpretREPL("factorial(6)");
+        assertEquals(v, "720");
     }
 
     @Test
@@ -64,10 +63,10 @@ public class ReplTests {
         String input1 = "val v = 22";
         repl.interpretREPL(input);
         repl.interpretREPL(input1);
-        Value v = repl.interpretREPL("c");
-        Value v1 = repl.interpretREPL("v");
-        assertEquals(v.toString(), "33");
-        assertEquals(v1.toString(), "22");
+        String v = repl.interpretREPL("c");
+        String v1 = repl.interpretREPL("v");
+        assertEquals(v, "33");
+        assertEquals(v1, "22");
     }
 
     @Test
@@ -77,10 +76,64 @@ public class ReplTests {
         String input1 = "val v = 22";
         repl.interpretREPL(input);
         repl.interpretREPL(input1);
-        Value v = repl.interpretREPL("c");
-        Value v1 = repl.interpretREPL("v");
-        assertEquals(v.toString(), "33");
-        assertEquals(v1.toString(), "22");
+        String v = repl.interpretREPL("c");
+        String v1 = repl.interpretREPL("v");
+        assertEquals(v, "33");
+        assertEquals(v1, "22");
     }
+    
+    @Test
+    public void testObj() throws ParseException {
+        repl.interpretREPL("reset");
+        String input = "val obj = new";
+        String input1 = "    def getValue():Int";
+        String input2 = "        5";
+        String input3 = "";
+        String input4 = "";
+        repl.interpretREPL(input);
+        repl.interpretREPL(input1);
+        repl.interpretREPL(input2);
+        repl.interpretREPL(input3);
+        repl.interpretREPL(input4);
+        String v1 = repl.interpretREPL("obj.getValue()");
+        assertEquals(v1, "5");
+    }
+    
+    @Test
+    public void testModule() throws ParseException {
+        repl.interpretREPL("reset");
+        String input = "resource type TCellAsModule";
+        String input1 = "    def get():Int";
+        String input2 = "    def set(newValue:Int):Unit";
+        String input3 = "";
+        String input4 = "";
+        String input5 = "module def cellAsModule():TCellAsModule";
+        String input6 = "var value : Int = 0";
+        String input7 = "def set(newValue:Int):Unit";
+        String input8 = "    value = newValue";
+        String input9 = "def get():Int = value";
+        String input10 = "";
+        String input11 = "";
+        String input12 = "val c = cellAsModule()";
+        String input13 = "c.set(34)";
+        repl.interpretREPL(input);
+        repl.interpretREPL(input1);
+        repl.interpretREPL(input2);
+        repl.interpretREPL(input3);
+        repl.interpretREPL(input4);
+        repl.interpretREPL(input5);
+        repl.interpretREPL(input6);
+        repl.interpretREPL(input7);
+        repl.interpretREPL(input8);
+        repl.interpretREPL(input9);
+        repl.interpretREPL(input10);
+        repl.interpretREPL(input11);
+        repl.interpretREPL(input12);
+        repl.interpretREPL(input13);
+        String v1 = repl.interpretREPL("c.get()");
+        assertEquals(v1, "34");
+    }
+
+    
 
 }

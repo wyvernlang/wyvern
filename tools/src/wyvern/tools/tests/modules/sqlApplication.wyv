@@ -11,3 +11,4 @@ def run() : Int
 	//val query = safeSQL.
 	
     safeSQL.querySelectFromWhereEquals("ID", "myTable", "name", input)
+    //stringSQL.prepare("query")

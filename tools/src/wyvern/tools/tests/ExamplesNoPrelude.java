@@ -7,10 +7,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.hamcrest.core.StringContains;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
@@ -37,6 +40,9 @@ public class ExamplesNoPrelude {
   public void setup() {
     Globals.resetPrelude();
   }*/
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @BeforeClass
   public static void setupResolver() {
@@ -66,6 +72,15 @@ public class ExamplesNoPrelude {
   public void testDatatypes() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "introductory.datatypes",
         Util.stringType(), new StringLiteral("(x => x) unit"));
+  }
+
+  @Test
+  public void testImmutability() throws ParseException {
+      expectedException.expect(ToolError.class);
+      expectedException.expectMessage(StringContains.containsString("This type must be a resource type"));
+
+        TestUtil.doTestScriptModularly(PATH, "introductory.immutability", Util.intType(),
+                new IntegerLiteral(15));
   }
 
   @Test

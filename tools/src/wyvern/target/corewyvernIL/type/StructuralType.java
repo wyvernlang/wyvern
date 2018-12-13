@@ -22,6 +22,7 @@ import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.expressions.Fn;
@@ -42,7 +43,10 @@ public class StructuralType extends ValueType {
         this(selfSite, declTypes, false);
     }
     public StructuralType(BindingSite selfSite, List<DeclType> declTypes, boolean resourceFlag) {
-        super();
+        this(selfSite, declTypes, resourceFlag, null);
+    }
+    public StructuralType(BindingSite selfSite, List<DeclType> declTypes, boolean resourceFlag, FileLocation loc) {
+        super(loc);
         this.selfSite = selfSite;
         // check a sanity condition
         //        if (declTypes != null && declTypes.size()>0)
@@ -269,9 +273,14 @@ public class StructuralType extends ValueType {
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
+        boolean needsResource = false;
         final TypeContext selfCtx = ctx.extend(selfSite, this);
         for (DeclType dt : declTypes) {
             dt.checkWellFormed(selfCtx);
+            needsResource = needsResource || dt.containsResource(selfCtx);
+        }
+        if (needsResource && !resourceFlag) {
+            ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, this, "This type");
         }
     }
 

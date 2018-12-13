@@ -137,8 +137,8 @@ def makeBrandPair[T](name:String):BrandPair[T]
                 result
 
 // Simple example of using brand pair from E Wiki:
-var alexBrandPair:BrandPair = makeBrandPair[String]("Alex")
-var jonathanBrandPair:BrandPair = makeBrandPair[String]("Jonathan")
+var alexBrandPair:BrandPair[String] = makeBrandPair[String]("Alex")
+var jonathanBrandPair:BrandPair[String] = makeBrandPair[String]("Jonathan")
 
 var alexBox:SealedBox[String] = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
 var jonathanBox:SealedBox[String] = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
@@ -211,7 +211,7 @@ resource type Purse
      def print():Unit
 
 def makeMint(name:String):Mint
-    var brandPair:BrandPair = makeBrandPair[Int -> Unit](name)
+    var brandPair:BrandPair[Int -> Unit] = makeBrandPair[Int -> Unit](name)
     val blankBox:SealedBox[Int -> Unit] = new
         type T = Int -> Unit
         def shareContent():Unit

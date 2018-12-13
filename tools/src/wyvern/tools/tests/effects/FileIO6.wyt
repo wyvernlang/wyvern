@@ -1,0 +1,3 @@
+resource type FileIO6
+    def read(): {system.ffiEffect} Int
+    def write(x: Int): {system.ffiEffect} Int

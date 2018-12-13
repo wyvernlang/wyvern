@@ -1,0 +1,32 @@
+{
+  "name": "wyvern",
+  "version": "0.3.0",
+  "description": "Wyvern REPL app",
+  "engines": {
+    "node": "8.9.1"
+  },
+  "main": "app.js",
+  "scripts": {
+    "start": "node bin/www",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "ejs": "^2.5.8",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "https-post": "^0.1.1",
+    "jsdom": "^11.11.0",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.18.7",
+    "pg": "^7.7.1"
+  },
+  "devDependencies": {
+    "request": "^2.85.0",
+    "tape": "^4.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heroku/node-js-getting-started"
+  }
+}

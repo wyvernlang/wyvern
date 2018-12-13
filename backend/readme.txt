@@ -1,4 +1,5 @@
-To test out the backend, install the necessary nodejs dependencies and then
+To test out the backend, install the necessary nodejs dependencies, ensure
+$WYVERN_HOME is set properly (see the Wyvern installation instructions), and then
 bootstrap. Bootstrapping takes ~8min on a reasonably fast machine.
 
 $ cd wyvern/backend

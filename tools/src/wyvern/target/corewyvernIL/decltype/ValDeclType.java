@@ -20,6 +20,11 @@ public class ValDeclType extends DeclTypeWithResult implements IASTNode {
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor, S state) {
         return emitILVisitor.visit(state, this);
     }
+    
+    @Override
+    public boolean containsResource(TypeContext ctx) {
+        return this.getRawResultType().isResource(ctx);
+    }
 
     @Override
     public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {

@@ -30,9 +30,7 @@ public class NominalType extends ValueType {
     private String typeMember;
 
     public NominalType(String pathVariable, String typeMember) {
-        super();
-        this.path = new Variable(pathVariable);
-        this.typeMember = typeMember;
+        this (new Variable(pathVariable), typeMember, null);
     }
 
     public NominalType(Path path, String typeMember) {
@@ -244,7 +242,11 @@ public class NominalType extends ValueType {
         }
         try {
             final Path newPath = path.adapt(v);
-            return new NominalType(newPath, typeMember);
+            if (newPath == this.path) {
+                return this;
+            } else {
+                return new NominalType(newPath, typeMember);
+            }
         } catch (RuntimeException e) {
             if (v.getContext() != null) {
                 return getCanonicalType(v.getContext());

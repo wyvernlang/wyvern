@@ -1,0 +1,19 @@
+//import wyvern.option
+
+//type Object = option.Option
+
+datatype StringList
+    Cons(element : String/*, next : option.Option[StringList]*/)
+    Nil
+
+resource type MStringList
+    var element : String
+    //var next : option.Option[MStringList]
+    
+// expect an error: must be resource since MStringList is a resource
+// also get an error if name is a var
+type User
+    val name : String
+    val addresses : MStringList
+    
+5

@@ -34,7 +34,7 @@ public class DefDeclType extends DeclTypeWithResult {
     public DefDeclType(String method, ValueType returnType, List<FormalArg> args, EffectSet effects) {
         super(method, returnType);
         this.args = args;
-        this.effectSet = effects;
+        effectSet = effects;
     }
 
     public List<FormalArg> getFormalArgs() {
@@ -49,12 +49,12 @@ public class DefDeclType extends DeclTypeWithResult {
     @Override
     public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
         if (!(dt instanceof DefDeclType)) {
-            reason.setReason("declaration type of " + this.getName() + " didn't match");
+            reason.setReason("declaration type of " + getName() + " didn't match");
             return false;
         }
         DefDeclType ddt = (DefDeclType) dt;
         if (args.size() != ddt.args.size() || !ddt.getName().equals(getName())) {
-            reason.setReason("number of arguments of " + this.getName() + " didn't match");
+            reason.setReason("number of arguments of " + getName() + " didn't match");
             return false;
         }
         View adaptationView = null;
@@ -68,30 +68,36 @@ public class DefDeclType extends DeclTypeWithResult {
             FormalArg theirArg = ddt.args.get(i);
             ValueType theirType = theirArg.getType();
             if (adaptationView == null) {
-                adaptationView = new ReceiverView(new Variable(theirArg.getName()), new Variable(myArg.getName()));
+                adaptationView = new ReceiverView(new Variable(theirArg.getSite()), new Variable(myArg.getSite()));
             } else {
                 theirType = theirType.adapt(adaptationView);
-                adaptationView = new ViewExtension(new Variable(theirArg.getName()), new Variable(myArg.getName()), adaptationView);
+                adaptationView = new ViewExtension(new Variable(theirArg.getSite()), new Variable(myArg.getSite()), adaptationView);
             }
-            if (!(theirType.isSubtypeOf(myArg.getType(), ctx, reason))) {
+            if (!theirType.isSubtypeOf(myArg.getType(), ctx, reason)) {
                 return false;
             }
             ctx = ctx.extend(myArg.getSite(), myArg.getType());
         }
-        ValueType rawResultType = this.getRawResultType();
+        EffectSet rawEffectSet = getEffectSet();
+        EffectSet otherEffectSet = ddt.getEffectSet();
+        if (rawEffectSet != null && otherEffectSet == null) {
+            return false;
+        }
+        ValueType rawResultType = getRawResultType();
         ValueType otherRawResultType = ddt.getRawResultType();
         if (adaptationView != null) {
             otherRawResultType = otherRawResultType.adapt(adaptationView);
         }
         return rawResultType.isSubtypeOf(otherRawResultType, ctx, reason);
     }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getRawResultType() == null) ? 0 : getRawResultType().hashCode());
-        result = prime * result + ((args == null) ? 0 : args.hashCode());
+        result = prime * result + (getName() == null ? 0 : getName().hashCode());
+        result = prime * result + (getRawResultType() == null ? 0 : getRawResultType().hashCode());
+        result = prime * result + (args == null ? 0 : args.hashCode());
         return result;
     }
 
@@ -168,7 +174,7 @@ public class DefDeclType extends DeclTypeWithResult {
         for (FormalArg a : args) {
             newArgs.add(new FormalArg(a.getSite(), a.getType().adapt(v)));
         }
-        if ((effectSet != null) && (effectSet.getEffects() != null)) {
+        if (effectSet != null && effectSet.getEffects() != null) {
             for (Effect e : effectSet.getEffects()) {
                 /* e.addPath(ctx) wouldn't work here, but there seems to be no
                  * logical place to add paths before here (and there are effects
@@ -178,7 +184,7 @@ public class DefDeclType extends DeclTypeWithResult {
                 } // TODO: find some way to have all paths ready before this is called
             }
         }
-        return new DefDeclType(this.getName(), this.getRawResultType().adapt(v), newArgs, getEffectSet()); // need to adapt effects too
+        return new DefDeclType(getName(), getRawResultType().adapt(v), newArgs, getEffectSet()); // need to adapt effects too
     }
 
     @Override
@@ -195,8 +201,8 @@ public class DefDeclType extends DeclTypeWithResult {
         boolean changed = false;
 
         // Return type
-        ValueType t = this.getRawResultType().doAvoid(varName, ctx, count);
-        if (!(t.equals(this.getRawResultType()))) {
+        ValueType t = getRawResultType().doAvoid(varName, ctx, count);
+        if (!t.equals(getRawResultType())) {
             changed = true;
         }
 
@@ -221,7 +227,7 @@ public class DefDeclType extends DeclTypeWithResult {
         if (!changed) {
             return this;
         } else {
-            return new DefDeclType(this.getName(), t, newArgs, newEffectSet);
+            return new DefDeclType(getName(), t, newArgs, newEffectSet);
         }
     }
 
@@ -241,7 +247,7 @@ public class DefDeclType extends DeclTypeWithResult {
      */
     public  Map<Integer, List<Integer>> genericMapping() {
         Map<Integer, List<Integer>> inferenceMap = new HashMap<Integer, List<Integer>>();
-        List<FormalArg> args = this.getFormalArgs();
+        List<FormalArg> args = getFormalArgs();
 
         for (int i = 0; i < args.size(); i++) {
             FormalArg arg = args.get(i);
@@ -301,14 +307,14 @@ public class DefDeclType extends DeclTypeWithResult {
     @Override
     public boolean isEffectAnnotated(TypeContext ctx) {
         return super.isEffectAnnotated(ctx)
-                && this.getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectAnnotated(ctx))
-                && this.getEffectSet() != null;
+                && getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectAnnotated(ctx))
+                && getEffectSet() != null;
     }
 
     @Override
     public boolean isEffectUnannotated(TypeContext ctx) {
         return super.isEffectUnannotated(ctx)
-                && this.getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectUnannotated(ctx))
-                && this.getEffectSet() == null;
+                && getFormalArgs().stream().allMatch(arg -> arg.getType().isEffectUnannotated(ctx))
+                && getEffectSet() == null;
     }
 }

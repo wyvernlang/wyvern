@@ -99,25 +99,26 @@ public class TypeVarDecl extends Declaration {
 
     private wyvern.target.corewyvernIL.type.Type computeInternalILType(GenContext ctx) {
         TypeDeclaration td = this.body;
-        GenContext localCtx = ctx.extend(getSelfName(), new Variable(getSelfSite()), null);
+        GenContext ctxWithParams = ctx;
         for (GenericParameter gp : generics) {
-            localCtx = new TypeOrEffectGenContext(gp.getName(), getSelfSite(), localCtx);
+            ctxWithParams = new TypeOrEffectGenContext(gp.getName(), getSelfSite(), ctxWithParams);
         }
+        GenContext localCtx = ctxWithParams.extend(getSelfName(), new Variable(getSelfSite()), null);
         TaggedInfo taggedInfo = td.getTaggedInfo();
-        StructuralType thisType = new StructuralType(getSelfSite(), td.genDeclTypeSeq(localCtx), this.resourceFlag);
+        StructuralType thisType = new StructuralType(getSelfSite(), td.genDeclTypeSeq(localCtx), this.resourceFlag, this.getLocation());
         if (taggedInfo == null) {
             return thisType;
         } else {
             Type parent = taggedInfo.getCaseOfTag();
             NominalType parentType = null;
             if (parent != null) {
-                parentType = (NominalType) parent.getILType(localCtx);
+                parentType = (NominalType) parent.getILType(ctxWithParams);
             }
             List<Type> children = taggedInfo.getComprisesTags();
             if (children == null) {
                 return new ExtensibleTagType(parentType, thisType);
             } else {
-                final GenContext theCtx = localCtx; // final alias
+                final GenContext theCtx = ctxWithParams; // final alias
                 List<NominalType> cases = children.stream()
                                                   .map(child -> (NominalType) child.getILType(theCtx))
                                                   .collect(Collectors.toList());
@@ -150,6 +151,7 @@ public class TypeVarDecl extends Declaration {
 
     private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
         wyvern.target.corewyvernIL.type.Type type = computeInternalILType(ctx);
+        type.checkWellFormed(ctx);
         return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
     }
 
