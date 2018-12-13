@@ -1,8 +1,0 @@
-resource type TSocket
-    def getOutputStream():Dyn
-    def getInputStream():Dyn
-    def close():Unit
-
-
-
-

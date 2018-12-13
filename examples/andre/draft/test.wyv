@@ -1,6 +1,0 @@
-require stdout
-stdout.print("********************************\n")
-stdout.print("This is a WYVERN TEST\n")
-stdout.print("Do not be alarmed\n")
-stdout.print("********************************\n")
-

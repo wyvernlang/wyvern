@@ -1,3 +1,0 @@
-module def serverSocket: TServerSocket
-
-def accept():TSocket
