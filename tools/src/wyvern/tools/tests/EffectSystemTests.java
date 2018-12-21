@@ -313,27 +313,21 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNetwork13() throws ParseException {
         /* Nonexistent effect in method annotation in type (not in module);
          * error should be reported before module is evaluated). */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
-        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
-                + "MOD$effects.NetworkType13.NetworkType13; declaration receiveData is not a subtype of the expected declaration at location file "
-                + Paths.get(PATH, "effects", "network13.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"unknown\" not found"));
+        expectedException.expectMessage(StringContains.containsString("on line 5 column 7"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork13", Util.stringType(), new StringLiteral("Network13 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNetwork14() throws ParseException {
         /* A field is used in a method effect annotation in a type. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
-        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
-                + "MOD$effects.NetworkType14.NetworkType14; declaration receiveData is not a subtype of the expected declaration at location file "
-                + Paths.get(PATH, "effects", "network14.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"n\" not found"));
+        expectedException.expectMessage(StringContains.containsString("on line 6 column 7"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork14", Util.stringType(), new StringLiteral("Network14 with effects"));
     }
 

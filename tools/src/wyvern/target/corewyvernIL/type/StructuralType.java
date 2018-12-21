@@ -218,7 +218,8 @@ public class StructuralType extends ValueType {
     /** Search for decl types with the name given.  Take out those that match the exclusionFilter.
      * If exactly one remains, return it.  Otherwise, return null.
      */
-    DeclType findMatchingDecl(String name, Predicate<? super DeclType> exclusionFilter, TypeContext ctx) {
+    @Override
+    public DeclType findMatchingDecl(String name, Predicate<? super DeclType> exclusionFilter, TypeContext ctx) {
         List<DeclType> ds = findDecls(name, ctx);
         ds.removeIf(exclusionFilter);
         if (ds.size() != 1) {

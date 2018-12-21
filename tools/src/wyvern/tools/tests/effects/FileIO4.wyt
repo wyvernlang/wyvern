@@ -1,5 +1,5 @@
 resource type FileIO4
     effect readF
     effect writeF = {system.ffiEffect}
-    def read(): {readF} Int
-    def write(x: Int): {writeF} Int
+    def read(): {this.readF} Int
+    def write(x: Int): {this.writeF} Int

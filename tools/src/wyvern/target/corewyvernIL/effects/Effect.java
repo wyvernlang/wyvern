@@ -127,7 +127,7 @@ public class Effect {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }
 
-        final DeclType eDT = vt.findDecl(getName(), ctx); // the effect definition as appeared in the type (e.g. "effect receive = ")
+        final DeclType eDT = vt.findMatchingDecl(getName(), cdt -> !cdt.isTypeOrEffectDecl(), ctx);
         if (eDT == null || !(eDT instanceof EffectDeclType)) {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }

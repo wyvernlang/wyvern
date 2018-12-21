@@ -193,6 +193,9 @@ public class DefDeclType extends DeclTypeWithResult {
             arg.getType().checkWellFormed(ctx);
             ctx = ctx.extend(arg.getSite(), arg.getType());
         }
+        if (effectSet != null) {
+            effectSet.effectsCheck(ctx);
+        }
         super.checkWellFormed(ctx);
     }
 
@@ -238,6 +241,11 @@ public class DefDeclType extends DeclTypeWithResult {
 
     public EffectSet getEffectSet() {
         return effectSet;
+    }
+
+    public EffectSet getEffectSet(View v) {
+        EffectSet e = getEffectSet(); 
+        return e == null ? e : e.adapt(v);
     }
 
     /**

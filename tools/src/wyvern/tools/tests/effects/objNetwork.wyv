@@ -2,7 +2,7 @@ resource type ObjNetworkType
   effect send
   effect receive
   def sendData(data: String): {} Unit
-  def receiveData(): {receive} String
+  def receiveData(): {this.receive} String
 
 val objNetwork: ObjNetworkType = new
   effect send = {}

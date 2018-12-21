@@ -2,5 +2,5 @@ import effects.fileIOEffects as fEffects
 resource type FileIO5
     effect readF = {fEffects.readF}
     effect writeF = {fEffects.writeF}
-    def read(): {readF} Int
-    def write(x: Int): {writeF} Int
+    def read(): {this.readF} Int
+    def write(x: Int): {this.writeF} Int

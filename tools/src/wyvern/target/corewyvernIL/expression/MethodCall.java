@@ -302,7 +302,8 @@ public class MethodCall extends Expression {
 
                 // accumulate effects from method calls
                 if (effectAccumulator != null) {
-                    EffectSet methodCallE = defDeclType.getEffectSet();
+                    // get the effects through the current view
+                    EffectSet methodCallE = defDeclType.getEffectSet(v);
 
                     if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
                         Set<Effect> concreteEffects = new HashSet<>();
@@ -319,10 +320,7 @@ public class MethodCall extends Expression {
 
                                 final IExpr arg = args.get(i);
 
-                                if (arg instanceof Variable) {
-                                    // Normal dependent effect
-                                    concreteEffects.add(new Effect((Variable) arg, e.getName(), e.getLocation()));
-                                } else if (arg instanceof New) {
+                                if (arg instanceof New) {
                                     // Polymorphic dependent effect
                                     for (Declaration d : ((New) arg).getDecls()) {
                                         if (d instanceof EffectDeclaration && d.getName().equals(e.getName())) {
