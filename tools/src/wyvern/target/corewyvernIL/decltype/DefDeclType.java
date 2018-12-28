@@ -2,9 +2,11 @@ package wyvern.target.corewyvernIL.decltype;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.FormalArg;
@@ -174,17 +176,19 @@ public class DefDeclType extends DeclTypeWithResult {
         for (FormalArg a : args) {
             newArgs.add(new FormalArg(a.getSite(), a.getType().adapt(v)));
         }
+        EffectSet newES = getEffectSet();
         if (effectSet != null && effectSet.getEffects() != null) {
+            Set<Effect> newS = new HashSet<Effect>();
             for (Effect e : effectSet.getEffects()) {
                 /* e.addPath(ctx) wouldn't work here, but there seems to be no
                  * logical place to add paths before here (and there are effects
                  * that have missing paths here, i.e., e.getPath() here can be null) */
-                if (e.getPath() != null) {
-                    e.adapt(v);
-                } // TODO: find some way to have all paths ready before this is called
+                // TODO: find some way to have all paths ready before this is called, so we don't have to test for null
+                newS.add(e.getPath() != null ? e.adapt(v) : e);
             }
+            newES = new EffectSet(newS);
         }
-        return new DefDeclType(getName(), getRawResultType().adapt(v), newArgs, getEffectSet()); // need to adapt effects too
+        return new DefDeclType(getName(), getRawResultType().adapt(v), newArgs, newES);
     }
 
     @Override
