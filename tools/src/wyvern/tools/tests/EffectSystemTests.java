@@ -3,12 +3,14 @@ package wyvern.tools.tests;
 import java.nio.file.Paths;
 
 import org.hamcrest.core.StringContains;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
@@ -28,7 +30,13 @@ public class EffectSystemTests {
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
+        Globals.setUsePrelude(false);
     }
+
+    @AfterClass public static void teardown() {
+        Globals.setUsePrelude(true);  // restore the default to use the prelude
+    }
+
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -371,8 +379,6 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
-    // TODO: May be related to the issue in testNetwork18.
     public void testNetwork19() throws ParseException {
         /* An effect defined in a pure module is used in another effect definition in the same module. */
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork19", Util.stringType(), new StringLiteral("Network19 with effects"));

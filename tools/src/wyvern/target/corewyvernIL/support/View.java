@@ -15,6 +15,9 @@ public abstract class View {
     /*public String adapt(String varName) {
         return adapt(new Variable(varName)).getName();
     }*/
+    /**
+     * Returns a view from the given expression, i.e. mapping from the self name in the type of e to e itself, assuming e is a path
+     */
     public static View from(IExpr e, TypeContext ctx) {
         return new ReceiverView(e, ctx);
     }

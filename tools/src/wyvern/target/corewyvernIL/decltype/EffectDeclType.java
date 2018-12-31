@@ -81,7 +81,6 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
     /** Decompose set of effects to lowest-level ones in scope (obeys any type ascription) **/
     public Set<Effect> recursiveEffectCheck(TypeContext ctx, Set<Effect> effects) {
-        // TODO: need to adapt effects when they're being added to moreEffects
         if (effects == null) {
             return null;
         }
@@ -91,7 +90,8 @@ public class EffectDeclType extends DeclType implements IASTNode {
         for (Effect e : effects) {
             EffectSet s = e.effectCheck(ctx);
             if (s != null) {
-                moreEffects = s.getEffects();
+                View view = View.from(e.getPath(), ctx);
+                moreEffects = s.adapt(view).getEffects();
                 allEffects.addAll(moreEffects);
             } else { // e was the lowest-level in scope (hidden by type ascription)
                 allEffects.add(e);
