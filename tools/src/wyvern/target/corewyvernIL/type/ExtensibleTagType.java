@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.type;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
@@ -17,6 +18,19 @@ public class ExtensibleTagType extends TagType {
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor,
             S state) {
         return emitILVisitor.visit(state, this);
+    }
+
+    @Override
+    public void doPrettyPrint(Appendable dest, String indent) throws IOException {
+        dest.append("tagged type ");
+        this.getSelfType().doPrettyPrint(dest, indent);
+        dest.append(" extends ");
+        NominalType parent = this.getParentType(); 
+        if (parent == null) {
+            dest.append("Top");
+        } else {
+            parent.doPrettyPrint(dest, indent);
+        }
     }
 
     @Override
