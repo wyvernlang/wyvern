@@ -100,7 +100,7 @@ public class NominalType extends ValueType {
     }
 
     
-    private DeclType getSourceDeclType(TypeContext ctx) {
+    DeclType getSourceDeclType(TypeContext ctx) {
         final ValueType t = path.typeCheck(ctx, null);
         nestingCount++;
         if (nestingCount > 100) {

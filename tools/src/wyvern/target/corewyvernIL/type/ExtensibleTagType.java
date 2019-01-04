@@ -10,8 +10,8 @@ import wyvern.target.corewyvernIL.support.View;
 
 public class ExtensibleTagType extends TagType {
 
-    public ExtensibleTagType(NominalType parentType, ValueType valueType) {
-        super(parentType, valueType);
+    public ExtensibleTagType(NominalType parentType, ValueType valueType, NominalType selfType) {
+        super(parentType, valueType, selfType);
     }
 
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor,
@@ -21,13 +21,13 @@ public class ExtensibleTagType extends TagType {
 
     @Override
     public TagType adapt(View v) {
-        return new ExtensibleTagType((NominalType) getParentType(v), getValueType().adapt(v));
+        return new ExtensibleTagType((NominalType) getParentType(v), getValueType().adapt(v), getSelfType());
     }
 
     @Override
     public TagType doAvoid(String varName, TypeContext ctx, int depth) {
         final NominalType newPT = getParentType() != null ? (NominalType) getParentType().doAvoid(varName, ctx, depth) : null;
-        return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth));
+        return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth), getSelfType());
     }
 
     @Override

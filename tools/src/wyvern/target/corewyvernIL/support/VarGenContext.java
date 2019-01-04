@@ -44,6 +44,10 @@ public class VarGenContext extends GenContext {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+    
     @Override
     public String toString() {
         return "GenContext[" + endToString();

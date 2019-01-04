@@ -69,7 +69,7 @@ public enum ErrorMessage {
     TYPE_NOT_TAGGED("Type is not tagged: %ARG", 1),
     CIRCULAR_TAGGED_RELATION("Circular tagged hierarchy found with tag: %ARG, case-of: %ARG", 2),
     COMPRISES_RELATION_NOT_RECIPROCATED("The tag declared to comprise this tag is not a case-of this tag", 0),
-    COMPRISES_EXCLUDES_TAG("The comprises clause of: %ARG, excludes a tag which is a case-of of this tag: %ARG", 2),
+    COMPRISES_EXCLUDES_TAG("%ARG cannot extend %ARG because it is not listed among the comprised types", 2),
 
     //For match expression
     BOUNDED_EXHAUSTIVE_WITH_DEFAULT("Default cannot be present in satisfied bounded match", 0),

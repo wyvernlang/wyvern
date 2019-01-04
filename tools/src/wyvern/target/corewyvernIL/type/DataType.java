@@ -13,7 +13,9 @@ import wyvern.target.corewyvernIL.support.View;
 public class DataType extends TagType {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-        dest.append("datatype extends ");
+        dest.append("datatype ");
+        this.getSelfType().doPrettyPrint(dest, indent);
+        dest.append(" extends ");
         NominalType parent = this.getParentType(); 
         if (parent == null) {
             dest.append("Top");
@@ -26,8 +28,8 @@ public class DataType extends TagType {
 
     private List<NominalType> cases;
 
-    public DataType(NominalType parentType, ValueType valueType, List<NominalType> cases) {
-        super(parentType, valueType);
+    public DataType(NominalType parentType, ValueType valueType, NominalType selfType, List<NominalType> cases) {
+        super(parentType, valueType, selfType);
         this.cases = cases;
     }
 
@@ -54,7 +56,7 @@ public class DataType extends TagType {
         for (NominalType t : cases) {
             newCases.add((NominalType) t.adapt(v));
         }
-        return new DataType(newCT, getValueType().adapt(v), newCases);
+        return new DataType(newCT, getValueType().adapt(v), getSelfType(), newCases);
     }
 
     @Override
@@ -82,7 +84,7 @@ public class DataType extends TagType {
         for (NominalType t : cases) {
             newCases.add((NominalType) t.doAvoid(varName, ctx, depth));
         }
-        return new DataType(newCT, getValueType().doAvoid(varName, ctx, depth), newCases);
+        return new DataType(newCT, getValueType().doAvoid(varName, ctx, depth), getSelfType(), newCases);
     }
 
     @Override
