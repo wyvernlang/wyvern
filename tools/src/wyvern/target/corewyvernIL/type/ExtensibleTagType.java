@@ -22,9 +22,9 @@ public class ExtensibleTagType extends TagType {
 
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-        dest.append("tagged type ");
-        this.getSelfType().doPrettyPrint(dest, indent);
-        dest.append(" extends ");
+        dest.append("tagged type ")
+            .append(this.getSelfType().getTypeMember())
+            .append(" extends ");
         NominalType parent = this.getParentType(); 
         if (parent == null) {
             dest.append("Top");
@@ -73,7 +73,10 @@ public class ExtensibleTagType extends TagType {
         }
         ExtensibleTagType extensibleTagType = (ExtensibleTagType) sourceType;
         if (!(Objects.equals(this.getParentType(), extensibleTagType.getParentType()))) {
-            return false;
+            // not obviously equal; use a more complex test to see if they are unequal after following links
+            if (!this.getParentType().nominallyEquals(extensibleTagType.getParentType(), ctx)) {
+                return false;
+            }
         }
         return this.getValueType().isSubtypeOf(extensibleTagType.getValueType(), ctx, reason);
     }

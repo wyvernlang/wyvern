@@ -137,6 +137,29 @@ public class NominalType extends ValueType {
         }
     }
 
+    public NominalType getCanonicalNominalType(TypeContext ctx) {
+        DeclType dt = null;
+        try {
+            dt = getSourceDeclType(ctx);
+        } catch (RuntimeException e) {
+            // failed to get a canonical type
+            return this;
+        }
+        if (dt instanceof ConcreteTypeMember) {
+            if (((ConcreteTypeMember) dt).getSourceType() instanceof TagType) {
+                return this;
+            }
+            final ValueType resultType = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+            if (this.equals(resultType) || !(resultType instanceof NominalType)) {
+                return this;
+            } else {
+                return ((NominalType) resultType).getCanonicalNominalType(ctx);
+            }
+        } else {
+            return this;
+        }
+    }
+
     @Override
     public void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException {
         String desugared = null;
@@ -333,5 +356,12 @@ public class NominalType extends ValueType {
     @Override
     public boolean isEffectUnannotated(TypeContext ctx) {
         return true;
+    }
+
+    public boolean nominallyEquals(NominalType parentType, TypeContext ctx) {
+        NominalType myCanonical = getCanonicalNominalType(ctx);
+        NominalType theirCanonical = getCanonicalNominalType(ctx);
+        
+        return myCanonical.equals(theirCanonical);
     }
 }
