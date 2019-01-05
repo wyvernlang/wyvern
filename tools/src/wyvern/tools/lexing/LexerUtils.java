@@ -191,6 +191,8 @@ public final class LexerUtils {
             int loc = simpler.indexOf("\n");
             if (loc != -1) {
                 simpler = simpler.substring(loc + 1);
+            } else {
+                simpler = "";
             }
         }
         if (simpler.length() == 0) {
