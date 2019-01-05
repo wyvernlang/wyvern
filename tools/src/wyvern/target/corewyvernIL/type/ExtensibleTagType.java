@@ -8,11 +8,12 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.tools.errors.FileLocation;
 
 public class ExtensibleTagType extends TagType {
 
-    public ExtensibleTagType(NominalType parentType, ValueType valueType, NominalType selfType) {
-        super(parentType, valueType, selfType);
+    public ExtensibleTagType(NominalType parentType, ValueType valueType, NominalType selfType, FileLocation location) {
+        super(parentType, valueType, selfType, location);
     }
 
     public <S, T> T acceptVisitor(ASTVisitor<S, T> emitILVisitor,
@@ -35,13 +36,13 @@ public class ExtensibleTagType extends TagType {
 
     @Override
     public TagType adapt(View v) {
-        return new ExtensibleTagType((NominalType) getParentType(v), getValueType().adapt(v), getSelfType());
+        return new ExtensibleTagType((NominalType) getParentType(v), getValueType().adapt(v), getSelfType(), getLocation());
     }
 
     @Override
     public TagType doAvoid(String varName, TypeContext ctx, int depth) {
         final NominalType newPT = getParentType() != null ? (NominalType) getParentType().doAvoid(varName, ctx, depth) : null;
-        return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth), getSelfType());
+        return new ExtensibleTagType(newPT, getValueType().doAvoid(varName, ctx, depth), getSelfType(), getLocation());
     }
 
     @Override

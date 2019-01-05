@@ -124,13 +124,13 @@ public class TypeVarDecl extends Declaration {
             }
             NominalType myType = new NominalType(container, this.getName());
             if (children == null) {
-                return new ExtensibleTagType(parentType, thisType, myType);
+                return new ExtensibleTagType(parentType, thisType, myType, getLocation());
             } else {
                 final GenContext theCtx = ctxWithParams; // final alias
                 List<NominalType> cases = children.stream()
                                                   .map(child -> (NominalType) child.getILType(theCtx))
                                                   .collect(Collectors.toList());
-                return new DataType(parentType, thisType, myType, cases);
+                return new DataType(parentType, thisType, myType, cases, getLocation());
             }
         }
     }

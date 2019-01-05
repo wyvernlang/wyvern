@@ -269,7 +269,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             ctors.add(valueConstructor);
 
             /* The type constructor */
-            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, null, isResource, null);
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, loc, isResource, null);
             exps.add(cons);
 
         }

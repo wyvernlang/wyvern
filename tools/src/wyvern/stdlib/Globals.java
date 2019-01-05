@@ -228,13 +228,13 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("Nothing", new BottomType()));
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
         NominalType systemPlatform = new NominalType("this", "Platform");
-        ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType(), systemPlatform);
+        ExtensibleTagType platformType = new ExtensibleTagType(null, Util.unitType(), systemPlatform, null);
         declTypes.add(new ConcreteTypeMember("Platform", platformType));
         NominalType systemJava = new NominalType("this", "Java");
-        ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType(), systemJava);
+        ExtensibleTagType javaType = new ExtensibleTagType(systemPlatform, Util.unitType(), systemJava, null);
         declTypes.add(new ConcreteTypeMember("Java", javaType));
         NominalType systemJavaScript = new NominalType("this", "JavaScript");
-        ExtensibleTagType javascriptType = new ExtensibleTagType(systemPlatform, Util.unitType(), systemJavaScript);
+        ExtensibleTagType javascriptType = new ExtensibleTagType(systemPlatform, Util.unitType(), systemJavaScript, null);
         declTypes.add(new ConcreteTypeMember("JavaScript", javascriptType));
         //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
@@ -243,7 +243,7 @@ public final class Globals {
                 Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
         NominalType systemPython = new NominalType("this", "Java");
-        ExtensibleTagType pythonTagType = new ExtensibleTagType(systemPlatform, pythonType, systemPython);
+        ExtensibleTagType pythonTagType = new ExtensibleTagType(systemPlatform, pythonType, systemPython, null);
         //declTypes.add(new ConcreteTypeMember("Python", pythonType));
         declTypes.add(new ConcreteTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
