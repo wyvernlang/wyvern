@@ -117,7 +117,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
             elseExpr = (Expression) defaultExp.generateIL(ctx, expectedType, dependencies);
         }
         List<wyvern.target.corewyvernIL.Case> casesIL = cases.stream()
-                                                             .map(c -> c.generateILCase(ctx, matchType, (NominalType) expectedType, dependencies))
+                                                             .map(c -> c.generateILCase(ctx, matchType, expectedType, dependencies))
                                                              .collect(Collectors.toList());
         ValueType expectedCaseType = expectedType;
         for (wyvern.target.corewyvernIL.Case c : casesIL) {
