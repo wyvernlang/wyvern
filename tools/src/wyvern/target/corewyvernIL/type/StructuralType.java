@@ -3,8 +3,10 @@ package wyvern.target.corewyvernIL.type;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
@@ -54,8 +56,16 @@ public class StructuralType extends ValueType {
         //                throw new NullPointerException("invariant: decl types should not be null");
         this.declTypes = declTypes;
         this.setResourceFlag(resourceFlag);
+        Set<String> valueNames = new HashSet<String>();  
+        Set<String> typeNames = new HashSet<String>();  
         // if there is a var declaration, it's a resource type
         for (DeclType dt : declTypes) {
+            Set<String> names = dt.isTypeOrEffectDecl() ? typeNames : valueNames;
+            if (names.contains(dt.getName())) {
+                ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, this, "Type", dt.getName());
+            } else {
+                names.add(dt.getName());
+            }
             if (dt instanceof VarDeclType) {
                 this.setResourceFlag(true);
             }
