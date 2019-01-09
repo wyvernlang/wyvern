@@ -56,16 +56,8 @@ public class StructuralType extends ValueType {
         //                throw new NullPointerException("invariant: decl types should not be null");
         this.declTypes = declTypes;
         this.setResourceFlag(resourceFlag);
-        Set<String> valueNames = new HashSet<String>();  
-        Set<String> typeNames = new HashSet<String>();  
         // if there is a var declaration, it's a resource type
         for (DeclType dt : declTypes) {
-            Set<String> names = dt.isTypeOrEffectDecl() ? typeNames : valueNames;
-            if (names.contains(dt.getName())) {
-                ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, this, "Type", dt.getName());
-            } else {
-                names.add(dt.getName());
-            }
             if (dt instanceof VarDeclType) {
                 this.setResourceFlag(true);
             }
@@ -73,6 +65,19 @@ public class StructuralType extends ValueType {
     }
 
     private static final StructuralType emptyType = new StructuralType("IGNORE_ME", Collections.emptyList());
+    
+    public void checkForDuplicates() {
+        Set<String> valueNames = new HashSet<String>();  
+        Set<String> typeNames = new HashSet<String>();  
+        for (DeclType dt : declTypes) {
+            Set<String> names = dt.isTypeOrEffectDecl() ? typeNames : valueNames;
+            if (names.contains(dt.getName())) {
+                ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, this, "Type", dt.getName());
+            } else {
+                names.add(dt.getName());
+            }
+        }
+    }
 
     public static StructuralType getEmptyType() {
         return emptyType;
@@ -199,14 +204,20 @@ public class StructuralType extends ValueType {
 
         TypeContext extendedCtx = ctx.extend(selfSite, this);
         for (DeclType dt : st.getDeclTypes()) {
-            DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeOrEffectDecl() != dt.isTypeOrEffectDecl(), ctx);
+            // get all decls
+            List<DeclType> candidates = findDecls(dt.getName(), ctx);
+            //DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeOrEffectDecl() != dt.isTypeOrEffectDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
-            if (candidateDT == null) {
+            if (candidates.isEmpty()) {
                 if (!reason.isDefined()) {
                     reason.setReason("missing declaration " + dt.getName());
                 }
                 return false;
-            } else if (!candidateDT.isSubtypeOf(dt, extendedCtx, reason)) {
+            }
+            // filter ones that don't match
+            candidates.removeIf(c -> !c.isSubtypeOf(dt, extendedCtx, reason));
+            // if empty, error
+            if (candidates.isEmpty()) {
                 if (!reason.isDefined()) {
                     reason.setReason("declaration " + dt.getName() + " is not a subtype of the expected declaration");
                 }

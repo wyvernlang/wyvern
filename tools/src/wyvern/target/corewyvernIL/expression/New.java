@@ -157,6 +157,7 @@ public class New extends Expression {
         // check that everything in the claimed structural type was accounted for
         StructuralType requiredT = type.getStructuralType(ctx);
         StructuralType actualT = new StructuralType(selfSite, dts);
+        actualT.checkForDuplicates();
         FailureReason r = new FailureReason();
         if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());

@@ -160,6 +160,9 @@ public class TypeVarDecl extends Declaration {
     private wyvern.target.corewyvernIL.decl.Declaration computeInternalDecl(GenContext ctx) {
         wyvern.target.corewyvernIL.type.Type type = computeInternalILType(ctx);
         type.checkWellFormed(ctx);
+        if (type instanceof StructuralType) {
+            ((StructuralType) type).checkForDuplicates();
+        }
         return new wyvern.target.corewyvernIL.decl.TypeDeclaration(getName(), type, getMetadata(ctx), getLocation());
     }
 
