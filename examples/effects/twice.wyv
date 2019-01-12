@@ -1,11 +1,11 @@
-module def twice(file:File)
+module def twice(file:effects.File)
 
 // small hack as the Unit -> {E} Unit notation doesn't work yet
 type Function
     effect E
     def apply(): {this.E} Unit
 
-def invokeTwice[effect E](f: Function[E]):Unit
+def invokeTwice[effect E](f: Function[{E}]):Unit
    f()
    f()
 

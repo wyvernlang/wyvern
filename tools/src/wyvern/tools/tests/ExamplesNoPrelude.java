@@ -214,6 +214,11 @@ public class ExamplesNoPrelude {
   }
 
   @Test
+  public void testTwice() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.twice", null, null);
+  }
+
+  @Test
   public void testIOLibServerClient() throws ParseException {
     ExecutorService executor = Executors.newFixedThreadPool(2);
 
