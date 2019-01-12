@@ -1,0 +1,6 @@
+resource type Network
+   effect Receive
+   effect Send
+   
+   def receive(): {this.Receive} String
+   def send(s: String): {this.Send} Unit

@@ -177,6 +177,41 @@ public class ExamplesNoPrelude {
   public void testMembrane() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "capabilities.Membrane", null, null);
   }
+  
+  @Test
+  public void testCodeCompletion() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.codeCompletion", null, null);
+  }
+
+  @Test
+  public void testCodeCompletion2() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.codeCompletion2", null, null);
+  }
+
+  @Test
+  public void testLogger() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.logger", null, null);
+  }
+
+  @Test
+  public void testLogger2() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.logger2", null, null);
+  }
+
+  @Test
+  public void testRemoteLogger() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.remoteLogger", null, null);
+  }
+
+  @Test
+  public void testUserStats() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.userStats", null, null);
+  }
+
+  @Test
+  public void testUserStats2() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.userStats2", null, null);
+  }
 
   @Test
   public void testIOLibServerClient() throws ParseException {

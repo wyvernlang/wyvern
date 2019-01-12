@@ -1,0 +1,10 @@
+resource type File
+   effect Read
+   effect Write
+   effect Append
+   effect Delete
+   
+   def read(): {this.Read} String
+   def write(s: String): {this.Write} Unit
+   def append(s: String): {this.Append} Unit
+   def delete(): {this.Delete} Unit

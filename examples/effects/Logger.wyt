@@ -1,0 +1,5 @@
+resource type Logger
+   effect ReadLogFile
+   effect UpdateLogFile
+   def readLog(): {this.ReadLogFile} String
+   def updateLog(newEntry: String): {this.UpdateLogFile} Unit
