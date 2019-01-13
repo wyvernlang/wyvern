@@ -325,7 +325,7 @@ public class EffectSystemTests {
         /* Nonexistent effect in method annotation in type (not in module);
          * error should be reported before module is evaluated). */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"unknown\" not found"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"unknown\" is undefined"));
         expectedException.expectMessage(StringContains.containsString("on line 5 column 7"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork13", Util.stringType(), new StringLiteral("Network13 with effects"));
     }
@@ -334,7 +334,7 @@ public class EffectSystemTests {
     public void testNetwork14() throws ParseException {
         /* A field is used in a method effect annotation in a type. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect \"n\" not found"));
+        expectedException.expectMessage(StringContains.containsString("Effect \"n\" is undefined"));
         expectedException.expectMessage(StringContains.containsString("on line 6 column 7"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork14", Util.stringType(), new StringLiteral("Network14 with effects"));
     }

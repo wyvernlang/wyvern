@@ -49,6 +49,7 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
     private List<FormalArg> argILTypes = new LinkedList<FormalArg>(); // store to preserve IL arguments types and return types
     private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
     private EffectSet effectSet;
+    private boolean adapted = false;
 
     public DefDeclaration(String name, Type returnType, List<GenericParameter> generics, List<NameBinding> argNames,
                           TypedAST body, boolean isClassDef, FileLocation location, String effects) {
@@ -96,7 +97,12 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         return name;
     }
 
-    public EffectSet getEffectSet() {
+    public EffectSet getEffectSet(GenContext ctx) {
+        if (!adapted && effectSet != null) {
+            effectSet.contextualize(ctx);
+            adapted = true;
+        }
+
         return effectSet;
     }
 
@@ -123,7 +129,7 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
 
         ctx = this.serializeArguments(args, ctx);
 
-        DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args, getEffectSet());
+        DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args, getEffectSet(ctx));
         return ret;
     }
 
@@ -181,13 +187,12 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         this.returnILType = this.getResultILType(thisContext);
         this.argILTypes = args;
 
-        if (effectSet != null) {
-            effectSet.addPaths(thisContext);
-            effectSet.verifyInType(thisContext);
+        EffectSet effectSet2 = getEffectSet(thisContext);
+        if (effectSet2 != null) {
+            effectSet2.verifyInType(thisContext);
         }
-
         return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-                getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), getEffectSet());
+                getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectSet2);
     }
 
 
@@ -212,7 +217,12 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
             throw new NullPointerException("need to call topLevelGen/generateDecl before addModuleDecl");
         }
         wyvern.target.corewyvernIL.decl.DefDeclaration decl =
-                new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body, getLocation(), getEffectSet());
+                new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
+                                                                   getArgILTypes(),
+                                                                   getReturnILType(),
+                                                                   body,
+                                                                   getLocation(),
+                                                                   getEffectSet(tlc.getContext()));
 
         DeclType dt = genILType(tlc.getContext());
         tlc.addModuleDecl(decl, dt);

@@ -38,18 +38,6 @@ public class Effect {
         path = p;
     }
 
-    /** Add path to the effect if it doesn't already have one (i.e. if it's defined in the same type or module def). **/
-    public void addPath(GenContext ctx) {
-        /* ignore if path not found in context (i.e. null) -- this sometimes occurs in a valid setting,
-         * such as sometimes for obj definitions in typedAST.DefDeclaration.generateDecl(), which
-         * is made up for later in the compiling process; otherwise the effect is invalid and will be
-         * caught by effectCheck() later. */
-        if (getPath() == null) {
-            final Path ePath = ctx.getContainerForTypeAbbrev(getName());
-            setPath(ePath); // may be null
-        }
-    }
-
     public String getName() {
         return name;
     }
@@ -113,9 +101,9 @@ public class Effect {
         try {
             // if path is null (due to failure of addPath() before) or typeCheck() fails
             if (getPath() == null) {
-                // try to do an addPath
+                // try to fill in the path
                 if (ctx instanceof GenContext) {
-                    addPath((GenContext) ctx);
+                    adaptVariables((GenContext) ctx);
                 }
                 if (getPath() == null) {
                     ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
@@ -163,18 +151,13 @@ public class Effect {
         return s;
     }
 
-    public Effect adaptVariables(GenContext ctx) {
+    public void adaptVariables(GenContext ctx) {
         if (path == null) {
             path = ctx.getContainerForTypeAbbrev(name);
         }
         if (path == null) {
             ToolError.reportError(ErrorMessage.UNDEFINED_EFFECT, loc, name);
         }
-        Path newPath = path.adaptVariables(ctx);
-        if (newPath == path) {
-            return this;
-        } else {
-            return new Effect(newPath, name, loc);
-        }
+        path = path.adaptVariables(ctx);
     }
 }

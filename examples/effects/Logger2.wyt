@@ -1,4 +1,4 @@
-import fileEffects
+import effects.fileEffects
 
 resource type Logger2
    def readLog(): {fileEffects.Read} String

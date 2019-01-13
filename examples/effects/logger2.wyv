@@ -1,18 +1,9 @@
+module def logger2(f: effects.File2): effects.Logger2
+
 import effects.fileEffects
 
-resource type File2
-   def read(): {fileEffects.Read} String
-   def write(s: String): {fileEffects.Write} Unit
-   def append(s: String): {fileEffects.Append} Unit
-   def delete(): {fileEffects.Delete} Unit
-
-resource type Logger2
-   def readLog(): {fileEffects.Read} String
-   def updateLog(newEntry: String): {fileEffects.Append} Unit
+def readLog(): {fileEffects.Read} String
+   f.read()
    
-// small hack - this really should be a module def, but there's an issue importing modules from types that we need to fix
-def logger2(f: File2): Logger2 = new
-    def readLog(): {fileEffects.Read} String
-       f.read()
-    def updateLog(newEntry: String): {fileEffects.Append} Unit
-       f.append(newEntry)
+def updateLog(newEntry: String): {fileEffects.Append} Unit
+   f.append(newEntry)
