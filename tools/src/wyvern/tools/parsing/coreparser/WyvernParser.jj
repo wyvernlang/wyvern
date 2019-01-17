@@ -721,7 +721,7 @@ List<Type> TypeList() :
 }
 
 Type Type() :
-{ Type arrowResult = null; Token ar=null; Type t; Type t2; List<Type> tList=null; }
+{ Type arrowResult = null; Token ar=null; Type t; Type t2; List<Type> tList=null; Token effects = null; }
 {
  t = NonArrowType()
  (<MULT> t2 = NonArrowType() {
@@ -731,7 +731,7 @@ Type Type() :
    }
    tList.add(t2);
  })*
- ((ar=<TARROW> | ar=<EQARROW>) arrowResult = Type() )? {
+ ((ar=<TARROW> | ar=<EQARROW>) [effects = <DSL_LITERAL>] arrowResult = Type() )? {
 
     if (arrowResult == null) {
         return t;
@@ -741,7 +741,7 @@ Type Type() :
             tList.add(t);
         }
         boolean resourceArrow = (ar.kind == TARROW);
-        return build.arrowType(tList, arrowResult, resourceArrow);
+        return build.arrowType(tList, arrowResult, resourceArrow, effects == null ? null : effects.image, loc(ar));
     }
  }
 }

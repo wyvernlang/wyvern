@@ -35,7 +35,6 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.GetterAndSetterGeneration;
 import wyvern.tools.util.TreeWritable;
 
@@ -78,13 +77,13 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         this(name, returnType, null, argNames, body, isClassDef, location, null);
     }
 
-    public static Arrow getMethodType(List<NameBinding> args, Type returnType, boolean isResource) {
+    /*public static Arrow getMethodType(List<NameBinding> args, Type returnType, boolean isResource) {
         List<Type> argTypes = new LinkedList<Type>();
         for (int i = 0; i < args.size(); i++) {
             argTypes.add(args.get(i).getType());
         }
-        return new Arrow(argTypes, returnType, isResource);
-    }
+        return new Arrow(argTypes, returnType, isResource, effectSet, this.getLocation());
+    }*/
 
 
     private boolean isClass;

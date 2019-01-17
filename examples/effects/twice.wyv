@@ -1,12 +1,7 @@
-module def twice(file:effects.File)
+module def twice(file:effects.File) : /*{file.Read}*/ Unit
 
-// small hack as the Unit -> {E} Unit notation doesn't work yet
-type Function
-    effect E
-    def apply(): {this.E} Unit
-
-def invokeTwice[effect E](f: Function[{E}]):Unit
+def invokeTwice[effect E](f: Unit -> {E} Unit):{E} Unit
    f()
    f()
 
-//invokeTwice[file.Read]( () -> file.read() )
+invokeTwice[{file.Read}]( () => file.read() )
