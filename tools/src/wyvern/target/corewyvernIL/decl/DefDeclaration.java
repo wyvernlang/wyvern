@@ -188,7 +188,7 @@ public class DefDeclaration extends NamedDeclaration {
     }
 
     @Override
-    public DeclType getDeclType() {
+    public DefDeclType getDeclType() {
         return new DefDeclType(getName(), type, formalArgs, getEffectSet());
     }
 }
