@@ -80,6 +80,8 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
         }
 
 
-        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals, effectSet)), isResource);
+        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL,
+                                  Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals, effectSet)),
+                                  isResource);
     }
 }
