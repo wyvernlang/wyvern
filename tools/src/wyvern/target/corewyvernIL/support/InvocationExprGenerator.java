@@ -20,7 +20,7 @@ import wyvern.tools.errors.ToolError;
 public class InvocationExprGenerator implements CallableExprGenerator {
     private final IExpr receiver;
     private DeclType declType;
-    private List<DeclType> dtList; // may use if there are multiple matching decls
+    private List<DeclType> dtList; // non-null if there are multiple matching decls
     private final FileLocation location;
 
     public InvocationExprGenerator(IExpr iExpr, String operationName, GenContext ctx, FileLocation loc) {
@@ -92,7 +92,8 @@ public class InvocationExprGenerator implements CallableExprGenerator {
 
     @Override
     public DefDeclType getDeclType(TypeContext ctx) {
-        if (declType == null) {
+        if (declType == null || dtList != null) {
+            // no DeclType is known, either because the receiver has type Dynamic or because there is more than one DeclType with the right name
             return null;
         } else if (declType instanceof ValDeclType || declType instanceof VarDeclType) {
             Expression e = genExpr(null);
