@@ -1,0 +1,49 @@
+module llist
+
+import wyvern.option
+import wyvern.collections.Iterator
+import wyvern.collections.Iterable
+
+type Option = option.Option
+
+type LinkedList
+    type E
+    def iterator():Iterator[this.E]
+    def map[T](f:this.E->T):LinkedList[T]
+    def head():Option[this.E]
+    def tail():LinkedList[this.E]
+    def isEmpty():Boolean
+
+// ensure LinkedList subtypes Iterable
+def toIterable(l:LinkedList):Iterable = l
+    
+def emptyDynamic():LinkedList[Dyn] = empty[Dyn]()
+def empty[U]():LinkedList[U] = new
+    type E = U
+    def iterator():Iterator[U] = listIterator(this)
+    def map[T](f:U->T):LinkedList[T] = empty[T]()
+    def head():Option[U] = option.None[U]()
+    def tail():LinkedList[U] = this
+    def isEmpty():Boolean = true
+
+
+def consDynamic(elem:Dyn, rest:LinkedList[Dyn]):LinkedList[Dyn] = cons[Dyn](elem, rest)
+def cons[U](elem:U, rest:LinkedList[U]):LinkedList[U] = new
+    type E = U
+    def iterator():Iterator[U] = listIterator(this)
+        
+    // TODO: make me tail recursive
+    def map[T](f:U->T):LinkedList[T] = cons[T](f(elem),rest.map[T](f))
+    
+    def head():Option[U] = option.Some[U](elem)
+    def isEmpty():Boolean = false
+    def tail():LinkedList[U] = rest
+
+def listIterator(list:LinkedList):Iterator[list.E] = new
+    type E = list.E
+    var current : LinkedList[list.E] = list
+    def hasNext():Boolean = !this.current.isEmpty()
+    def next():this.E
+        val result = this.current.head().getOrElse(() => runtime.fail("call next() only if hasNext() returns true"))
+        this.current = this.current.tail()
+        result
