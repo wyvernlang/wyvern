@@ -76,8 +76,11 @@ public class REPL {
         Scanner scanner = new Scanner(System.in);
         String input = "";
         REPL repl = new REPL();
+        System.out.println("Welcome to the Wyvern REPL!");
 
         while (true) {
+            System.out.print("> ");
+            System.out.flush();
             input = scanner.nextLine();
             String v = repl.interpretREPL(input);
             if (v != null) {
@@ -246,7 +249,7 @@ public class REPL {
             SeqExpr program = (SeqExpr) tlc.getExpression();
             program = genContext.getInterpreterState().getResolver().wrap(program, dependencies);
 
-            System.out.println("Interpreting:");
+            //System.out.println("Interpreting:");
 
             Pair<Value, EvalContext> result = program.interpretCtx(programContext);
 
