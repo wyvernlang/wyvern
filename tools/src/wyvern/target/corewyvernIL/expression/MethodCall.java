@@ -235,15 +235,14 @@ public class MethodCall extends Expression {
                                         ValueType argType = arg.getType();
                                         if (argType instanceof StructuralType) {
                                             // The argument is function, so the function is higher-order
-                                            StructuralType structuralType = (StructuralType) argType;
                                             if (first.getEffectSet().getEffects().isEmpty()) {
                                                 // There is no higher-order effect
                                                 return;
                                             } else {
+                                                //Check if the effect is expected
                                                 ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
                                                         "Higher order effect mismatch");
                                             }
-
                                         }
                                     }
                                 }

@@ -78,6 +78,12 @@ public final class QuantificationLifter {
         final DefDeclaration oldFunctor = (DefDeclaration) oldDecl;
         final List<FormalArg> oldFormalArgs = oldFunctor.getFormalArgs();
 
+        //List<DeclType> firstDeclTypes = (oldFormalArgs.get(0).getType().getStructuralType(ctx).getDeclTypes());
+        //System.out.println(firstDeclTypes);
+
+        //List<DeclType> secondDeclTypes = (oldFormalArgs.get(1).getType().getStructuralType(ctx).getDeclTypes());
+        //System.out.println(secondDeclTypes);
+
         if (oldFormalArgs.size() == 0) {
             return null;
         }
@@ -90,7 +96,7 @@ public final class QuantificationLifter {
             return null;
         }
 
-       if (!isLifted) {
+        if (!isLifted) {
             return null;
         }
 
@@ -112,6 +118,7 @@ public final class QuantificationLifter {
         final String genericName = wyvern.tools.typedAST.core.declarations.DefDeclaration.GENERIC_PREFIX + MONOMORPHIZED_EFFECT;
         final BindingSite genericArgSite = new BindingSite(genericName);
         final ValueType genericType = wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, GenericKind.EFFECT);
+        System.out.println(genericType);
         final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 

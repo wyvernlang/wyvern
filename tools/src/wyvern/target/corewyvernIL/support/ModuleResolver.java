@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.support;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.Globals;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -25,7 +27,11 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.effects.Effect;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
@@ -33,6 +39,7 @@ import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.ModuleSpec;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -311,7 +318,6 @@ public class ModuleResolver {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 valueName = decl.getName();
 
-
                 // Rename according to "apply"
                 DefDeclaration defDecl = new DefDeclaration(
                         Util.APPLY_NAME,
@@ -323,6 +329,7 @@ public class ModuleResolver {
 
                 // Wrap in an object
                 program = new New(defDecl);
+                List<FormalArg> formalArgs = ((DefDeclType) defDecl.getDeclType()).getFormalArgs();
 
                 // Perform quantification lifting if possible
                 final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
@@ -330,6 +337,15 @@ public class ModuleResolver {
                 if (liftResult != null) {
                     program = liftResult;
                 }
+
+                for(FormalArg arg : formalArgs) {
+                    Set<EffectDeclType> effects = getEffects(arg, newGenCtx);
+                }
+//                List<DeclType> firstDeclTypes = (h.getFormalArgs().get(0).getType().getStructuralType(newGenCtx).getDeclTypes());
+//                List<DeclType> secondDeclTypes = (h.getFormalArgs().get(1).getType().getStructuralType(newGenCtx).getDeclTypes());
+//                System.out.println(firstDeclTypes);
+//                System.out.println(secondDeclTypes);
+
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);
             } else {
@@ -342,6 +358,45 @@ public class ModuleResolver {
         TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
 
         return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType);
+    }
+
+    private Set<EffectDeclType> getEffects(FormalArg arg, GenContext ctx) {
+        HashSet<EffectDeclType> effects = new HashSet<>();
+        List<DeclType> declTypes = arg.getType().getStructuralType(ctx).getDeclTypes();
+        for(DeclType declType : declTypes) {
+            if(declType instanceof DefDeclType) {
+                List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
+                List<DeclType> returnType = ((DefDeclType) declType).getRawResultType().getStructuralType(ctx).getDeclTypes();
+                for(FormalArg recursiveArg : recursiveArgs) {
+                    Set<EffectDeclType> hoEffects1 = getHOEffects(recursiveArg, ctx);
+                    effects.addAll(hoEffects1);
+                }
+            } else if(declType instanceof  EffectDeclType) {
+                // declType is an effect
+                System.out.println(declType);
+            }
+        }
+        return effects;
+    }
+
+    private Set<EffectDeclType> getHOEffects(FormalArg arg, GenContext ctx) {
+        HashSet<EffectDeclType> hoEffects = new HashSet<>();
+        List<DeclType> declTypes = arg.getType().getStructuralType(ctx).getDeclTypes();
+        for(DeclType declType : declTypes) {
+            if(declType instanceof DefDeclType) {
+                List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
+                List<DeclType> returnType = ((DefDeclType) declType).getRawResultType().getStructuralType(ctx).getDeclTypes();
+                for(FormalArg recursiveArg : recursiveArgs) {
+                    Set<EffectDeclType> effects1 = getEffects(recursiveArg, ctx);
+                    hoEffects.addAll(effects1);
+                }
+            }
+        }
+        return hoEffects;
+    }
+
+    private Set<EffectDeclType> HOSafe(FormalArg arg, GenContext ctx) {
+        return null;
     }
 
     /**

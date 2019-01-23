@@ -327,7 +327,7 @@ public class NominalType extends ValueType {
         return true;
     }
 
-    // Safely true because of Craig et al.'s import semantics
+    // Safely true because of  et al.'s import semantics
     @Override
     public boolean isEffectUnannotated(TypeContext ctx) {
         return true;

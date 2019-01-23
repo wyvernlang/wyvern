@@ -4,12 +4,12 @@ import polymorphicEffects.Go
 import lifted polymorphicEffects.import3Lib
 
 type UnitFnWithoutEffect
-    def apply() : {} Unit
+    def app() : {} Unit
 
 val g : Go [{system.ffiEffect}] = new
     // x should be a function without effect
     def go (x : UnitFnWithoutEffect) : {} Unit
-        x()
+        x.app()
 
 val file1 : File[{system.ffiEffect}] = new
     effect write = {system.ffiEffect}
