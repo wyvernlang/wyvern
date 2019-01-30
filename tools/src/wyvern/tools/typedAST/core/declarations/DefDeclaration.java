@@ -333,12 +333,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         return new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
     }
 
-    public static StructuralType boundedStructuralType(String genericName, EffectSet L, EffectSet U) {
+    public static StructuralType boundedStructuralType(String genericName, EffectSet lb, EffectSet ub) {
         List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
 
         // the body contains only a abstract type or effect member representing the generic type
         final DeclType member;
-        member = new EffectDeclType(genericName, null, null, L, U);
+        member = new EffectDeclType(genericName, null, null, lb, ub);
         bodyDecl.add(member);
 
         return new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);

@@ -207,55 +207,6 @@ public class MethodCall extends Expression {
     }
 
     /**
-     * Check if the imported capabilities are expecting effects given by the unannotated code
-     */
-    public void checkHigherOrderEffect(List<ValueType> actualArgTypes, List<FormalArg> formalArgs) {
-        // Checking higher order effects
-        if (actualArgTypes.size() >= 1) {
-            ValueType firstArgType = actualArgTypes.get(0);
-            if (firstArgType instanceof StructuralType) {
-                StructuralType t = (StructuralType) firstArgType;
-                List<DeclType> declTypes = t.getDeclTypes();
-                // The first argument is a effect
-                if (declTypes.size() > 0 && declTypes.get(0) instanceof EffectDeclType) {
-                    EffectDeclType first = (EffectDeclType) declTypes.get(0);
-                    // Check the capabilities passed into the functor
-                    for (int i = 1; i < formalArgs.size(); i++) {
-                        FormalArg formalArg = formalArgs.get(i);
-                        if (formalArg.getType() instanceof  StructuralType) {
-                            StructuralType type = (StructuralType) formalArg.getType();
-                            List<DeclType> declTypeList = type.getDeclTypes();
-                            for (DeclType declaration : declTypeList) {
-                                if (declaration instanceof DefDeclType) {
-                                    DefDeclType def = (DefDeclType) declaration;
-                                    // def is a definition of a function
-                                    // compute the higher order effects of function arguments
-                                    List<FormalArg> args = def.getFormalArgs();
-                                    for (FormalArg arg : args) {
-                                        ValueType argType = arg.getType();
-                                        if (argType instanceof StructuralType) {
-                                            // The argument is function, so the function is higher-order
-                                            if (first.getEffectSet().getEffects().isEmpty()) {
-                                                // There is no higher-order effect
-                                                return;
-                                            } else {
-                                                //Check if the effect is expected
-                                                ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
-                                                        "Higher order effect mismatch");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return;
-    }
-
-    /**
      * Type the declaration for the method being invoked.
      * @param ctx: ctx in which invocation happens.
      * @return the declaration of the method.
@@ -265,26 +216,21 @@ public class MethodCall extends Expression {
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
         StructuralType receiverType = receiver.getStructuralType(ctx);
-
         // Sanity check: make sure it has declarations.
         List<DeclType> declarationTypes = receiverType.findDecls(methodName, ctx);
         if (declarationTypes.isEmpty()) {
             ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName, receiver.desugar(ctx));
         }
-
         // Go through all declarations, typechecking against the actual types passed in...
         List<ValueType> actualArgTypes = getArgTypes(ctx);
         List<ValueType> formalArgTypes = null;
-
 
         // ...use this context to do that.
         TypeContext newCtx = null;
         TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
-
             formalArgTypes = new LinkedList<ValueType>();
-
             // Ignore non-methods.
             newCtx = ctx;
             calleeCtx = ctx.extend(receiverType.getSelfSite(), receiver);
@@ -292,25 +238,16 @@ public class MethodCall extends Expression {
                 continue;
             }
             DefDeclType defDeclType = (DefDeclType) declType;
-
             // Check it has correct number of arguments.
             List<FormalArg> formalArgs = defDeclType.getFormalArgs();
             if (args.size() != formalArgs.size()) {
                 continue;
             }
 
-            // Typecheck higher order effects
-//            checkHigherOrderEffect(actualArgTypes, formalArgs);
-
-//            if(declType.toString().contains("apply(__generic")) {
-//                System.out.println(((EffectDeclType)formalArgs.get(0).getType().getStructuralType(ctx).getDeclTypes().get(0)).getLowerBound());
-//            }
-
             // Typecheck actual args against formal args of this declaration.
             boolean argsTypechecked = true;
             View v = View.from(objectExpr, newCtx);
             for (int i = 0; i < args.size(); ++i) {
-
                 // Get info about the formal arguments.
                 FormalArg formalArg = formalArgs.get(i);
                 ValueType formalArgType = formalArg.getType();
@@ -325,19 +262,8 @@ public class MethodCall extends Expression {
                 String formalArgName = formalArg.getName();
                 ValueType actualArgType = actualArgTypes.get(i);
 
-
                 // Check actual argument type accords with formal argument type.
                 FailureReason r = new FailureReason();
-
-//                if(declType.toString().contains("apply(__generic")) {
-//                    DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
-//                    if(argType instanceof  EffectDeclType) {
-//                        EffectDeclType effectDeclType = (EffectDeclType) argType;
-////                        System.out.println(effectDeclType.getLowerBound());
-//                    }
-//                }
-
-
 
                 if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
                     argsTypechecked = false;
@@ -348,16 +274,16 @@ public class MethodCall extends Expression {
                 }
 
                 List<DeclType> declTypes = actualArgType.getStructuralType(ctx).getDeclTypes();
-                if(!declTypes.isEmpty() && declTypes.get(0) instanceof  EffectDeclType) {
+                if (!declTypes.isEmpty() && declTypes.get(0) instanceof  EffectDeclType) {
 
                     DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
                     EffectDeclType effectDeclType = (EffectDeclType) argType;
-                    EffectSet L = effectDeclType.getLowerBound();
+                    EffectSet lb = effectDeclType.getLowerBound();
 
                     EffectSet effectSet = (((EffectDeclType) declTypes.get(0)).getEffectSet());
-                    if(L != null && !effectSet.getEffects().containsAll(L.getEffects())) {
+                    if (lb != null && !effectSet.getEffects().containsAll(lb.getEffects())) {
                         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
-                                                        "Higher order effect mismatch");
+                                                        "Effect set does not contains lower bound");
                     }
                 }
 
@@ -372,16 +298,13 @@ public class MethodCall extends Expression {
 
             // We were able to typecheck; figure out the return type, and set the method declaration.
             if (argsTypechecked) {
-
                 // accumulate effects from method calls
                 if (effectAccumulator != null) {
                     EffectSet methodCallE = defDeclType.getEffectSet();
-
 //                    for ambiguous effects: need primitive operations and etc. to have effects implemented or specifically ignored
 //                    if (methodCallE==null) {
 //                        ToolError.reportError(ErrorMessage.UNKNOWN_EFFECT, getLocation(), getMethodName());
 //                    }
-
                     if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
                         Set<Effect> concreteEffects = new HashSet<>();
                         for (Effect e : methodCallE.getEffects()) {

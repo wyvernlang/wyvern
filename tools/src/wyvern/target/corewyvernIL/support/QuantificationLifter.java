@@ -35,7 +35,6 @@ import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.HasLocation;
-import wyvern.tools.generics.GenericKind;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -109,21 +108,27 @@ public final class QuantificationLifter {
     private static EffectSet getEffects(ValueType type, GenContext ctx) {
         EffectSet effects = new EffectSet(new HashSet<>());
         List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
-        for(DeclType declType : declTypes) {
-            if(declType instanceof DefDeclType) {
+        for (DeclType declType : declTypes) {
+            if (declType instanceof DefDeclType) {
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
-                for(FormalArg recursiveArg : recursiveArgs) {
+                for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
-                    EffectSet argEffects = getHOEffects(argType, ctx);
-                    effects.getEffects().addAll(argEffects.getEffects());
+                    if (!argType.equalsInContext(type, ctx, new FailureReason())) {
+                        EffectSet argEffects = getHOEffects(argType, ctx);
+                        effects.getEffects().addAll(argEffects.getEffects());
+                    }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                EffectSet effects2 = getEffects(resultType, ctx);
-                effects.getEffects().addAll(effects2.getEffects());
-            } else if(declType instanceof  EffectDeclType) {
+                if (!resultType.equalsInContext(type, ctx, new FailureReason())) {
+                    EffectSet effects2 = getEffects(resultType, ctx);
+                    effects.getEffects().addAll(effects2.getEffects());
+                }
+            } else if (declType instanceof  EffectDeclType) {
                 EffectDeclType effectDecl = (EffectDeclType) declType;
                 EffectSet effectSet = effectDecl.getEffectSet();
-                effects.getEffects().addAll(effectSet.getEffects());
+                if (effectSet != null) {
+                    effects.getEffects().addAll(effectSet.getEffects());
+                }
             }
         }
         return effects;
@@ -132,17 +137,21 @@ public final class QuantificationLifter {
     private static EffectSet getHOEffects(ValueType type, GenContext ctx) {
         EffectSet effects = new EffectSet(new HashSet<>());
         List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
-        for(DeclType declType : declTypes) {
-            if(declType instanceof DefDeclType) {
+        for (DeclType declType : declTypes) {
+            if (declType instanceof DefDeclType) {
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
-                for(FormalArg recursiveArg : recursiveArgs) {
+                for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
-                    EffectSet argEffects = getEffects(argType, ctx);
-                    effects.getEffects().addAll(argEffects.getEffects());
+                    if (!type.equalsInContext(argType, ctx, new FailureReason())) {
+                        EffectSet argEffects = getEffects(argType, ctx);
+                        effects.getEffects().addAll(argEffects.getEffects());
+                    }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                EffectSet hoEffects = getHOEffects(resultType, ctx);
-                effects.getEffects().addAll(hoEffects.getEffects());
+                if (!type.equalsInContext(resultType, ctx, new FailureReason())) {
+                    EffectSet hoEffects = getHOEffects(resultType, ctx);
+                    effects.getEffects().addAll(hoEffects.getEffects());
+                }
             }
         }
         return effects;
@@ -164,18 +173,17 @@ public final class QuantificationLifter {
 
         // Construct effect bounds
 
-        EffectSet L = new EffectSet(new HashSet<>());
-        EffectSet U = new EffectSet(new HashSet<>());
-        for(FormalArg arg : oldFormalArgs) {
+        EffectSet lb = new EffectSet(new HashSet<>());
+        for (FormalArg arg : oldFormalArgs) {
             ValueType argType = arg.getType();
             EffectSet effects = getEffects(argType, ctx);
             EffectSet hoEffects = getHOEffects(argType, ctx);
-            L.getEffects().addAll(effects.getEffects());
-            L.getEffects().addAll(hoEffects.getEffects());
+            lb.getEffects().addAll(effects.getEffects());
+            lb.getEffects().addAll(hoEffects.getEffects());
         }
 
-//        final ValueType genericType = wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, GenericKind.EFFECT);
-        final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(MONOMORPHIZED_EFFECT, L, null);
+
+        final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(MONOMORPHIZED_EFFECT, lb, null);
         final FormalArg newFormalArg = new FormalArg(genericArgSite, boundedType);
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 

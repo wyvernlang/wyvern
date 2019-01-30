@@ -117,17 +117,22 @@ public class PolymorphicEffectTests {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.client", Util.stringType(), new StringLiteral("abc"));
     }
 
+    @Test
+    public void import3() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
+
 
 
 
     // Rejected examples
     @Test
-    public void import3() throws ParseException {
+    public void import3Rejected() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
-                "Higher order effect mismatch"
+                "Effect set does not contains lower bound"
         ));
-        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Rejected", Util.stringType(), new StringLiteral("abc"));
     }
 
     @Test
@@ -251,7 +256,7 @@ public class PolymorphicEffectTests {
     public void testImport2() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(String.format(
-                "The callee method cannot accept actual arguments with types: 'File[{system.ffiEffect}]; "
+                "Effect set does not contains lower bound"
         )));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import2Client", Util.stringType(), new StringLiteral("abcabc"));
     }

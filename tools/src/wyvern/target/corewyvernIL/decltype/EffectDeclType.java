@@ -20,11 +20,11 @@ import wyvern.tools.errors.FileLocation;
 public class EffectDeclType extends DeclType implements IASTNode {
     private EffectSet effectSet;
 
-    public EffectDeclType(String name, EffectSet effectSet, FileLocation loc, EffectSet L, EffectSet U) {
+    public EffectDeclType(String name, EffectSet effectSet, FileLocation loc, EffectSet lb, EffectSet ub) {
         super(name);
         this.effectSet = effectSet;
-        this.lowerBound = L;
-        this.upperBound = U;
+        this.lowerBound = lb;
+        this.upperBound = ub;
     }
 
     public EffectDeclType(String name, EffectSet effectSet, FileLocation loc) {
@@ -174,9 +174,9 @@ public class EffectDeclType extends DeclType implements IASTNode {
         // of results from calling adapt(v) on each Effect in this.EffectSet
 
         //        return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
-        EffectSet L = lowerBound;
-        EffectSet U =  upperBound;
-        return new EffectDeclType(getName(), effectSet == null ? null : getEffectSet().adapt(v), getLocation(), L, U);
+        EffectSet lb = lowerBound;
+        EffectSet up =  upperBound;
+        return new EffectDeclType(getName(), effectSet == null ? null : getEffectSet().adapt(v), getLocation(), lb, up);
     }
 
     @Override

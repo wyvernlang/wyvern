@@ -3,7 +3,6 @@ package wyvern.target.corewyvernIL.support;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,11 +26,7 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
-import wyvern.target.corewyvernIL.effects.Effect;
-import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
@@ -39,7 +34,6 @@ import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.Module;
-import wyvern.target.corewyvernIL.modules.ModuleSpec;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -369,10 +363,6 @@ public class ModuleResolver {
     }
 
 
-
-    private Set<EffectDeclType> HOSafe(FormalArg arg, GenContext ctx) {
-        return null;
-    }
 
     /**
      * Reads the file.
