@@ -105,6 +105,49 @@ public final class QuantificationLifter {
         return new New(newFunctor, expression.getLocation());
     }
 
+
+    private static EffectSet getEffects(ValueType type, GenContext ctx) {
+        EffectSet effects = new EffectSet(new HashSet<>());
+        List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
+        for(DeclType declType : declTypes) {
+            if(declType instanceof DefDeclType) {
+                List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
+                for(FormalArg recursiveArg : recursiveArgs) {
+                    ValueType argType = recursiveArg.getType();
+                    EffectSet argEffects = getHOEffects(argType, ctx);
+                    effects.getEffects().addAll(argEffects.getEffects());
+                }
+                ValueType resultType = ((DefDeclType) declType).getRawResultType();
+                EffectSet effects2 = getEffects(resultType, ctx);
+                effects.getEffects().addAll(effects2.getEffects());
+            } else if(declType instanceof  EffectDeclType) {
+                EffectDeclType effectDecl = (EffectDeclType) declType;
+                EffectSet effectSet = effectDecl.getEffectSet();
+                effects.getEffects().addAll(effectSet.getEffects());
+            }
+        }
+        return effects;
+    }
+
+    private static EffectSet getHOEffects(ValueType type, GenContext ctx) {
+        EffectSet effects = new EffectSet(new HashSet<>());
+        List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
+        for(DeclType declType : declTypes) {
+            if(declType instanceof DefDeclType) {
+                List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
+                for(FormalArg recursiveArg : recursiveArgs) {
+                    ValueType argType = recursiveArg.getType();
+                    EffectSet argEffects = getEffects(argType, ctx);
+                    effects.getEffects().addAll(argEffects.getEffects());
+                }
+                ValueType resultType = ((DefDeclType) declType).getRawResultType();
+                EffectSet hoEffects = getHOEffects(resultType, ctx);
+                effects.getEffects().addAll(hoEffects.getEffects());
+            }
+        }
+        return effects;
+    }
+
     /**
      * Lifts effect polymorphism from the return type of a functor to the functor itself.
      *
@@ -117,9 +160,23 @@ public final class QuantificationLifter {
 
         final String genericName = wyvern.tools.typedAST.core.declarations.DefDeclaration.GENERIC_PREFIX + MONOMORPHIZED_EFFECT;
         final BindingSite genericArgSite = new BindingSite(genericName);
-        final ValueType genericType = wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, GenericKind.EFFECT);
-        System.out.println(genericType);
-        final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
+        final List<FormalArg> oldFormalArgs = functor.getFormalArgs();
+
+        // Construct effect bounds
+
+        EffectSet L = new EffectSet(new HashSet<>());
+        EffectSet U = new EffectSet(new HashSet<>());
+        for(FormalArg arg : oldFormalArgs) {
+            ValueType argType = arg.getType();
+            EffectSet effects = getEffects(argType, ctx);
+            EffectSet hoEffects = getHOEffects(argType, ctx);
+            L.getEffects().addAll(effects.getEffects());
+            L.getEffects().addAll(hoEffects.getEffects());
+        }
+
+//        final ValueType genericType = wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, GenericKind.EFFECT);
+        final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(MONOMORPHIZED_EFFECT, L, null);
+        final FormalArg newFormalArg = new FormalArg(genericArgSite, boundedType);
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 
         // Construct updated type context
@@ -140,8 +197,6 @@ public final class QuantificationLifter {
         final DeclarationLifter declarationLifter = new DeclarationLifter(typeLifter, monomorphicEffect);
 
         // Construct new list of formal arguments
-
-        final List<FormalArg> oldFormalArgs = functor.getFormalArgs();
 
         final List<FormalArg> newFormalArgs = new LinkedList<>();
         newFormalArgs.add(newFormalArg);
@@ -209,6 +264,7 @@ public final class QuantificationLifter {
 
         return newFunctor;
     }
+
 
     private static New handleNew(TypeContext ctx, DeclarationLifter declarationLifter, New oldNew) {
         // Construct new declarations

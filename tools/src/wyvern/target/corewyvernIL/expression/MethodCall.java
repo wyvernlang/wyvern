@@ -282,6 +282,7 @@ public class MethodCall extends Expression {
         TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
+
             formalArgTypes = new LinkedList<ValueType>();
 
             // Ignore non-methods.
@@ -299,7 +300,11 @@ public class MethodCall extends Expression {
             }
 
             // Typecheck higher order effects
-            checkHigherOrderEffect(actualArgTypes, formalArgs);
+//            checkHigherOrderEffect(actualArgTypes, formalArgs);
+
+//            if(declType.toString().contains("apply(__generic")) {
+//                System.out.println(((EffectDeclType)formalArgs.get(0).getType().getStructuralType(ctx).getDeclTypes().get(0)).getLowerBound());
+//            }
 
             // Typecheck actual args against formal args of this declaration.
             boolean argsTypechecked = true;
@@ -323,12 +328,37 @@ public class MethodCall extends Expression {
 
                 // Check actual argument type accords with formal argument type.
                 FailureReason r = new FailureReason();
+
+//                if(declType.toString().contains("apply(__generic")) {
+//                    DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
+//                    if(argType instanceof  EffectDeclType) {
+//                        EffectDeclType effectDeclType = (EffectDeclType) argType;
+////                        System.out.println(effectDeclType.getLowerBound());
+//                    }
+//                }
+
+
+
                 if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
                     argsTypechecked = false;
                     if (failureReason == null) {
                         failureReason = r.getReason();
                     }
                     break;
+                }
+
+                List<DeclType> declTypes = actualArgType.getStructuralType(ctx).getDeclTypes();
+                if(!declTypes.isEmpty() && declTypes.get(0) instanceof  EffectDeclType) {
+
+                    DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
+                    EffectDeclType effectDeclType = (EffectDeclType) argType;
+                    EffectSet L = effectDeclType.getLowerBound();
+
+                    EffectSet effectSet = (((EffectDeclType) declTypes.get(0)).getEffectSet());
+                    if(L != null && !effectSet.getEffects().containsAll(L.getEffects())) {
+                        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
+                                                        "Higher order effect mismatch");
+                    }
                 }
 
                 // Update context and view.
