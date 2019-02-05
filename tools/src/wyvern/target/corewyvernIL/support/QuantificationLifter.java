@@ -24,10 +24,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
-import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.expression.New;
-import wyvern.target.corewyvernIL.expression.SeqExpr;
-import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.expression.*;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -110,6 +107,13 @@ public final class QuantificationLifter {
         List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
         for (DeclType declType : declTypes) {
             if (declType instanceof DefDeclType) {
+                DefDeclType def = (DefDeclType) (declType);
+                EffectSet e = def.getEffectSet();
+                if(e != null) {
+                    for(Effect effect : e.getEffects()) {
+                        effects.getEffects().add(effect);
+                    }
+                }
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
                 for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
@@ -122,12 +126,6 @@ public final class QuantificationLifter {
                 if (!resultType.equalsInContext(type, ctx, new FailureReason())) {
                     EffectSet effects2 = getEffects(resultType, ctx);
                     effects.getEffects().addAll(effects2.getEffects());
-                }
-            } else if (declType instanceof  EffectDeclType) {
-                EffectDeclType effectDecl = (EffectDeclType) declType;
-                EffectSet effectSet = effectDecl.getEffectSet();
-                if (effectSet != null) {
-                    effects.getEffects().addAll(effectSet.getEffects());
                 }
             }
         }
@@ -180,6 +178,10 @@ public final class QuantificationLifter {
             EffectSet hoEffects = getHOEffects(argType, ctx);
             lb.getEffects().addAll(effects.getEffects());
             lb.getEffects().addAll(hoEffects.getEffects());
+        }
+
+        for(Effect e : lb.getEffects()) {
+            View x = null;
         }
 
 

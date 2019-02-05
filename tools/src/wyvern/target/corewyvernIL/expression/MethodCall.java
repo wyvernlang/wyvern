@@ -22,12 +22,7 @@ import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
-import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.FailureReason;
-import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.corewyvernIL.support.ViewExtension;
+import wyvern.target.corewyvernIL.support.*;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -206,6 +201,48 @@ public class MethodCall extends Expression {
                 .collect(Collectors.toList());
     }
 
+    private boolean checkHighOrderEffect(TypeContext ctx, ValueType actualArgType, ValueType formalArgType) {
+        List<DeclType> declTypes = actualArgType.getStructuralType(ctx).getDeclTypes();
+        if (!declTypes.isEmpty() && declTypes.get(0) instanceof  EffectDeclType) {
+            DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
+            EffectDeclType effectDeclType = (EffectDeclType) argType;
+            EffectSet lb = effectDeclType.getLowerBound();
+
+            if (lb == null) {
+                return true;
+            }
+
+            EffectSet effectSet = (((EffectDeclType) declTypes.get(0)).getEffectSet());
+
+            // Checking each effect in the lower bound is present
+            for (Effect lbEffect : lb.getEffects()) {
+                boolean found = false;
+                String name = lbEffect.getName();
+                for (Effect effect : effectSet.getEffects()) {
+                    if (effect.getName().equals(name)) {
+                        found = true;
+                    }
+
+                    EffectDeclType decl = effect.findEffectDeclType(ctx);
+                    EffectSet declared = decl.getEffectSet();
+                    if(declared != null) {
+                        for(Effect declaredEffect : declared.getEffects()) {
+                            if(declaredEffect.getName().equals(name)) {
+                                found = true;
+                            }
+                        }
+                    }
+                }
+                if(!found) {
+                    ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
+                                                "Effect set does not contains lower bound");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Type the declaration for the method being invoked.
      * @param ctx: ctx in which invocation happens.
@@ -273,19 +310,10 @@ public class MethodCall extends Expression {
                     break;
                 }
 
-                List<DeclType> declTypes = actualArgType.getStructuralType(ctx).getDeclTypes();
-                if (!declTypes.isEmpty() && declTypes.get(0) instanceof  EffectDeclType) {
-
-                    DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
-                    EffectDeclType effectDeclType = (EffectDeclType) argType;
-                    EffectSet lb = effectDeclType.getLowerBound();
-
-                    EffectSet effectSet = (((EffectDeclType) declTypes.get(0)).getEffectSet());
-                    if (lb != null && !effectSet.getEffects().containsAll(lb.getEffects())) {
-                        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
-                                                        "Effect set does not contains lower bound");
-                    }
+                if(!checkHighOrderEffect(ctx, actualArgType, formalArgType)) {
+                    break;
                 }
+
 
                 // Update context and view.
                 newCtx = newCtx.extend(formalArg.getSite(), actualArgType);
