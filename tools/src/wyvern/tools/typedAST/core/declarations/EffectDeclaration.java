@@ -59,7 +59,7 @@ public class EffectDeclaration extends Declaration {
 
     public EffectSet getEffectSetInContext(GenContext ctx) {
         if (!adapted && effectSet != null) {
-            effectSet = effectSet.contextualize(ctx);
+            effectSet.contextualize(ctx);
             adapted = true;
         }
         return effectSet;
@@ -72,11 +72,11 @@ public class EffectDeclaration extends Declaration {
 
     @Override
     public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-        if (effectSet != null) {
-            effectSet.addPaths(ctx);
-            effectSet.verifyInType(ctx);
+        EffectSet effectSetInContext = getEffectSetInContext(ctx);
+        if (effectSetInContext != null) {
+            effectSetInContext.verifyInType(ctx);
         }
-        return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), getEffectSetInContext(ctx), getLocation());
+        return new wyvern.target.corewyvernIL.decl.EffectDeclaration(getName(), effectSetInContext, getLocation());
     }
 
     @Override

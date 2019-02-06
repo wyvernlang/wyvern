@@ -1,0 +1,7 @@
+module def twice(file:effects.File) : /*{file.Read}*/ Unit
+
+def invokeTwice[effect E](f: Unit -> {E} Unit):{E} Unit
+   f()
+   f()
+
+invokeTwice[{file.Read}]( () => file.read() )

@@ -121,7 +121,7 @@ public class Application extends AbstractExpressionAST implements CoreAST {
         generateILForTuples(formals, args, ctx, dependencies);
 
         // generate the call
-        return exprGen.genExprWithArgs(args, this, isMarkedAsTailCall());
+        return exprGen.genExprWithArgs(args, this, isMarkedAsTailCall(), ctx);
     }
 
     private int countFormalGenerics(List<FormalArg> formals) {

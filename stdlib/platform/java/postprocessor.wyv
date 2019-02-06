@@ -1,0 +1,14 @@
+module def postprocessor(java:Java): wyvern.TPostProcessor
+import java:wyvern.stdlib.support.PostParameters.postparam
+
+def getPayload(is:Dyn):String
+    postparam.getPayload(is)
+
+def getParamByIndex(params:String,index:Int):String
+    postparam.getParamByIndex(params,index)
+
+def getParamNameByIndex(index:Int):String
+    postparam.getParamNameByIndex(index)
+
+def getParamMappingToString():String
+    postparam.getParamMappingToString()

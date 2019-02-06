@@ -137,13 +137,12 @@ public class New extends Expression {
         for (Declaration d : declsExceptDelegate()) {
             DeclType dt = d.typeCheck(ctx, thisCtx);
             dts.add(dt);
-            if (d.containsResource(thisCtx)) {
+            if (d.containsResource(thisCtx) || dt.containsResource(thisCtx)) {
                 isResource = true;
             }
         }
 
         ValueType type = getType();
-        type.checkWellFormed(ctx);
         if (hasDelegate) {
             ValueType delegateObjectType = ctx.lookupTypeOf(delegateDeclaration.getFieldName());
             StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
@@ -158,6 +157,7 @@ public class New extends Expression {
         // check that everything in the claimed structural type was accounted for
         StructuralType requiredT = type.getStructuralType(ctx);
         StructuralType actualT = new StructuralType(selfSite, dts);
+        actualT.checkForDuplicates();
         FailureReason r = new FailureReason();
         if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
             ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
@@ -172,6 +172,7 @@ public class New extends Expression {
                 ToolError.reportError(ErrorMessage.MUST_BE_ASSIGNED_TO_RESOURCE_TYPE, this);
             }
         }
+        type.checkWellFormed(ctx);
 
         return type;
     }

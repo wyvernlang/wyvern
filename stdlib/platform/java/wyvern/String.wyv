@@ -3,20 +3,23 @@ module String
 import java:wyvern.stdlib.support.StringHelper.utils
 
 def equals(str1:String,str2:String):Boolean
-	utils.testEqual(str1,str2)
+    utils.testEqual(str1,str2)
 
 def ofInt(x : Int) : String
-  utils.ofInt(x)
+    utils.ofInt(x)
 
 def ofFloat(f : Float) : String
-  utils.ofFloat(f)
+    utils.ofFloat(f)
 
 // The format parameter should contain a Java format string, as specified in
 // https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#syntax.
 // Note that *only one* parameter may be referenced in the format string, and it
 // must be a floating-point type (e.g. "%.2f").
 def ofFormattedFloat(format : String, f : Float) : String
-  utils.ofFormattedFloat(format, f)
+    utils.ofFormattedFloat(format, f)
 
 def ofCharacter(c : Character) : String
-  utils.ofCharacter(c)
+    utils.ofCharacter(c)
+
+def concatenate(s1:String,s2:String): String
+    utils.concatenate(s1,s2)

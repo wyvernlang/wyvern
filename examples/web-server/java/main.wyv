@@ -1,0 +1,83 @@
+require java
+
+// module for printing and debugging
+import stdout
+
+// input-output for files and network access
+import io
+import fileio
+
+// modules for Web-Server-Client Interaction
+import server
+import httphandler
+import bmihandler
+import simplehandler
+
+// helper modules 
+import postprocessor
+import stringhelper
+
+//instantiated java dependent module objects - can now use to call proper functions
+val stdout = stdout(java)
+val ioobj = io(java)
+val fileioobj = fileio(java)
+val ppobj = postprocessor(java)
+val stringObj = stringhelper(java)
+
+//val handler = httphandler(simplehandler(ppobj, stringObj))
+val handler = httphandler(bmihandler(ppobj, stringObj))
+
+
+// begin/execute program
+val port = 1254
+
+val serverSocket = ioobj.makeServerSocket(port)
+stdout.print("Waiting for a client connection...\n")
+stdout.print("Server is on port: ")
+stdout.printInt(port)
+stdout.println()
+val soc = serverSocket.accept()
+stdout.print("Accepted a connection.\n")
+
+// Get a communication stream associated with the socket and set Headers
+val s1out = soc.getOutputStream()
+val dos = ioobj.makeDataOutputStream(s1out)
+val serverObj = server(dos) 
+serverObj.sendHeaders()
+
+val bufferedReader = fileioobj.makeBufferedReader(handler.responseFile())
+val msg = fileioobj.readFile(bufferedReader)
+serverObj.sendHtmlFile(msg)
+
+stdout.print("Sent Form to Client\n")
+stdout.print("Wrote to DataOutputStream\n")
+
+val soc2 = serverSocket.accept()
+val slin = soc2.getInputStream()
+val params: String = ppobj.getPayload(slin)
+stdout.print("Received Client Request\n")
+stdout.print("Processing Parameters...\n")
+
+val s2out = soc2.getOutputStream()
+val dos2 = ioobj.makeDataOutputStream(s2out)
+val serverObj2 = server(dos2)
+//stdout.print(params)
+//send response to request
+handler.setParams(params)
+serverObj2.sendHeaders()
+val serverResponse: String = handler.sendResponse()
+val paramMappings: String = handler.getFormData()
+serverObj2.sendHtmlFile(serverResponse)
+
+val filename = "bmi"
+
+fileioobj.writeFile(paramMappings,filename)
+
+stdout.print("Successfully Manipulated and Displayed Posted Form Data to Client\n")
+stdout.print("Saved Client parameter information\n")
+
+// Close the connection but not the server socket
+dos.close()
+// Call to "s1out.close()" causes an error.
+// This call is not necessary, but was provided in the example cited.
+soc.close()

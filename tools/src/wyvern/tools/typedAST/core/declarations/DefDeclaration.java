@@ -18,7 +18,6 @@ import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -26,7 +25,6 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.generics.GenericKind;
 import wyvern.tools.generics.GenericParameter;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.core.expressions.Assignment;
@@ -37,24 +35,20 @@ import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
-import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.GetterAndSetterGeneration;
 import wyvern.tools.util.TreeWritable;
 
 //Def's canonical form is: def NAME : TYPE where def m() : R -> def : m : Unit -> R
 
-public class DefDeclaration extends Declaration implements CoreAST, BoundCode, TreeWritable {
+public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, BoundCode, TreeWritable {
     private ExpressionAST body; // HACK // FIXME:
     private String name;
     private Type returnType;
     private List<NameBinding> argNames; // Stored to preserve their names mostly for environments etc.
     private List<FormalArg> argILTypes = new LinkedList<FormalArg>(); // store to preserve IL arguments types and return types
     private wyvern.target.corewyvernIL.type.ValueType returnILType = null;
-    private List<GenericParameter> generics;
     private EffectSet effectSet;
-
-    public static final String GENERIC_PREFIX = "__generic__";
-    public static final String GENERIC_MEMBER = "T";
+    private boolean adapted = false;
 
     public DefDeclaration(String name, Type returnType, List<GenericParameter> generics, List<NameBinding> argNames,
                           TypedAST body, boolean isClassDef, FileLocation location, String effects) {
@@ -83,13 +77,13 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         this(name, returnType, null, argNames, body, isClassDef, location, null);
     }
 
-    public static Arrow getMethodType(List<NameBinding> args, Type returnType, boolean isResource) {
+    /*public static Arrow getMethodType(List<NameBinding> args, Type returnType, boolean isResource) {
         List<Type> argTypes = new LinkedList<Type>();
         for (int i = 0; i < args.size(); i++) {
             argTypes.add(args.get(i).getType());
         }
-        return new Arrow(argTypes, returnType, isResource);
-    }
+        return new Arrow(argTypes, returnType, isResource, effectSet, this.getLocation());
+    }*/
 
 
     private boolean isClass;
@@ -102,7 +96,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         return name;
     }
 
-    public EffectSet getEffectSet() {
+    public EffectSet getEffectSet(GenContext ctx) {
+        if (!adapted && effectSet != null) {
+            effectSet.contextualize(ctx);
+            adapted = true;
+        }
+
         return effectSet;
     }
 
@@ -129,7 +128,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
         ctx = this.serializeArguments(args, ctx);
 
-        DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args, getEffectSet());
+        DefDeclType ret = new DefDeclType(getName(), getResultILType(ctx), args, getEffectSet(ctx));
         return ret;
     }
 
@@ -137,7 +136,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         if (isGeneric()) {
             GenContext[] contexts = new GenContext[1];
             contexts[0] = ctx;
-            addGenericParameters(contexts, args, generics);
+            addGenericParameters(contexts, args);
             ctx = contexts[0];
         }
 
@@ -173,7 +172,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
             GenContext[] contexts = new GenContext[2];
             contexts[0] = methodContext;
             contexts[1] = thisContext;
-            addGenericParameters(contexts, args, generics);
+            addGenericParameters(contexts, args);
             methodContext = contexts[0];
             thisContext = contexts[1];
         }
@@ -187,13 +186,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         this.returnILType = this.getResultILType(thisContext);
         this.argILTypes = args;
 
-        if (effectSet != null) {
-            effectSet.addPaths(thisContext);
-            effectSet.verifyInType(thisContext);
+        EffectSet effectSet2 = getEffectSet(thisContext);
+        if (effectSet2 != null) {
+            effectSet2.verifyInType(thisContext);
         }
-
         return new wyvern.target.corewyvernIL.decl.DefDeclaration(
-                getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), getEffectSet());
+                getName(), args, getResultILType(thisContext), body.generateIL(methodContext, this.returnILType, null), getLocation(), effectSet2);
     }
 
 
@@ -218,7 +216,12 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
             throw new NullPointerException("need to call topLevelGen/generateDecl before addModuleDecl");
         }
         wyvern.target.corewyvernIL.decl.DefDeclaration decl =
-                new wyvern.target.corewyvernIL.decl.DefDeclaration(name, getArgILTypes(), getReturnILType(), body, getLocation(), getEffectSet());
+                new wyvern.target.corewyvernIL.decl.DefDeclaration(name,
+                                                                   getArgILTypes(),
+                                                                   getReturnILType(),
+                                                                   body,
+                                                                   getLocation(),
+                                                                   getEffectSet(tlc.getContext()));
 
         DeclType dt = genILType(tlc.getContext());
         tlc.addModuleDecl(decl, dt);
@@ -287,33 +290,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
 
     }
 
-    /**
-     * Adds a list of generic parameters to a list of formal arguments and updates the entries of an array of contexts
-     * with this new information.
-     *
-     * @param contexts The contexts to update (modified by method)
-     * @param formalArgs The list of formal arguments to which the new generic parameter arguments will be added (modified by method)
-     * @param generics The generic parameters to be added to the list of formal arguments (not modified by method)
-     */
-    public static void addGenericParameters(
-            GenContext[] contexts, List<FormalArg> formalArgs, List<GenericParameter> generics
-    ) {
-        for (GenericParameter gp : generics) {
-            String s = gp.getName();
-
-            String genName = GENERIC_PREFIX + s;
-            BindingSite argSite = new BindingSite(genName);
-            ValueType type = DefDeclaration.genericStructuralType(s, gp.getKind());
-            formalArgs.add(new FormalArg(argSite, type));
-
-            for (int i = 0; i < contexts.length; i++) {
-                contexts[i] = contexts[i].extend(argSite, new Variable(argSite), type);
-                contexts[i] = new TypeOrEffectGenContext(s, argSite, contexts[i]);
-            }
-        }
-    }
-
-    public static StructuralType genericStructuralType(String genericName, GenericKind kind) {
+    public static StructuralType genericStructuralType(String genericName, BindingSite genericSite, GenericKind kind) {
         List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
 
         // the body contains only a abstract type or effect member representing the generic type
@@ -330,7 +307,7 @@ public class DefDeclaration extends Declaration implements CoreAST, BoundCode, T
         }
         bodyDecl.add(member);
 
-        return new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
+        return new StructuralType(genericSite, bodyDecl);
     }
 
     public static StructuralType boundedStructuralType(String genericName, EffectSet lb, EffectSet ub) {

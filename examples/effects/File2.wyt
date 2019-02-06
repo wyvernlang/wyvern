@@ -1,0 +1,7 @@
+import effects.fileEffects
+
+resource type File2
+   def read(): {fileEffects.Read} String
+   def write(s: String): {fileEffects.Write} Unit
+   def append(s: String): {fileEffects.Append} Unit
+   def delete(): {fileEffects.Delete} Unit

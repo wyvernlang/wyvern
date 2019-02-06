@@ -3,12 +3,14 @@ package wyvern.tools.tests;
 import java.nio.file.Paths;
 
 import org.hamcrest.core.StringContains;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
+import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.support.Util;
@@ -28,7 +30,13 @@ public class EffectSystemTests {
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
+        Globals.setUsePrelude(false);
     }
+
+    @AfterClass public static void teardown() {
+        Globals.setUsePrelude(true);  // restore the default to use the prelude
+    }
+
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -115,47 +123,78 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testFileIO2() throws ParseException {
         /* Effects defined in a pure module are used in effect definitions in both type and module. */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO2", Util.intType(), new IntegerLiteral(3));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
+    public void testFileIO3() throws ParseException {
+        /* Effect names may be the same as method names. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO3", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
+    public void testFileIO5() throws ParseException {
+        /* Effects defined in a pure module are used in effect definitions in both type and module.
+         * Pure module imported in type is renamed. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testFileIO5", Util.intType(), new IntegerLiteral(3));
+    }
+
+    @Test
     public void testLogger() throws ParseException {
-        expectedException.expect(ToolError.class);
         /* A method has an effect annotation involving a globally available effect (system.ffiEffect)
          * in module but not in type. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
+        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
+                + "MOD$effects.Logger.Logger; declaration updateLog is not a subtype of the expected declaration at location file "
+                + Paths.get(PATH, "effects", "logger.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger", Util.intType(), new IntegerLiteral(5));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLogger1() throws ParseException {
-        /* Globally available effect (system.ffiEffect) is used to annotate a method directly,
-         * without defining any local effects. */
+        /* Globally available effect (system.ffiEffect) is attempted to be used to annotate a method directly
+         * without having exposed the effect definition in the type. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect annotation {system.ffiEffect} "
+                + "on method updateLog is not a subtype of effects that method produces, which are [fio.writeF];  at location file "
+                + Paths.get(PATH, "effects", "logger1.wyv").toAbsolutePath().toString() + " on line 2 column 5"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger1", Util.intType(), new IntegerLiteral(5));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLogger2() throws ParseException {
-        expectedException.expect(ToolError.class);
         /* A method has an effect annotation, involving a passed in resource, in module but not in type. */
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
+        expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
+                + "MOD$effects.Logger2.Logger2; declaration updateLog is not a subtype of the expected declaration at location file "
+                + Paths.get(PATH, "effects", "logger2.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger2", Util.intType(), new IntegerLiteral(5));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLogger3() throws ParseException {
-        /* The exact resource instance passed into a module functor is conditional
-         * (i.e. it is decided by an if statement). */
-        TestUtil.doTestScriptModularly(PATH, "effects.testLogger3", Util.intType(), new IntegerLiteral(3));
+        /* Uses a resource passed as a method argument in the method's effect annotation. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger3", Util.intType(), new IntegerLiteral(2));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
+    public void testLogger4() throws ParseException {
+        /* Globally available effect (system.ffiEffect) is used to annotate a method directly
+         * without defining any local effects. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger4", Util.intType(), new IntegerLiteral(5));
+    }
+
+    @Test
+    public void testLogger5() throws ParseException {
+        /* Effect subtyping: accepting a module with fewer effects than in the expected type. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testLogger5", Util.intType(), new IntegerLiteral(6));
+    }
+
+    @Test
     public void testNested() throws ParseException {
         /* An object in a module's immutable field defines an effect
          * and uses it in a method annotation inside that object. */
@@ -282,20 +321,21 @@ public class EffectSystemTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNetwork13() throws ParseException {
-        /* Nonexistent effect in method annotation in type (not in module,
-         * but error should be reported before module is evaluated). */
+        /* Nonexistent effect in method annotation in type (not in module);
+         * error should be reported before module is evaluated). */
         expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"unknown\" is undefined"));
+        expectedException.expectMessage(StringContains.containsString("on line 5 column 7"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork13", Util.stringType(), new StringLiteral("Network13 with effects"));
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testNetwork14() throws ParseException {
-        /* Int included as effect in module annotation of type (not in module,
-         * but error should be reported before module is evaluated). */
+        /* A field is used in a method effect annotation in a type. */
         expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect \"n\" is undefined"));
+        expectedException.expectMessage(StringContains.containsString("on line 6 column 7"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork14", Util.stringType(), new StringLiteral("Network14 with effects"));
     }
 
@@ -330,6 +370,18 @@ public class EffectSystemTests {
         expectedException.expectMessage(StringContains.containsString("Effect \"something\" is undefined at location file "
                 + Paths.get(PATH, "effects", "NetworkType17.wyt").toAbsolutePath().toString() + " on line 3 column 10"));
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork17", Util.stringType(), new StringLiteral("Network17 with effects"));
+    }
+
+    @Test
+    public void testNetwork18() throws ParseException {
+        /* An effect defined in a pure module is used in a method annotation in the same module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork18", Util.stringType(), new StringLiteral("Network18 with effects"));
+    }
+
+    @Test
+    public void testNetwork19() throws ParseException {
+        /* An effect defined in a pure module is used in another effect definition in the same module. */
+        TestUtil.doTestScriptModularly(PATH, "effects.testNetwork19", Util.stringType(), new StringLiteral("Network19 with effects"));
     }
 
     @Test

@@ -32,6 +32,7 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
@@ -199,14 +200,17 @@ public class MethodCall extends Expression {
         return freeVars;
     }
 
-    public List<ValueType> getArgTypes(TypeContext ctx) {
-        List<? extends IExpr> args = getArgs();
+    public static List<ValueType> getArgTypes(TypeContext ctx, List<? extends IExpr> args) {
         return args.stream()
                 .map(arg -> arg.typeCheck(ctx, null))
                 .collect(Collectors.toList());
     }
 
-    private boolean checkHighOrderEffect(TypeContext ctx, ValueType actualArgType, ValueType formalArgType) {
+    private static boolean checkHighOrderEffect(TypeContext ctx, ValueType actualArgType, ValueType formalArgType) {
+        // TODO: check why there is a circularly defined type
+        if (actualArgType.toString().contains("__generic__X.X")) {
+            return true;
+        }
         List<DeclType> declTypes = actualArgType.getStructuralType(ctx).getDeclTypes();
         if (!declTypes.isEmpty() && declTypes.get(0) instanceof  EffectDeclType) {
             DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
@@ -239,7 +243,7 @@ public class MethodCall extends Expression {
                     }
                 }
                 if (!found) {
-                    ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
+                    ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
                                                 "Effect set does not contains lower bound");
                     return false;
                 }
@@ -248,6 +252,101 @@ public class MethodCall extends Expression {
         return true;
     }
 
+    public static class MatchResult {
+        //CHECKSTYLE:OFF
+        public final boolean succeeded;
+        public final List<ValueType> formalArgTypes;
+        public final TypeContext newCtx;
+        public final TypeContext calleeCtx;
+        public final String failureReason;
+        public final View view;
+        //CHECKSTYLE:ON
+        public MatchResult(List<ValueType> fat, TypeContext newCtx, TypeContext calleeCtx, String fr, View v, boolean succeeded) {
+            formalArgTypes = fat;
+            this.newCtx = newCtx;
+            this.calleeCtx = calleeCtx;
+            this.failureReason = fr;
+            view = v;
+            this.succeeded = succeeded;
+        }
+        
+    }
+    
+    public static MatchResult matches(TypeContext newCtx, ValueType receiver, DeclType declType, List<? extends IExpr> args, IExpr objectExpr) {
+        List<ValueType> actualArgTypes = getArgTypes(newCtx, args);
+        StructuralType receiverType = receiver.getStructuralType(newCtx);
+        List<ValueType> formalArgTypes = new LinkedList<ValueType>();
+        String failureReason = null;
+
+        // Ignore non-methods.
+        TypeContext calleeCtx = newCtx.extend(receiverType.getSelfSite(), receiver);
+        if (!(declType instanceof DefDeclType)) {
+            return new MatchResult(formalArgTypes, newCtx, calleeCtx, failureReason, null, false);
+        }
+        DefDeclType defDeclType = (DefDeclType) declType;
+
+        // Check it has correct number of arguments.
+        List<FormalArg> formalArgs = defDeclType.getFormalArgs();
+        if (args.size() != formalArgs.size()) {
+            return new MatchResult(formalArgTypes, newCtx, calleeCtx, failureReason, null, false);
+        }
+
+        // Typecheck actual args against formal args of this declaration.
+        boolean argsTypechecked = true;
+        View v = View.from(objectExpr, newCtx);
+        for (int i = 0; i < args.size(); ++i) {
+            // Get info about the formal arguments.
+            FormalArg formalArg = formalArgs.get(i);
+            ValueType formalArgType = formalArg.getType();
+            if (objectExpr.isPath()) {
+                formalArgType = formalArgType.adapt(v);
+            } else {
+                // adaptation for the receiver won't work, so try avoiding "this"
+                try {
+                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), calleeCtx);
+                } catch (RuntimeException e) {
+                    if (!e.getMessage().contains("not found")) {
+                        throw e;
+                    }
+                    // else: avoiding didn't succeed, but just try to continue for now
+                }
+            }
+            formalArgTypes.add(formalArgType);
+            ValueType actualArgType = actualArgTypes.get(i);
+
+            checkHighOrderEffect(newCtx, actualArgType, formalArgType);
+            // Check actual argument type accords with formal argument type.
+            FailureReason r = new FailureReason();
+            try {
+                if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
+                    argsTypechecked = false;
+                    if (failureReason == null) {
+                        failureReason = r.getReason();
+                    }
+                    break;
+                }
+            } catch (RuntimeException e) {
+                if (e.getMessage().contains("not found")) {
+                    argsTypechecked = false;
+                } else {
+                    throw e;
+                }
+            }
+
+
+            // Update context and view.
+            newCtx = newCtx.extend(formalArg.getSite(), actualArgType);
+            calleeCtx = calleeCtx.extend(formalArg.getSite(), actualArgType);
+            IExpr e = args.get(i);
+            if (e instanceof Variable) {
+                v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getSite()), (Variable) e, v);
+            }
+
+        }
+        
+        return new MatchResult(formalArgTypes, newCtx, calleeCtx, failureReason, v, argsTypechecked);
+    }
+    
     /**
      * Type the declaration for the method being invoked.
      * @param ctx: ctx in which invocation happens.
@@ -264,7 +363,7 @@ public class MethodCall extends Expression {
             ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName, receiver.desugar(ctx));
         }
         // Go through all declarations, typechecking against the actual types passed in...
-        List<ValueType> actualArgTypes = getArgTypes(ctx);
+        List<ValueType> actualArgTypes = getArgTypes(ctx, args);
         List<ValueType> formalArgTypes = null;
 
         // ...use this context to do that.
@@ -272,72 +371,29 @@ public class MethodCall extends Expression {
         TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
-            formalArgTypes = new LinkedList<ValueType>();
-            // Ignore non-methods.
-            newCtx = ctx;
-            calleeCtx = ctx.extend(receiverType.getSelfSite(), receiver);
-            if (!(declType instanceof DefDeclType)) {
+
+            MatchResult mr = matches(ctx, receiver, declType, args, objectExpr);
+            
+            newCtx = mr.newCtx;
+            calleeCtx = mr.calleeCtx;
+            formalArgTypes = mr.formalArgTypes;
+            if (mr.failureReason != null) {
+                failureReason = mr.failureReason;
+            }
+            if (!mr.succeeded) {
                 continue;
             }
             DefDeclType defDeclType = (DefDeclType) declType;
-            // Check it has correct number of arguments.
             List<FormalArg> formalArgs = defDeclType.getFormalArgs();
-            if (args.size() != formalArgs.size()) {
-                continue;
-            }
-
-            // Typecheck actual args against formal args of this declaration.
-            boolean argsTypechecked = true;
-            View v = View.from(objectExpr, newCtx);
-            for (int i = 0; i < args.size(); ++i) {
-                // Get info about the formal arguments.
-                FormalArg formalArg = formalArgs.get(i);
-                ValueType formalArgType = formalArg.getType();
-                if (objectExpr.isPath()) {
-                    formalArgType = formalArgType.adapt(v);
-                } else {
-                    //TypeContext thisCtx = newCtx.extend(receiverType.getSelfName(), receiverType);
-                    // adaptation for the receiver won't work, so try avoiding "this"
-                    formalArgType = formalArgType.avoid(receiverType.getSelfName(), calleeCtx);
-                }
-                formalArgTypes.add(formalArgType);
-                String formalArgName = formalArg.getName();
-                ValueType actualArgType = actualArgTypes.get(i);
-
-                // Check actual argument type accords with formal argument type.
-                FailureReason r = new FailureReason();
-
-                if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
-                    argsTypechecked = false;
-                    if (failureReason == null) {
-                        failureReason = r.getReason();
-                    }
-                    break;
-                }
-
-                if (!checkHighOrderEffect(ctx, actualArgType, formalArgType)) {
-                    break;
-                }
-
-
-                // Update context and view.
-                newCtx = newCtx.extend(formalArg.getSite(), actualArgType);
-                calleeCtx = calleeCtx.extend(formalArg.getSite(), actualArgType);
-                IExpr e = args.get(i);
-                if (e instanceof Variable) {
-                    v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getSite()), (Variable) e, v);
-                }
-            }
-
+            View v = mr.view;
+            
             // We were able to typecheck; figure out the return type, and set the method declaration.
-            if (argsTypechecked) {
+            if (mr.succeeded) {
+
                 // accumulate effects from method calls
                 if (effectAccumulator != null) {
-                    EffectSet methodCallE = defDeclType.getEffectSet();
-//                    for ambiguous effects: need primitive operations and etc. to have effects implemented or specifically ignored
-//                    if (methodCallE==null) {
-//                        ToolError.reportError(ErrorMessage.UNKNOWN_EFFECT, getLocation(), getMethodName());
-//                    }
+                    // get the effects through the current view
+                    EffectSet methodCallE = defDeclType.getEffectSet(v);
                     if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
                         Set<Effect> concreteEffects = new HashSet<>();
                         for (Effect e : methodCallE.getEffects()) {
@@ -353,10 +409,7 @@ public class MethodCall extends Expression {
 
                                 final IExpr arg = args.get(i);
 
-                                if (arg instanceof Variable) {
-                                    // Normal dependent effect
-                                    concreteEffects.add(new Effect((Variable) arg, e.getName(), e.getLocation()));
-                                } else if (arg instanceof New) {
+                                if (arg instanceof New) {
                                     // Polymorphic dependent effect
                                     for (Declaration d : ((New) arg).getDecls()) {
                                         if (d instanceof EffectDeclaration && d.getName().equals(e.getName())) {

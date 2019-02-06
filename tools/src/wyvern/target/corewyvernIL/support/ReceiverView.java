@@ -24,15 +24,28 @@ public class ReceiverView extends View {
         ValueType vt = e.typeCheck(ctx, null);
         StructuralType st = vt.getStructuralType(ctx);
         if (st != null) {
-            from = new Variable(st.getSelfName());
+            if (st.getSelfSite() == null) {
+                from = new Variable(st.getSelfName());
+            } else {
+                from = new Variable(st.getSelfSite());
+            }
         } else {
             from = null;
+        }
+        normalize();
+    }
+
+    private void normalize() {
+        if (from != null && to != null && to instanceof Variable
+                && from.getSite() == ((Variable) to).getSite() && from.getName().equals(((Variable) to).getName())) {
+            from = null; // empty transformation
         }
     }
 
     public ReceiverView(Variable from, Path to) {
         this.from = from;
         this.to = to;
+        normalize();
     }
 
     @Override

@@ -1,0 +1,6 @@
+module fileEffects
+
+effect Read = {system.ffiEffect}
+effect Write = {system.ffiEffect}
+effect Append = {system.ffiEffect}
+effect Delete = {system.ffiEffect}

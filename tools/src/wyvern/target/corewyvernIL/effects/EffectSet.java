@@ -63,13 +63,6 @@ public class EffectSet {
         return effectSet;
     }
 
-    /** Find and add paths for all effects in the set. */
-    public void addPaths(GenContext ctx) {
-        if (getEffects() != null) {
-            getEffects().stream().forEach(e -> e.addPath(ctx));
-        }
-    }
-
     /** Check that all effects in the set are well-formed, reports an error upon the first not found. */
     public void effectsCheck(TypeContext ctx) {
         if (getEffects() != null) {
@@ -120,14 +113,12 @@ public class EffectSet {
         return new EffectSet(newSet);
     }
 
-    public EffectSet contextualize(GenContext ctx) {
+    public void contextualize(GenContext ctx) {
         if (effectSet.isEmpty()) {
-            return this;
+            return;
         }
-        final Set<Effect> newSet = new HashSet<Effect>();
         for (final Effect e:effectSet) {
-            newSet.add(e.adaptVariables(ctx));
+            e.adaptVariables(ctx);
         }
-        return new EffectSet(newSet);
     }
 }

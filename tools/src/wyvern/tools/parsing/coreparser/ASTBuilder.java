@@ -57,7 +57,7 @@ interface ASTBuilder<AST, Type> {
     Object tagInfo(Type type, List<Type> comprises);
 
     Type nominalType(String name, FileLocation loc);
-    Type arrowType(List<Type> arguments, Type result, boolean isResource);
+    Type arrowType(List<Type> arguments, Type result, boolean isResource, String effects, FileLocation loc);
     Type parameterizedType(Type base, List<GenericArgument> genericArguments, FileLocation loc);
 
     Type qualifiedType(AST base, String name);

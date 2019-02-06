@@ -22,7 +22,7 @@ public class DefaultExprGenerator implements CallableExprGenerator {
     }
 
     @Override
-    public IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc, boolean isTailCall) {
+    public IExpr genExprWithArgs(List<? extends IExpr> args, HasLocation loc, boolean isTailCall, TypeContext ctx) {
         IExpr e = genExpr(loc.getLocation());
         return new MethodCall(e, Util.APPLY_NAME, args, loc, isTailCall);
     }

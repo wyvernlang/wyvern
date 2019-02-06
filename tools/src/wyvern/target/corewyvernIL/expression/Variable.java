@@ -74,6 +74,10 @@ public class Variable extends Expression implements Path {
         } else if (!name.equals(other.name)) {
             return false;
         }
+        // if sites are non-null, compare sites
+        if (site != null && other.site != null && site != other.site) {
+            return false;
+        }
         return true;
     }
 

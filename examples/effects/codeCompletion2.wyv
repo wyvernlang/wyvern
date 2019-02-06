@@ -1,0 +1,8 @@
+module def codeCompletion2(log: effects.Logger2)
+
+import effects.fileEffects
+
+def findTemplate(wordSequence: String): {fileEffects.Append} String
+   log.updateLog("Searching for a matching template.")
+   log.updateLog("Found matching template.")
+   "template"

@@ -235,6 +235,13 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     
  	terminal Token dslLine_t ::= /[^\n]*(\n|(\r\n))/ {: RESULT = token(DSLLINE,lexeme); flagTok = null; :};
  	
+ 	/* When is an indent a DSL?
+ 	 * Here's the abstract specification, implemented by the code below along with isDSLNext() and the code that sets flagTok:
+ 	 * - in general, all indents are DSLs.  The exceptions are:
+ 	 *   - when we are at a line of code with the type, datatype, new, or match keywords
+ 	 *   - when we are at a line of code with the def keyword and no = symbol after it
+ 	 * - note that case is implemented to allow DSLs but immediately translates them into other code (see WyvernParser.jj)
+ 	 */
  	// error if DSLNext but not indented further
  	// DSL if DSLNext and indented (unsets DSLNext, sets inDSL)
  	// DSL if inDSL and indented

@@ -183,13 +183,12 @@ public final class QuantificationLifter {
             lb.getEffects().addAll(hoEffects.getEffects());
         }
 
-        for (Effect e : lb.getEffects()) {
-            View x = null;
-        }
-
-
         final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(MONOMORPHIZED_EFFECT, lb, null);
         final FormalArg newFormalArg = new FormalArg(genericArgSite, boundedType);
+//        final ValueType genericType =
+//                wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, GenericKind.EFFECT);
+//        final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
+
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 
         // Construct updated type context

@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.type;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
@@ -112,6 +113,15 @@ public abstract class ValueType extends Type implements IASTNode {
         return t instanceof DynamicType || equals(t); // default
     }
 
+    /** Find the declaration type with the specified name, excluding matches for which the exclusionFilter returns true, or return null if it is not present */
+    public DeclType findMatchingDecl(String name, Predicate<? super DeclType> exclusionFilter, TypeContext ctx) {
+        StructuralType st = getStructuralType(ctx);
+        if (st == null) {
+            return null;
+        }
+        return st.findMatchingDecl(name, exclusionFilter, ctx);
+    }
+    
     /** Find the declaration type with the specified name, or return null if it is not present */
     public DeclType findDecl(String declName, TypeContext ctx) {
         StructuralType st = getStructuralType(ctx);

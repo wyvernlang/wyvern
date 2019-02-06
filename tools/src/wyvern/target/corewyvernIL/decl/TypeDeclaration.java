@@ -45,7 +45,9 @@ public class TypeDeclaration extends NamedDeclaration {
         if (metadata != null) {
             metadata.typeCheck(thisCtx, null);
         }
-        return getDeclType();
+        sourceType.checkWellFormed(thisCtx);
+        DeclType declType = getDeclType();
+        return declType;
     }
 
     @Override

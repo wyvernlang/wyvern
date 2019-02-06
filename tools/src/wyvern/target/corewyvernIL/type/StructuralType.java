@@ -3,8 +3,10 @@ package wyvern.target.corewyvernIL.type;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
@@ -22,6 +24,7 @@ import wyvern.target.corewyvernIL.support.ReceiverView;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.expressions.Fn;
@@ -42,7 +45,10 @@ public class StructuralType extends ValueType {
         this(selfSite, declTypes, false);
     }
     public StructuralType(BindingSite selfSite, List<DeclType> declTypes, boolean resourceFlag) {
-        super();
+        this(selfSite, declTypes, resourceFlag, null);
+    }
+    public StructuralType(BindingSite selfSite, List<DeclType> declTypes, boolean resourceFlag, FileLocation loc) {
+        super(loc);
         this.selfSite = selfSite;
         // check a sanity condition
         //        if (declTypes != null && declTypes.size()>0)
@@ -59,6 +65,19 @@ public class StructuralType extends ValueType {
     }
 
     private static final StructuralType emptyType = new StructuralType("IGNORE_ME", Collections.emptyList());
+    
+    public void checkForDuplicates() {
+        Set<String> valueNames = new HashSet<String>();  
+        Set<String> typeNames = new HashSet<String>();  
+        for (DeclType dt : declTypes) {
+            Set<String> names = dt.isTypeOrEffectDecl() ? typeNames : valueNames;
+            if (names.contains(dt.getName())) {
+                ToolError.reportError(ErrorMessage.DUPLICATE_MEMBER, this, "Type", dt.getName());
+            } else {
+                names.add(dt.getName());
+            }
+        }
+    }
 
     public static StructuralType getEmptyType() {
         return emptyType;
@@ -185,14 +204,20 @@ public class StructuralType extends ValueType {
 
         TypeContext extendedCtx = ctx.extend(selfSite, this);
         for (DeclType dt : st.getDeclTypes()) {
-            DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeOrEffectDecl() != dt.isTypeOrEffectDecl(), ctx);
+            // get all decls
+            List<DeclType> candidates = findDecls(dt.getName(), ctx);
+            //DeclType candidateDT = findMatchingDecl(dt.getName(), cdt -> cdt.isTypeOrEffectDecl() != dt.isTypeOrEffectDecl(), ctx);
             //DeclType candidateDT = findDecl(dt.getName(), ctx);
-            if (candidateDT == null) {
+            if (candidates.isEmpty()) {
                 if (!reason.isDefined()) {
                     reason.setReason("missing declaration " + dt.getName());
                 }
                 return false;
-            } else if (!candidateDT.isSubtypeOf(dt, extendedCtx, reason)) {
+            }
+            // filter ones that don't match
+            candidates.removeIf(c -> !c.isSubtypeOf(dt, extendedCtx, reason));
+            // if empty, error
+            if (candidates.isEmpty()) {
                 if (!reason.isDefined()) {
                     reason.setReason("declaration " + dt.getName() + " is not a subtype of the expected declaration");
                 }
@@ -214,7 +239,8 @@ public class StructuralType extends ValueType {
     /** Search for decl types with the name given.  Take out those that match the exclusionFilter.
      * If exactly one remains, return it.  Otherwise, return null.
      */
-    DeclType findMatchingDecl(String name, Predicate<? super DeclType> exclusionFilter, TypeContext ctx) {
+    @Override
+    public DeclType findMatchingDecl(String name, Predicate<? super DeclType> exclusionFilter, TypeContext ctx) {
         List<DeclType> ds = findDecls(name, ctx);
         ds.removeIf(exclusionFilter);
         if (ds.size() != 1) {
@@ -269,9 +295,14 @@ public class StructuralType extends ValueType {
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
+        boolean needsResource = false;
         final TypeContext selfCtx = ctx.extend(selfSite, this);
         for (DeclType dt : declTypes) {
             dt.checkWellFormed(selfCtx);
+            needsResource = needsResource || dt.containsResource(selfCtx);
+        }
+        if (needsResource && !resourceFlag) {
+            ToolError.reportError(ErrorMessage.MUST_BE_A_RESOURCE, this, "This type");
         }
     }
 

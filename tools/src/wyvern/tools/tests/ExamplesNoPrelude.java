@@ -7,10 +7,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.hamcrest.core.StringContains;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
@@ -37,6 +40,9 @@ public class ExamplesNoPrelude {
   public void setup() {
     Globals.resetPrelude();
   }*/
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @BeforeClass
   public static void setupResolver() {
@@ -66,6 +72,15 @@ public class ExamplesNoPrelude {
   public void testDatatypes() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "introductory.datatypes",
         Util.stringType(), new StringLiteral("(x => x) unit"));
+  }
+
+  @Test
+  public void testImmutability() throws ParseException {
+      expectedException.expect(ToolError.class);
+      expectedException.expectMessage(StringContains.containsString("This type must be a resource type"));
+
+        TestUtil.doTestScriptModularly(PATH, "introductory.immutability", Util.intType(),
+                new IntegerLiteral(15));
   }
 
   @Test
@@ -161,6 +176,46 @@ public class ExamplesNoPrelude {
   @Test
   public void testMembrane() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "capabilities.Membrane", null, null);
+  }
+  
+  @Test
+  public void testCodeCompletion() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.codeCompletion", null, null);
+  }
+
+  @Test
+  public void testCodeCompletion2() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.codeCompletion2", null, null);
+  }
+
+  @Test
+  public void testLogger() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.logger", null, null);
+  }
+
+  @Test
+  public void testLogger2() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.logger2", null, null);
+  }
+
+  @Test
+  public void testRemoteLogger() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.remoteLogger", null, null);
+  }
+
+  @Test
+  public void testUserStats() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.userStats", null, null);
+  }
+
+  @Test
+  public void testUserStats2() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.userStats2", null, null);
+  }
+
+  @Test
+  public void testTwice() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "effects.twice", null, null);
   }
 
   @Test

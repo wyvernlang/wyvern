@@ -6,11 +6,13 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.types.AbstractTypeImpl;
 import wyvern.tools.types.ApplyableType;
@@ -20,11 +22,15 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
     private Type result;
     private List<Type> arguments;
     private boolean isResource;
+    private EffectSet effectSet;
+    private boolean adapted = false;
 
-    public Arrow(List<Type> arguments, Type result, boolean isResource) {
+    public Arrow(List<Type> arguments, Type result, boolean isResource, String effects, FileLocation location) {
+        super(location);
         this.arguments = arguments;
         this.result = result;
         this.isResource = isResource;
+        this.effectSet = EffectSet.parseEffects("arrow type", effects, false, location);
     }
 
     public Type getResult() {
@@ -67,7 +73,15 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
                 formals.add(new FormalArg("arg" + i, argType));
             }
         }
+        
+        if (!adapted && effectSet != null) {
+            effectSet.contextualize(ctx);
+            adapted = true;
+        }
 
-        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL, Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals)), isResource);
+
+        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL,
+                                  Arrays.asList(new DefDeclType(Util.APPLY_NAME, result.getILType(ctx), formals, effectSet)),
+                                  isResource);
     }
 }

@@ -8,7 +8,7 @@ type Function
   effect E
   type A
   type B
-  def apply(x : this.A) : {E} this.B
+  def apply(x : this.A) : {this.E} this.B
 
 val repeatFunction = new
   effect E = {u.E}

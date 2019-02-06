@@ -1,0 +1,9 @@
+module def remoteLogger(net: effects.Network): effects.Logger
+
+effect ReadLogFile = {net.Receive}
+effect UpdateLogFile = {net.Send}
+
+def readLog(): {ReadLogFile} String
+   net.receive()
+def updateLog(newEntry: String): {UpdateLogFile} Unit
+   net.send(newEntry)

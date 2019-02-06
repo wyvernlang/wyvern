@@ -23,7 +23,6 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.generics.GenericParameter;
-import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
@@ -31,7 +30,7 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
 import wyvern.tools.util.Pair;
 
-public class ModuleDeclaration extends Declaration implements CoreAST {
+public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAST {
     private final String name;
     private final TypedAST inner;
     private FileLocation location;
@@ -40,7 +39,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
     private final List<NameBindingImpl> args;
 
     private final List<ImportDeclaration> imports;
-    private final List<GenericParameter> generics;
+    //private final List<GenericParameter> generics;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
                              TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
@@ -210,7 +209,7 @@ public class ModuleDeclaration extends Declaration implements CoreAST {
         if (this.generics != null) {
             GenContext[] contexts = new GenContext[1];
             contexts[0] = methodContext;
-            DefDeclaration.addGenericParameters(contexts, formalArgs, this.generics);
+            addGenericParameters(contexts, formalArgs);
             methodContext = contexts[0];
         }
 

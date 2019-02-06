@@ -1,0 +1,22 @@
+module def simpledb()
+
+var firstName: String = ""
+var lastName: String = ""
+var age: String = ""
+var country: String = ""
+
+def getFirstName():String = firstName
+def setFirstName(str: String):Unit 
+    firstName = str
+
+def getLastName():String = lastName
+def setLastName(str: String):Unit 
+    lastName = str
+
+def getAge():String = age
+def setAge(str: String):Unit 
+    age = str
+
+def getCountry():String = country
+def setCountry(str: String):Unit
+    country = str

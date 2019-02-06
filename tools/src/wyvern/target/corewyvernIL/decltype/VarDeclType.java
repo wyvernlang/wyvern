@@ -36,6 +36,11 @@ public class VarDeclType extends DeclTypeWithResult implements IASTNode {
     }
 
     @Override
+    public boolean containsResource(TypeContext ctx) {
+        return true;
+    }
+    
+    @Override
     public DeclType adapt(View v) {
         return new VarDeclType(getName(), this.getRawResultType().adapt(v));
     }

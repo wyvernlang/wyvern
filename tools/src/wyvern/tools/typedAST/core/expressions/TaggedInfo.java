@@ -1,6 +1,5 @@
 package wyvern.tools.typedAST.core.expressions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import wyvern.tools.types.Type;
@@ -23,11 +22,9 @@ public class TaggedInfo {
      * Has no case of, and no comprises.
      */
     public TaggedInfo() {
-        this.comprises = new ArrayList<Type>();
     }
 
     public TaggedInfo(String name, Type type) {
-        this.comprises = new ArrayList<Type>();
         this.tagName = name;
         this.tagType = type;
     }
@@ -51,7 +48,7 @@ public class TaggedInfo {
     /**
      * Constructs a TaggedInfo with the given caseOf and given comprises.
      *
-     * comprises cannot be null or a NullPointerException is thrown.
+     * comprises may be null if no list of comprises is specified.
      *
      * @param caseOf the datatype that this tagged type is a subtype of
      * @param comprises the list of subtypes for a tagged type
@@ -59,12 +56,8 @@ public class TaggedInfo {
     public TaggedInfo(Type caseOf, List<Type> comprises) {
         this.caseOf = caseOf;
 
-        if (comprises != null) {
-            this.comprises = comprises;
-        } else {
-            this.comprises = new ArrayList<Type>();
-        }
-    }
+        this.comprises = comprises;
+}
 
     /**
      * Associates this name with the tag. Needed because we don't know tags name when this object is
@@ -97,12 +90,12 @@ public class TaggedInfo {
     }
 
     /**
-     * Returns true if this TaggedInfo has at least 1 comprises tag.
+     * Returns true if this TaggedInfo has a non-null comprises list.
      *
      * @return
      */
     public boolean hasComprises() {
-        return !comprises.isEmpty();
+        return comprises != null;
     }
 
     /**
@@ -116,8 +109,9 @@ public class TaggedInfo {
     }
 
     /**
-     * Returns a non-null list of what tags are comprised.
-     * A size of 0 indicates this doesn't have any comprise tags.
+     * Returns a list of what tags are comprised.
+     * null indicates this doesn't have any comprise tags.
+     * an empty list indicates there are no cases
      *
      * @return
      */

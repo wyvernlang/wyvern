@@ -1,0 +1,4 @@
+resource type TPostProcessor
+    def getPayload(is:Dyn):String
+    def getParamByIndex(params:String,index:Int):String
+    def getParamMappingToString():String

@@ -1,0 +1,9 @@
+module def logger(f: effects.File): effects.Logger
+
+effect ReadLogFile = {f.Read}
+effect UpdateLogFile = {f.Append}
+
+def readLog(): {ReadLogFile} String
+   f.read()
+def updateLog(newEntry: String): {UpdateLogFile} Unit
+   f.append(newEntry)

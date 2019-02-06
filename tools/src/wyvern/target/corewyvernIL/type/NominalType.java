@@ -30,9 +30,7 @@ public class NominalType extends ValueType {
     private String typeMember;
 
     public NominalType(String pathVariable, String typeMember) {
-        super();
-        this.path = new Variable(pathVariable);
-        this.typeMember = typeMember;
+        this (new Variable(pathVariable), typeMember, null);
     }
 
     public NominalType(Path path, String typeMember) {
@@ -102,7 +100,7 @@ public class NominalType extends ValueType {
     }
 
     
-    private DeclType getSourceDeclType(TypeContext ctx) {
+    DeclType getSourceDeclType(TypeContext ctx) {
         final ValueType t = path.typeCheck(ctx, null);
         nestingCount++;
         if (nestingCount > 100) {
@@ -133,6 +131,29 @@ public class NominalType extends ValueType {
                 return this;
             } else {
                 return resultType.getCanonicalType(ctx);
+            }
+        } else {
+            return this;
+        }
+    }
+
+    public NominalType getCanonicalNominalType(TypeContext ctx) {
+        DeclType dt = null;
+        try {
+            dt = getSourceDeclType(ctx);
+        } catch (RuntimeException e) {
+            // failed to get a canonical type
+            return this;
+        }
+        if (dt instanceof ConcreteTypeMember) {
+            if (((ConcreteTypeMember) dt).getSourceType() instanceof TagType) {
+                return this;
+            }
+            final ValueType resultType = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+            if (this.equals(resultType) || !(resultType instanceof NominalType)) {
+                return this;
+            } else {
+                return ((NominalType) resultType).getCanonicalNominalType(ctx);
             }
         } else {
             return this;
@@ -244,7 +265,11 @@ public class NominalType extends ValueType {
         }
         try {
             final Path newPath = path.adapt(v);
-            return new NominalType(newPath, typeMember);
+            if (newPath == this.path) {
+                return this;
+            } else {
+                return new NominalType(newPath, typeMember);
+            }
         } catch (RuntimeException e) {
             if (v.getContext() != null) {
                 return getCanonicalType(v.getContext());
@@ -331,5 +356,12 @@ public class NominalType extends ValueType {
     @Override
     public boolean isEffectUnannotated(TypeContext ctx) {
         return true;
+    }
+
+    public boolean nominallyEquals(NominalType parentType, TypeContext ctx) {
+        NominalType myCanonical = getCanonicalNominalType(ctx);
+        NominalType theirCanonical = getCanonicalNominalType(ctx);
+        
+        return myCanonical.equals(theirCanonical);
     }
 }

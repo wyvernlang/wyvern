@@ -269,7 +269,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             ctors.add(valueConstructor);
 
             /* The type constructor */
-            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, null, isResource, null);
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, loc, isResource, null);
             exps.add(cons);
 
         }
@@ -316,8 +316,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public Type arrowType(List<Type> arguments, Type result, boolean isResource) {
-        return new Arrow(arguments, result, isResource);
+    public Type arrowType(List<Type> arguments, Type result, boolean isResource, String effects, FileLocation location) {
+        return new Arrow(arguments, result, isResource, effects, location);
     }
 
     @Override
@@ -372,7 +372,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public void addArgument(TypedAST application, TypedAST argument) throws ParseException {
         if (!(application instanceof Application)) {
-            throw new ParseException("Added an additional TSL argument to something that was not an application");
+            ToolError.reportError(ErrorMessage.PARSE_ERROR,
+                    argument.getLocation(), "Added an additional TSL argument to something that was not an application");
         }
         Application app = (Application) application;
         app.addArgument(argument);

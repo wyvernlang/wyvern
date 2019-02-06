@@ -9,11 +9,14 @@ import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
+import wyvern.tools.errors.FileLocation;
 
 public class DataType extends TagType {
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-        dest.append("datatype extends ");
+        dest.append("datatype ");
+        this.getSelfType().doPrettyPrint(dest, indent);
+        dest.append(" extends ");
         NominalType parent = this.getParentType(); 
         if (parent == null) {
             dest.append("Top");
@@ -26,8 +29,8 @@ public class DataType extends TagType {
 
     private List<NominalType> cases;
 
-    public DataType(NominalType parentType, ValueType valueType, List<NominalType> cases) {
-        super(parentType, valueType);
+    public DataType(NominalType parentType, ValueType valueType, NominalType selfType, List<NominalType> cases, FileLocation location) {
+        super(parentType, valueType, selfType, location);
         this.cases = cases;
     }
 
@@ -54,7 +57,7 @@ public class DataType extends TagType {
         for (NominalType t : cases) {
             newCases.add((NominalType) t.adapt(v));
         }
-        return new DataType(newCT, getValueType().adapt(v), newCases);
+        return new DataType(newCT, getValueType().adapt(v), getSelfType(), newCases, getLocation());
     }
 
     @Override
@@ -82,7 +85,7 @@ public class DataType extends TagType {
         for (NominalType t : cases) {
             newCases.add((NominalType) t.doAvoid(varName, ctx, depth));
         }
-        return new DataType(newCT, getValueType().doAvoid(varName, ctx, depth), newCases);
+        return new DataType(newCT, getValueType().doAvoid(varName, ctx, depth), getSelfType(), newCases, getLocation());
     }
 
     @Override

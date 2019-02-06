@@ -1,0 +1,11 @@
+module def userStats2(log: effects.Logger)
+
+effect AnalyzeLog = {log.ReadLogFile, log.UpdateLogFile}
+
+def analyzeLogContent(logText: String):String
+    "stats"
+
+def calculateUserStats(): {AnalyzeLog} String
+   log.updateLog("Starting to analyze the log content.")
+   analyzeLogContent(log.readLog())
+   

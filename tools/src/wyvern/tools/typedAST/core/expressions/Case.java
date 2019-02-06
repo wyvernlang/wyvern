@@ -7,6 +7,7 @@ import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -89,7 +90,7 @@ public class Case {
         return caseType == CaseType.TYPED;
     }
 
-    public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, NominalType expectedType, List<TypedModuleSpec> dependencies) {
+    public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         String bindingVar = binding.getName();
         BindingSite bindingSite = new BindingSite(bindingVar);
         wyvern.target.corewyvernIL.expression.Variable expr = new wyvern.target.corewyvernIL.expression.Variable(bindingVar);
@@ -103,6 +104,10 @@ public class Case {
             ctx = ctx.extend(bindingSite, expr, bestType);
         }
         Expression body = (Expression) ast.generateIL(ctx, expectedType, dependencies);
+        if (bestType instanceof RefinementType) {
+            bestType = ((RefinementType) bestType).getBase();
+            System.err.println("Ignoring refinement in case branch in " + taggedType.getLocation());
+        }
         return new wyvern.target.corewyvernIL.Case(bindingSite, (NominalType) bestType, body);
     }
 

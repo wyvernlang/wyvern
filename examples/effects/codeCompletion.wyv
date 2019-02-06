@@ -1,0 +1,7 @@
+module def codeCompletion(log: effects.Logger)
+
+def findTemplate(wordSequence: String): {log.UpdateLogFile} String
+   log.updateLog("Searching for a matching template.")
+   log.updateLog("Found matching template.")
+   "template"
+

@@ -13,14 +13,18 @@ public class VarGenContext extends GenContext {
     private ValueType type;
 
     public VarGenContext(BindingSite varBinding, Expression expr, ValueType type, GenContext genContext) {
-        super(genContext);
+        this(varBinding.getName(), expr, type, genContext);
+        /*super(genContext);
         if (varBinding == null) {
             throw new NullPointerException();
-        }
+        }*/
         this.site = varBinding;
-        this.name = site.getName();
+        if (expr instanceof Variable && !((Variable) expr).getName().equals(varBinding.getName())) {
+            throw new RuntimeException("invariant violated");
+        }
+        /*this.name = site.getName();
         this.expr = expr;
-        this.type = type;
+        this.type = type;*/
     }
 
     public VarGenContext(String varName, Expression expr, ValueType type, GenContext genContext) {
@@ -40,6 +44,10 @@ public class VarGenContext extends GenContext {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+    
     @Override
     public String toString() {
         return "GenContext[" + endToString();
@@ -61,22 +69,22 @@ public class VarGenContext extends GenContext {
 
     @Override
     public ValueType lookupTypeOf(Variable v) {
-        /*if (v.getSite() != null) {
+        if (v.getSite() != null) {
             if (v.getSite() == site) {
                 return type;
             } else {
                 return getNext().lookupTypeOf(v);
             }
-        } else {*/
+        } else {
             if (v.getName().equals(name)) {
-                if (site != null) {
-                    v.siteFound(site);
-                }
+                //if (site != null) {
+                    //v.siteFound(site);
+                //}
                 return type;
             } else {
                 return getNext().lookupTypeOf(v);
             }
-        //}
+        }
     }
 
     @Override
