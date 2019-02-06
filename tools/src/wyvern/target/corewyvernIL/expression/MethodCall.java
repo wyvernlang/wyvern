@@ -207,6 +207,7 @@ public class MethodCall extends Expression {
     }
 
     private static boolean checkHighOrderEffect(TypeContext ctx, ValueType actualArgType, ValueType formalArgType) {
+
         // TODO: check why there is a circularly defined type
         if (actualArgType.toString().contains("__generic__X.X")) {
             return true;
