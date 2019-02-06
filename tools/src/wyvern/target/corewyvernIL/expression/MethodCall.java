@@ -22,7 +22,12 @@ import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
-import wyvern.target.corewyvernIL.support.*;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.View;
+import wyvern.target.corewyvernIL.support.FailureReason;
+import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.ViewExtension;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -225,15 +230,15 @@ public class MethodCall extends Expression {
 
                     EffectDeclType decl = effect.findEffectDeclType(ctx);
                     EffectSet declared = decl.getEffectSet();
-                    if(declared != null) {
-                        for(Effect declaredEffect : declared.getEffects()) {
-                            if(declaredEffect.getName().equals(name)) {
+                    if (declared != null) {
+                        for (Effect declaredEffect : declared.getEffects()) {
+                            if (declaredEffect.getName().equals(name)) {
                                 found = true;
                             }
                         }
                     }
                 }
-                if(!found) {
+                if (!found) {
                     ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this,
                                                 "Effect set does not contains lower bound");
                     return false;
@@ -310,7 +315,7 @@ public class MethodCall extends Expression {
                     break;
                 }
 
-                if(!checkHighOrderEffect(ctx, actualArgType, formalArgType)) {
+                if (!checkHighOrderEffect(ctx, actualArgType, formalArgType)) {
                     break;
                 }
 

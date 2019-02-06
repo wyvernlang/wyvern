@@ -24,7 +24,10 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
-import wyvern.target.corewyvernIL.expression.*;
+import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.SeqExpr;
+import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.type.DataType;
 import wyvern.target.corewyvernIL.type.ExtensibleTagType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -109,8 +112,8 @@ public final class QuantificationLifter {
             if (declType instanceof DefDeclType) {
                 DefDeclType def = (DefDeclType) (declType);
                 EffectSet e = def.getEffectSet();
-                if(e != null) {
-                    for(Effect effect : e.getEffects()) {
+                if (e != null) {
+                    for (Effect effect : e.getEffects()) {
                         effects.getEffects().add(effect);
                     }
                 }
@@ -180,7 +183,7 @@ public final class QuantificationLifter {
             lb.getEffects().addAll(hoEffects.getEffects());
         }
 
-        for(Effect e : lb.getEffects()) {
+        for (Effect e : lb.getEffects()) {
             View x = null;
         }
 
