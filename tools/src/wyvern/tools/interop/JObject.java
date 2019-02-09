@@ -18,7 +18,8 @@ public class JObject implements FObject {
     if (args.size() > 0) {
       int i = 0;
       for (Object arg : args) {
-        parameterTypes[i++] = arg.getClass();
+        // handle null objects by representing their type as null
+        parameterTypes[i++] = (arg == null) ? null : arg.getClass();
       }
     }
     Class<?> cls = jObject.getClass();
@@ -62,7 +63,8 @@ public class JObject implements FObject {
       return false;
     }
     for (int i = 0; i < formalTypes.length; ++i) {
-      if (!mapPrimitives(formalTypes[i]).isAssignableFrom(parameterTypes[i])) {
+      // null for the type means the object is null, so always assignable
+      if (parameterTypes[i] != null && !mapPrimitives(formalTypes[i]).isAssignableFrom(parameterTypes[i])) {
         return false;
       }
     }

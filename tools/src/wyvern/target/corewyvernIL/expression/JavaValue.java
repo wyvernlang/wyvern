@@ -79,6 +79,7 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else if (result instanceof Character) {
             return new CharacterLiteral((Character) result);
         } else if (result == null) {
+            // null is represented as unit
             return Util.unitValue();
         } else if (result instanceof List) {
             ObjectValue v = null;
@@ -128,14 +129,20 @@ public class JavaValue extends AbstractValue implements Invokable {
             return new Character(((CharacterLiteral) arg).getValue());
         } else if (arg instanceof ObjectValue) {
             // Check if arg looks like a list type
-            ObjectValue wyvList = (ObjectValue) arg;
-            if (wyvList.findDecl("get", false) != null && wyvList.findDecl("length", false) != null) {
+            ObjectValue wyvObj = (ObjectValue) arg;
+            // is it null?
+            if (wyvObj.getDecls().isEmpty()) {
+                // unit represents null
+                return null;
+            }
+            // is it a list?
+            if (wyvObj.findDecl("get", false) != null && wyvObj.findDecl("length", false) != null) {
                 List<Value> javaList = new LinkedList<>();
-                int listLen = ((IntegerLiteral) (wyvList.invoke("length", new LinkedList<>()))).getValue();
+                int listLen = ((IntegerLiteral) (wyvObj.invoke("length", new LinkedList<>()))).getValue();
                 for (int i = 0; i < listLen; i++) {
                     LinkedList<Value> args = new LinkedList<>();
                     args.add(new IntegerLiteral(i));
-                    Value element = MethodCall.trampoline(wyvList.invoke("get", args));
+                    Value element = MethodCall.trampoline(wyvObj.invoke("get", args));
                     Value v = ((ObjectValue) element).getField("value");
                     javaList.add(v);
                 }

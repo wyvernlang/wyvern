@@ -16,8 +16,10 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.FObject;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.util.Pair;
@@ -93,7 +95,7 @@ public class FFI extends AbstractValue {
         try {
             obj = wyvern.tools.interop.Default.importer().find(importPath, errorLocation);
         } catch (ReflectiveOperationException e1) {
-            throw new RuntimeException(e1);
+            ToolError.reportError(ErrorMessage.IMPORT_NOT_FOUND, errorLocation, uri.toString());
         }
 
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
