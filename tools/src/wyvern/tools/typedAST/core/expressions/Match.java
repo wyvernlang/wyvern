@@ -120,7 +120,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
                                                              .collect(Collectors.toList());
         ValueType expectedCaseType = expectedType;
         for (wyvern.target.corewyvernIL.Case c : casesIL) {
-            GenContext caseCtx = ctx.extend(c.getSite(), c.getAdaptedPattern(matchType));
+            GenContext caseCtx = ctx.extend(c.getSite(), c.getAdaptedPattern(matchType, matchExpr, ctx));
             ValueType caseType = c.getBody().typeCheck(caseCtx, null);
             FailureReason reason = new FailureReason();
             if (expectedCaseType != null && !caseType.isSubtypeOf(expectedCaseType, caseCtx, reason)) {

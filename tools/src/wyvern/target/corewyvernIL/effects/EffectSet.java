@@ -4,6 +4,7 @@
  */
 package wyvern.target.corewyvernIL.effects;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -57,6 +58,10 @@ public class EffectSet {
     private final Set<Effect> effectSet;
     public EffectSet(Set<Effect> effectSet) {
         this.effectSet = effectSet;
+    }
+
+    public EffectSet(Effect effect) {
+        this(Collections.singleton(effect));
     }
 
     public Set<Effect> getEffects() {
