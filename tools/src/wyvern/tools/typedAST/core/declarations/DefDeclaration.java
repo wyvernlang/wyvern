@@ -310,7 +310,7 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         return new StructuralType(genericSite, bodyDecl);
     }
 
-    public static StructuralType boundedStructuralType(String genericName, EffectSet lb, EffectSet ub) {
+    public static StructuralType boundedStructuralType(String genericName, BindingSite genericSite, EffectSet lb, EffectSet ub) {
         List<DeclType> bodyDecl = new LinkedList<>(); // these are the declarations internal to the struct
 
         // the body contains only a abstract type or effect member representing the generic type
@@ -318,7 +318,7 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         member = new EffectDeclType(genericName, null, null, lb, ub);
         bodyDecl.add(member);
 
-        return new StructuralType(GENERIC_PREFIX + genericName, bodyDecl);
+        return new StructuralType(genericSite, bodyDecl);
     }
 
     @Override

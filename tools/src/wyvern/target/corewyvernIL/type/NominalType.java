@@ -6,10 +6,7 @@ import java.util.Arrays;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
-import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
-import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
+import wyvern.target.corewyvernIL.decltype.*;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Tag;
@@ -215,10 +212,16 @@ public class NominalType extends ValueType {
         if (ctx.isAssumedSubtype(this, t)) {
             return true;
         }
+
+        // Testing variable
+        boolean cond = this.toString().contains("import3.Go")&& t.toString().contains("resource");
+
         DeclType dt = getSourceDeclType(ctx);
+
         if (dt instanceof ConcreteTypeMember) {
             Type definedType = ((ConcreteTypeMember) dt).getSourceType();
             ValueType ct = t.getCanonicalType(ctx);
+
             if (definedType instanceof TagType) {
                 // before checking parent, test for equality with canonical type
                 if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
@@ -229,6 +232,7 @@ public class NominalType extends ValueType {
                 return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
             }
             ValueType vt = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+
             // if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
             //if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
             ctx = new SubtypeAssumption(this, t, ctx);

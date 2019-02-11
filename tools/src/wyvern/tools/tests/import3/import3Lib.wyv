@@ -1,0 +1,5 @@
+module def import3Lib(g : import3.Go)
+
+import polymorphicEffects.Go
+
+unit

@@ -35,12 +35,15 @@ import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.generics.GenericKind;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType;
 
 public final class QuantificationLifter {
     private static final String MONOMORPHIZED_EFFECT = "__MonomorphizedEffect__";
@@ -183,10 +186,10 @@ public final class QuantificationLifter {
             lb.getEffects().addAll(hoEffects.getEffects());
         }
 
-        final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(MONOMORPHIZED_EFFECT, lb, null);
+        final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, lb, null);
         final FormalArg newFormalArg = new FormalArg(genericArgSite, boundedType);
 //        final ValueType genericType =
-//                wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, GenericKind.EFFECT);
+//                genericStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, GenericKind.EFFECT);
 //        final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
 
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
@@ -431,8 +434,10 @@ public final class QuantificationLifter {
                 final EffectSet oldEffectSet = defDeclType.getEffectSet();
                 final EffectSet newEffectSet;
                 if (oldEffectSet == null) {
+                    // TODO: this is the problem...
                     // This declaration is unannotated, so annotate it with the monomorphized effect
                     newEffectSet = TypeLifter.this.monomorphicEffect;
+                    //newEffectSet = null;
                 } else {
                     // This declaration is annotated, so don't change it
                     newEffectSet = oldEffectSet;

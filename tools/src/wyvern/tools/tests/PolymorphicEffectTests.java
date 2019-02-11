@@ -118,10 +118,15 @@ public class PolymorphicEffectTests {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.client", Util.stringType(), new StringLiteral("abc"));
     }
 
-//    @Test
-//    public void import3() throws ParseException {
-//        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
-//    }
+    @Test
+    public void import3() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
+    public void go() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "import3.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
 
 
 

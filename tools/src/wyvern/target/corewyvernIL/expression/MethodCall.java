@@ -274,10 +274,13 @@ public class MethodCall extends Expression {
     }
     
     public static MatchResult matches(TypeContext newCtx, ValueType receiver, DeclType declType, List<? extends IExpr> args, IExpr objectExpr) {
+
+
         List<ValueType> actualArgTypes = getArgTypes(newCtx, args);
         StructuralType receiverType = receiver.getStructuralType(newCtx);
         List<ValueType> formalArgTypes = new LinkedList<ValueType>();
         String failureReason = null;
+
 
         // Ignore non-methods.
         TypeContext calleeCtx = newCtx.extend(receiverType.getSelfSite(), receiver);
@@ -320,6 +323,8 @@ public class MethodCall extends Expression {
             FailureReason r = new FailureReason();
             try {
                 if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
+                    DeclType actualDecl = actualArgType.getStructuralType(newCtx).getDeclTypes().get(0);
+                    DeclType formalDecl = formalArgType.getStructuralType(newCtx).getDeclTypes().get(0);
                     argsTypechecked = false;
                     if (failureReason == null) {
                         failureReason = r.getReason();
@@ -374,7 +379,6 @@ public class MethodCall extends Expression {
         for (DeclType declType : declarationTypes) {
 
             MatchResult mr = matches(ctx, receiver, declType, args, objectExpr);
-            
             newCtx = mr.newCtx;
             calleeCtx = mr.calleeCtx;
             formalArgTypes = mr.formalArgTypes;
@@ -387,7 +391,7 @@ public class MethodCall extends Expression {
             DefDeclType defDeclType = (DefDeclType) declType;
             List<FormalArg> formalArgs = defDeclType.getFormalArgs();
             View v = mr.view;
-            
+
             // We were able to typecheck; figure out the return type, and set the method declaration.
             if (mr.succeeded) {
 

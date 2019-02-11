@@ -8,7 +8,7 @@ type UnitFnWithoutEffect
 
 val g : Go [{system.ffiEffect}] = new
     // x should be a function without effect
-    def go (x : Unit -> Unit) : {} Unit
+    def go (x : Unit -> {} Unit) : {} Unit
         x()
 
 val file1 : File[{system.ffiEffect}] = new
