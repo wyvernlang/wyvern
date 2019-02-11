@@ -6,7 +6,10 @@ import java.util.Arrays;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.*;
+import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
+import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Tag;
@@ -212,9 +215,6 @@ public class NominalType extends ValueType {
         if (ctx.isAssumedSubtype(this, t)) {
             return true;
         }
-
-        // Testing variable
-        boolean cond = this.toString().contains("import3.Go")&& t.toString().contains("resource");
 
         DeclType dt = getSourceDeclType(ctx);
 
