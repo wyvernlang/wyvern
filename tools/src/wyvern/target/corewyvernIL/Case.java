@@ -47,8 +47,8 @@ public class Case extends ASTNode {
         // TODO Auto-generated method stub
         return visitor.visit(state, this);
     }
-    public ValueType getAdaptedPattern(ValueType matchType, IExpr matchExpr, TypeContext ctx) {
-        return adapt(this.getPattern(), matchType, matchExpr, ctx);
+    public static ValueType getAdaptedPattern(NominalType pat, ValueType matchType, IExpr matchExpr, TypeContext ctx) {
+        return adapt(pat, matchType, matchExpr, ctx);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Case extends ASTNode {
         return pattern.getLocation();
     }
     
-    DeclType mapRefinement(DeclType dt, Path p) {
+    private static DeclType mapRefinement(DeclType dt, Path p) {
         if (dt instanceof EffectDeclType) {
             return new EffectDeclType(dt.getName(), new EffectSet(new Effect(p, dt.getName(), dt.getLocation())), dt.getLocation());
         } else {
@@ -64,7 +64,7 @@ public class Case extends ASTNode {
         }
     }
 
-    private ValueType adapt(NominalType basePattern, ValueType matchType, IExpr matchExpr, TypeContext ctx) {
+    private static ValueType adapt(NominalType basePattern, ValueType matchType, IExpr matchExpr, TypeContext ctx) {
         if (matchType instanceof NominalType) {
             // if matchExpr is a path and if matchType has type members, refine the basePattern so that its type members are known to be the same
             if (matchExpr instanceof Path) {
@@ -74,7 +74,7 @@ public class Case extends ASTNode {
                     .map(dt -> mapRefinement(dt, (Path) matchExpr))
                     .collect(Collectors.toList());
                 if (!newDTs.isEmpty()) {
-                    return new RefinementType(basePattern, newDTs, this, "dontcare");
+                    return new RefinementType(basePattern, newDTs, basePattern, "dontcare");
                 }
             }
             return basePattern;

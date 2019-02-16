@@ -4,6 +4,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -90,19 +91,18 @@ public class Case {
         return caseType == CaseType.TYPED;
     }
 
-    public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+    public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, IExpr matchExpr, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         String bindingVar = binding.getName();
         BindingSite bindingSite = new BindingSite(bindingVar);
         wyvern.target.corewyvernIL.expression.Variable expr = new wyvern.target.corewyvernIL.expression.Variable(bindingVar);
         ValueType vt = taggedType == null ? null : taggedType.getILType(ctx);
         ValueType bestType = vt;
         // Figure out the best type to use here between the match type and the tag
-        if (matchType != null && vt != null && vt.isSubtypeOf(matchType, ctx, null)) {
-            ctx = ctx.extend(bindingSite, expr, vt);
-        } else {
+        if (!(matchType != null && vt != null && vt.isSubtypeOf(matchType, ctx, null))) {
             bestType = vt == null ? matchType : vt;
-            ctx = ctx.extend(bindingSite, expr, bestType);
         }
+        ValueType adaptedPattern = wyvern.target.corewyvernIL.Case.getAdaptedPattern((NominalType) bestType, matchType, matchExpr, ctx);
+        ctx = ctx.extend(bindingSite, expr, adaptedPattern);
         Expression body = (Expression) ast.generateIL(ctx, expectedType, dependencies);
         if (bestType instanceof RefinementType) {
             bestType = ((RefinementType) bestType).getBase();
