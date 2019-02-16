@@ -1,0 +1,21 @@
+import prelude
+import MySystem
+import Primitives
+import LoggingPrimitives
+
+// faked
+val mySystem:MySystem = new
+    type JavaTag = Unit
+    type PythonTag = Unit
+    type ExternObject = Unit
+    type Int
+        def +(x:Int):Int
+
+// faked
+val primitives:Primitives = new
+    val logging:LoggingPrimitives = new
+        def log(x:Int):Unit = unit
+        
+prelude(mySystem, primitives)
+
+// import Prelude.* from prelude

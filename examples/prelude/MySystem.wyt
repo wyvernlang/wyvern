@@ -1,0 +1,7 @@
+// faked - really System
+type MySystem
+    type JavaTag
+    type PythonTag
+    type ExternObject
+    type Int
+        def +(x:Int):Int

@@ -1,0 +1,13 @@
+module def prelude(mySystem:MySystem, primitives:Primitives):Prelude
+
+import LoggingPrimitives
+
+type Int = system.Int
+
+//TODO: implement module installation
+//module wyvern.stdlog = wyvern.stdlogDef(primitives.logging)
+
+// faked
+val stdlog : LoggingPrimitives = primitives.logging
+
+def log(x:system.Int):Unit = stdlog.log(x)
