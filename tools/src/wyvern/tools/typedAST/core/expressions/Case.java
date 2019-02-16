@@ -91,7 +91,12 @@ public class Case {
         return caseType == CaseType.TYPED;
     }
 
-    public wyvern.target.corewyvernIL.Case generateILCase(GenContext ctx, ValueType matchType, IExpr matchExpr, ValueType expectedType, List<TypedModuleSpec> dependencies) {
+    public wyvern.target.corewyvernIL.Case generateILCase(
+                GenContext ctx,
+                ValueType matchType,
+                IExpr matchExpr,
+                ValueType expectedType,
+                List<TypedModuleSpec> dependencies) {
         String bindingVar = binding.getName();
         BindingSite bindingSite = new BindingSite(bindingVar);
         wyvern.target.corewyvernIL.expression.Variable expr = new wyvern.target.corewyvernIL.expression.Variable(bindingVar);
