@@ -124,7 +124,13 @@ public class Match extends AbstractExpressionAST implements CoreAST {
             ValueType caseType = c.getBody().typeCheck(caseCtx, null);
             FailureReason reason = new FailureReason();
             if (expectedCaseType != null && !caseType.isSubtypeOf(expectedCaseType, caseCtx, reason)) {
-                ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
+                FailureReason reason1 = new FailureReason();
+                if (expectedType == null && expectedCaseType.isSubtypeOf(caseType, caseCtx, reason1)) {
+                    // the first type we inferred is too narrow.  Broaden it to the current type.
+                    expectedCaseType = caseType.avoid(c.getVarName(), caseCtx);
+                } else {
+                    ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
+                }
             }
             if (expectedCaseType == null) {
                 expectedCaseType = caseType.avoid(c.getVarName(), caseCtx);
