@@ -355,7 +355,7 @@ public class AST {
     public List<IExpr> parseExpressionList(String input, GenContext ctx) throws ParseException {
         List<IExpr> result = new LinkedList<>();
         Reader r = new StringReader(input);
-        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser("parseExpressionList Parse", r);
+        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser(new FileLocation("parseExpressionList Parse", 1, 0), r);
         List<TypedAST> exprASTs = wp.ExpressionList();
         //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
 
@@ -424,6 +424,18 @@ public class AST {
 
     public String genIdent() {
         return "ASTIDENT$" + Integer.toString(++identNum);
+    }
+
+    public int charCount(String leading) {
+        int count = 0;
+        for (int i = 0; i < leading.length(); ++i) {
+            if (leading.charAt(i) == '\t') {
+                count += 8;
+            } else {
+                count++;
+            }
+        }
+        return count;
     }
 
 }

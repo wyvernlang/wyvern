@@ -67,6 +67,30 @@ public final class TestUtil {
      * Converts the given program into the TypedAST representation, using the
      * new Wyvern parser.
      *
+     * @param program the program to parse
+     * @param adjustedFile the name of the program/module, and the adjusted
+     *          location we are parsing from (an offset that should be added
+     *          to the location of each token)
+     * @return
+     * @throws IOException
+     * @throws CopperParserException
+     */
+    public static TypedAST getNewAST(String program, FileLocation adjustedFile) throws ParseException {
+        clearGlobalTagInfo();
+        Reader r = new StringReader(program);
+        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser(adjustedFile, r);
+        TypedAST result = wp.CompilationUnit();
+        final Token nextToken = wp.token_source.getNextToken();
+        if (nextToken.kind != WyvernParserConstants.EOF) {
+            ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, wp.loc(nextToken));
+        }
+        return result;
+    }
+
+    /**
+     * Converts the given program into the TypedAST representation, using the
+     * new Wyvern parser.
+     *
      * @param program
      * @param programName TODO
      * @return
@@ -74,15 +98,7 @@ public final class TestUtil {
      * @throws CopperParserException
      */
     public static TypedAST getNewAST(String program, String programName) throws ParseException {
-        clearGlobalTagInfo();
-        Reader r = new StringReader(program);
-        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser(programName, r);
-        TypedAST result = wp.CompilationUnit();
-        final Token nextToken = wp.token_source.getNextToken();
-        if (nextToken.kind != WyvernParserConstants.EOF) {
-            ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, wp.loc(nextToken));
-        }
-        return result;
+        return getNewAST(program, new FileLocation(programName, 1, 0));
     }
 
     /**
