@@ -8,11 +8,11 @@ val g : Go [{system.ffiEffect}] = new
     def go (x : Unit -> {} Unit) : {} Unit
         x()
 
-val file1 : File[{system.ffiEffect}] = new
-    effect write = {system.ffiEffect}
+val file1 : File[{}] = new
+    effect write = {}
     def writeToFile() : {this.write} Unit
         unit
 
-val lib1 = import3Lib[{file1.write}](file1, g)
+val lib1 = import3Lib[{}](file1, g)
 
 "abc"

@@ -233,9 +233,13 @@ public class MethodCall extends Expression {
         return decls;
     }
 
+    private static EffectSet getUpperBound(TypeContext ctx, List<ValueType> formalArgTypes, List<ValueType> actualArgTypes,
+                                      List<? extends IExpr> args) {
+        return null;
+    }
+
     private static void checkHigherOrderEffect(TypeContext ctx, List<ValueType> formalArgTypes,
                                                 List<ValueType> actualArgTypes, List<? extends IExpr> args) {
-
         HashMap<String, EffectSet> effectDecls = getEffectDeclarations(ctx, args, actualArgTypes);
         for (int i = 0; i < formalArgTypes.size(); i++) {
             ValueType formalArgType = formalArgTypes.get(i);
@@ -256,7 +260,6 @@ public class MethodCall extends Expression {
                 EffectDeclType actualDeclType = (EffectDeclType) actualArgType.getStructuralType(ctx).getDeclTypes().get(0);
                 EffectSet effectSet = actualDeclType.getEffectSet();
 
-
                 // Checking each effect in the lower bound is present
                 for (Effect lbEffect : lb.getEffects()) {
                     boolean found = false;
@@ -272,16 +275,6 @@ public class MethodCall extends Expression {
                             found = true;
                         }
 
-                        // the lbEffect is defined to be other effect in the argument
-                        for (String effectName : effectDecls.keySet()) {
-                            EffectSet declaration = effectDecls.get(effectName);
-                            if (name.equals(effectName)) {
-                                if (effectSet.getEffects().containsAll(declaration.getEffects())) {
-                                    found = true;
-                                }
-                            }
-                        }
-
                         EffectSet declared = decl.getEffectSet();
                         if (declared != null) {
                             for (Effect declaredEffect : declared.getEffects()) {
@@ -291,6 +284,17 @@ public class MethodCall extends Expression {
                             }
                         }
                     }
+
+                    // the lbEffect is defined to be other effect in the argument
+                    for (String effectName : effectDecls.keySet()) {
+                        EffectSet declaration = effectDecls.get(effectName);
+                        if (name.equals(effectName)) {
+                            if (effectSet.getEffects().containsAll(declaration.getEffects())) {
+                                found = true;
+                            }
+                        }
+                    }
+
                     if (!found) {
                         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
                                 "Effect set does not contains lower bound");
@@ -298,6 +302,8 @@ public class MethodCall extends Expression {
                 }
             }
         }
+
+        EffectSet ub = getUpperBound(ctx, formalArgTypes, actualArgTypes, args);
     }
 
     public static class MatchResult {

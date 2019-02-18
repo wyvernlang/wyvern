@@ -124,6 +124,11 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    public void import3empty() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3empty", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void go() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "import3.import3Client", Util.stringType(), new StringLiteral("abc"));
     }

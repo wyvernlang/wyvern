@@ -137,6 +137,7 @@ public final class QuantificationLifter {
     }
 
     private static EffectSet getHOEffects(ValueType type, GenContext ctx) {
+        boolean cond = type.toString().contains("Go.Go");
         EffectSet effects = new EffectSet(new HashSet<>());
         List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
         for (DeclType declType : declTypes) {
@@ -174,24 +175,20 @@ public final class QuantificationLifter {
         final List<FormalArg> oldFormalArgs = functor.getFormalArgs();
 
         // Construct effect bounds
-
         EffectSet lb = new EffectSet(new HashSet<>());
+        EffectSet ub = new EffectSet(new HashSet<>());
         for (FormalArg arg : oldFormalArgs) {
             ValueType argType = arg.getType();
             EffectSet effects = getEffects(argType, ctx);
-            EffectSet hoEffects = getHOEffects(argType, ctx);
             lb.getEffects().addAll(effects.getEffects());
-            lb.getEffects().addAll(hoEffects.getEffects());
+            EffectSet hoEffects = getHOEffects(argType, ctx);
+            ub.getEffects().addAll(hoEffects.getEffects());
         }
 
         final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(
-                MONOMORPHIZED_EFFECT, genericArgSite, lb, null
+                MONOMORPHIZED_EFFECT, genericArgSite, lb, ub
         );
         final FormalArg newFormalArg = new FormalArg(genericArgSite, boundedType);
-
-//        final ValueType genericType =
-//                genericStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, GenericKind.EFFECT);
-//        final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
 
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 
