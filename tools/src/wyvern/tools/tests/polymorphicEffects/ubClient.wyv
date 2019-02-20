@@ -1,0 +1,12 @@
+import polymorphicEffects.UbFile
+import lifted polymorphicEffects.ubLib
+
+val ubFile : UbFile[{system.ffiEffect}] = new
+    effect write = {}
+    def writeToFile(f : Unit -> {} Unit) : {} Unit
+        unit
+
+val ublib = ubLib[{}](ubFile)
+
+"abc"
+

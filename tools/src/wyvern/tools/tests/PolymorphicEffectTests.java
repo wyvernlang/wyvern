@@ -144,6 +144,15 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    public void ub() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "outside of the upper bound"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.ubClient", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void import3Rejected() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
