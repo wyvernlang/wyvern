@@ -13,6 +13,6 @@ val file1 : File[{system.ffiEffect}] = new
     def writeToFile() : {this.write} Unit
         unit
 
-val lib1 = import3Lib[{file1.write}](file1, g)
+val lib1 = import3Lib[{system.ffiEffect}](file1, g)
 
 "abc"

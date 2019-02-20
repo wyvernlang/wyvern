@@ -21,15 +21,17 @@ import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.effects.EffectUtil;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ViewExtension;
 import wyvern.target.corewyvernIL.support.Util;
-import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -233,9 +235,49 @@ public class MethodCall extends Expression {
         return decls;
     }
 
-    private static EffectSet getUpperBound(TypeContext ctx, List<ValueType> formalArgTypes, List<ValueType> actualArgTypes,
+    private static EffectSet computeUpperBound(TypeContext ctx, List<ValueType> actualArgTypes) {
+        EffectSet ub = null;
+        for (ValueType argType : actualArgTypes) {
+            EffectSet hoEffects = EffectUtil.getHOEffects(argType, (GenContext) ctx);
+            if (hoEffects != null) {
+                if (ub == null) {
+                    ub = new EffectSet(new HashSet<>());
+                }
+                ub.getEffects().addAll(hoEffects.getEffects());
+            }
+        }
+        return ub;
+    }
+
+    private static void checkUpperBound(TypeContext ctx, List<ValueType> formalArgTypes, List<ValueType> actualArgTypes,
                                       List<? extends IExpr> args) {
-        return null;
+        if (actualArgTypes.size() == 0) {
+            return;
+        }
+
+        ValueType firstFormalArg = actualArgTypes.get(0);
+        if (firstFormalArg.getStructuralType(ctx).getDeclTypes().size() == 0) {
+            return;
+        }
+
+        DeclType firstDeclType = firstFormalArg.getStructuralType(ctx).getDeclTypes().get(0);
+        if (!(firstDeclType instanceof EffectDeclType)) {
+            return;
+        }
+
+        EffectDeclType selectedEffect = (EffectDeclType) firstDeclType;
+        EffectSet upperBound = computeUpperBound(ctx, actualArgTypes.subList(1, actualArgTypes.size()));
+
+        if (upperBound == null) {
+            return;
+        }
+
+        for (Effect e : selectedEffect.getEffectSet().getEffects()) {
+            if (!upperBound.getEffects().contains(e)) {
+                 ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
+                                "Selected an effect which is outside of the upper bound");
+            }
+        }
     }
 
     private static void checkHigherOrderEffect(TypeContext ctx, List<ValueType> formalArgTypes,
@@ -297,13 +339,13 @@ public class MethodCall extends Expression {
 
                     if (!found) {
                         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
-                                "Effect set does not contains lower bound");
+                                "Selected effect does not contain lower bound");
                     }
                 }
             }
         }
 
-        EffectSet ub = getUpperBound(ctx, formalArgTypes, actualArgTypes, args);
+        checkUpperBound(ctx, formalArgTypes, actualArgTypes, args);
     }
 
     public static class MatchResult {

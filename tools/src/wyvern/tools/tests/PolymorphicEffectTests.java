@@ -118,10 +118,7 @@ public class PolymorphicEffectTests {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.client", Util.stringType(), new StringLiteral("abc"));
     }
 
-    @Test
-    public void import3() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
-    }
+
 
     @Test
     public void import3empty() throws ParseException {
@@ -138,10 +135,19 @@ public class PolymorphicEffectTests {
 
     // Rejected examples
     @Test
+    public void import3() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "outside of the upper bound"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void import3Rejected() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
-                "Effect set does not contains lower bound"
+                "Selected effect does not contain lower bound'"
         ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Rejected", Util.stringType(), new StringLiteral("abc"));
     }
@@ -267,7 +273,7 @@ public class PolymorphicEffectTests {
     public void testImport2() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(String.format(
-                "Effect set does not contains lower bound"
+                "Selected effect does not contain lower bound"
         )));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import2Client", Util.stringType(), new StringLiteral("abcabc"));
     }

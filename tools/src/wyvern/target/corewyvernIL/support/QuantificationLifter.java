@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.effects.EffectUtil;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -106,59 +107,7 @@ public final class QuantificationLifter {
     }
 
 
-    private static EffectSet getEffects(ValueType type, GenContext ctx) {
-        EffectSet effects = new EffectSet(new HashSet<>());
-        List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
-        for (DeclType declType : declTypes) {
-            if (declType instanceof DefDeclType) {
-                DefDeclType def = (DefDeclType) (declType);
-                EffectSet e = def.getEffectSet();
-                if (e != null) {
-                    for (Effect effect : e.getEffects()) {
-                        effects.getEffects().add(effect);
-                    }
-                }
-                List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
-                for (FormalArg recursiveArg : recursiveArgs) {
-                    ValueType argType = recursiveArg.getType();
-                    if (!argType.equalsInContext(type, ctx, new FailureReason())) {
-                        EffectSet argEffects = getHOEffects(argType, ctx);
-                        effects.getEffects().addAll(argEffects.getEffects());
-                    }
-                }
-                ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                if (!resultType.equalsInContext(type, ctx, new FailureReason())) {
-                    EffectSet effects2 = getEffects(resultType, ctx);
-                    effects.getEffects().addAll(effects2.getEffects());
-                }
-            }
-        }
-        return effects;
-    }
 
-    private static EffectSet getHOEffects(ValueType type, GenContext ctx) {
-        boolean cond = type.toString().contains("Go.Go");
-        EffectSet effects = new EffectSet(new HashSet<>());
-        List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
-        for (DeclType declType : declTypes) {
-            if (declType instanceof DefDeclType) {
-                List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
-                for (FormalArg recursiveArg : recursiveArgs) {
-                    ValueType argType = recursiveArg.getType();
-                    if (!type.equalsInContext(argType, ctx, new FailureReason())) {
-                        EffectSet argEffects = getEffects(argType, ctx);
-                        effects.getEffects().addAll(argEffects.getEffects());
-                    }
-                }
-                ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                if (!type.equalsInContext(resultType, ctx, new FailureReason())) {
-                    EffectSet hoEffects = getHOEffects(resultType, ctx);
-                    effects.getEffects().addAll(hoEffects.getEffects());
-                }
-            }
-        }
-        return effects;
-    }
 
     /**
      * Lifts effect polymorphism from the return type of a functor to the functor itself.
@@ -179,10 +128,10 @@ public final class QuantificationLifter {
         EffectSet ub = new EffectSet(new HashSet<>());
         for (FormalArg arg : oldFormalArgs) {
             ValueType argType = arg.getType();
-            EffectSet effects = getEffects(argType, ctx);
-            lb.getEffects().addAll(effects.getEffects());
-            EffectSet hoEffects = getHOEffects(argType, ctx);
-            ub.getEffects().addAll(hoEffects.getEffects());
+            EffectSet effects = EffectUtil.getEffects(argType, ctx);
+            if (effects != null) {
+                lb.getEffects().addAll(effects.getEffects());
+            }
         }
 
         final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(
