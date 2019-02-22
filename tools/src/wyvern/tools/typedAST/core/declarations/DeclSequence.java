@@ -253,7 +253,8 @@ public class DeclSequence extends Sequence {
                      * for tests like testTSL). */
                     ctxTemp = ctxTemp.extend(dd.getName(), null, new StructuralType(dd.getName(), declTypes));
                 }
-
+                
+                dd.checkAnnotated();
                 DeclType t = dd.genILType(ctxTemp);
                 declTypes.add(t);
             }

@@ -48,6 +48,7 @@ public enum ErrorMessage {
     QUALIFIED_TYPES_ONLY_FIELDS("Qualified types can only include val fields", 0),
     ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
     ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),
+    VAL_NEEDS_TYPE("val declaration %ARG is inside a new statement and thus needs a type annotation", 1),
 
     // Syntax errors
     LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
