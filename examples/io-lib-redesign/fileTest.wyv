@@ -1,0 +1,28 @@
+require java
+import fileSystem
+import stdout
+val filesys = fileSystem(java)
+val out = stdout(java)
+
+val f = filesys.makeFile("example.txt")		//should this create the file in itself? or only make existing?
+
+val w = f.makeWriter()						//automatically creates file
+
+w.write("Hello World!")
+
+w.close()
+
+val ap = f.makeAppender()
+
+ap.write("\nfoo")
+
+ap.close()
+
+val r = f.makeReader()
+
+out.print(r.read())
+out.println()
+out.print(r.read())
+out.println()
+
+r.close()
