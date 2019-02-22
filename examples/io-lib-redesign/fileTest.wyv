@@ -26,3 +26,15 @@ out.print(r.read())
 out.println()
 
 r.close()
+
+/* Random Access File */
+
+/* options: "r" read only, "rw" read/write, "rws" content & metadata written synchronously,
+ * "rwd" content written synchronously
+ */
+val raf = f.makeRandomAccessFile("rw")
+
+out.printInt(raf.getPosition())
+out.println()
+
+raf.close()
