@@ -1,0 +1,69 @@
+
+module def fileSystem(java:Java): fileSystem.FileSystem
+import java:wyvern.stdlib.support.FileIO.file
+
+
+/* Import Types (temporary) */
+import fileSystem.File
+import fileSystem.Reader
+import fileSystem.Writer
+import fileSystem.RandomAccessFile
+
+
+def makeFile(path: String) : File = new
+	val f : Unit = file.createNewFile(path)
+		
+	def makeReader() : Reader
+		val br = file.openBRForRead(this.f)
+		new
+			def read() : String
+				file.readLineFromFile(br)	//temporary, for now only reads line
+			def close() : Unit
+				file.closeReader(br)
+			
+	def makeWriter() : Writer 
+		val bw = file.openBWForWrite(this.f)
+		new
+			def write(s : String) : Unit
+				file.writeString(bw, s)		//again temporary limits on write format
+			def close() : Unit
+				file.closeWriter(bw)
+			
+	
+	/* For now this seems a little messy, considering the typical default
+	 * is to have a FileWriter append to a file, not overwrite...
+	 * Consider how to design this better
+	 * Name method openForAppend or openForWrite? Since they're just returning Writer
+	 */
+	def makeAppender() : Writer
+		val bw = file.openBWForAppend(this.f)
+		new
+			def write(s : String) : Unit
+				file.writeString(bw, s)		//again temporary limits on write format
+			def close() : Unit
+				file.closeWriter(bw)
+			
+	
+	
+	/* May want to rename this to something more unique
+	 * Modify "mode" parameter? and available methods?
+	 */
+	def makeRandomAccessFile(mode : String) : RandomAccessFile
+		val rf = file.makeRandomAccessFile(this.f, mode)
+		new
+			def close() : Unit
+				file.closeRandomAccessFile(rf)
+			def getPosition() : Int
+				file.accessFilePointer(rf)
+			def seek(pos : Int) : Unit
+				file.seekFilePointer(rf, pos)
+			def length() : Int
+				file.getRandomAccessFileLength(rf)
+			def readLine() : String
+				file.readLineRandomAccess(rf)
+			def readUTF() : String
+				file.readUTFRandomAccess(rf)
+			def write(s : String) : Unit
+				file.writeUTFRandomAccess(rf, s)			//temporary write method
+			def writeUTF(s : String) : Unit
+				file.writeUTFRandomAccess(rf, s)
