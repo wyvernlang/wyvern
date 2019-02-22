@@ -254,7 +254,7 @@ public class DeclSequence extends Sequence {
                     ctxTemp = ctxTemp.extend(dd.getName(), null, new StructuralType(dd.getName(), declTypes));
                 }
                 
-                dd.checkAnnotated();
+                dd.checkAnnotated(ctx);
                 DeclType t = dd.genILType(ctxTemp);
                 declTypes.add(t);
             }

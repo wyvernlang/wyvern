@@ -74,9 +74,14 @@ public class ValDeclaration extends Declaration implements CoreAST {
     }
 
     // raises an error if the type is null
-    public void checkAnnotated() {
+    @Override
+    public void checkAnnotated(GenContext ctxWithoutThis) {
         if (binding.getType() == null) {
-            ToolError.reportError(ErrorMessage.VAL_NEEDS_TYPE, this, binding.getName());
+            try {
+                ValueType vt = getILValueType(ctxWithoutThis);
+            } catch (RuntimeException e) {
+                ToolError.reportError(ErrorMessage.VAL_NEEDS_TYPE, this, binding.getName());
+            }
         }
     }
     

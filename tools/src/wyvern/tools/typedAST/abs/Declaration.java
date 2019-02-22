@@ -56,7 +56,7 @@ public abstract class Declaration extends AbstractTreeWritable implements TypedA
     public Type getType() {
         throw new RuntimeException();
     }
-    public void checkAnnotated() {
+    public void checkAnnotated(GenContext ctxWithoutThis) {
         // by default does nothing; annotations are required on everything except ValDeclarations 
     }
 }
