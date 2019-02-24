@@ -1,4 +1,4 @@
-package wyvern.target.corewyvernIL.expression;
+package wyvern.tools.interop;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -9,6 +9,16 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.expression.AbstractValue;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.Invokable;
+import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
@@ -17,8 +27,6 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.interop.FObject;
-import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
 
@@ -72,6 +80,8 @@ public class JavaValue extends AbstractValue implements Invokable {
     private Value javaToWyvern(Object result) {
         if (result instanceof Integer) {
             return new IntegerLiteral((Integer) result);
+        } else if (result instanceof Long) {
+            return new IntegerLiteral(BigInteger.valueOf((Long) result));
         } else if (result instanceof Double) {
             return new FloatLiteral((Double) result);
         } else if (result instanceof String) {
@@ -116,6 +126,9 @@ public class JavaValue extends AbstractValue implements Invokable {
         if (arg instanceof IntegerLiteral) {
             if (hintClass != null && hintClass == BigInteger.class) {
                 return ((IntegerLiteral) arg).getFullValue();
+            }
+            if (hintClass != null && hintClass == Long.class) {
+                return ((IntegerLiteral) arg).getLongValue();
             }
             return new Integer(((IntegerLiteral) arg).getValue());
         } else if (arg instanceof FloatLiteral) {

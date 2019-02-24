@@ -1,6 +1,9 @@
-package wyvern.target.corewyvernIL.support;
+package wyvern.tools.interop;
 
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public final class GenUtil {

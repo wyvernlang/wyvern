@@ -1,4 +1,4 @@
-package wyvern.target.corewyvernIL.support;
+package wyvern.tools.interop;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -9,6 +9,7 @@ import java.util.List;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 

@@ -29,8 +29,6 @@ import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.CharacterLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FFI;
-import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.FloatLiteral;
@@ -85,6 +83,8 @@ import wyvern.target.oir.expressions.OIRRational;
 import wyvern.target.oir.expressions.OIRString;
 import wyvern.target.oir.expressions.OIRVariable;
 import wyvern.tools.errors.HasLocation;
+import wyvern.tools.interop.FFI;
+import wyvern.tools.interop.FFIImport;
 import wyvern.tools.util.Pair;
 
 public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
