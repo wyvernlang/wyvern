@@ -9,7 +9,9 @@ import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -71,6 +73,18 @@ public class ValDeclaration extends Declaration implements CoreAST {
                 false);
     }
 
+    // raises an error if the type is null
+    @Override
+    public void checkAnnotated(GenContext ctxWithoutThis) {
+        if (binding.getType() == null) {
+            try {
+                ValueType vt = getILValueType(ctxWithoutThis);
+            } catch (RuntimeException e) {
+                ToolError.reportError(ErrorMessage.VAL_NEEDS_TYPE, this, binding.getName());
+            }
+        }
+    }
+    
     @Override
     public DeclType genILType(GenContext ctx) {
         ValueType vt = getILValueType(ctx);

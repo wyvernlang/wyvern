@@ -72,6 +72,10 @@ public class IntegerLiteral extends Literal implements Invokable {
         return value.intValueExact();
     }
 
+    public long getLongValue() {
+        return value.longValueExact();
+    }
+
     public BigInteger getFullValue() {
         return value;
     }
