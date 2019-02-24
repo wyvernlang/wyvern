@@ -77,7 +77,7 @@ public class BoundedIntLiteral extends Literal implements Invokable {
     }
 
     @Override
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         switch (methodName) {
         case "+": return new BoundedIntLiteral(Math.addExact(this.value, ((BoundedIntLiteral) args.get(0)).getValue()));
         case "-": return new BoundedIntLiteral(Math.subtractExact(this.value, ((BoundedIntLiteral) args.get(0)).getValue()));

@@ -13,6 +13,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.FileLocation;
 
 public class BooleanLiteral extends Literal implements Invokable {
     private boolean value;
@@ -84,7 +85,7 @@ public class BooleanLiteral extends Literal implements Invokable {
     }
 
     @Override
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         switch (methodName) {
         case "ifTrue":
             if (this.value) {

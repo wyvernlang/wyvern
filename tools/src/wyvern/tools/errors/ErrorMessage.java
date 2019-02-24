@@ -17,6 +17,7 @@ public enum ErrorMessage {
     NO_SUCH_METHOD("There is no visible method named %ARG in type %ARG", 2),
     MUST_INSTANTIATE("Must instantiate module def %ARG before using it", 1),
     DYNAMIC_METHOD_ERROR("Called method %ARG, but the method does not exist on the receiver object.  Did you use type Dyn?", 1),
+    JAVA_NULL_EXCEPTION("Called method %ARG on a null pointer from Java", 1),
     NO_SUCH_FIELD("There is no visible field named %ARG", 1),
     NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
     NOT_A_METHOD("%ARG is not a method", 1),

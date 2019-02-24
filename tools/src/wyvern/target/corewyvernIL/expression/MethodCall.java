@@ -159,7 +159,7 @@ public class MethodCall extends Expression {
 
                 @Override
                 public Value interpret(EvalContext ignored) {
-                    return receiver.invoke(methodName, argValues);
+                    return receiver.invoke(methodName, argValues, getLocation());
                 }
 
                 @Override
@@ -170,7 +170,7 @@ public class MethodCall extends Expression {
 
             };
         }
-        return trampoline(receiver.invoke(methodName, argValues));
+        return trampoline(receiver.invoke(methodName, argValues, getLocation()));
     }
 
     public static Value trampoline(Value v) {
