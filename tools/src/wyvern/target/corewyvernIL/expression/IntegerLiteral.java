@@ -72,6 +72,10 @@ public class IntegerLiteral extends Literal implements Invokable {
         return value.intValueExact();
     }
 
+    public long getLongValue() {
+        return value.longValueExact();
+    }
+
     public BigInteger getFullValue() {
         return value;
     }
@@ -98,7 +102,7 @@ public class IntegerLiteral extends Literal implements Invokable {
     }
 
     @Override
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         switch (methodName) {
         case "+": return new IntegerLiteral(this.value.add(((IntegerLiteral) args.get(0)).getFullValue()));
         case "-": return new IntegerLiteral(this.value.subtract(((IntegerLiteral) args.get(0)).getFullValue()));

@@ -116,15 +116,21 @@ public class Match extends AbstractExpressionAST implements CoreAST {
             elseExpr = (Expression) defaultExp.generateIL(ctx, expectedType, dependencies);
         }
         List<wyvern.target.corewyvernIL.Case> casesIL = cases.stream()
-                                                             .map(c -> c.generateILCase(ctx, matchType, expectedType, dependencies))
+                                                             .map(c -> c.generateILCase(ctx, matchType, matchExpr, expectedType, dependencies))
                                                              .collect(Collectors.toList());
         ValueType expectedCaseType = expectedType;
         for (wyvern.target.corewyvernIL.Case c : casesIL) {
-            GenContext caseCtx = ctx.extend(c.getSite(), c.getAdaptedPattern(matchType));
+            GenContext caseCtx = ctx.extend(c.getSite(), c.getAdaptedPattern(c.getPattern(), matchType, matchExpr, ctx));
             ValueType caseType = c.getBody().typeCheck(caseCtx, null);
             FailureReason reason = new FailureReason();
             if (expectedCaseType != null && !caseType.isSubtypeOf(expectedCaseType, caseCtx, reason)) {
-                ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
+                FailureReason reason1 = new FailureReason();
+                if (expectedType == null && expectedCaseType.isSubtypeOf(caseType, caseCtx, reason1)) {
+                    // the first type we inferred is too narrow.  Broaden it to the current type.
+                    expectedCaseType = caseType.avoid(c.getVarName(), caseCtx);
+                } else {
+                    ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
+                }
             }
             if (expectedCaseType == null) {
                 expectedCaseType = caseType.avoid(c.getVarName(), caseCtx);

@@ -164,7 +164,7 @@ public class MethodCall extends Expression {
 
                 @Override
                 public Value interpret(EvalContext ignored) {
-                    return receiver.invoke(methodName, argValues);
+                    return receiver.invoke(methodName, argValues, getLocation());
                 }
 
                 @Override
@@ -175,10 +175,10 @@ public class MethodCall extends Expression {
 
             };
         }
-        return trampoline(receiver.invoke(methodName, argValues));
+        return trampoline(receiver.invoke(methodName, argValues, getLocation()));
     }
 
-    static Value trampoline(Value v) {
+    public static Value trampoline(Value v) {
         while (v instanceof SuspendedTailCall) {
             v = v.interpret(null);
         }

@@ -71,7 +71,7 @@ public class FloatLiteral extends Literal implements Invokable  {
       return value;
     }
     @Override
-    public Value invoke(String methodName, List<Value> args)  {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc)  {
       switch (methodName) {
       case "+": return new FloatLiteral(this.value + ((FloatLiteral) args.get(0)).getFullValue());
       case "-": return new FloatLiteral(this.value - ((FloatLiteral) args.get(0)).getFullValue());

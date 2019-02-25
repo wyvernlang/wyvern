@@ -13,24 +13,29 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.lexing.LexerUtils;
+import wyvern.tools.lexing.WyvernLexer;
 
 public class WyvernTokenManager<Lexer extends SingleDFAEngine<List<Token>, CopperParserException>, ParserConstants> implements TokenManager {
     private Constructor<Lexer> lexerCtor;
     private Class<ParserConstants> parserConstantsClass;
 
     private Reader input;
-    private String filename;
+    private FileLocation startLocation;
     private Iterator<Token> tokens;
     private Token specialToken;
     private List<Token> tokenList;
     
     public WyvernTokenManager(Reader input, String filename, Class<Lexer> lexerClass, Class<ParserConstants> parserConstantsClass) {
+        this(input, new FileLocation(filename, 1, 0), lexerClass, parserConstantsClass);
+    }
+    
+    public WyvernTokenManager(Reader input, FileLocation startLocation, Class<Lexer> lexerClass, Class<ParserConstants> parserConstantsClass) {
         try {
             this.lexerCtor = lexerClass.getConstructor();
             this.parserConstantsClass = parserConstantsClass;
 
             this.input = input;
-            this.filename = filename;
+            this.startLocation = startLocation;
             this.tokens = null;
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -39,7 +44,11 @@ public class WyvernTokenManager<Lexer extends SingleDFAEngine<List<Token>, Coppe
 
     private void readTokenList() throws CopperParserException, IOException, InstantiationException,
     IllegalAccessException, InvocationTargetException {
-        tokenList = this.lexerCtor.newInstance().parse(input, filename);
+        Lexer l = this.lexerCtor.newInstance();
+        if (l instanceof WyvernLexer) {
+            ((WyvernLexer) l).startLocation = startLocation;
+        }
+        tokenList = l.parse(input, getFilename());
         tokens = tokenList.iterator();
     }
 
@@ -75,7 +84,7 @@ public class WyvernTokenManager<Lexer extends SingleDFAEngine<List<Token>, Coppe
     }
 
     public String getFilename() {
-        return filename;
+        return startLocation.getFilename();
     }
 
 }

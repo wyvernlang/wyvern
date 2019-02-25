@@ -66,7 +66,7 @@ public abstract class GenContext extends TypeContext {
         if (objName == null) {
             ToolError.reportError(ErrorMessage.TYPE_NOT_DEFINED, loc, typeName);
         }
-        return new NominalType(objName, typeName);
+        return new NominalType(objName, typeName, loc);
     }
 
 

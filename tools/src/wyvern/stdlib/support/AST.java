@@ -34,13 +34,10 @@ import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.FFI;
-import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
-import wyvern.target.corewyvernIL.expression.JavaValue;
 import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Literal;
 import wyvern.target.corewyvernIL.expression.Match;
@@ -60,6 +57,9 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.interop.FFI;
+import wyvern.tools.interop.FFIImport;
+import wyvern.tools.interop.JavaValue;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.WyvernParser;
@@ -355,7 +355,7 @@ public class AST {
     public List<IExpr> parseExpressionList(String input, GenContext ctx) throws ParseException {
         List<IExpr> result = new LinkedList<>();
         Reader r = new StringReader(input);
-        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser("parseExpressionList Parse", r);
+        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser(new FileLocation("parseExpressionList Parse", 1, 0), r);
         List<TypedAST> exprASTs = wp.ExpressionList();
         //GenContext ctx = (GenContext)context.getFObject().getWrappedValue();
 
@@ -424,6 +424,18 @@ public class AST {
 
     public String genIdent() {
         return "ASTIDENT$" + Integer.toString(++identNum);
+    }
+
+    public int charCount(String leading) {
+        int count = 0;
+        for (int i = 0; i < leading.length(); ++i) {
+            if (leading.charAt(i) == '\t') {
+                count += 8;
+            } else {
+                count++;
+            }
+        }
+        return count;
     }
 
 }

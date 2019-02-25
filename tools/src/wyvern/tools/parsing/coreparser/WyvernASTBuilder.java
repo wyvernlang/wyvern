@@ -471,8 +471,13 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         ExpressionAST ast;
         try {
             String withoutLeading = wyvern.stdlib.support.AST.utils.stripLeadingWhitespace(source, false);
-            //TODO: adjust error messages below based on whitespace stripped above;
-            ast = (ExpressionAST) TestUtil.getNewAST(withoutLeading + "\n", "Indented Parse");
+            int oldNewlineIndex = source.indexOf('\n');
+            int newlineIndex = withoutLeading.indexOf('\n');
+            String leading = source.substring(0, oldNewlineIndex - newlineIndex);
+            FileLocation locAfterStrip = new FileLocation(loc.getFilename(),
+                                                          loc.getLine(),
+                                                          loc.getCharacter() + wyvern.stdlib.support.AST.utils.charCount(leading));
+            ast = (ExpressionAST) TestUtil.getNewAST(withoutLeading + "\n", locAfterStrip);
             if (ast instanceof Script) {
                 Script s = (Script) ast;
                 if (!s.getImports().isEmpty() || !s.getRequires().isEmpty()) {
@@ -483,8 +488,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             }
         } catch (ParseException e) {
             Token errorLocToken = e.getCurrentToken();
-            FileLocation newLoc = adjustLocation(loc, errorLocToken);
-            ToolError.reportError(ErrorMessage.PARSE_ERROR, newLoc, e.getMessage());
+            FileLocation errorLoc = getLocation(loc, errorLocToken);
+            ToolError.reportError(ErrorMessage.PARSE_ERROR, errorLoc, e.getMessage());
             throw new RuntimeException("weird, shouldn't get here");
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -494,10 +499,17 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         return ast;
     }
 
-    private FileLocation adjustLocation(FileLocation baseLocation, Token errorLocToken) {
+    /*private FileLocation adjustLocation(FileLocation baseLocation, Token errorLocToken) {
         int line = errorLocToken.beginLine;
         int character = errorLocToken.beginColumn;
         FileLocation newLoc = new FileLocation(baseLocation.getFilename(), baseLocation.getLine() + line - 1, baseLocation.getCharacter() + character - 1);
+        return newLoc;
+    }*/
+
+    private FileLocation getLocation(FileLocation baseLocation, Token errorLocToken) {
+        int line = errorLocToken.beginLine;
+        int character = errorLocToken.beginColumn + 1;
+        FileLocation newLoc = new FileLocation(baseLocation.getFilename(), line, character);
         return newLoc;
     }
 

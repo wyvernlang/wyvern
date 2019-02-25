@@ -90,7 +90,7 @@ public class StringLiteral extends Literal implements Invokable {
         return Util.stringType();
     }
 
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         switch (methodName) {
         case "<": return new BooleanLiteral(this.value.compareTo(((StringLiteral) args.get(0)).getValue()) < 0);
         case ">": return new BooleanLiteral(this.value.compareTo(((StringLiteral) args.get(0)).getValue()) > 0);

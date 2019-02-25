@@ -229,7 +229,13 @@ public class NominalType extends ValueType {
                 }
                 NominalType superType = ((TagType) definedType).getParentType(View.from(path, ctx));
                 // TODO: this is not necessarily the whole check, but it does the nominal part of the check correctly
-                return superType == null ? false : superType.isSubtypeOf(t, ctx, reason);
+                if (superType == null) {
+                    if (reason != null && !reason.isDefined()) {
+                        reason.setReason("nominal type " + this.desugar(ctx) + " has no supertype and thus can't be a subtype of " + t.desugar(ctx));
+                    }
+                    return false;
+                }
+                return superType.isSubtypeOf(t, ctx, reason);
             }
             ValueType vt = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
 

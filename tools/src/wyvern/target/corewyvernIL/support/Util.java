@@ -18,6 +18,8 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public final class Util {
+    public static final String NULL_SELF = "nullSelf";
+
     private Util() { }
     private static final ValueType theBooleanType = new NominalType("system", "Boolean");
     private static final ValueType theEmptyType = new StructuralType("empty", new LinkedList<>());
@@ -67,6 +69,9 @@ public final class Util {
     public static ObjectValue unitValue() {
         return new ObjectValue(new LinkedList<Declaration>(), new BindingSite("unitSelf"), theUnitType, null, null, EvalContext.empty());
     }
+    public static ObjectValue nullValue() {
+        return new ObjectValue(new LinkedList<Declaration>(), new BindingSite(NULL_SELF), theUnitType, null, null, EvalContext.empty());
+    }
     public static final String APPLY_NAME = "apply";
 
     public static boolean isDynamicType(ValueType type) {
@@ -78,5 +83,8 @@ public final class Util {
     }
     public static Value floatValue(double d)  {
         return new FloatLiteral(d);
+    }
+    public static boolean isJavaNull(ObjectValue objectValue) {
+        return objectValue.getSelfName().equals(Util.NULL_SELF);
     }
 }

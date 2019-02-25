@@ -1,8 +1,6 @@
 package wyvern.tools;
 
 import java.io.File;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -34,19 +32,13 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.parsing.coreparser.ParseUtils;
-import wyvern.tools.parsing.coreparser.Token;
-import wyvern.tools.parsing.coreparser.WyvernParser;
-import wyvern.tools.parsing.coreparser.WyvernParserConstants;
+import wyvern.tools.tests.TestUtil;
+import wyvern.tools.typedAST.core.Script;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
-import wyvern.tools.typedAST.core.Script;
 
 public class REPL {
     public static final String WYVERN_HOME = System.getenv("WYVERN_HOME");
@@ -455,15 +447,7 @@ public class REPL {
      * @return The generated AST
      */
     public TypedAST getNewAST(String program, String programName) throws ParseException {
-        clearGlobalTagInfo();
-        Reader r = new StringReader(program);
-        WyvernParser<TypedAST, Type> wp = ParseUtils.makeParser(programName, r);
-        TypedAST result = wp.CompilationUnit();
-        final Token nextToken = wp.token_source.getNextToken();
-        if (nextToken.kind != WyvernParserConstants.EOF) {
-            ToolError.reportError(ErrorMessage.UNEXPECTED_INPUT, wp.loc(nextToken));
-        }
-        return result;
+        return TestUtil.getNewAST(program, programName);
     }
 
     private void clearGlobalTagInfo() {

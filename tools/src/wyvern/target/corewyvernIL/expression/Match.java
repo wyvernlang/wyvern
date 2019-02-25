@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.interop.FFI;
 
 public class Match extends Expression {
 
@@ -72,11 +73,11 @@ public class Match extends Expression {
         // typecheck the other cases
         for (Case c : cases) {
             FailureReason reason = new FailureReason();
-            if (!c.getAdaptedPattern(matchType).isSubtypeOf(matchType, env, reason)) {
+            if (!c.getAdaptedPattern(c.getPattern(), matchType, matchExpr, env).isSubtypeOf(matchType, env, reason)) {
                 ToolError.reportError(ErrorMessage.UNMATCHABLE_CASE, c, c.getPattern().desugar(env), matchType.desugar(env), reason.getReason());
             }
 
-            TypeContext caseCtx = env.extend(c.getSite(), c.getAdaptedPattern(matchType));
+            TypeContext caseCtx = env.extend(c.getSite(), c.getAdaptedPattern(c.getPattern(), matchType, matchExpr, env));
             ValueType caseType = c.getBody().typeCheck(caseCtx, effectAccumulator);
             reason = new FailureReason();
             if (!caseType.isSubtypeOf(getType(), caseCtx, reason)) {

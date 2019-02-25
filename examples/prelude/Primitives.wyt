@@ -1,0 +1,4 @@
+import LoggingPrimitives
+
+type Primitives
+    val logging:LoggingPrimitives

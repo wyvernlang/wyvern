@@ -25,7 +25,6 @@ import wyvern.target.corewyvernIL.modules.Module;
 import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
-import wyvern.target.corewyvernIL.support.GenUtil;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -39,6 +38,7 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.interop.GenUtil;
 import wyvern.tools.tests.TestUtil;
 
 public final class Globals {

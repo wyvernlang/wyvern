@@ -1,4 +1,4 @@
-package wyvern.target.corewyvernIL.expression;
+package wyvern.tools.interop;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -7,12 +7,13 @@ import java.util.Set;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.interop.FObject;
 
 public class FFIImport extends Expression {
     private String path;

@@ -1,4 +1,4 @@
-package wyvern.target.corewyvernIL.expression;
+package wyvern.tools.interop;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -9,16 +9,23 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
+import wyvern.target.corewyvernIL.expression.AbstractValue;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
+import wyvern.target.corewyvernIL.expression.CharacterLiteral;
+import wyvern.target.corewyvernIL.expression.FloatLiteral;
+import wyvern.target.corewyvernIL.expression.IntegerLiteral;
+import wyvern.target.corewyvernIL.expression.Invokable;
+import wyvern.target.corewyvernIL.expression.MethodCall;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
-import wyvern.tools.interop.FObject;
-import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
 
@@ -37,7 +44,7 @@ public class JavaValue extends AbstractValue implements Invokable {
     }
 
     @Override
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         List<Object> javaArgs = new LinkedList<Object>();
         Class<?>[] hints = foreignObject.getTypeHints(methodName);
         int hintNum = 0;
@@ -58,7 +65,7 @@ public class JavaValue extends AbstractValue implements Invokable {
                 }
                 if (cause instanceof ParseException) {
                     ParseException pe = (ParseException) cause;
-                    ToolError.reportError(ErrorMessage.PARSE_ERROR, (HasLocation) null, pe.getMessage());
+                    ToolError.reportError(ErrorMessage.PARSE_ERROR, loc, pe.getMessage());
                 }
             }
             throw new RuntimeException(e);
@@ -72,6 +79,8 @@ public class JavaValue extends AbstractValue implements Invokable {
     private Value javaToWyvern(Object result) {
         if (result instanceof Integer) {
             return new IntegerLiteral((Integer) result);
+        } else if (result instanceof Long) {
+            return new IntegerLiteral(BigInteger.valueOf((Long) result));
         } else if (result instanceof Double) {
             return new FloatLiteral((Double) result);
         } else if (result instanceof String) {
@@ -79,7 +88,8 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else if (result instanceof Character) {
             return new CharacterLiteral((Character) result);
         } else if (result == null) {
-            return Util.unitValue();
+            // null is represented as unit
+            return Util.nullValue();
         } else if (result instanceof List) {
             ObjectValue v = null;
             try {
@@ -116,6 +126,9 @@ public class JavaValue extends AbstractValue implements Invokable {
             if (hintClass != null && hintClass == BigInteger.class) {
                 return ((IntegerLiteral) arg).getFullValue();
             }
+            if (hintClass != null && hintClass == Long.class) {
+                return ((IntegerLiteral) arg).getLongValue();
+            }
             return new Integer(((IntegerLiteral) arg).getValue());
         } else if (arg instanceof FloatLiteral) {
             if (hintClass != null && hintClass == Double.class) {
@@ -128,14 +141,19 @@ public class JavaValue extends AbstractValue implements Invokable {
             return new Character(((CharacterLiteral) arg).getValue());
         } else if (arg instanceof ObjectValue) {
             // Check if arg looks like a list type
-            ObjectValue wyvList = (ObjectValue) arg;
-            if (wyvList.findDecl("get", false) != null && wyvList.findDecl("length", false) != null) {
+            ObjectValue wyvObj = (ObjectValue) arg;
+            // is it null?
+            if (wyvObj.getSelfName().equals(Util.NULL_SELF)) {
+                return null;
+            }
+            // is it a list?
+            if (wyvObj.findDecl("get", false) != null && wyvObj.findDecl("length", false) != null) {
                 List<Value> javaList = new LinkedList<>();
-                int listLen = ((IntegerLiteral) (wyvList.invoke("length", new LinkedList<>()))).getValue();
+                int listLen = ((IntegerLiteral) (wyvObj.invoke("length", new LinkedList<>()))).getValue();
                 for (int i = 0; i < listLen; i++) {
                     LinkedList<Value> args = new LinkedList<>();
                     args.add(new IntegerLiteral(i));
-                    Value element = MethodCall.trampoline(wyvList.invoke("get", args));
+                    Value element = MethodCall.trampoline(wyvObj.invoke("get", args));
                     Value v = ((ObjectValue) element).getField("value");
                     javaList.add(v);
                 }

@@ -13,8 +13,6 @@ import wyvern.target.corewyvernIL.expression.Bind;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Cast;
 import wyvern.target.corewyvernIL.expression.CharacterLiteral;
-import wyvern.target.corewyvernIL.expression.FFI;
-import wyvern.target.corewyvernIL.expression.FFIImport;
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.FieldSet;
 import wyvern.target.corewyvernIL.expression.FloatLiteral;
@@ -33,6 +31,8 @@ import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.interop.FFI;
+import wyvern.tools.interop.FFIImport;
 
 public abstract class DeclTypeVisitor<S, T> extends ASTVisitor<S, T> {
     private final String name;

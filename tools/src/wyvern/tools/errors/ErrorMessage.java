@@ -17,6 +17,7 @@ public enum ErrorMessage {
     NO_SUCH_METHOD("There is no visible method named %ARG in type %ARG", 2),
     MUST_INSTANTIATE("Must instantiate module def %ARG before using it", 1),
     DYNAMIC_METHOD_ERROR("Called method %ARG, but the method does not exist on the receiver object.  Did you use type Dyn?", 1),
+    JAVA_NULL_EXCEPTION("Called method %ARG on a null pointer from Java", 1),
     NO_SUCH_FIELD("There is no visible field named %ARG", 1),
     NO_METHOD_WITH_THESE_ARG_TYPES("The callee method cannot accept actual arguments with types: '%ARG'", 1),
     NOT_A_METHOD("%ARG is not a method", 1),
@@ -48,6 +49,7 @@ public enum ErrorMessage {
     QUALIFIED_TYPES_ONLY_FIELDS("Qualified types can only include val fields", 0),
     ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
     ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),
+    VAL_NEEDS_TYPE("val declaration %ARG is inside a new statement and thus needs a type annotation", 1),
 
     // Syntax errors
     LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
@@ -91,6 +93,7 @@ public enum ErrorMessage {
     //Verification errors
     IMPORT_CYCLE("Import cycles have been found, with cycles\n%ARG", 1),
     IMPORT_MUST_BE_STATIC_FIELD("Imported Java field %ARG must be static", 1),
+    IMPORT_NOT_FOUND("Import %ARG not found", 1),
 
     ReaderError("An error has occured in import resolution of URI %ARG with exception:\n%ARG", 2), // end of error list
 

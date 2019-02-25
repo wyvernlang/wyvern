@@ -23,6 +23,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	Stack<String> indents = new Stack<String>();	// the stack of indents
 	Token flagTok = null;							// a token that signals whether an indent is for a DSL
 	Token lastIndent = null;
+    public FileLocation startLocation = null;
 	
 	/********************** HELPER FUNCTIONS ************************/
 
@@ -49,7 +50,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	 */
 	Token token(int kind, String s) {
 		// Copper starts counting columns at 0, but we want to follow convention and count columns starting at 1
-		return LexerUtils.makeToken(kind, s, virtualLocation.getLine(), virtualLocation.getColumn()+1);
+		int startLine = startLocation==null?1:startLocation.getLine();
+        int startChar = startLocation==null?0:startLocation.getCharacter();
+        return LexerUtils.makeToken(kind, s, virtualLocation.getLine()+startLine-1, virtualLocation.getColumn()+startChar+1);
 	}
 
     /**

@@ -601,10 +601,11 @@ AST DefBody() :
 }
 
 Token DSLLines() :
-{ Token t, t2; String content = ""; }
+{ Token t, t2; int beginColumn; String content = ""; }
 {
     t=<DSLLINE> {
       content = t.specialToken.image + t.image;
+      beginColumn = t.specialToken.beginColumn;
   }
   ( t2 = <DSLLINE> {
       content = content + t2.specialToken.image + t2.image;
@@ -617,7 +618,7 @@ Token DSLLines() :
       return null;
     }
     t.image = content;
-    t.beginColumn = 0; // this DSL line should start at the beginning of the line
+    t.beginColumn = beginColumn-1; // this DSL line should start where the indent did
     return t;
   }
 }
