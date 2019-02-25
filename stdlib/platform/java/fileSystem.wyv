@@ -64,6 +64,6 @@ def makeFile(path: String) : File = new
 			def readUTF() : String
 				file.readUTFRandomAccess(rf)
 			def write(s : String) : Unit
-				file.writeUTFRandomAccess(rf, s)			//temporary write method
+				file.writeStringRandomAccess(rf, s)			//temporary write method
 			def writeUTF(s : String) : Unit
 				file.writeUTFRandomAccess(rf, s)

@@ -95,6 +95,13 @@ public class FileIO {
 		r.writeUTF(s);
 	}
 	
+	public void writeStringRandomAccess(RandomAccessFile r, String s) throws IOException {
+		//r.writeChars(s);
+		for(int i=0; i<s.length(); i++){
+			r.writeChar(s.charAt(i));
+		}
+	}
+	
 	public String readUTFRandomAccess(RandomAccessFile r) throws IOException {
 		return r.readUTF();
 	}
