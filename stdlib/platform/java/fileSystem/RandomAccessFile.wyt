@@ -1,9 +1,9 @@
 resource type RandomAccessFile //can be renamed later if necessary
-	def close() : Unit
-	def getPosition() : Int
-	def seek(pos : Int) : Unit
-	def length() : Int
-	def readLine() : String
-	def readUTF() : String
-	def write(s : String) : Unit
-	def writeUTF(s : String) : Unit
+    def close() : Unit
+    def getPosition() : Int
+    def seek(pos : Int) : Unit
+    def length() : Int
+    def readLine() : String
+    def readUTF() : String
+    def write(s : String) : Unit
+    def writeUTF(s : String) : Unit

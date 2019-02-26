@@ -45,94 +45,94 @@ public class FileIO {
         writer.close();
     }
 
-	/** NEW METHODS ADDED FOR IO LIBRARY **/
-	
-	public File createNewFile(String pathname){
-		return new File(pathname);
-	}
-	
-	/** Naming conventions a bit shady but won't conflict with previously defined methods **/
-	public BufferedWriter openBWForWrite(Object f) throws IOException {
-		return new BufferedWriter(new FileWriter((File) f));
-	}
-	
-	public BufferedWriter openBWForAppend(Object f) throws IOException {
-		return new BufferedWriter(new FileWriter((File)f, true));
-	}
-	
-	public BufferedReader openBRForRead(Object f) throws IOException {
-		return new BufferedReader(new FileReader((File) f));
-	}
-	
-	/* Used for both append and write, since both are BufferedWriter */
-	public void writeString(BufferedWriter bw, String s) throws IOException {
-		bw.write(s, 0, s.length());
-	}
-	
-	public String readLineFromFile(BufferedReader br) throws IOException {
-		return br.readLine();
-	}
-	
-	public void closeWriter(BufferedWriter bw) throws IOException {
-		bw.close();
-	}
-	
-	public void closeReader(BufferedReader br) throws IOException {
-		br.close();
-	}
-	
-	/** functionality for RandomAccessFile **/
-	
-	public RandomAccessFile makeRandomAccessFile(Object f, String mode) throws IOException {
-		return new RandomAccessFile((File)f, mode);
-	}
-	
-	public void closeRandomAccessFile(RandomAccessFile r) throws IOException {
-		r.close();
-	}
-	
-	public void writeUTFRandomAccess(RandomAccessFile r, String s) throws IOException {
-		r.writeUTF(s);
-	}
-	
-	public void writeStringRandomAccess(RandomAccessFile r, String s) throws IOException {
-		//r.writeChars(s);
-		for(int i=0; i<s.length(); i++){
-			r.writeChar(s.charAt(i));
-			r.seek(r.getFilePointer() - 1);
-			System.out.println(r.getFilePointer());
-		}
-	}
-	
-	public String readUTFRandomAccess(RandomAccessFile r) throws IOException {
-		return r.readUTF();
-	}
-	
-	public String readLineRandomAccess(RandomAccessFile r) throws IOException {
-		return r.readLine();
-	}
-	
-	public long accessFilePointer(RandomAccessFile r) throws IOException {
-		return r.getFilePointer();
-	}
-	
-	//check if long actually works here?
-	public void seekFilePointer(RandomAccessFile r, long pos) throws IOException {
-		r.seek(pos);
-	}
-	
-	//seeks relative to current position
-	public void seekRelativeFilePointer(RandomAccessFile r, long offset) throws IOException {
-		//check negative offset
-		r.seek(r.getFilePointer() + offset);
-	}
-	
-	public long getRandomAccessFileLength(RandomAccessFile r) throws IOException {
-		return r.length();
-	}
-	
-	/** way more read/write methods to add here **/
-	
+    /** NEW METHODS ADDED FOR IO LIBRARY **/
+    
+    public File createNewFile(String pathname) {
+        return new File(pathname);
+    }
+    
+    /** Naming conventions a bit shady but won't conflict with previously defined methods **/
+    public BufferedWriter openBWForWrite(Object f) throws IOException {
+        return new BufferedWriter(new FileWriter((File) f));
+    }
+    
+    public BufferedWriter openBWForAppend(Object f) throws IOException {
+        return new BufferedWriter(new FileWriter((File) f, true));
+    }
+    
+    public BufferedReader openBRForRead(Object f) throws IOException {
+        return new BufferedReader(new FileReader((File) f));
+    }
+    
+    /* Used for both append and write, since both are BufferedWriter */
+    public void writeString(BufferedWriter bw, String s) throws IOException {
+        bw.write(s, 0, s.length());
+    }
+    
+    public String readLineFromFile(BufferedReader br) throws IOException {
+        return br.readLine();
+    }
+    
+    public void closeWriter(BufferedWriter bw) throws IOException {
+        bw.close();
+    }
+    
+    public void closeReader(BufferedReader br) throws IOException {
+        br.close();
+    }
+    
+    /** functionality for RandomAccessFile **/
+    
+    public RandomAccessFile makeRandomAccessFile(Object f, String mode) throws IOException {
+        return new RandomAccessFile((File) f, mode);
+    }
+    
+    public void closeRandomAccessFile(RandomAccessFile r) throws IOException {
+        r.close();
+    }
+    
+    public void writeUTFRandomAccess(RandomAccessFile r, String s) throws IOException {
+        r.writeUTF(s);
+    }
+    
+    public void writeStringRandomAccess(RandomAccessFile r, String s) throws IOException {
+        //r.writeChars(s);
+        for (int i = 0; i < s.length(); i++) {
+            r.writeChar(s.charAt(i));
+            //r.seek(r.getFilePointer() - 1);
+            //System.out.println(r.getFilePointer());
+        }
+    }
+    
+    public String readUTFRandomAccess(RandomAccessFile r) throws IOException {
+        return r.readUTF();
+    }
+    
+    public String readLineRandomAccess(RandomAccessFile r) throws IOException {
+        return r.readLine();
+    }
+    
+    public long accessFilePointer(RandomAccessFile r) throws IOException {
+        return r.getFilePointer();
+    }
+    
+    //check if long actually works here?
+    public void seekFilePointer(RandomAccessFile r, long pos) throws IOException {
+        r.seek(pos);
+    }
+    
+    //seeks relative to current position
+    public void seekRelativeFilePointer(RandomAccessFile r, long offset) throws IOException {
+        //check negative offset
+        r.seek(r.getFilePointer() + offset);
+    }
+    
+    public long getRandomAccessFileLength(RandomAccessFile r) throws IOException {
+        return r.length();
+    }
+    
+    /** way more read/write methods to add here **/
+    
 
 
 }
