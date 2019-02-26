@@ -164,9 +164,10 @@ public final class QuantificationLifter {
         newFormalArgs.add(newFormalArg);
 
         for (FormalArg oldFormalArg : oldFormalArgs) {
+            ValueType newFormalArgType = oldFormalArg.getType().acceptVisitor(typeLifter, new State());
             newFormalArgs.add(new FormalArg(
                     oldFormalArg.getSite(),
-                    oldFormalArg.getType().acceptVisitor(typeLifter, new State())
+                    newFormalArgType
             ));
         }
 

@@ -1,7 +1,0 @@
-// Effect-unannotated library
-module def ubLib(f : polymorphicEffects.UbFile)
-
-import polymorphicEffects.UbFile
-
-unit
-

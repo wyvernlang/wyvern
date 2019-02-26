@@ -1,0 +1,18 @@
+// This test case is rejected
+// The type of writeTypFile is
+//      Unit -> ((Unit -> {} Unit) -> Unit)
+// So the upperbound would be
+//      ho-effects((Unit -> {} Unit) -> Unit) = empty set
+
+import higherOrderEffects.AcceptedFile1
+import lifted higherOrderEffects.acceptedLib1
+
+val ubFile : AcceptedFile1[{}] = new
+    effect write = {}
+    def go() : {} ((Unit -> {system.ffiEffect} Unit) -> {} Unit)
+        y : (Unit -> {system.ffiEffect} Unit) => unit
+
+// This causes an error since ffiEffect is not in the upper bound
+val ublib = acceptedLib1[{system.ffiEffect}](ubFile)
+
+"abc"

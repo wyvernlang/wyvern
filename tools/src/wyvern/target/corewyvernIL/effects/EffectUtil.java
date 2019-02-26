@@ -59,7 +59,6 @@ public final class EffectUtil {
     }
 
     public static EffectSet getHOEffects(ValueType type, GenContext ctx) {
-        boolean cond = type.toString().contains("polymorphicEffects.Logger.Logger[");
         EffectSet effects = null;
         List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
         for (DeclType declType : declTypes) {
