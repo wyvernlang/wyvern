@@ -44,6 +44,11 @@ public class HigherOrderTests {
     }
 
     @Test
+    public void accepted2() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.acceptedClient2", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void rejected1() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
@@ -51,5 +56,15 @@ public class HigherOrderTests {
         ));
         TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.rejectedClient1", Util.stringType(), new StringLiteral("abc"));
     }
+
+    @Test
+    public void rejected2() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "does not contain lower bound"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.rejectedClient2", Util.stringType(), new StringLiteral("abc"));
+    }
+
 
 }
