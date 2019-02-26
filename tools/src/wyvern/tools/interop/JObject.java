@@ -77,7 +77,7 @@ public class JObject implements FObject {
     }
     // handle numeric hierarchy
     if (c1 == Long.class && c2 == Integer.class) {
-    	return true;
+        return true;
     }
     // default
     return false;
