@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -60,7 +61,7 @@ public class ObjectValue extends New implements Invokable {
     }
 
     @Override
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         EvalContext methodCtx = evalCtx;
         DefDeclaration dd = (DefDeclaration) findDecl(methodName, false);
         if (dd != null) {
@@ -75,7 +76,10 @@ public class ObjectValue extends New implements Invokable {
         } else if (hasDelegate) {
             return delegateTarget.invoke(methodName, args);
         } else {
-            ToolError.reportError(ErrorMessage.DYNAMIC_METHOD_ERROR, this, methodName);
+            if (Util.isJavaNull(this)) {
+                ToolError.reportError(ErrorMessage.JAVA_NULL_EXCEPTION, loc, methodName);
+            }
+            ToolError.reportError(ErrorMessage.DYNAMIC_METHOD_ERROR, loc, methodName);
             throw new RuntimeException("can't reach here");
         }
     }

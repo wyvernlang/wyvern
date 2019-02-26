@@ -64,11 +64,23 @@ public class JObject implements FObject {
     }
     for (int i = 0; i < formalTypes.length; ++i) {
       // null for the type means the object is null, so always assignable
-      if (parameterTypes[i] != null && !mapPrimitives(formalTypes[i]).isAssignableFrom(parameterTypes[i])) {
+      if (parameterTypes[i] != null && !isAssignableFrom(mapPrimitives(formalTypes[i]), parameterTypes[i])) {
         return false;
       }
     }
     return true;
+  }
+
+  private boolean isAssignableFrom(Class<?> c1, Class<?> c2) {
+    if (c1.isAssignableFrom(c2)) {
+      return true;
+    }
+    // handle numeric hierarchy
+    if (c1 == Long.class && c2 == Integer.class) {
+        return true;
+    }
+    // default
+    return false;
   }
 
   private Class<?> mapPrimitives(Class<?> class1) {

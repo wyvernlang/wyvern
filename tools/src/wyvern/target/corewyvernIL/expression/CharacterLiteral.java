@@ -82,7 +82,8 @@ public class CharacterLiteral extends Literal implements Invokable {
         return Util.charType();
     }
 
-    public Value invoke(String methodName, List<Value> args) {
+    @Override
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         switch (methodName) {
         case "<": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) < 0);
         case ">": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) > 0);

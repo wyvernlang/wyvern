@@ -25,7 +25,6 @@ import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
-import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.TestUtil;
@@ -45,7 +44,7 @@ public class JavaValue extends AbstractValue implements Invokable {
     }
 
     @Override
-    public Value invoke(String methodName, List<Value> args) {
+    public Value invoke(String methodName, List<Value> args, FileLocation loc) {
         List<Object> javaArgs = new LinkedList<Object>();
         Class<?>[] hints = foreignObject.getTypeHints(methodName);
         int hintNum = 0;
@@ -66,7 +65,7 @@ public class JavaValue extends AbstractValue implements Invokable {
                 }
                 if (cause instanceof ParseException) {
                     ParseException pe = (ParseException) cause;
-                    ToolError.reportError(ErrorMessage.PARSE_ERROR, (HasLocation) null, pe.getMessage());
+                    ToolError.reportError(ErrorMessage.PARSE_ERROR, loc, pe.getMessage());
                 }
             }
             throw new RuntimeException(e);
@@ -90,7 +89,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             return new CharacterLiteral((Character) result);
         } else if (result == null) {
             // null is represented as unit
-            return Util.unitValue();
+            return Util.nullValue();
         } else if (result instanceof List) {
             ObjectValue v = null;
             try {
@@ -144,8 +143,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             // Check if arg looks like a list type
             ObjectValue wyvObj = (ObjectValue) arg;
             // is it null?
-            if (wyvObj.getDecls().isEmpty()) {
-                // unit represents null
+            if (wyvObj.getSelfName().equals(Util.NULL_SELF)) {
                 return null;
             }
             // is it a list?
