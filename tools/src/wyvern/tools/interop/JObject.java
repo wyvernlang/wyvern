@@ -42,7 +42,6 @@ public class JObject implements FObject {
       Object result = bestMethod.invoke(jObject, argArray);
       return result;
     } else {
-    	System.out.println();
       throw new RuntimeException("no applicable method '" + methodName + "'!");
     }
   }
@@ -65,7 +64,7 @@ public class JObject implements FObject {
     }
     for (int i = 0; i < formalTypes.length; ++i) {
       // null for the type means the object is null, so always assignable
-      if (parameterTypes[i] != null && !isAssignableFrom(mapPrimitives(formalTypes[i]),parameterTypes[i])) {
+      if (parameterTypes[i] != null && !isAssignableFrom(mapPrimitives(formalTypes[i]), parameterTypes[i])) {
         return false;
       }
     }
