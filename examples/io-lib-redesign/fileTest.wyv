@@ -35,16 +35,18 @@ r.close()
 val raf = f.makeRandomAccessFile("rw")
 
 out.printInt(raf.getPosition())
+out.println()
 
-raf.seek(5)
+//raf.seek(5)
 
-raf.write("hello")
+raf.write("what")
 //out.print(raf.readLine())
 
+
+
+raf.close()
 val r = f.makeReader()
 out.print(r.read())
 r.close()
 
 out.println()
-
-raf.close()

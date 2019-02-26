@@ -99,6 +99,8 @@ public class FileIO {
 		//r.writeChars(s);
 		for(int i=0; i<s.length(); i++){
 			r.writeChar(s.charAt(i));
+			r.seek(r.getFilePointer() - 1);
+			System.out.println(r.getFilePointer());
 		}
 	}
 	
