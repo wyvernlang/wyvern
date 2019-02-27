@@ -73,6 +73,10 @@ public class FileIO {
         return br.readLine();
     }
     
+    public int readCharFromFile(BufferedReader br) throws IOException {
+        return br.read();
+    }
+    
     public void closeWriter(BufferedWriter bw) throws IOException {
         bw.close();
     }
