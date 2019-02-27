@@ -3,7 +3,7 @@ module def fileSystem(java:Java): fileSystem.FileSystem
 import java:wyvern.stdlib.support.FileIO.file
 
 
-/* Import Types (temporary) */
+/* Import Types */
 import fileSystem.File
 import fileSystem.Reader
 import fileSystem.Writer
@@ -16,12 +16,14 @@ def makeFile(path: String) : File = new
     def makeReader() : Reader
         val br = file.openBRForRead(this.f)
         new
-            def read() : String
-                file.readLineFromFile(br)    //temporary, for now only reads line
+            def read() : Int
+                file.readCharFromFile(br)
+            def readLine() : String
+                file.readLineFromFile(br)
             def close() : Unit
                 file.closeReader(br)
             
-    def makeWriter() : Writer 
+    def makeWriter() : Writer
         val bw = file.openBWForWrite(this.f)
         new
             def write(s : String) : Unit
