@@ -1,0 +1,52 @@
+require java
+import fileSystem
+import stdout
+val filesys = fileSystem(java)
+val out = stdout(java)
+
+val f = filesys.makeFile("example.txt")	     //should this create the file in itself? or only make existing?
+
+val w = f.makeWriter()                       //automatically creates file
+
+w.write("Hello World!")
+
+w.close()
+
+val ap = f.makeAppender()
+
+ap.write("\nfoo")
+
+ap.close()
+
+val r = f.makeReader()
+
+out.print(r.read())
+out.println()
+out.print(r.read())
+out.println()
+
+r.close()
+
+/* Random Access File */
+
+/* options: "r" read only, "rw" read/write, "rws" content & metadata written synchronously,
+ * "rwd" content written synchronously
+ */
+val raf = f.makeRandomAccessFile("rw")
+
+out.printInt(raf.getPosition())
+out.println()
+
+//raf.seek(5)
+
+raf.write("what")
+//out.print(raf.readLine())
+
+
+
+raf.close()
+val r = f.makeReader()
+out.print(r.read())
+r.close()
+
+out.println()

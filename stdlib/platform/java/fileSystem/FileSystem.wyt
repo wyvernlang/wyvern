@@ -1,0 +1,3 @@
+import fileSystem.File
+type FileSystem
+    def makeFile(path: String): File
