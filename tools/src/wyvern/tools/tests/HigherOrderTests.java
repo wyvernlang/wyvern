@@ -44,6 +44,11 @@ public class HigherOrderTests {
     }
 
     @Test
+    public void accepted1a() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.acceptedClient1a", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void accepted2() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.acceptedClient2", Util.stringType(), new StringLiteral("abc"));
     }
@@ -75,6 +80,12 @@ public class HigherOrderTests {
         TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.rejectedClient3", Util.stringType(), new StringLiteral("abc"));
     }
 
-
-
+    @Test
+    public void rejected4() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "outside of the upper bound"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.rejectedClient4", Util.stringType(), new StringLiteral("abc"));
+    }
 }
