@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import wyvern.stdlib.Globals;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
+import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
@@ -311,7 +312,6 @@ public class ModuleResolver {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 valueName = decl.getName();
 
-
                 // Rename according to "apply"
                 DefDeclaration defDecl = new DefDeclaration(
                         Util.APPLY_NAME,
@@ -323,6 +323,7 @@ public class ModuleResolver {
 
                 // Wrap in an object
                 program = new New(defDecl);
+                List<FormalArg> formalArgs = ((DefDeclType) defDecl.getDeclType()).getFormalArgs();
 
                 // Perform quantification lifting if possible
                 final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
@@ -330,6 +331,23 @@ public class ModuleResolver {
                 if (liftResult != null) {
                     program = liftResult;
                 }
+
+//                for(FormalArg arg : formalArgs) {
+//                    Set<EffectDeclType> effects = getEffects(arg, newGenCtx);
+//                    for(DeclType declType : arg.getType().getStructuralType(newGenCtx).getDeclTypes()) {
+//                        if(declType instanceof EffectDeclType) {
+//                            EffectDeclType effectDecl = (EffectDeclType) declType;
+//                            effectDecl.adapt(View.from(program, newGenCtx));
+//                            System.out.println(effectDecl);
+//                        }
+//                    }
+//                }
+
+//                List<DeclType> firstDeclTypes = (h.getFormalArgs().get(0).getType().getStructuralType(newGenCtx).getDeclTypes());
+//                List<DeclType> secondDeclTypes = (h.getFormalArgs().get(1).getType().getStructuralType(newGenCtx).getDeclTypes());
+//                System.out.println(firstDeclTypes);
+//                System.out.println(secondDeclTypes);
+
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);
             } else {
@@ -343,6 +361,8 @@ public class ModuleResolver {
 
         return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType);
     }
+
+
 
     /**
      * Reads the file.

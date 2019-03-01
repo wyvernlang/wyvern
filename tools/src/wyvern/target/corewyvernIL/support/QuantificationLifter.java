@@ -24,6 +24,7 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.effects.EffectUtil;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -35,13 +36,13 @@ import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.HasLocation;
-import wyvern.tools.generics.GenericKind;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 public final class QuantificationLifter {
     private static final String MONOMORPHIZED_EFFECT = "__MonomorphizedEffect__";
@@ -78,6 +79,12 @@ public final class QuantificationLifter {
         final DefDeclaration oldFunctor = (DefDeclaration) oldDecl;
         final List<FormalArg> oldFormalArgs = oldFunctor.getFormalArgs();
 
+        //List<DeclType> firstDeclTypes = (oldFormalArgs.get(0).getType().getStructuralType(ctx).getDeclTypes());
+        //System.out.println(firstDeclTypes);
+
+        //List<DeclType> secondDeclTypes = (oldFormalArgs.get(1).getType().getStructuralType(ctx).getDeclTypes());
+        //System.out.println(secondDeclTypes);
+
         if (oldFormalArgs.size() == 0) {
             return null;
         }
@@ -90,7 +97,7 @@ public final class QuantificationLifter {
             return null;
         }
 
-       if (!isLifted) {
+        if (!isLifted) {
             return null;
         }
 
@@ -98,6 +105,9 @@ public final class QuantificationLifter {
 
         return new New(newFunctor, expression.getLocation());
     }
+
+
+
 
     /**
      * Lifts effect polymorphism from the return type of a functor to the functor itself.
@@ -111,9 +121,24 @@ public final class QuantificationLifter {
 
         final String genericName = wyvern.tools.typedAST.core.declarations.DefDeclaration.GENERIC_PREFIX + MONOMORPHIZED_EFFECT;
         final BindingSite genericArgSite = new BindingSite(genericName);
-        final ValueType genericType =
-                wyvern.tools.typedAST.core.declarations.DefDeclaration.genericStructuralType(MONOMORPHIZED_EFFECT, genericArgSite, GenericKind.EFFECT);
-        final FormalArg newFormalArg = new FormalArg(genericArgSite, genericType);
+        final List<FormalArg> oldFormalArgs = functor.getFormalArgs();
+
+        // Construct effect bounds
+        EffectSet lb = new EffectSet(new HashSet<>());
+        EffectSet ub = new EffectSet(new HashSet<>());
+        for (FormalArg arg : oldFormalArgs) {
+            ValueType argType = arg.getType();
+            EffectSet effects = EffectUtil.getEffects(argType, ctx);
+            if (effects != null) {
+                lb.getEffects().addAll(effects.getEffects());
+            }
+        }
+
+        final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(
+                MONOMORPHIZED_EFFECT, genericArgSite, lb, ub
+        );
+        final FormalArg newFormalArg = new FormalArg(genericArgSite, boundedType);
+
         final Variable newFormalArgVariable = new Variable(newFormalArg.getSite());
 
         // Construct updated type context
@@ -135,15 +160,14 @@ public final class QuantificationLifter {
 
         // Construct new list of formal arguments
 
-        final List<FormalArg> oldFormalArgs = functor.getFormalArgs();
-
         final List<FormalArg> newFormalArgs = new LinkedList<>();
         newFormalArgs.add(newFormalArg);
 
         for (FormalArg oldFormalArg : oldFormalArgs) {
+            ValueType newFormalArgType = oldFormalArg.getType().acceptVisitor(typeLifter, new State());
             newFormalArgs.add(new FormalArg(
                     oldFormalArg.getSite(),
-                    oldFormalArg.getType().acceptVisitor(typeLifter, new State())
+                    newFormalArgType
             ));
         }
 
@@ -203,6 +227,7 @@ public final class QuantificationLifter {
 
         return newFunctor;
     }
+
 
     private static New handleNew(TypeContext ctx, DeclarationLifter declarationLifter, New oldNew) {
         // Construct new declarations
@@ -357,8 +382,10 @@ public final class QuantificationLifter {
                 final EffectSet oldEffectSet = defDeclType.getEffectSet();
                 final EffectSet newEffectSet;
                 if (oldEffectSet == null) {
+                    // TODO: this is the problem...
                     // This declaration is unannotated, so annotate it with the monomorphized effect
                     newEffectSet = TypeLifter.this.monomorphicEffect;
+                    //newEffectSet = null;
                 } else {
                     // This declaration is annotated, so don't change it
                     newEffectSet = oldEffectSet;
