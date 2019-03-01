@@ -392,6 +392,9 @@ public class MethodCall extends Expression {
             }
         }
         // Couldn't find an appropriate method declaration. Build up a nice error message.
+        if (!(declarationTypes.get(0) instanceof DefDeclType)) {
+            ToolError.reportError(ErrorMessage.NOT_A_METHOD, this, methodName);
+        }
         String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
         return null;
