@@ -99,4 +99,10 @@ public class VarBinding implements HasLocation {
         freeVars.remove(varName);
         freeVars.addAll(expr.getFreeVariables());
     }
+    
+    @Override
+    public String toString() {
+        return getVarName() + " : " + getType() + " = " + getExpression(); 
+    }
+
 }

@@ -93,6 +93,14 @@ class PSVState {
 
 public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode> {
 
+    /** Specializes all ModuleDeclarations in ast to the given platform.
+     * Collects dependencies along the way and wraps the resulting expression with them as needed.
+     * 
+     * @param ast
+     * @param platform
+     * @param ctx
+     * @return
+     */
     public static ASTNode specializeAST(ASTNode ast, String platform, GenContext ctx) {
         PSVState state = new PSVState(platform, ctx);
         ASTNode result = ast.acceptVisitor(new PlatformSpecializationVisitor(), state);
@@ -104,7 +112,13 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
 
         List<TypedModuleSpec> dependenciesList = new ArrayList<>(state.getDependencies());
         dependenciesList = resolver.sortDependencies(dependenciesList);
-        return (ASTNode) resolver.wrap((IExpr) result, dependenciesList);
+        // TODO: may need to add dependencies if the resolved module depends on something else.
+        // in that case, though, rather than blindly wrapping, should only wrap with new dependencies,
+        // and may need to preserve order with existing dependencies.
+        // question: might a dependency also need specialization?
+        // perhaps we need a more global strategy that recursively adds dependencies to
+        // the list (in order) and specializes each one as it is added?
+        return (ASTNode) result; //resolver.wrap((IExpr) result, dependenciesList);
     }
 
     public ASTNode visit(PSVState state, ModuleDeclaration moduleDecl) {
