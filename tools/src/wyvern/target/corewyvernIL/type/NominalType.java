@@ -75,7 +75,7 @@ public class NominalType extends ValueType {
         if (dt instanceof DefinedTypeMember) {
             ValueType vt = ((DefinedTypeMember) dt).getResultType(View.from(path, ctx));
             if (vt.equals(this)) {
-                throw new RuntimeException("circularly defined type; should not be possible");
+                return theDefault;
             }
             return vt.getStructuralType(ctx, theDefault);
         } else {
