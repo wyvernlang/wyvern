@@ -25,7 +25,7 @@ tagged type None extends Option
     def orElse(x:Unit -> Option[this.T]):Option[this.T]
     val isDefined:Boolean 
 	
-def Some[T](x:T):Option[T] = new
+def Some[T](x:T):Some[T] = new
     type T = T
     val content : T = x
     def map[U](f:T -> U):Option[U] = Some[U](f(x))
@@ -35,7 +35,7 @@ def Some[T](x:T):Option[T] = new
     def orElse(x:Unit -> Option[T]):Option[T] = this
     val isDefined:Boolean = true
 
-def None[T]():Option[T] = new
+def None[T]():None[T] = new
     type T = T
     def map[U](f:T -> U):Option[U] = None[U]()
     def flatMap[U](f:T -> Option[U]):Option[U] = None[U]()

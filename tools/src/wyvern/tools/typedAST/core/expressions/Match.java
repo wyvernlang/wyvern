@@ -129,7 +129,7 @@ public class Match extends AbstractExpressionAST implements CoreAST {
                     // the first type we inferred is too narrow.  Broaden it to the current type.
                     expectedCaseType = caseType.avoid(c.getVarName(), caseCtx);
                 } else {
-                    ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, reason.getReason());
+                    ToolError.reportError(ErrorMessage.CASE_TYPE_MISMATCH, c, expectedCaseType.desugar(caseCtx), caseType.desugar(caseCtx));
                 }
             }
             if (expectedCaseType == null) {

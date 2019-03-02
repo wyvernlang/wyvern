@@ -72,6 +72,7 @@ public enum ErrorMessage {
     CIRCULAR_TAGGED_RELATION("Circular tagged hierarchy found with tag: %ARG, case-of: %ARG", 2),
     COMPRISES_RELATION_NOT_RECIPROCATED("The tag declared to comprise this tag is not a case-of this tag", 0),
     COMPRISES_EXCLUDES_TAG("%ARG cannot extend %ARG because it is not listed among the comprised types", 2),
+    ILLEGAL_TAG_INSTANCE("Cannot instantiate type %ARG; must specify one of the types it is comprised of", 1),
 
     //For match expression
     BOUNDED_EXHAUSTIVE_WITH_DEFAULT("Default cannot be present in satisfied bounded match", 0),
@@ -83,7 +84,7 @@ public enum ErrorMessage {
     UNBOUNDED_WITHOUT_DEFAULT("Default must be present when matching over unbounded tag", 0),
     UNMATCHABLE_CASE("Case type %ARG is not a subtype of match expression type %ARG: %ARG", 3),
     UNMATCHED_CASE("Matched value with tag %ARG has no matching case arm", 1),
-    CASE_TYPE_MISMATCH("Type of this case branch does not match the first case branch: %ARG", 1),
+    CASE_TYPE_MISMATCH("The types of the case branches do not match: please have one return a common supertype of %ARG and %ARG", 2),
 
     // Evaluation errors
     VALUE_CANNOT_BE_APPLIED("The value %ARG cannot be applied to an argument", 1),

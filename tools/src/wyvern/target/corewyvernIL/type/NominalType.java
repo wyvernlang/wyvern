@@ -368,6 +368,17 @@ public class NominalType extends ValueType {
         return true;
     }
 
+    @Override
+    public void canInstantiate(TypeContext ctx) {
+        DeclType dt = this.getSourceDeclType(ctx);
+        if (dt instanceof ConcreteTypeMember) {
+            Type t = ((ConcreteTypeMember) dt).getSourceType();
+            if (t instanceof DataType) {
+                ToolError.reportError(ErrorMessage.ILLEGAL_TAG_INSTANCE, this, this.desugar(ctx));
+            }
+        }
+    }
+    
     public boolean nominallyEquals(NominalType parentType, TypeContext ctx) {
         NominalType myCanonical = getCanonicalNominalType(ctx);
         NominalType theirCanonical = getCanonicalNominalType(ctx);
