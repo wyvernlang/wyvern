@@ -2,4 +2,5 @@ resource type Reader
     /* add read for UTF and bytes */
     def read():Int
     def readLine():String
+    def readFully():String
     def close():Unit

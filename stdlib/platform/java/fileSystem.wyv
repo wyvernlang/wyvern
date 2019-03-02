@@ -20,6 +20,8 @@ def makeFile(path: String) : File = new
                 file.readCharFromFile(br)
             def readLine() : String
                 file.readLineFromFile(br)
+            def readFully() : String
+                file.readFullyFile(br)
             def close() : Unit
                 file.closeReader(br)
             

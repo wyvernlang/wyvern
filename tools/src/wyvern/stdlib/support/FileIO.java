@@ -73,6 +73,21 @@ public class FileIO {
         return br.readLine();
     }
     
+    public String readFullyFile(BufferedReader br) throws IOException {
+        String next = br.readLine();
+        if (next == null) {
+            return "";
+        } else {
+            String acc = next;
+            next = br.readLine();
+            while (next != null) {
+                acc += "\n" + next;
+                next = br.readLine();
+            }
+            return acc;
+        }
+    }
+    
     public int readCharFromFile(BufferedReader br) throws IOException {
         return br.read();
     }
@@ -92,6 +107,7 @@ public class FileIO {
     }
     
     public void closeRandomAccessFile(RandomAccessFile r) throws IOException {
+        //uhh so consider trying to copy the whole file to a writer at the end
         r.close();
     }
     

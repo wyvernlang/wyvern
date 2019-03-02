@@ -7,8 +7,8 @@ val out = stdout(java)
 val f = filesys.makeFile("example.txt")	     //should this create the file in itself? or only make existing?
 
 val w = f.makeWriter()                       //automatically creates file
-
 w.write("Hello World!")
+
 
 w.close()
 
@@ -20,12 +20,24 @@ ap.close()
 
 val r = f.makeReader()
 
-out.print(r.readLine())
-out.println()
-out.print(r.readLine())
+out.print(r.readFully())
+//out.print(r.readLine())
+//out.println()
+//out.print(r.readLine())
 out.println()
 
 r.close()
+
+val fe = filesys.makeFile("empty.txt")
+out.print("/** READ FULLY TEST **/")
+out.println()
+val re = fe.makeReader()
+out.print("made reader")
+out.println()
+out.print(re.readFully())
+out.println()
+re.close()
+
 
 /* Random Access File */
 
@@ -38,11 +50,15 @@ out.printInt(raf.getPosition())
 out.println()
 
 //raf.seek(5)
-
-raf.write("what")
+raf.seek(1)
+raf.writeUTF("what")
 //out.print(raf.readLine())
+raf.writeUTF("help")
 
-
+/*
+ * RandomAccessFile doesn't appear to actually write anything to the file
+ * Also really weird spacing on normal write, writeUTF writes a weird character too
+ */
 
 raf.close()
 val r = f.makeReader()
