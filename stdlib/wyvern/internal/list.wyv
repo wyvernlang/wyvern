@@ -27,7 +27,7 @@ def make[E]():List[E]
         def get(n:Int):Option[E]
         def getCell(n:Int):Option[Cell]
         def do(f:E -> Unit):Unit
-    def makeCell(e:E, n:Option):Cell = new (self) =>
+    def makeCell(e:E, n:Option[Cell]):Cell = new (self) =>
         var element:E = e
         var next:Option[Cell] = n
         def find(pred:E -> Boolean):Option[E]
@@ -45,7 +45,7 @@ def make[E]():List[E]
         def do(f:E -> Unit):Unit
             f(self.element)
             self.next.map[Unit](c:Cell => c.do(f))
-    def makeOneCell(e:E):Cell = makeCell(e, option.None[E]())
+    def makeOneCell(e:E):Cell = makeCell(e, option.None[Cell]())
     new (self) =>
         type E = E
         var first:Option[Cell] = option.None[Cell]()

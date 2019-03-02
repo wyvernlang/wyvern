@@ -114,7 +114,7 @@ resource type BrandPair
     var unsealer:BrandUnsealer[this.T]
 
 def makeBrandPair[T](name:String):BrandPair[T]
-    var shared:Option = option.None[SealedBox]()
+    var shared:Option[T] = option.None[T]()
     def makeSealedBox(object:Option[T]):SealedBox[T]
         val newBox:SealedBox[T] = new
             type T = T
@@ -131,7 +131,7 @@ def makeBrandPair[T](name:String):BrandPair[T]
         var unsealer:BrandUnsealer[T] = new
             type T = T
             def unseal(box:SealedBox[T]):Option[T]
-                shared = option.None[SealedBox[T]]()
+                shared = option.None[T]()
                 box.shareContent()
                 var result:Option[T] = shared
                 result
