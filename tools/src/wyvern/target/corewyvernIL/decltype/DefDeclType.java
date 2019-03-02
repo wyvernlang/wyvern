@@ -50,6 +50,8 @@ public class DefDeclType extends DeclTypeWithResult {
 
     @Override
     public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
+
+
         if (!(dt instanceof DefDeclType)) {
             reason.setReason("declaration type of " + getName() + " didn't match");
             return false;

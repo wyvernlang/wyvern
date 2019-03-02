@@ -1,0 +1,3 @@
+resource type UbFile
+    effect write
+    def writeToFile(f : Unit -> {} Unit) : {} Unit
