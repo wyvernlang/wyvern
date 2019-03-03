@@ -2,12 +2,14 @@
 module def fileSystem(java:Java): fileSystem.FileSystem
 import java:wyvern.stdlib.support.FileIO.file
 
-
 /* Import Types */
 import fileSystem.File
 import fileSystem.Reader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
+
+import wyvern.option
+type Option = option.Option
 
 
 def makeFile(path: String) : File = new
@@ -18,8 +20,13 @@ def makeFile(path: String) : File = new
         new
             def read() : Int
                 file.readCharFromFile(br)
-            def readLine() : String
-                file.readLineFromFile(br)
+            def readLine() : Option[String]
+                val line = file.readLineFromFile(br)
+                if (file.isNull(line))
+                    option.None[String]()
+                option.Some[String](line)
+            def readFully() : String
+                file.readFullyFile(br)
             def close() : Unit
                 file.closeReader(br)
             
