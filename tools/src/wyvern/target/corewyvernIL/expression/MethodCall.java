@@ -421,7 +421,7 @@ public class MethodCall extends Expression {
                     if (failureReason == null) {
                         failureReason = r.getReason();
                     }
-                    break;
+                    //break;
                 }
             } catch (RuntimeException e) {
                 if (e.getMessage().contains("not found")) {
@@ -538,10 +538,18 @@ public class MethodCall extends Expression {
             }
         }
         // Couldn't find an appropriate method declaration. Build up a nice error message.
-        if (!(declarationTypes.get(0) instanceof DefDeclType)) {
+        // find one DefDeclType to use for the error message
+        DefDeclType aDefDeclType = null;
+        for (int i = 0; i < declarationTypes.size(); ++i) {
+            if (declarationTypes.get(i) instanceof DefDeclType) {
+                aDefDeclType = (DefDeclType) declarationTypes.get(i);
+                break;
+            }
+        }
+        if (aDefDeclType == null) {
             ToolError.reportError(ErrorMessage.NOT_A_METHOD, this, methodName);
         }
-        String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
+        String errorMessage = methodDeclarationNotFoundMsg(ctx, aDefDeclType, actualArgTypes, formalArgTypes, failureReason);
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
         return null;
     }
@@ -556,14 +564,14 @@ public class MethodCall extends Expression {
     }
 
     private String methodDeclarationNotFoundMsg(
-            TypeContext ctx, List<DeclType> declarationTypes, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
+            TypeContext ctx, DefDeclType aDefDeclType, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
     ) {
         StringBuilder errMsg = new StringBuilder();
         //errMsg.append(methodName);
         //errMsg.append("(");
         for (int i = 0; i <= args.size() - 2; ++i) {
             // add the argument only if it's not a generic
-            if (!((DefDeclType) declarationTypes.get(0)).getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX)) {
+            if (!(aDefDeclType.getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX))) {
                 errMsg.append(actualArgTypes.get(i).desugar(ctx));
                 errMsg.append(", ");
             }
@@ -572,7 +580,7 @@ public class MethodCall extends Expression {
             errMsg.append(actualArgTypes.get(args.size() - 1).desugar(ctx));
         }
         errMsg.append("; expected types ");
-        DefDeclType ddt = (DefDeclType) declarationTypes.get(0);
+        DefDeclType ddt = aDefDeclType;
         for (int i = 0; i <= formalArgTypes.size() - 2; ++i) {
             // add the argument only if it's not a generic
             if (!ddt.getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX)) {
@@ -584,9 +592,9 @@ public class MethodCall extends Expression {
             errMsg.append(formalArgTypes.get(formalArgTypes.size() - 1).desugar(ctx));
         }
         //errMsg.append(")");
-        if (failureReason != null) {
+        /*if (failureReason != null) {
             errMsg.append("; argument subtyping failed because " + failureReason);
-        }
+        }*/
         return errMsg.toString();
     }
 }

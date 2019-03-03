@@ -49,7 +49,7 @@ public abstract class ValueType extends Type implements IASTNode {
         try {
             Appendable dest = new StringBuilder();
             doPrettyPrint(dest, "", ctx);
-            return dest.toString();
+            return dest.toString().replaceAll("MOD\\$", "");
         } catch (IOException e) {
             e.printStackTrace();
             return "ERROR_PRINTING";

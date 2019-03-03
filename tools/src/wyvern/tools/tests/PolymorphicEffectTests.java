@@ -238,7 +238,7 @@ public class PolymorphicEffectTests {
     public void testRejectedParametricModuleFunctor1() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
-                "The callee method cannot accept actual arguments with types: 'String; expected types Int; argument subtyping failed"
+                "The callee method cannot accept actual arguments with types: 'String; expected types Int"
                 ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedParametricModuleFunctor1", Util.stringType(), new StringLiteral("abc"));
     }
