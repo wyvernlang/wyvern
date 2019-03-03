@@ -1,6 +1,8 @@
 require java
 import fileSystem
 import stdout
+import wyvern.option
+type Option = option.Option
 val filesys = fileSystem(java)
 val out = stdout(java)
 
@@ -20,10 +22,10 @@ ap.close()
 
 val r = f.makeReader()
 
-out.print(r.readFully())
-//out.print(r.readLine())
-//out.println()
-//out.print(r.readLine())
+//out.print(r.readFully())
+out.print(r.readLine().getOrElse(() => ""))
+out.println()
+out.print(r.readLine().getOrElse(() => ""))
 out.println()
 
 r.close()
@@ -62,7 +64,7 @@ raf.writeUTF("help")
 
 raf.close()
 val r = f.makeReader()
-out.print(r.readLine())
+//out.print(r.readLine())
 r.close()
 
 out.println()

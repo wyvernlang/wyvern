@@ -73,6 +73,10 @@ public class FileIO {
         return br.readLine();
     }
     
+    public boolean isNull(Object o) {
+        return o == null;
+    }
+    
     public String readFullyFile(BufferedReader br) throws IOException {
         String next = br.readLine();
         if (next == null) {
