@@ -385,8 +385,23 @@ public class EffectSystemTests {
     }
 
     @Test
+    public void accepted2() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.acceptedClient2", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void testObjNetwork() throws ParseException {
         /* Object with effect annotations. */
         TestUtil.doTestScriptModularly(PATH, "effects.objNetwork", Util.stringType(), new StringLiteral("ObjNetwork with effects"));
+    }
+
+    @Test
+    public void testSeparation1() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client1", Util.unitType(),Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation2() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client2", Util.unitType(),Util.unitValue());
     }
 }

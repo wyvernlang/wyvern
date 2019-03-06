@@ -39,10 +39,12 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     private final List<NameBindingImpl> args;
 
     private final List<ImportDeclaration> imports;
+    private boolean isAnnotated;
     //private final List<GenericParameter> generics;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
-                             TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
+                             TypedAST inner, NamedType type, FileLocation location, boolean isResource,
+                             boolean isAnnotated) {
         this.name = name;
         this.inner = inner;
         this.location = location;
@@ -51,6 +53,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.args = args;
         this.imports = imports;
         this.generics = generics;
+        this.isAnnotated = isAnnotated;
     }
 
     @Override
@@ -99,7 +102,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
      * loadedTypes is updated with all the types that had to be loaded in
      * order to specify the required types.
      *
-     * @param reqSeq
      * @param ctx
      * @param loadedTypes
      * @return

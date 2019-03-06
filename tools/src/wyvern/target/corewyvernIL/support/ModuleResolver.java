@@ -298,6 +298,7 @@ public class ModuleResolver {
             if (decl instanceof ValDeclaration) {
                 program = ((ValDeclaration) decl).getDefinition();
                 //program = wrap(program, dependencies);
+
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
                 valueName = decl.getName();
@@ -308,6 +309,7 @@ public class ModuleResolver {
                             oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
                     program = new New(moduleDecl);
                 }
+
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 valueName = decl.getName();
@@ -332,21 +334,12 @@ public class ModuleResolver {
                     program = liftResult;
                 }
 
-//                for(FormalArg arg : formalArgs) {
-//                    Set<EffectDeclType> effects = getEffects(arg, newGenCtx);
-//                    for(DeclType declType : arg.getType().getStructuralType(newGenCtx).getDeclTypes()) {
-//                        if(declType instanceof EffectDeclType) {
-//                            EffectDeclType effectDecl = (EffectDeclType) declType;
-//                            effectDecl.adapt(View.from(program, newGenCtx));
-//                            System.out.println(effectDecl);
-//                        }
-//                    }
-//                }
+                // Perform effect annotation check
+                boolean result = EffectAnnotationChecker.isAnnotated(genCtx, program);
+                System.out.println("File: " + file);
+                System.out.println(result);
+                System.out.println();
 
-//                List<DeclType> firstDeclTypes = (h.getFormalArgs().get(0).getType().getStructuralType(newGenCtx).getDeclTypes());
-//                List<DeclType> secondDeclTypes = (h.getFormalArgs().get(1).getType().getStructuralType(newGenCtx).getDeclTypes());
-//                System.out.println(firstDeclTypes);
-//                System.out.println(secondDeclTypes);
 
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);

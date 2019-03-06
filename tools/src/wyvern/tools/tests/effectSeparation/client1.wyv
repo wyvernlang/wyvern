@@ -1,2 +1,2 @@
-annotated module client1 : effectSeparation.Client
+import effectSeparation.file1
 unit
