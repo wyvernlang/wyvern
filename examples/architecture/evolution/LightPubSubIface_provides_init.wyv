@@ -1,0 +1,6 @@
+module def LightPubSubIface_provides_init(node_name: String, python: Python): LightPubSubIfaceProvidesInit
+
+import python:rospy
+
+def init(): Unit
+	rospy.init_node(node_name)

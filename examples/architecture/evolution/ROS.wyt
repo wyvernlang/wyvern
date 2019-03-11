@@ -1,0 +1,6 @@
+resource type ROS
+    def is_shutdown(): Boolean
+    def log_pub(v: Float): Unit
+    def log_recv(v: Float): Unit
+    def log(s: String): Unit
+    def spin(): Unit
