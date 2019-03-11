@@ -1,0 +1,23 @@
+require python
+require stdout
+
+import python:rospy
+
+def is_shutdown(): Boolean = rospy.is_shutdown()
+
+def log_pub(v: Float): Unit
+	stdout.print("Published: ")
+	stdout.printFloat(v)
+	stdout.print("\n")
+
+def log_recv(v: Float): Unit
+	stdout.print("Received: ")
+	stdout.printFloat(v)
+	stdout.print("\n")
+
+def log(s: String): Unit
+	stdout.print(s)
+	stdout.print("\n")
+
+def spin(): Unit
+	rospy.spin()

@@ -1,0 +1,4 @@
+deployment Braitenberg1Deployment extends Braitenberg1
+	sensor.name = "sensor"
+	controller.name = "controller"
+	lightValues.name = "lightValues"

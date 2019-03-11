@@ -8,46 +8,39 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import wyvern.stdlib.Globals;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+
 import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.stdlib.support.AST;
 import wyvern.target.corewyvernIL.VarBinding;
-import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
-import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Value;
-import wyvern.target.corewyvernIL.modules.Module;
-import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
-import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.arch.lexing.ArchLexer;
-import wyvern.tools.errors.ErrorMessage;
-import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.JObject;
 import wyvern.tools.interop.JavaValue;
 import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.parsing.coreparser.ParseException;
-import wyvern.tools.parsing.coreparser.TokenManager;
 import wyvern.tools.parsing.coreparser.WyvernTokenManager;
 import wyvern.tools.parsing.coreparser.arch.ASTArchDesc;
 import wyvern.tools.parsing.coreparser.arch.ASTComponentDecl;
@@ -62,17 +55,28 @@ public final class ArchitectureInterpreter {
     protected ArchitectureInterpreter() {
     }
 
+    private static final String CNC_VIEW_FILE_PATH_OPTION = "cnc";
+    private static final String DEPLOYMENT_VIEW_FILE_PATH_OPTION = "deploy";
+    private static final String PLATFORM_OPTION = "platform";
+
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        if (args.length != 1) {
-            System.err.println("usage: wyarch <filename>");
-            System.exit(1);
+        CommandLine cmd = processCommandLineOptions(args);
+        String cncFile = cmd.getOptionValue(CNC_VIEW_FILE_PATH_OPTION);
+        checkFileReadability(cncFile);
+        String deploymentFile = cmd.getOptionValue(DEPLOYMENT_VIEW_FILE_PATH_OPTION);
+        if (deploymentFile != null) {
+            checkFileReadability(deploymentFile);
         }
-        String filename = args[0];
-        Path filepath = Paths.get(filename);
-        if (!Files.isReadable(filepath)) {
-            System.err.println("Cannot read file " + filename);
-            System.exit(1);
+        String platform = cmd.getOptionValue(PLATFORM_OPTION);
+        if (platform == null) {
+            platform = "java";
+        } else {
+            platform = platform.trim().toLowerCase();
+            if (!(platform.equals("java") || platform.equals("python"))) {
+                System.err.println("Platform must be java or python");
+                System.exit(1);
+            }
         }
         try {
             String rootLoc;
@@ -96,10 +100,18 @@ public final class ArchitectureInterpreter {
                 System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
                 return;
             }
-            // Construct interpreter state
-            InterpreterState state = new InterpreterState(
-                    InterpreterState.PLATFORM_JAVA, new File(rootLoc),
-                    new File(wyvernPath));
+            /*try {
+                File f = new File(Paths.get(deploymentFile).toAbsolutePath().toString());
+                BufferedReader source = new BufferedReader(new FileReader(f));
+                DeploymentViewParser dvp = new DeploymentViewParser(new WyvernTokenManager<>(
+                        source, "test", DeploymentViewLexer.class, DeploymentViewParserConstants.class));
+                dvp.DeploymentDecl();
+            } catch (Exception e) {
+                System.out.println(e);
+            }*/
+/*            // Construct interpreter state
+            InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA,
+                                        new File(rootLoc), new File(wyvernPath));
 
             DeclCheckVisitor visitor = checkArchFile(rootLoc, wyvernPath, filename, filepath, state);
 
@@ -107,8 +119,7 @@ public final class ArchitectureInterpreter {
             HashMap<String, String> connectors = visitor.getConnectors();
             for (String connectorInstance : connectors.keySet()) {
                 String connector = connectors.get(connectorInstance);
-                HashSet<String> fullports = visitor.getAttachments()
-                        .get(connectorInstance);
+                HashSet<String> fullports = visitor.getAttachments().get(connectorInstance);
                 List<ASTPortDecl> portObjs = new LinkedList<>();
                 HashMap portDecls = visitor.getPortDecls();
                 for (String p : fullports) {
@@ -119,27 +130,22 @@ public final class ArchitectureInterpreter {
                 Module m = state.getResolver().resolveType(connector + "Properties");
                 GenContext genCtx = Globals.getGenContext(state);
                 EvalContext evalCtx = Globals.getStandardEvalContext();
-                SeqExpr mSeqExpr = state.getResolver().wrapWithCtx(m.getExpression(),
-                        m.getDependencies(), evalCtx);
+                SeqExpr mSeqExpr = state.getResolver().wrapWithCtx(m.getExpression(), m.getDependencies(), evalCtx);
                 genCtx = mSeqExpr.extendContext(genCtx);
                 evalCtx = mSeqExpr.interpretCtx(evalCtx).getSecond();
                 // Get AST node
                 TypedModuleSpec mSpec = m.getSpec();
                 ValueType mType = mSpec.getType();
                 StructuralType mSType = mType.getStructuralType(genCtx);
-                ConcreteTypeMember connectorDecl = (ConcreteTypeMember) mSType
-                        .findDecl(connector + "Properties", genCtx);
+                ConcreteTypeMember connectorDecl = (ConcreteTypeMember) mSType.findDecl(connector + "Properties", genCtx);
                 // Interpret type and get metadata
-                ConcreteTypeMember contype = (ConcreteTypeMember) connectorDecl
-                        .interpret(evalCtx);
+                ConcreteTypeMember contype = (ConcreteTypeMember) connectorDecl.interpret(evalCtx);
                 Value metadata = contype.getMetadataValue();
                 ValueType metadataType = metadata.getType();
-                StructuralType metadataStructure = metadataType
-                        .getStructuralType(genCtx);
+                StructuralType metadataStructure = metadataType.getStructuralType(genCtx);
 
                 // Execute metadata
-                String checkPortCompatibility = null, generateConnectorImpl = null,
-                        generateConnectorInit = null;
+                String checkPortCompatibility = null, generateConnectorImpl = null, generateConnectorInit = null;
                 List<Value> testArgs = new LinkedList<Value>();
                 testArgs.add(javaToWyvernList(portObjs));
                 for (DeclType dt : metadataStructure.getDeclTypes()) {
@@ -153,27 +159,20 @@ public final class ArchitectureInterpreter {
                         } else if (methodName.equals("generateConnectorInit")) {
                             generateConnectorInit = methodName;
                         } else {
-                            ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
-                                    FileLocation.UNKNOWN, connector);
+                            ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA, FileLocation.UNKNOWN, connector);
                         }
                     }
                 }
 
-                if (checkPortCompatibility == null || generateConnectorImpl == null
-                        || generateConnectorInit == null) {
-                    ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA,
-                            FileLocation.UNKNOWN, connector);
+                if (checkPortCompatibility == null || generateConnectorImpl == null || generateConnectorInit == null) {
+                    ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_METADATA, FileLocation.UNKNOWN, connector);
                 }
 
-                Value portCompatibility = ((Invokable) metadata)
-                        .invoke(checkPortCompatibility, testArgs).executeIfThunk();
+                Value portCompatibility = ((Invokable) metadata).invoke(checkPortCompatibility, testArgs).executeIfThunk();
                 if (!((BooleanLiteral) portCompatibility).getValue()) {
-                    ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_PORTS,
-                            FileLocation.UNKNOWN, connector);
+                    ToolError.reportError(ErrorMessage.INVALID_CONNECTOR_PORTS, FileLocation.UNKNOWN, connector);
                 }
-                Value connectorImpl = ((Invokable) metadata)
-                        .invoke(generateConnectorImpl, testArgs).executeIfThunk();
-
+                Value connectorImpl = ((Invokable) metadata).invoke(generateConnectorImpl, testArgs).executeIfThunk();
 
                 int numPortAST = portObjs.size();
                 List<Expression> portInstances = unwrapGeneratedAST(numPortAST, connectorImpl, state, evalCtx);
@@ -183,8 +182,7 @@ public final class ArchitectureInterpreter {
                 testArgs = new LinkedList<>();
                 testArgs.add(javaToWyvernList(portInstances));
                 testArgs.add(javaToWyvernList(compOrder));
-                Value connectorInit = ((Invokable) metadata)
-                        .invoke(generateConnectorInit, testArgs).executeIfThunk();
+                Value connectorInit = ((Invokable) metadata).invoke(generateConnectorInit, testArgs).executeIfThunk();
                 List<Expression> orderedInitASTs = makeASTOrder(compOrder,
                         unwrapGeneratedAST(numPortAST, connectorInit, state, evalCtx));
 
@@ -206,10 +204,52 @@ public final class ArchitectureInterpreter {
                 }
                 long end = System.currentTimeMillis();
                 //System.out.println((end - start) / 1000.0 + "s");
-            }
-        } catch (ToolError | FileNotFoundException | ParseException e) {
+            }*/
+        } catch (ToolError/* | FileNotFoundException | ParseException*/ e) {
             e.printStackTrace();
         }
+    }
+
+    private static void checkFileReadability(String filename) {
+        Path filepath = Paths.get(filename);
+        if (!Files.isReadable(filepath)) {
+            System.err.println("Cannot read file " + filename);
+            System.exit(1);
+        }
+    }
+
+    private static CommandLine processCommandLineOptions(String[] args) {
+        Options cliOptions = new Options();
+
+        cliOptions.addOption(Option.builder(CNC_VIEW_FILE_PATH_OPTION)
+                .hasArg()
+                .desc("CnC view file path")
+                .required()
+                .build());
+
+        cliOptions.addOption(Option.builder(DEPLOYMENT_VIEW_FILE_PATH_OPTION)
+                .hasArg()
+                .desc("Deployment view file path")
+                .build());
+
+        cliOptions.addOption(Option.builder(PLATFORM_OPTION)
+                .hasArg()
+                .desc("Should be either java or python")
+                .build());
+
+        CommandLineParser cliParser = new DefaultParser();
+        HelpFormatter cliHelpFormatter = new HelpFormatter();
+        CommandLine cmd = null;
+
+        try {
+            cmd = cliParser.parse(cliOptions, args);
+        } catch (org.apache.commons.cli.ParseException e) {
+            System.out.println(e.getMessage());
+            cliHelpFormatter.printHelp("wyarch", cliOptions);
+            System.exit(1);
+        }
+
+        return cmd;
     }
 
     private static List<Expression> makeASTOrder(List<ASTComponentDecl> order, ArrayList<Expression> unordered) {
@@ -232,13 +272,12 @@ public final class ArchitectureInterpreter {
         return orderedExprs;
     }
 
-    private static DeclCheckVisitor checkArchFile(String rootLoc, String wyvernPath, String filename,
-                                                  Path filepath, InterpreterState state) throws ParseException, FileNotFoundException {
-        File f = new File(rootLoc + "/" + filepath.toString());
+    private static DeclCheckVisitor checkArchFile(String filename, Path filepath, InterpreterState state)
+            throws ParseException, FileNotFoundException {
+        File f = new File(filepath.toAbsolutePath().toString());
         BufferedReader source = new BufferedReader(new FileReader(f));
-        ArchParser wp = new ArchParser(
-                (TokenManager) new WyvernTokenManager<ArchLexer, ArchParserConstants>(
-                        source, "test", ArchLexer.class, ArchParserConstants.class));
+        ArchParser wp = new ArchParser(new WyvernTokenManager<>(
+                                            source, "test", ArchLexer.class, ArchParserConstants.class));
         wp.fname = filename;
         Node start = wp.ArchDesc();
         DeclCheckVisitor visitor = new DeclCheckVisitor(state);

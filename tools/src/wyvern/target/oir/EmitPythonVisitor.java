@@ -441,6 +441,8 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
             return "(" + objExpr + " or " + args + ")";
         } else if (isBool && methodName.equals("&&")) {
             return "(" + objExpr + " and " + args + ")";
+        } else if (isBool && methodName.equals("!")) {
+            return "(not " + objExpr + ")";
         } else if (isInt && methodName.equals("/")) {
             // Make int division result in an int on Python 3
             return "int(" + objExpr + " " + methodName + " " + args + ")";
@@ -746,13 +748,19 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
             state.getFreeVarSet().remove(formalArg.getName());
         }
         String name = decl.getName();
-        String trampolineDecl = "";
 
-        trampolineDecl =
-                "def " + name + "(" + args + ")" + ":\n"
-                        + indent + indentIncrement + "return trampoline(" + NameMangleVisitor.mangle("this") + "."
-                        + tcoPrefix + name + argsWithoutThis + ")\n"
-                        + indent;
+        String trampolineBody =
+                indent + indentIncrement + "return trampoline(" + NameMangleVisitor.mangle("this") + "."
+                + tcoPrefix + name + argsWithoutThis + ")\n"
+                + indent;
+        String trampolineDecl = "def " + name + "(" + args + ")" + ":\n" + trampolineBody;
+
+        String callFnDecl = "";
+        if (name.equals("apply")) {
+            // This is a callable. So, we add the __call__ function so that it can be used as an ordinary function.
+            // This is required, for example, to make callback functions work in ROS.
+            callFnDecl = "def __call__(" + args + "):\n" + trampolineBody;
+        }
         name = tcoPrefix + name;
 
         String oldMethod = state.getCurrentMethod();
@@ -783,7 +791,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
                     + indent + state.getReturnType() + " " + name + "\n"
                     + indent + trampolineDecl;
         }
-        return def + prefix + body + "\n" + indent + trampolineDecl;
+        return def + prefix + body + "\n" + indent + trampolineDecl + callFnDecl;
     }
 
     public String visit(EmitPythonState state, OIRFFIImport oirImport) {
