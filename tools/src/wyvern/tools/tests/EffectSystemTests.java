@@ -414,4 +414,24 @@ public class EffectSystemTests {
     public void testSeparation4() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client4", Util.unitType(), Util.unitValue());
     }
+
+    @Test
+    public void testSeparation5() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client5", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation6() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client6", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation7() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client7", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation8() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client8", Util.unitType(), Util.unitValue());
+    }
 }

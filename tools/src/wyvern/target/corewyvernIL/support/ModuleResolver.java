@@ -297,6 +297,7 @@ public class ModuleResolver {
             // ast is still a module declaration here
 
 //            if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
+//                System.out.println(((wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast).isAnnotated());
 //            }
 
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
@@ -343,9 +344,6 @@ public class ModuleResolver {
 
                 // Perform effect annotation check
                 boolean result = EffectAnnotationChecker.isAnnotated(genCtx, program);
-                System.out.println("File: " + file);
-                System.out.println(result);
-                System.out.println();
 
 
             } else if (decl instanceof TypeDeclaration) {
