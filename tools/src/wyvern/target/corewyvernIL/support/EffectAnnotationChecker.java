@@ -1,20 +1,18 @@
 package wyvern.target.corewyvernIL.support;
 
-import wyvern.target.corewyvernIL.FormalArg;
-import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.tools.errors.HasLocation;
 
-import java.text.Normalizer;
-import java.util.List;
+public final class EffectAnnotationChecker {
 
-public class EffectAnnotationChecker {
+    private EffectAnnotationChecker() {
+        return;
+    }
 
     public static boolean isAnnotated(final GenContext ctx, final IExpr expression) {
 
@@ -27,7 +25,7 @@ public class EffectAnnotationChecker {
             if (element instanceof New) {
                 New elementNew = (New) element;
                 for (Declaration declaration : elementNew.getDecls()) {
-                    if(!isAnnotated(ctx, declaration)) {
+                    if (!isAnnotated(ctx, declaration)) {
                         return false;
                     }
                 }

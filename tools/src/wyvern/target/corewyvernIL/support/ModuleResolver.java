@@ -294,7 +294,14 @@ public class ModuleResolver {
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
+            // ast is still a module declaration here
+
+//            if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
+//            }
+
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
+            // but not here
+            // I should check this
             if (decl instanceof ValDeclaration) {
                 program = ((ValDeclaration) decl).getDefinition();
                 //program = wrap(program, dependencies);

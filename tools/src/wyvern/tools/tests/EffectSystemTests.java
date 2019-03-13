@@ -397,11 +397,21 @@ public class EffectSystemTests {
 
     @Test
     public void testSeparation1() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client1", Util.unitType(),Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client1", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation2() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client2", Util.unitType(),Util.unitValue());
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client2", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation3() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client3", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation4() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client4", Util.unitType(), Util.unitValue());
     }
 }

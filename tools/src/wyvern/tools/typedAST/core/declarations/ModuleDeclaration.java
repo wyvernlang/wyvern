@@ -82,6 +82,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         return null;
     }
 
+    public boolean isAnnotated() {
+        return isAnnotated;
+    }
+
     /**
      * Generate the rest part of a module (not import/instantiate/require)
      *
