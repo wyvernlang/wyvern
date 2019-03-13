@@ -24,9 +24,8 @@ val fileioobj = fileio(java)
 val ppobj = postprocessor(java)
 val stringObj = stringhelper(java)
 
-//val handler = httphandler(simplehandler(ppobj, stringObj))
-val handler = httphandler(bmihandler(ppobj, stringObj))
-
+val handler = httphandler(simplehandler(ppobj))
+//val handler = httphandler(bmihandler(ppobj, stringObj))
 
 // begin/execute program
 val port = 1254
