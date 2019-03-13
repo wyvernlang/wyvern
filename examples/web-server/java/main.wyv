@@ -13,19 +13,17 @@ import httphandler
 import bmihandler
 import simplehandler
 
-// helper modules 
+// helper module
 import postprocessor
-import stringhelper
 
 //instantiated java dependent module objects - can now use to call proper functions
 val stdout = stdout(java)
 val ioobj = io(java)
 val fileioobj = fileio(java)
 val ppobj = postprocessor(java)
-val stringObj = stringhelper(java)
 
 val handler = httphandler(simplehandler(ppobj))
-//val handler = httphandler(bmihandler(ppobj, stringObj))
+//val handler = httphandler(bmihandler(ppobj))
 
 // begin/execute program
 val port = 1254
