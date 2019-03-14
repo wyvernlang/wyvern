@@ -22,6 +22,6 @@ public class StringHelper {
     }
 
     public String ofCharacter(char c) {
-        return "" + c;
+        return String.valueOf(c);
     }
 }
