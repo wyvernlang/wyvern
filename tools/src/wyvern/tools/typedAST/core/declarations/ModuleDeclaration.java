@@ -71,6 +71,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         return location;
     }
 
+    public TypedAST getInner() {
+        return inner;
+    }
+
     @Override
     public DeclType genILType(GenContext ctx) {
         // TODO Auto-generated method stub

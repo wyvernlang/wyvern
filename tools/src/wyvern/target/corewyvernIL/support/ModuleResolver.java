@@ -296,9 +296,11 @@ public class ModuleResolver {
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
             // ast is still a module declaration here
 
-//            if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
-//                System.out.println(((wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast).isAnnotated());
-//            }
+            if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
+                wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleDecl =
+                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
+                EffectAnnotationChecker.checkModule(genCtx, moduleDecl);
+            }
 
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
             // but not here
@@ -343,7 +345,7 @@ public class ModuleResolver {
                 }
 
                 // Perform effect annotation check
-                boolean result = EffectAnnotationChecker.isAnnotated(genCtx, program);
+//                boolean result = EffectAnnotationChecker.isAnnotated(genCtx, program);
 
 
             } else if (decl instanceof TypeDeclaration) {

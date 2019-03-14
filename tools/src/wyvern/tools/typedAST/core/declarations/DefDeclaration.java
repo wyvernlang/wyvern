@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,6 +90,16 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
     private boolean isClass;
     public boolean isClassMember() {
         return isClass;
+    }
+
+    /**
+     * Set the effectset to be empty set
+     * This function is used to make modules fully annotated
+     */
+    public void setEmptyEffectSet() {
+        if (effectSet == null) {
+            effectSet = new EffectSet(new HashSet<>());
+        }
     }
 
     @Override

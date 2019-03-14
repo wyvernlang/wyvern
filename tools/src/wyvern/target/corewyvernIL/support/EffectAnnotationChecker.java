@@ -1,12 +1,13 @@
 package wyvern.target.corewyvernIL.support;
 
-import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.expression.IExpr;
-import wyvern.target.corewyvernIL.expression.New;
-import wyvern.target.corewyvernIL.expression.SeqExpr;
-import wyvern.tools.errors.HasLocation;
+import wyvern.tools.typedAST.core.Sequence;
+import wyvern.tools.typedAST.core.declarations.DeclSequence;
+import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
+import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
+import wyvern.tools.typedAST.interfaces.TypedAST;
+
+import java.util.Iterator;
+import java.util.List;
 
 public final class EffectAnnotationChecker {
 
@@ -14,34 +15,72 @@ public final class EffectAnnotationChecker {
         return;
     }
 
-    public static boolean isAnnotated(final GenContext ctx, final IExpr expression) {
-
-        New expNew = (New) expression;
-        Declaration decl = expNew.getDecls().get(0);
-        DefDeclaration defDecl = (DefDeclaration) decl;
-
-        final SeqExpr body = (SeqExpr) defDecl.getBody();
-        for (HasLocation element : body.getElements()) {
-            if (element instanceof New) {
-                New elementNew = (New) element;
-                for (Declaration declaration : elementNew.getDecls()) {
-                    if (!isAnnotated(ctx, declaration)) {
-                        return false;
-                    }
+    public static void checkModule(GenContext ctx, ModuleDeclaration moduleDecl) {
+        TypedAST typedAST = moduleDecl.getInner();
+        if (moduleDecl.isAnnotated()) {
+            List<ImportDeclaration> imports = moduleDecl.getImports();
+            for (ImportDeclaration decl : imports) {
+                if (decl.isLifted()) {
+                    continue;
                 }
             }
+            // TODO: Check if all imports are fully annotated
+
+            // Annotate missing annotations with empty effect set
+            annotateModule(ctx, typedAST);
+            assert (isAnnotated(ctx, typedAST));
         }
-        return true;
     }
 
-    private static boolean isAnnotated(GenContext ctx, Declaration declaration) {
-        if (declaration instanceof DefDeclaration) {
-            DefDeclaration defDecl = (DefDeclaration) declaration;
-            DefDeclType declType = defDecl.getDeclType();
-            if (declType.getEffectSet() == null) {
-                return false;
+    /**
+     * Make the module fully annotated
+     * @param ctx
+     */
+    private static void annotateModule(GenContext ctx, TypedAST ast) {
+        if (ast instanceof DeclSequence) {
+            DeclSequence seq = (DeclSequence) ast;
+            Sequence normalSeq = seq.filterNormal();
+            Iterator<TypedAST> astIterator = normalSeq.flatten();
+            while (astIterator.hasNext()) {
+                TypedAST nextAST = astIterator.next();
+                annotateModule(ctx, nextAST);
+            }
+        } else if (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
+            wyvern.tools.typedAST.core.declarations.DefDeclaration def =
+                    (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
+            if (def.getEffectSet(ctx) == null) {
+                def.setEmptyEffectSet();
             }
         }
-        return true;
+    }
+
+    /**
+     * Check if the ast is fully annotated
+     * @param ctx: context to evaluate in.
+     * @param ast : the object we want to check
+     * @return true if the ast is annotated
+     */
+    private static boolean isAnnotated(GenContext ctx, TypedAST ast) {
+        if (ast instanceof DeclSequence) {
+            DeclSequence seq = (DeclSequence) ast;
+            Sequence normalSeq = seq.filterNormal();
+            Iterator<TypedAST> astIterator = normalSeq.flatten();
+            while (astIterator.hasNext()) {
+                TypedAST nextAST = astIterator.next();
+                if (!isAnnotated(ctx, nextAST)) {
+                    return false;
+                }
+            }
+            return true;
+        } else if (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
+            wyvern.tools.typedAST.core.declarations.DefDeclaration def =
+                    (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
+            if (def.getEffectSet(ctx) == null) {
+                return false;
+            }
+            return true;
+        } else {
+            return true;
+        }
     }
 }
