@@ -20,6 +20,3 @@ def ofFormattedFloat(format : String, f : Float) : String
 
 def ofCharacter(c : Character) : String
     utils.ofCharacter(c)
-
-def concatenate(s1:String,s2:String): String
-    utils.concatenate(s1,s2)

@@ -8,5 +8,3 @@ type String
   def ofFormattedFloat(format : String, f : Float) : String
 
   def ofCharacter(c : Character) : String
-
-  def concatenate(s1:String,s2:String) : String 
