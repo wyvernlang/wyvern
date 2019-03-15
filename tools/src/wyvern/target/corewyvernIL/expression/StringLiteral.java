@@ -102,6 +102,7 @@ public class StringLiteral extends Literal implements Invokable {
         case "charAt": return new CharacterLiteral(value.charAt(((IntegerLiteral) args.get(0)).getValue()));
         case "substring": return new StringLiteral(value.substring(((IntegerLiteral) args.get(0)).getValue(), ((IntegerLiteral) args.get(1)).getValue()));
         case "concat": return new StringLiteral(value.concat(((StringLiteral) args.get(0)).getValue()));
+        case "indexOf": return new IntegerLiteral(value.indexOf(((IntegerLiteral) args.get(0)).getValue()));
         default: throw new RuntimeException("runtime error: string operation " + methodName + "not supported by the runtime");
         }
     }
