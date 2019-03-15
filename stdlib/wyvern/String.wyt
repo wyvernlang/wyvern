@@ -1,6 +1,4 @@
 type String
-  def equals(str1:String,str2:String):Boolean
-
   def ofInt(x : Int) : String
 
   def ofFloat(f : Float) : String
@@ -8,5 +6,3 @@ type String
   def ofFormattedFloat(format : String, f : Float) : String
 
   def ofCharacter(c : Character) : String
-
-  def concatenate(s1:String,s2:String) : String 

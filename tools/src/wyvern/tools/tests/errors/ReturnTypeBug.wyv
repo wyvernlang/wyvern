@@ -22,7 +22,6 @@ module capabilities
 
 import wyvern.option
 import wyvern.collections.map
-import wyvern.String
 
 // This example would be a lot nicer if parameterised Option[T]
 // worked! Will rewrite when this bug is fixed. :-)
@@ -46,7 +45,7 @@ resource type SealerUnsealer
      var unsealer:Unsealer
 
 def make():SealerUnsealer
-    var map:Map = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
+    var map:Map = map.make((s1:String,s2:String) => s1.equals(s2))
     new
         var sealer:Sealer = new
             def seal(object:Option):String
