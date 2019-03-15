@@ -2,7 +2,6 @@ module database
 
 import wyvern.option
 import wyvern.collections.map
-import wyvern.String
 
 type Option = option.Option
 
@@ -12,7 +11,7 @@ resource type KeyVal
 
 // currently the actual implementation ignores the dbFilePath, but it's useful for thinking about deployment properties.  Need to implement it soon.
 def make(dbFilePath:String):KeyVal = new
-	val entries = map.make((s1:Dyn,s2:Dyn) => String.equals(s1,s2))
+	val entries = map.make((s1:String,s2:String) => s1.equals(s2))
 	def get(key:String):Option[String] = this.entries.get(key)
 	def put(key:String, value:String):Unit
 		this.entries.put(key,value)

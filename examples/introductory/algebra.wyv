@@ -170,7 +170,7 @@ def toString(t : Term) : String
 
 def d(wrt : String, t : Term) : Term = match t:
   t:Constant => Constant(0.0)
-  t:Variable => if (String.equals(t.name, wrt))
+  t:Variable => if (wrt.equals(t.name))
                   Constant(1.0)
                  else
                   Constant(0.0)
@@ -466,7 +466,7 @@ def printInfo(t : Term, xVal : Number, yVal : Number) : Unit
   val xString : String = numberToString(xVal)
   val yString : String = numberToString(yVal)
 
-  var bindings : Map = map.make((x : String, y : String) => String.equals(x, y))
+  var bindings : Map = map.make((x : String, y : String) => x.equals(y))
   bindings.put("x", xVal)
   bindings.put("y", yVal)
 

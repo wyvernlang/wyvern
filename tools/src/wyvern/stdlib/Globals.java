@@ -102,7 +102,7 @@ public final class Globals {
         }
         return s.getResolver().getPreludeIfPresent();
     }
-    
+
     public static SeqExpr getPrelude() {
         if (!usePrelude) {
             SeqExpr result = new SeqExpr();
@@ -210,6 +210,7 @@ public final class Globals {
         stringDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("+", Util.stringType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType("equals", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
         stringDeclTypes.add(new DefDeclType("length", Util.intType(), new LinkedList<FormalArg>()));
         stringDeclTypes.add(new DefDeclType("substring", Util.stringType(),
