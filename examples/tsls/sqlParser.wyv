@@ -134,20 +134,20 @@ lex("CREATE TABLE Students (Name varchar(255), GPA float)")
 // A parse function for SQL queries
 def parse(input:String):Option[String]
     val scanner = createScanner(input)
-	val t = scanner.nextToken()
+    val t = scanner.nextToken()
     match t:
-        tokens.UPDATE => parseUpdate(scanner)
-        tokens.SELECT => parseSelect(scanner)
-        tokens.INSERT => parseInsert(scanner)
-        tokens.CREATE => parseCreate(scanner)
+//        t:tokens.UPDATE => parseUpdate(scanner)
+//        t:tokens.SELECT => parseSelect(scanner)
+        t:tokens.INSERT => parseInsert(scanner)
+//        t:tokens.CREATE => parseCreate(scanner)
         default => None[String]()
 
 def parseInsert(scanner:lexer.Scanner):Option[String]
-	val t = scanner.nextToken()
+    val t = scanner.nextToken()
     match t:
-        tokens.INTO => unit
+        t:tokens.INTO => unit
         default => error
-  
+
 /*
     // A parse function for reverse Polish notation
 def parse(input:String):option.Option[AST] // Option of AST
