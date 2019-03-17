@@ -7,12 +7,14 @@ public class TypedModuleSpec extends ModuleSpec {
     private final String definedTypeName;
     private final String definedValueName;
     private Module module = null;
+    private Boolean isAnnotated;
 
-    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName) {
+    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName, Boolean isAnnotated) {
         super(qualifiedName);
         this.type = type;
         this.definedTypeName = typeName;
         this.definedValueName = valueName;
+        this.isAnnotated = isAnnotated;
     }
 
     /** Returns the signature of this module.
@@ -37,6 +39,10 @@ public class TypedModuleSpec extends ModuleSpec {
 
     public Module getModule() {
         return this.module;
+    }
+
+    public Boolean getIsAnnotated() {
+        return this.isAnnotated;
     }
 
     public void setModule(Module module) {

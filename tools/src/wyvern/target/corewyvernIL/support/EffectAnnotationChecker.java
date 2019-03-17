@@ -1,5 +1,9 @@
 package wyvern.target.corewyvernIL.support;
 
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
@@ -15,7 +19,7 @@ public final class EffectAnnotationChecker {
         return;
     }
 
-    public static void checkModule(GenContext ctx, ModuleDeclaration moduleDecl) {
+    public static void checkModule(GenContext ctx, ModuleDeclaration moduleDecl, List<TypedModuleSpec> dependencies) {
         TypedAST typedAST = moduleDecl.getInner();
         if (moduleDecl.isAnnotated()) {
             List<ImportDeclaration> imports = moduleDecl.getImports();
@@ -24,7 +28,14 @@ public final class EffectAnnotationChecker {
                     continue;
                 }
             }
-            // TODO: Check if all imports are fully annotated
+
+            for (TypedModuleSpec spec : dependencies) {
+                if (spec.getIsAnnotated() != null && !spec.getIsAnnotated()) {
+                    ToolError.reportError(ErrorMessage.EFFECT_ANNOTATION_SEPARATION, FileLocation.UNKNOWN);
+                }
+            }
+
+            // TODO: Check if all dependency is lifted
 
             // Annotate missing annotations with empty effect set
             annotateModule(ctx, typedAST);

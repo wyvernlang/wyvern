@@ -245,6 +245,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             // TODO: need to add types for non-java imports
             String moduleName = this.getUri().getSchemeSpecificPart();
             final Module module = resolver.resolveModule(moduleName, false, isLifted);
+
             final String internalName = module.getSpec().getInternalName();
             final BindingSite site = module.getSpec().getSite();
             if (this.metadataFlag) {

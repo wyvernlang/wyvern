@@ -296,15 +296,15 @@ public class ModuleResolver {
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
             // ast is still a module declaration here
 
+
+            Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
+
             if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
                 wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleDecl =
                         (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
-                EffectAnnotationChecker.checkModule(genCtx, moduleDecl);
+                EffectAnnotationChecker.checkModule(genCtx, moduleDecl, dependencies);
             }
 
-            Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
-            // but not here
-            // I should check this
             if (decl instanceof ValDeclaration) {
                 program = ((ValDeclaration) decl).getDefinition();
                 //program = wrap(program, dependencies);
@@ -359,7 +359,15 @@ public class ModuleResolver {
 
         TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
 
-        return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType);
+        boolean isModule = ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
+        if (isModule) {
+            wyvern.tools.typedAST.core.declarations.ModuleDeclaration decl =
+                    (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
+            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
+                    loadingType, decl.isAnnotated());
+        } else {
+            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType, null);
+        }
     }
 
 
@@ -396,7 +404,7 @@ public class ModuleResolver {
 
     private Module createAdaptedModule(File file, String qualifiedName, String valueName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
-                                       TypeContext ctx, boolean toplevel, boolean loadingType) {
+                                       TypeContext ctx, boolean toplevel, boolean loadingType, Boolean isAnnotated) {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
@@ -448,7 +456,7 @@ public class ModuleResolver {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName);
+        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
         return new Module(spec, program, dependencies);
     }
 

@@ -437,6 +437,14 @@ public class EffectSystemTests {
 
     @Test
     public void testSeparation9() throws ParseException {
+        // Import effect-unannotated module from annotated module
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Effect-annotated module"));
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client9", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation10() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client10", Util.unitType(), Util.unitValue());
     }
 }
