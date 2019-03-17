@@ -447,4 +447,9 @@ public class EffectSystemTests {
     public void testSeparation10() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client10", Util.unitType(), Util.unitValue());
     }
+
+    @Test
+    public void testSeparation11() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client11", Util.unitType(), Util.unitValue());
+    }
 }

@@ -294,15 +294,13 @@ public class ModuleResolver {
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
-            // ast is still a module declaration here
-
 
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
 
             if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
                 wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleDecl =
                         (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
-                EffectAnnotationChecker.checkModule(genCtx, moduleDecl, dependencies);
+                EffectAnnotationChecker.checkModule(this, genCtx, moduleDecl, dependencies);
             }
 
             if (decl instanceof ValDeclaration) {
