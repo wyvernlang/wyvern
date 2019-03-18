@@ -1,0 +1,19 @@
+module pair
+
+type Pair
+	type E
+	type F
+	val t1:this.E
+	val t2:this.F
+
+def Pair[U,T](x:U, y:T):Pair[U,T] = new
+	type E = U
+	type F = T
+	val t1 = x
+	val t2 = y
+
+def fst[U,T](e:Pair[U,T]):U = e.t1
+def snd[U,T](e:Pair[U,T]):T = e.t2
+
+val testTuple1:Pair[Boolean,Boolean]= Pair[Boolean, Boolean](true,true)
+val testTuple1t1 :Boolean = fst[Boolean, Boolean](testTuple1)
