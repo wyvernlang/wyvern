@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -40,11 +41,12 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
 
     private final List<ImportDeclaration> imports;
     private boolean isAnnotated;
+    private EffectSet effectSet;
     //private final List<GenericParameter> generics;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
                              TypedAST inner, NamedType type, FileLocation location, boolean isResource,
-                             boolean isAnnotated) {
+                             boolean isAnnotated, String effects) {
         this.name = name;
         this.inner = inner;
         this.location = location;
@@ -54,6 +56,11 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.imports = imports;
         this.generics = generics;
         this.isAnnotated = isAnnotated;
+        this.effectSet = EffectSet.parseEffects(name, effects, false, location);
+    }
+
+    public EffectSet getEffectSet() {
+        return effectSet;
     }
 
     @Override

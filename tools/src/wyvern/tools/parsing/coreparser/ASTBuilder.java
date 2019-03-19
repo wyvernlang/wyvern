@@ -12,7 +12,7 @@ interface ASTBuilder<AST, Type> {
 
     AST script(List<AST> requires, List<AST> imports, AST body);
     AST moduleDecl(String name, List<AST> imports, List<GenericParameter> generics,
-                   List args, AST ast, Type type, FileLocation loc, boolean isResource, boolean isAnnotated);
+                   List args, AST ast, Type type, FileLocation loc, boolean isResource, boolean isAnnotated, String effects);
     AST importDecl(URI uri, FileLocation loc, Token name, boolean isRequire, boolean isMetadata, boolean isLifted);
     /** if type is null, it will be inferred*/
     AST valDecl(String name, Type type, AST exp, FileLocation loc);
