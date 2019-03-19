@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 
 /** New imports! **/
 import java.io.RandomAccessFile;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 public class FileIO {
     public static final FileIO file = new FileIO();
@@ -111,7 +113,6 @@ public class FileIO {
     }
     
     public void closeRandomAccessFile(RandomAccessFile r) throws IOException {
-        //uhh so consider trying to copy the whole file to a writer at the end
         r.close();
     }
     
@@ -120,12 +121,7 @@ public class FileIO {
     }
     
     public void writeStringRandomAccess(RandomAccessFile r, String s) throws IOException {
-        //r.writeChars(s);
-        for (int i = 0; i < s.length(); i++) {
-            r.writeChar(s.charAt(i));
-            //r.seek(r.getFilePointer() - 1);
-            //System.out.println(r.getFilePointer());
-        }
+        r.writeBytes(s);
     }
     
     public String readUTFRandomAccess(RandomAccessFile r) throws IOException {
@@ -140,15 +136,8 @@ public class FileIO {
         return r.getFilePointer();
     }
     
-    //check if long actually works here?
     public void seekFilePointer(RandomAccessFile r, long pos) throws IOException {
         r.seek(pos);
-    }
-    
-    //seeks relative to current position
-    public void seekRelativeFilePointer(RandomAccessFile r, long offset) throws IOException {
-        //check negative offset
-        r.seek(r.getFilePointer() + offset);
     }
     
     public long getRandomAccessFileLength(RandomAccessFile r) throws IOException {
@@ -157,6 +146,22 @@ public class FileIO {
     
     /** way more read/write methods to add here **/
     
+    /** read/write bytes functionality **/
+    
+    public FileInputStream makeFileInputStream(Object f) throws IOException {
+        return new FileInputStream((File) f);
+    }
+    
+    public void closeFileInputStream(FileInputStream f) throws IOException {
+        f.close();
+    }
+    
+    // read with blocking, -1 for EOF
+    public int readByteFileInputStream(FileInputStream f) throws IOException {
+        return f.read();
+    }
+	
+	
 
 
 }

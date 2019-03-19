@@ -1,0 +1,4 @@
+resource type BinaryWriter
+    def write(b:Int):Unit
+    def writeBytes(b:Int, numBytes:Int):Unit
+    def close():Unit

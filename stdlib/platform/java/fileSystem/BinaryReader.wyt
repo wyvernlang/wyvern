@@ -1,0 +1,4 @@
+resource type BinaryReader
+    def read():Int
+    def readBytes(numBytes:Int):Int
+    def close():Unit
