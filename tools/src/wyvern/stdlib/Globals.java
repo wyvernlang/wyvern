@@ -102,7 +102,7 @@ public final class Globals {
         }
         return s.getResolver().getPreludeIfPresent();
     }
-    
+
     public static SeqExpr getPrelude() {
         if (!usePrelude) {
             SeqExpr result = new SeqExpr();
@@ -173,8 +173,12 @@ public final class Globals {
         boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("!", Util.booleanType(), Arrays.asList()));
+
         // construct a type for the system object
+        // N.B.: Operations here are built-in and performed on an instance of a type.
+        // Static operations must be placed into a Wyvern module for that type.
         List<DeclType> declTypes = new LinkedList<DeclType>();
+
         List<DeclType> intDeclTypes = new LinkedList<DeclType>();
         intDeclTypes.add(new DefDeclType("+", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("-", Util.intType(), Arrays.asList(new FormalArg("other", Util.intType()))));
@@ -210,11 +214,13 @@ public final class Globals {
         stringDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("+", Util.stringType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
-        stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
+        stringDeclTypes.add(new DefDeclType("equals", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("length", Util.intType(), new LinkedList<FormalArg>()));
+        stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
         stringDeclTypes.add(new DefDeclType("substring", Util.stringType(),
                 Arrays.asList(new FormalArg[]{new FormalArg("start", Util.intType()), new FormalArg("end", Util.intType())})));
         stringDeclTypes.add(new DefDeclType("concat", Util.stringType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType("indexOf", Util.intType(), Arrays.asList(new FormalArg("ch", Util.intType()))));
         ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
         declTypes.add(new ConcreteTypeMember("String", stringType));
 
@@ -236,7 +242,6 @@ public final class Globals {
         NominalType systemJavaScript = new NominalType("this", "JavaScript");
         ExtensibleTagType javascriptType = new ExtensibleTagType(systemPlatform, Util.unitType(), systemJavaScript, null);
         declTypes.add(new ConcreteTypeMember("JavaScript", javascriptType));
-        //declTypes.add(new AbstractTypeMember("Python"));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
         pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(),
@@ -244,7 +249,6 @@ public final class Globals {
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
         NominalType systemPython = new NominalType("this", "Java");
         ExtensibleTagType pythonTagType = new ExtensibleTagType(systemPlatform, pythonType, systemPython, null);
-        //declTypes.add(new ConcreteTypeMember("Python", pythonType));
         declTypes.add(new ConcreteTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));

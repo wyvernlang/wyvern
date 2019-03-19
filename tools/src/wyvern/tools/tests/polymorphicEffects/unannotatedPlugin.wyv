@@ -1,0 +1,8 @@
+module def unannotatedPlugin(defaultLogger : polymorphicEffects.Logger)
+
+var logger : Logger = defaultLogger
+
+def run(s : String) : String
+  val t = s + s
+  logger.append(s + "->" + t)
+  t

@@ -1,9 +1,5 @@
 const sprintfjs = require("sprintf-js");
 
-exports.testEqual = function(s1, s2) {
-    return s1 === s2;
-}
-
 exports.ofInt = function(x) {
     return x.toString();
 }

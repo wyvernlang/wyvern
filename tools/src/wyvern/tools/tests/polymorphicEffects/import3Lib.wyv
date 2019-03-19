@@ -1,0 +1,7 @@
+// Effect-unannotated library
+module def import3Lib(f : polymorphicEffects.File, g : polymorphicEffects.Go)
+
+import polymorphicEffects.File
+import polymorphicEffects.Go
+
+g.go(() => f.writeToFile())

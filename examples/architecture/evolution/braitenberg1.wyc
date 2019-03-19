@@ -1,0 +1,21 @@
+component LightSensor
+    val name: String
+    port pubLight : requires LightPubSubIface
+
+component VelocityController
+    val name: String
+    port subLight: provides LightPubSubIface
+
+connector ROS2Topic
+    val name: String
+
+architecture BraitenbergVehicle1
+    components
+        LightSensor sensor
+        VelocityController controller
+
+    connectors
+        ROS2Topic lightValues
+
+    attachments
+        connect sensor.pubLight and controller.subLight with lightValues

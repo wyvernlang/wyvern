@@ -1,0 +1,11 @@
+module def LightPubSubIface_provides(prv_init: LightPubSubIfaceProvidesInit, topic: ROS1TopicProperties, callback: LightPubSubIface, python: Python)
+
+import python:rospy
+import python:std_msgs
+
+type Float64
+	val data: Float
+
+def init(): Unit
+	prv_init.init()
+	rospy.Subscriber(topic.name, std_msgs.msg.Float64, (v: Float64) => callback.pubNextValue(v.data))

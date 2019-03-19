@@ -1,4 +1,4 @@
-module def simplehandler(params : wyvern.TPostProcessor,stringObj : TStringHelper) : THttpHandler
+module def simplehandler(params: wyvern.TPostProcessor): THttpHandler
 
 import simpledb
 
@@ -8,24 +8,18 @@ val numParam: Int = 4
 def responseFile(): String
     "form.html"
 
-//manipulate params (say hello to person) and send response string/html
+// manipulate params (say hello to person) and send response string/html
 def sendResponse(): String
-    val msg: String = stringObj.concatenate("<html><h1> Hello ",db.getFirstName())
-    val msg2: String = stringObj.concatenate(msg, " ")
-    val msg3: String = stringObj.concatenate(msg2, db.getLastName())
-    val msg4: String = stringObj.concatenate(msg3, "<h1><h2> You are ")
-    val msg5: String = stringObj.concatenate(msg4, db.getAge())
-    val msg6: String = stringObj.concatenate(msg5, " years old</h2><h2> You come from ")
-    val msg7: String = stringObj.concatenate(msg6,db.getCountry())
-    val finalMsg: String = stringObj.concatenate(msg7," </h2></html>\r\n")
-    finalMsg
+    val line1 = "<html><h1> Hello " + db.getFirstName() + " " + db.getLastName() + "</h1>"
+    val line2 = "<h2> You are " + db.getAge() + " years old</h2>"
+    val line3 = "<h2> You come from " + db.getCountry() + " </h2></html>"
+    line1 + line2 + line3
 
-def setParams(postParams:String): Unit
-    db.setFirstName(params.getParamByIndex(postParams,0))
-    db.setLastName(params.getParamByIndex(postParams,1))
-    db.setAge(params.getParamByIndex(postParams,2))
-    db.setCountry(params.getParamByIndex(postParams,3))
+def setParams(postParams: String): Unit
+    db.setFirstName(params.getParamByIndex(postParams, 0))
+    db.setLastName(params.getParamByIndex(postParams, 1))
+    db.setAge(params.getParamByIndex(postParams, 2))
+    db.setCountry(params.getParamByIndex(postParams, 3))
 
-def getFormData():String
+def getFormData(): String
     params.getParamMappingToString()
-

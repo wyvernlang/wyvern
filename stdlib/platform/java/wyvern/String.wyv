@@ -2,9 +2,6 @@ module String
 
 import java:wyvern.stdlib.support.StringHelper.utils
 
-def equals(str1:String,str2:String):Boolean
-    utils.testEqual(str1,str2)
-
 def ofInt(x : Int) : String
     utils.ofInt(x)
 
@@ -20,6 +17,3 @@ def ofFormattedFloat(format : String, f : Float) : String
 
 def ofCharacter(c : Character) : String
     utils.ofCharacter(c)
-
-def concatenate(s1:String,s2:String): String
-    utils.concatenate(s1,s2)

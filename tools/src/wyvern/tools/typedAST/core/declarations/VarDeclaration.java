@@ -26,6 +26,10 @@ public class VarDeclaration extends Declaration implements CoreAST {
     private ExpressionAST definition;
     private Type definitionType;
     private String name;
+    
+    // cached generated Decls and DeclTypes, for use in addModuleDecl
+    private List<wyvern.target.corewyvernIL.decl.Declaration> declarations;
+    private List<DeclType> declarationTypes;
     //NameBinding binding;
 
     private boolean isClass;
@@ -125,7 +129,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
         setter = DefDeclaration.generateSetter(ctx, tempObjForSetter, varName, varType);
 
         // Figure out structural type from declared types.
-        List<DeclType> declarationTypes = new LinkedList<>();
+        declarationTypes = new LinkedList<>();
         declarationTypes.add(getter.genILType(ctx));
         declarationTypes.add(setter.genILType(ctx));
         String newName = GenContext.generateName();
@@ -136,7 +140,7 @@ public class VarDeclaration extends Declaration implements CoreAST {
         tlc.updateContext(ctx);
 
         // Group getter and setter into a single declaration block.
-        List<wyvern.target.corewyvernIL.decl.Declaration> declarations = new LinkedList<>();
+        declarations = new LinkedList<>();
         wyvern.target.corewyvernIL.decl.Declaration getterIL, setterIL;
         getterIL = getter.generateDecl(ctx, ctx);
         setterIL = setter.generateDecl(ctx, ctx);
@@ -157,8 +161,13 @@ public class VarDeclaration extends Declaration implements CoreAST {
 
     @Override
     public void addModuleDecl(TopLevelContext tlc) {
-        // do nothing--adding module declarations handled by genTopLevel method above.
-        // overriding this is needed as the default throws an exception.
+        // add getters and setters for local var declarations
+        // the "if" statement is a sanity check; we only add them 
+        // if genTopLevel() has already been called, which is what we expect to happen
+        if (declarations != null) {
+            tlc.addModuleDecl(declarations.get(0), declarationTypes.get(0));
+            tlc.addModuleDecl(declarations.get(1), declarationTypes.get(1));
+        }
         return;
     }
 

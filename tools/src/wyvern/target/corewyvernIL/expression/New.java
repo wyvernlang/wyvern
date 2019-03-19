@@ -173,6 +173,7 @@ public class New extends Expression {
             }
         }
         type.checkWellFormed(ctx);
+        type.canInstantiate(ctx);
 
         return type;
     }

@@ -6,10 +6,10 @@ import java.util.Arrays;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
-import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
-import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefinedTypeMember;
+import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Tag;
@@ -75,7 +75,7 @@ public class NominalType extends ValueType {
         if (dt instanceof DefinedTypeMember) {
             ValueType vt = ((DefinedTypeMember) dt).getResultType(View.from(path, ctx));
             if (vt.equals(this)) {
-                throw new RuntimeException("circularly defined type; should not be possible");
+                return theDefault;
             }
             return vt.getStructuralType(ctx, theDefault);
         } else {
@@ -215,10 +215,13 @@ public class NominalType extends ValueType {
         if (ctx.isAssumedSubtype(this, t)) {
             return true;
         }
+
         DeclType dt = getSourceDeclType(ctx);
+
         if (dt instanceof ConcreteTypeMember) {
             Type definedType = ((ConcreteTypeMember) dt).getSourceType();
             ValueType ct = t.getCanonicalType(ctx);
+
             if (definedType instanceof TagType) {
                 // before checking parent, test for equality with canonical type
                 if (super.isSubtypeOf(ct, ctx, new FailureReason())) {
@@ -235,6 +238,7 @@ public class NominalType extends ValueType {
                 return superType.isSubtypeOf(t, ctx, reason);
             }
             ValueType vt = ((ConcreteTypeMember) dt).getResultType(View.from(path, ctx));
+
             // if t is nominal but vt and ct are structural, assume this <: t in subsequent checking
             //if (t instanceof NominalType && ct instanceof StructuralType && vt instanceof StructuralType)
             ctx = new SubtypeAssumption(this, t, ctx);
@@ -364,6 +368,17 @@ public class NominalType extends ValueType {
         return true;
     }
 
+    @Override
+    public void canInstantiate(TypeContext ctx) {
+        DeclType dt = this.getSourceDeclType(ctx);
+        if (dt instanceof ConcreteTypeMember) {
+            Type t = ((ConcreteTypeMember) dt).getSourceType();
+            if (t instanceof DataType) {
+                ToolError.reportError(ErrorMessage.ILLEGAL_TAG_INSTANCE, this, this.desugar(ctx));
+            }
+        }
+    }
+    
     public boolean nominallyEquals(NominalType parentType, TypeContext ctx) {
         NominalType myCanonical = getCanonicalNominalType(ctx);
         NominalType theirCanonical = getCanonicalNominalType(ctx);

@@ -113,7 +113,45 @@ public class PolymorphicEffectTests {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.subtype4", Util.stringType(), new StringLiteral("abc"));
     }
 
+    @Test
+    public void import0() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.client", Util.stringType(), new StringLiteral("abc"));
+    }
+
+
+
+    @Test
+    public void import3empty() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3empty", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
+    public void go() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "import3.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
+
+
+
+
     // Rejected examples
+    @Test
+    public void import3() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "outside of the upper bound"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Client", Util.stringType(), new StringLiteral("abc"));
+    }
+
+
+    @Test
+    public void import3Rejected() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(
+                "Selected effect does not contain lower bound'"
+        ));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import3Rejected", Util.stringType(), new StringLiteral("abc"));
+    }
 
     @Test
     public void testRejectedAbstractTypeRefinement() throws ParseException {
@@ -200,7 +238,7 @@ public class PolymorphicEffectTests {
     public void testRejectedParametricModuleFunctor1() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
-                "The callee method cannot accept actual arguments with types: 'String; expected types Int; argument subtyping failed"
+                "The callee method cannot accept actual arguments with types: 'String; expected types Int"
                 ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedParametricModuleFunctor1", Util.stringType(), new StringLiteral("abc"));
     }
@@ -230,5 +268,14 @@ public class PolymorphicEffectTests {
                 "Generic[{}]; declaration E is not a subtype of the expected declaration"
                 ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedSubtype", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
+    public void testImport2() throws ParseException {
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString(String.format(
+                "Selected effect does not contain lower bound"
+        )));
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.import2Client", Util.stringType(), new StringLiteral("abcabc"));
     }
 }

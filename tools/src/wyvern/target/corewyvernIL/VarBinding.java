@@ -71,7 +71,7 @@ public class VarBinding implements HasLocation {
         FailureReason r = new FailureReason();
         if (!t.isSubtypeOf(type, ctx, r)) {
             //t.isSubtypeOf(type, ctx); // for debugging
-            reportError(ErrorMessage.NOT_SUBTYPE, this, t.toString(), type.toString(), r.getReason());
+            reportError(ErrorMessage.NOT_SUBTYPE, this, t.desugar(ctx), type.desugar(ctx), r.getReason());
         }
         final TypeContext extendedCtx = ctx.extend(getSite(), type);
         return extendedCtx;
@@ -99,4 +99,10 @@ public class VarBinding implements HasLocation {
         freeVars.remove(varName);
         freeVars.addAll(expr.getFreeVariables());
     }
+    
+    @Override
+    public String toString() {
+        return getVarName() + " : " + getType() + " = " + getExpression(); 
+    }
+
 }

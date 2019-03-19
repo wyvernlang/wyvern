@@ -31,6 +31,7 @@ tools/out/artifacts/wyvern_jar/asm-debug-all-5.0.1.jar
 tools/tools.iml
 tools/src/wyvern/tools/lexing/WyvernLexer.java
 tools/src/wyvern/tools/arch/lexing/ArchLexer.java
+tools/src/wyvern/tools/arch/lexing/DeploymentViewLexer.java
 tools/src/wyvern/tools/parsing/coreparser/Token.java
 tools/src/wyvern/tools/parsing/coreparser/TokenManager.java
 tools/src/wyvern/tools/parsing/coreparser/TokenMgrError.java
@@ -48,6 +49,17 @@ tools/src/wyvern/tools/parsing/coreparser/arch/Node.java
 tools/src/wyvern/tools/parsing/coreparser/arch/JJTArchParserState.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserVisitor.java
 tools/src/wyvern/tools/parsing/coreparser/arch/ArchParserDefaultVisitor.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/DeploymentViewParser.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/DeploymentViewParser.jj
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/DeploymentViewParserConstants.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/DeploymentViewParserTreeConstants.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/JJTDeploymentViewParserState.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/Node.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/ParseException.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/SimpleNode.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/Token.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/TokenManager.java
+tools/src/wyvern/tools/parsing/coreparser/arch/views/deployment/TokenMgrError.java
 tools/out
 tools/src/wyvern/target/llvm/autom4te.cache/
 tools/src/wyvern/target/llvm/.libs/

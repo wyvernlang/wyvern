@@ -30,7 +30,7 @@ def noLifting(e: String): LiftedExpression = LiftedExpression("", e)
 def flattenListing(stagedJS: LiftedExpression): String = stagedJS.lifting + stagedJS.expr
 
 def visitTypeDeclaration(td: wyb_ast.TypeDeclaration): String
-    val path: Option = match td.typeDesc.t:
+    val path: Option[String] = match td.typeDesc.t:
         tp: wyb_ast.TypePath => option.Some[String](tp.path)
         default => option.None[String]()
     var namedLocalPath: Boolean = false
@@ -124,7 +124,7 @@ def visitCallExpression(c: wyb_ast.CallExpression): LiftedExpression
         else
             LiftedExpression(receiverJS.lifting + util.join(argumentJS.map[String](a => a.lifting), ""), receiverJS.expr + "." + c.method + "(" + util.join(argumentJS.map[String](a => a.expr), ",") + ")" + comment)
 
-def newTypeExtends(nt: wyb_ast.Type): Option = match nt:
+def newTypeExtends(nt: wyb_ast.Type): Option[String] = match nt:
     ct: wyb_ast.CompoundType => newTypeExtends(ct.base)
     tp: wyb_ast.TypePath => option.Some[String](tp.path)
     default => option.None[String]()
@@ -223,7 +223,7 @@ def visitStaticCallExpression(e: wyb_ast.StaticCallExpression): LiftedExpression
         elif (op == "length")
             assert e.arguments.length() == 0
             LiftedExpression(receiverJS.lifting, "(" + receiverJS.expr + ").length")
-        elif (op == "charAt" || op == "substring" || op == "concat")
+        elif (op == "charAt" || op == "substring" || op == "concat" || op == "equals")
             visitExpression(wyb_ast.CallExpression(e.receiver, op, e.arguments, false))
         elif (op == "floor")
             LiftedExpression(receiverJS.lifting, "Math.floor(" + receiverJS.expr + ")")

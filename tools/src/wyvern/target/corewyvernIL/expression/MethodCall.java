@@ -1,11 +1,12 @@
 package wyvern.target.corewyvernIL.expression;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,21 +17,25 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.effects.EffectUtil;
 import wyvern.target.corewyvernIL.metadata.IsTailCall;
 import wyvern.target.corewyvernIL.metadata.Metadata;
-import wyvern.target.corewyvernIL.support.EvalContext;
-import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
-import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
-import wyvern.target.corewyvernIL.support.ViewExtension;
+import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.ViewExtension;
+import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
@@ -204,6 +209,145 @@ public class MethodCall extends Expression {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Go into the arguments to see if the effects in bound are redefined
+     * @return A map that maps the effect to its definition
+     */
+    private static HashMap<String, EffectSet> getEffectDeclarations(TypeContext ctx, List<? extends IExpr> args, List<ValueType> argTypes) {
+        HashMap<String, EffectSet> decls = new HashMap<>();
+        assert (args.size() == argTypes.size());
+        for (int i = 0; i < args.size(); i++) {
+            String argName = args.get(i).toString();
+            ValueType argType = argTypes.get(i);
+            // TODO: check why there is a circularly defined type
+            if (argType.toString().contains("__generic__X.X")) {
+                continue;
+            }
+            List<DeclType> declTypes = argType.getStructuralType(ctx).getDeclTypes();
+            for (DeclType declType : declTypes) {
+                if (declType instanceof EffectDeclType) {
+                    EffectDeclType effectDecl = (EffectDeclType) declType;
+                    EffectSet effectSet = effectDecl.getEffectSet();
+                    decls.put(effectDecl.getName(), effectSet);
+                }
+            }
+        }
+        return decls;
+    }
+
+    private static EffectSet computeUpperBound(TypeContext ctx, List<ValueType> actualArgTypes) {
+        EffectSet ub = null;
+        for (ValueType argType : actualArgTypes) {
+            EffectSet hoEffects = EffectUtil.getHOEffects(argType, (GenContext) ctx);
+            if (hoEffects != null) {
+                if (ub == null) {
+                    ub = new EffectSet(new HashSet<>());
+                }
+                ub.getEffects().addAll(hoEffects.getEffects());
+            }
+        }
+        return ub;
+    }
+
+    private static void checkUpperBound(TypeContext ctx, List<ValueType> formalArgTypes, List<ValueType> actualArgTypes,
+                                      List<? extends IExpr> args) {
+        if (actualArgTypes.size() == 0) {
+            return;
+        }
+
+        ValueType firstFormalArg = actualArgTypes.get(0);
+        if (firstFormalArg.getStructuralType(ctx).getDeclTypes().size() == 0) {
+            return;
+        }
+
+        DeclType firstDeclType = firstFormalArg.getStructuralType(ctx).getDeclTypes().get(0);
+        if (!(firstDeclType instanceof EffectDeclType)) {
+            return;
+        }
+
+        EffectDeclType selectedEffect = (EffectDeclType) firstDeclType;
+        EffectSet upperBound = computeUpperBound(ctx, actualArgTypes.subList(1, actualArgTypes.size()));
+
+        if (upperBound == null) {
+            return;
+        }
+
+        for (Effect e : selectedEffect.getEffectSet().getEffects()) {
+            if (!upperBound.getEffects().contains(e)) {
+                 ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
+                                "Selected an effect which is outside of the upper bound");
+            }
+        }
+    }
+
+    private static void checkHigherOrderEffect(TypeContext ctx, List<ValueType> formalArgTypes,
+                                                List<ValueType> actualArgTypes, List<? extends IExpr> args) {
+        HashMap<String, EffectSet> effectDecls = getEffectDeclarations(ctx, args, actualArgTypes);
+        for (int i = 0; i < formalArgTypes.size(); i++) {
+            ValueType formalArgType = formalArgTypes.get(i);
+            ValueType actualArgType = actualArgTypes.get(i);
+            if (actualArgType.toString().contains("__generic__X.X")) {
+                continue;
+            }
+            List<DeclType> formalDecls = formalArgType.getStructuralType(ctx).getDeclTypes();
+            if (!formalDecls.isEmpty() && formalDecls.get(0) instanceof EffectDeclType) {
+                DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
+                EffectDeclType formalDeclType = (EffectDeclType) argType;
+                EffectSet lb = formalDeclType.getLowerBound();
+
+                if (lb == null) {
+                    continue;
+                }
+
+                EffectDeclType actualDeclType = (EffectDeclType) actualArgType.getStructuralType(ctx).getDeclTypes().get(0);
+                EffectSet effectSet = actualDeclType.getEffectSet();
+
+                // Checking each effect in the lower bound is present
+                for (Effect lbEffect : lb.getEffects()) {
+                    boolean found = false;
+                    String name = lbEffect.getName();
+                    for (Effect effect : effectSet.getEffects()) {
+
+                        // Find the declaration of the effect
+                        EffectDeclType decl = effect.findEffectDeclType(ctx);
+
+                        // TODO: Should not check the effect using its name
+                        // the lbEffect is in the given effect
+                        if (effect.getName().equals(name)) {
+                            found = true;
+                        }
+
+                        EffectSet declared = decl.getEffectSet();
+                        if (declared != null) {
+                            for (Effect declaredEffect : declared.getEffects()) {
+                                if (declaredEffect.getName().equals(name)) {
+                                    found = true;
+                                }
+                            }
+                        }
+                    }
+
+                    // the lbEffect is defined to be other effect in the argument
+                    for (String effectName : effectDecls.keySet()) {
+                        EffectSet declaration = effectDecls.get(effectName);
+                        if (name.equals(effectName)) {
+                            if (effectSet.getEffects().containsAll(declaration.getEffects())) {
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (!found) {
+                        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
+                                "Selected effect does not contain lower bound");
+                    }
+                }
+            }
+        }
+
+        checkUpperBound(ctx, formalArgTypes, actualArgTypes, args);
+    }
+
     public static class MatchResult {
         //CHECKSTYLE:OFF
         public final boolean succeeded;
@@ -229,6 +373,7 @@ public class MethodCall extends Expression {
         StructuralType receiverType = receiver.getStructuralType(newCtx);
         List<ValueType> formalArgTypes = new LinkedList<ValueType>();
         String failureReason = null;
+
 
         // Ignore non-methods.
         TypeContext calleeCtx = newCtx.extend(receiverType.getSelfSite(), receiver);
@@ -270,11 +415,13 @@ public class MethodCall extends Expression {
             FailureReason r = new FailureReason();
             try {
                 if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
+                    DeclType actualDecl = actualArgType.getStructuralType(newCtx).getDeclTypes().get(0);
+                    DeclType formalDecl = formalArgType.getStructuralType(newCtx).getDeclTypes().get(0);
                     argsTypechecked = false;
                     if (failureReason == null) {
                         failureReason = r.getReason();
                     }
-                    break;
+                    //break;
                 }
             } catch (RuntimeException e) {
                 if (e.getMessage().contains("not found")) {
@@ -291,8 +438,9 @@ public class MethodCall extends Expression {
             if (e instanceof Variable) {
                 v = new ViewExtension(new Variable(defDeclType.getFormalArgs().get(i).getSite()), (Variable) e, v);
             }
+
         }
-        
+        checkHigherOrderEffect(newCtx, formalArgTypes, actualArgTypes, args);
         return new MatchResult(formalArgTypes, newCtx, calleeCtx, failureReason, v, argsTypechecked);
     }
     
@@ -302,16 +450,15 @@ public class MethodCall extends Expression {
      * @return the declaration of the method.
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        boolean isTarget = false;
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
         StructuralType receiverType = receiver.getStructuralType(ctx);
-
         // Sanity check: make sure it has declarations.
         List<DeclType> declarationTypes = receiverType.findDecls(methodName, ctx);
         if (declarationTypes.isEmpty()) {
             ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName, receiver.desugar(ctx));
         }
-
         // Go through all declarations, typechecking against the actual types passed in...
         List<ValueType> actualArgTypes = getArgTypes(ctx, args);
         List<ValueType> formalArgTypes = null;
@@ -321,8 +468,8 @@ public class MethodCall extends Expression {
         TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
+
             MatchResult mr = matches(ctx, receiver, declType, args, objectExpr);
-            
             newCtx = mr.newCtx;
             calleeCtx = mr.calleeCtx;
             formalArgTypes = mr.formalArgTypes;
@@ -335,7 +482,7 @@ public class MethodCall extends Expression {
             DefDeclType defDeclType = (DefDeclType) declType;
             List<FormalArg> formalArgs = defDeclType.getFormalArgs();
             View v = mr.view;
-            
+
             // We were able to typecheck; figure out the return type, and set the method declaration.
             if (mr.succeeded) {
 
@@ -343,7 +490,6 @@ public class MethodCall extends Expression {
                 if (effectAccumulator != null) {
                     // get the effects through the current view
                     EffectSet methodCallE = defDeclType.getEffectSet(v);
-
                     if ((methodCallE != null) && (methodCallE.getEffects() != null)) {
                         Set<Effect> concreteEffects = new HashSet<>();
                         for (Effect e : methodCallE.getEffects()) {
@@ -392,7 +538,18 @@ public class MethodCall extends Expression {
             }
         }
         // Couldn't find an appropriate method declaration. Build up a nice error message.
-        String errorMessage = methodDeclarationNotFoundMsg(ctx, declarationTypes, actualArgTypes, formalArgTypes, failureReason);
+        // find one DefDeclType to use for the error message
+        DefDeclType aDefDeclType = null;
+        for (int i = 0; i < declarationTypes.size(); ++i) {
+            if (declarationTypes.get(i) instanceof DefDeclType) {
+                aDefDeclType = (DefDeclType) declarationTypes.get(i);
+                break;
+            }
+        }
+        if (aDefDeclType == null) {
+            ToolError.reportError(ErrorMessage.NOT_A_METHOD, this, methodName);
+        }
+        String errorMessage = methodDeclarationNotFoundMsg(ctx, aDefDeclType, actualArgTypes, formalArgTypes, failureReason);
         ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, this, errorMessage);
         return null;
     }
@@ -407,14 +564,14 @@ public class MethodCall extends Expression {
     }
 
     private String methodDeclarationNotFoundMsg(
-            TypeContext ctx, List<DeclType> declarationTypes, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
+            TypeContext ctx, DefDeclType aDefDeclType, List<ValueType> actualArgTypes, List<ValueType> formalArgTypes, String failureReason
     ) {
         StringBuilder errMsg = new StringBuilder();
         //errMsg.append(methodName);
         //errMsg.append("(");
         for (int i = 0; i <= args.size() - 2; ++i) {
             // add the argument only if it's not a generic
-            if (!((DefDeclType) declarationTypes.get(0)).getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX)) {
+            if (!(aDefDeclType.getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX))) {
                 errMsg.append(actualArgTypes.get(i).desugar(ctx));
                 errMsg.append(", ");
             }
@@ -423,7 +580,7 @@ public class MethodCall extends Expression {
             errMsg.append(actualArgTypes.get(args.size() - 1).desugar(ctx));
         }
         errMsg.append("; expected types ");
-        DefDeclType ddt = (DefDeclType) declarationTypes.get(0);
+        DefDeclType ddt = aDefDeclType;
         for (int i = 0; i <= formalArgTypes.size() - 2; ++i) {
             // add the argument only if it's not a generic
             if (!ddt.getFormalArgs().get(i).getName().startsWith(DefDeclaration.GENERIC_PREFIX)) {
@@ -435,9 +592,9 @@ public class MethodCall extends Expression {
             errMsg.append(formalArgTypes.get(formalArgTypes.size() - 1).desugar(ctx));
         }
         //errMsg.append(")");
-        if (failureReason != null) {
+        /*if (failureReason != null) {
             errMsg.append("; argument subtyping failed because " + failureReason);
-        }
+        }*/
         return errMsg.toString();
     }
 }

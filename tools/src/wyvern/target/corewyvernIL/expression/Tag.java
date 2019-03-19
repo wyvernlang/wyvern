@@ -35,6 +35,6 @@ public class Tag {
     
     @Override
     public String toString() {
-        return nameHint;
+        return nameHint + "." + memberName;
     }
 }

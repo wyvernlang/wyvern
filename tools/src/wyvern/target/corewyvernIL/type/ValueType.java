@@ -49,7 +49,7 @@ public abstract class ValueType extends Type implements IASTNode {
         try {
             Appendable dest = new StringBuilder();
             doPrettyPrint(dest, "", ctx);
-            return dest.toString();
+            return dest.toString().replaceAll("MOD\\$", "");
         } catch (IOException e) {
             e.printStackTrace();
             return "ERROR_PRINTING";
@@ -241,4 +241,12 @@ public abstract class ValueType extends Type implements IASTNode {
      * @return True if the type is effect-unannotated, false otherwise.
      */
     public abstract boolean isEffectUnannotated(TypeContext ctx);
+    /**
+     * Checks if it is legal to instantiate this type.  Does nothing for most types.
+     * But for tagged types, there must not be a "comprises" limitation.
+     * Assumes this check has already been checked for well-formedness.
+     * @param ctx
+     */
+    public void canInstantiate(TypeContext ctx) {
+    }
 }

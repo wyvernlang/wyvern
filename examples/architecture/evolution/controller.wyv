@@ -1,0 +1,18 @@
+require python
+
+import LightPubSubIface_provides_init
+import ROS1TopicProperties
+import VelocityController
+import LightPubSubIface_provides
+import ros1
+
+val lpsi_prv_init = LightPubSubIface_provides_init("controller", python)
+
+val tProps: ROS1TopicProperties = new
+	val name = "lightValues"
+
+val controller = VelocityController(ros1)
+val controller_provides = LightPubSubIface_provides(lpsi_prv_init, tProps, controller.subLight, python)
+
+controller_provides.init()
+controller.start()

@@ -1,0 +1,10 @@
+import import3.Go
+import lifted import3.import3Lib
+
+val g : Go = new
+    def go (x : Unit -> {} Unit) : {} Unit
+        x()
+
+val lib1 = import3Lib[{}](g)
+
+"abc"

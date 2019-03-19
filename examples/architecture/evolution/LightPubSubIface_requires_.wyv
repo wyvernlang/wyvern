@@ -1,0 +1,49 @@
+module def LightPubSubIface_requires_(node_name: String, topic: ROS2TopicProperties, python: Python, stdout: Stdout)
+
+import python:rclpy
+import python:std_msgs
+import python:std_msgs.msg
+import python:sys
+import python:ros2helper
+
+import wyvern.option
+
+type Option = option.Option
+
+resource type Node
+	def create_publisher(msg_type: Dyn, topic_name: String): Publisher
+
+resource type Publisher
+	def publish(v: Dyn): Unit
+
+var node: Option[Node] = option.None[Node]()
+var pub: Option[Publisher] = option.None[Publisher]()
+
+def printErrMsgAndExit(msg: String): Unit
+	stdout.print(msg)
+	stdout.print("\n")
+	sys.exit(1)
+
+def get_node(): Node
+	node.isDefined.ifTrue(() => unit, () => printErrMsgAndExit("Node is not set"))
+	val dummy_node: Node = new
+		def create_publisher(msg_type: Dyn, topic_name: String): Publisher
+			new
+				def publish(v: Dyn): Unit
+					stdout.print("Control should never reach here")
+					sys.exit(1)
+	node.getOrElse(() => dummy_node)
+
+def init(): Unit
+	rclpy.init()
+	val n = rclpy.create_node(node_name)
+	pub = option.Some[Publisher](n.create_publisher(std_msgs.msg.Float64, topic.name))
+	node = option.Some[Node](n)
+
+def pubNextValue(v: Float): Unit
+	val err_pub: Publisher = new
+		def publish(v: Dyn): Unit
+			stdout.print("An error occurred while creating the publisher: " + node_name)
+			sys.exit(1)
+	//pub.getOrElse(() => err_pub).publish(v)
+	ros2helper.publishFloat(pub.getOrElse(() => err_pub), v)

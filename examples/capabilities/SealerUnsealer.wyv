@@ -5,7 +5,6 @@ require stdout
 import wyvern.option
 import wyvern.collections.map
 import wyvern.collections.list
-import wyvern.String
 
 // This example would be a lot nicer if parameterised Option[T]
 // worked! Will rewrite when this bug is fixed. :-)
@@ -51,7 +50,7 @@ resource type SealerUnsealer
      var unsealer:Unsealer
 
 def makeSealerUnsealer():SealerUnsealer
-    var map:Map = map.make((b1:Box,b2:Box) => String.equals(b1.name,b2.name))
+    var map:Map = map.make((b1:Box,b2:Box) => b1.name.equals(b2.name))
     var currentKey:String = "S"
     new
         var sealer:Sealer = new
@@ -114,7 +113,7 @@ resource type BrandPair
     var unsealer:BrandUnsealer[this.T]
 
 def makeBrandPair[T](name:String):BrandPair[T]
-    var shared:Option = option.None[SealedBox]()
+    var shared:Option[T] = option.None[T]()
     def makeSealedBox(object:Option[T]):SealedBox[T]
         val newBox:SealedBox[T] = new
             type T = T
@@ -131,7 +130,7 @@ def makeBrandPair[T](name:String):BrandPair[T]
         var unsealer:BrandUnsealer[T] = new
             type T = T
             def unseal(box:SealedBox[T]):Option[T]
-                shared = option.None[SealedBox[T]]()
+                shared = option.None[T]()
                 box.shareContent()
                 var result:Option[T] = shared
                 result

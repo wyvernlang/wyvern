@@ -106,13 +106,13 @@ public class Case {
         if (!(matchType != null && vt != null && vt.isSubtypeOf(matchType, ctx, null))) {
             bestType = vt == null ? matchType : vt;
         }
-        ValueType adaptedPattern = wyvern.target.corewyvernIL.Case.getAdaptedPattern((NominalType) bestType, matchType, matchExpr, ctx);
-        ctx = ctx.extend(bindingSite, expr, adaptedPattern);
-        Expression body = (Expression) ast.generateIL(ctx, expectedType, dependencies);
         if (bestType instanceof RefinementType) {
             bestType = ((RefinementType) bestType).getBase();
             System.err.println("Ignoring refinement in case branch in " + taggedType.getLocation());
         }
+        ValueType adaptedPattern = wyvern.target.corewyvernIL.Case.getAdaptedPattern((NominalType) bestType, matchType, matchExpr, ctx);
+        ctx = ctx.extend(bindingSite, expr, adaptedPattern);
+        Expression body = (Expression) ast.generateIL(ctx, expectedType, dependencies);
         return new wyvern.target.corewyvernIL.Case(bindingSite, (NominalType) bestType, body);
     }
 

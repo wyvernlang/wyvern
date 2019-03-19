@@ -10,7 +10,7 @@ type List = list.List
 type Option = option.Option
 
 def typeDescFromProtobuf(protobufTypeDesc: Dyn): wyb_ast.TypeDesc
-    var ext: Option = option.None[String]()
+    var ext: Option[String] = option.None[String]()
     if (protobufTypeDesc.hasExtends())
         ext = option.Some[String](protobufTypeDesc.getExtends())
     val t = protobufTypeDesc.getType()

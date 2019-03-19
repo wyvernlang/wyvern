@@ -24,7 +24,7 @@ def makeFile(path: String) : File = new
                 val line = file.readLineFromFile(br)
                 if (file.isNull(line))
                     option.None[String]()
-                else
+                  else
                     option.Some[String](line)
             def readFully() : String
                 file.readFullyFile(br)

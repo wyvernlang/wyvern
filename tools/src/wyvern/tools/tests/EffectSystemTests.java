@@ -148,7 +148,7 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
         expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
-                + "MOD$effects.Logger.Logger; declaration updateLog is not a subtype of the expected declaration at location file "
+                + "effects.Logger.Logger; declaration updateLog is not a subtype of the expected declaration at location file "
                 + Paths.get(PATH, "effects", "logger.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger", Util.intType(), new IntegerLiteral(5));
     }
@@ -170,7 +170,7 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
         expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
-                + "MOD$effects.Logger2.Logger2; declaration updateLog is not a subtype of the expected declaration at location file "
+                + "effects.Logger2.Logger2; declaration updateLog is not a subtype of the expected declaration at location file "
                 + Paths.get(PATH, "effects", "logger2.wyv").toAbsolutePath().toString() + " on line 1 column 12"));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger2", Util.intType(), new IntegerLiteral(5));
     }

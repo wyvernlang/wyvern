@@ -1,37 +1,31 @@
 package wyvern.stdlib.support;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Pattern;
+import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PostParameters {
     public static final PostParameters postparam = new PostParameters();
-
     private static List<String> parameterNames = new ArrayList<>();
     private static List<String> parameterValues = new ArrayList<>();
 
     public String getPayload(InputStream is) throws IOException {
         InputStreamReader isReader = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isReader);
-        
         StringBuilder payload = null;
 
         // read header of payload
-        String temp = "", header = "";
-        while (true) {
-            temp = br.readLine();
-            if (temp.length() == 0) {
-                break;
-            }
+        String header = "";
+        String temp = br.readLine();
+        while (temp != null && temp.length() > 0) {
             header += temp;
+            temp = br.readLine();
         }
         System.out.println(header);
         if (header.startsWith("POST")) {
@@ -42,16 +36,11 @@ public class PostParameters {
         }
         String result = payload.toString();
         return processPostBody(result);
-
     }
 
     public String processPostBody(String request) {
-
-        Map<String, String> params = new LinkedHashMap<String, String>();
-
-        List<String> paramNames = new ArrayList<String>();
-        List<String> paramValues = new ArrayList<String>();
-
+        List<String> paramNames = new ArrayList<>();
+        List<String> paramValues = new ArrayList<>();
         Pattern p = Pattern.compile("name=\"(.+?)\"");
         Matcher m = p.matcher(request);
 
@@ -69,11 +58,7 @@ public class PostParameters {
             paramValues.add(val);
         }
 
-        String last = paramValues.get(paramValues.size() - 1);
-        last =  paramNames.get(paramNames.size() - 1);
-
         String paramResult = "";
-
         if (paramValues.size() == paramNames.size()) {
             for (int i = 0; i < paramValues.size(); i++) {
                 String key = paramNames.get(i);
@@ -85,13 +70,9 @@ public class PostParameters {
                 } else {
                     paramResult += value + ",";
                 }
-
             }
-
-        } 
-
+        }
         return paramResult;
-
     }
 
     public String getParamByIndex(String params, int index) {

@@ -405,4 +405,11 @@ public class RefinementType extends ValueType {
         return this.getBase().isEffectUnannotated(ctx)
                 && this.getGenericArguments().stream().allMatch(ga -> ga.getKind() != GenericKind.EFFECT);
     }
+    /**
+     * Can be instantiated if the base type can.
+     */
+    @Override
+    public void canInstantiate(TypeContext ctx) {
+        base.canInstantiate(ctx);
+    }
 }
