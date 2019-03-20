@@ -160,8 +160,18 @@ public class FileIO {
     public int readByteFileInputStream(FileInputStream f) throws IOException {
         return f.read();
     }
-	
-	
+    
+    public FileOutputStream makeFileOutputStream(Object f) throws IOException {
+        return new FileOutputStream((File) f);
+    }
+    
+    public void closeFileOutputStream(FileOutputStream f) throws IOException {
+        f.close();
+    }
+    
+    public void writeByteFileOutputStream(FileOutputStream f, int b) throws IOException {
+        f.write(b);
+    }
 
 
 }

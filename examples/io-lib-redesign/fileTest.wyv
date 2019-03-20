@@ -74,5 +74,13 @@ out.printInt(binreader.readBytes(12))
 
 binreader.close()
 
+/* Binary Writer */
+
+val binwriter = fe.makeBinaryWriter()
+
+//binwriter.write(33)
+binwriter.writeBytes(9761,2)
+
+binwriter.close()
 
 out.println()

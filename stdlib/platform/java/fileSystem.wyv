@@ -8,6 +8,7 @@ import fileSystem.Reader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
 import fileSystem.BinaryReader
+import fileSystem.BinaryWriter
 
 import wyvern.option
 type Option = option.Option
@@ -84,6 +85,18 @@ def makeFile(path: String) : File = new
                 shift(0,numBytes)
             def close() : Unit
                 file.closeFileInputStream(br)
+                
+    def makeBinaryWriter() : BinaryWriter
+        val bw = file.makeFileOutputStream(this.f)
+        new
+            def write(b : Int) : Unit
+                file.writeByteFileOutputStream(bw, b)
+            def writeBytes(b : Int, numBytes : Int) : Unit
+                if (numBytes > 0)
+                    this.writeBytes(b/256, numBytes - 1)
+                    file.writeByteFileOutputStream(bw, b)
+            def close() : Unit
+                file.closeFileOutputStream(bw)
     
     /* May want to rename this to something more unique
      * Modify "mode" parameter? and available methods?

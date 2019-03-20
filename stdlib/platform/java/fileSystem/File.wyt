@@ -2,9 +2,11 @@ import fileSystem.Reader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
 import fileSystem.BinaryReader
+import fileSystem.BinaryWriter
 resource type File
     def makeReader():Reader
     def makeWriter():Writer
     def makeAppender():Writer
     def makeBinaryReader():BinaryReader
+    def makeBinaryWriter():BinaryWriter
     def makeRandomAccessFile(mode : String):RandomAccessFile
