@@ -58,9 +58,21 @@ out.print(raf.readLine())
 raf.write("help")
 raf.seek(0)
 out.print(raf.readLine())
+out.println()
 
 
 raf.close()
+
+/* Binary Reader */
+
+out.print("/** BINARY READER TESTS **/")
+out.println()
+
+val binreader = f.makeBinaryReader()
+
+out.printInt(binreader.readBytes(12))
+
+binreader.close()
 
 
 out.println()

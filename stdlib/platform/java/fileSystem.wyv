@@ -7,6 +7,7 @@ import fileSystem.File
 import fileSystem.Reader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
+import fileSystem.BinaryReader
 
 import wyvern.option
 type Option = option.Option
@@ -55,11 +56,8 @@ def makeFile(path: String) : File = new
             
     def makeBinaryReader() : BinaryReader
         val br = file.makeFileInputStream(this.f)
-        new
-            def read() : Int
-                file.readByteFileInputStream(br)
-            def readBytes(numBytes : Int) : Int
-                val shift : Int * Int -> Int =
+        /*
+        val shift : Int * Int -> Int =
                 (b:Int, iter:Int) => 
                     if (iter == 0)
                         b
@@ -69,6 +67,20 @@ def makeFile(path: String) : File = new
                             shift(((b * 256) + readnext), iter - 1)
                         else
                             b
+        */
+        new
+            def read() : Int
+                file.readByteFileInputStream(br)
+            def readBytes(numBytes : Int) : Int
+                def shift (b:Int, iter:Int) : Int
+                    if (iter == 0)
+                        b
+                      else
+                        val readnext = file.readByteFileInputStream(br)
+                        if (readnext == -1)
+                            b
+                          else
+                            shift(((b * 256) + readnext), iter - 1)
                 shift(0,numBytes)
             def close() : Unit
                 file.closeFileInputStream(br)
