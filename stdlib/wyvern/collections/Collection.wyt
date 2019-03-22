@@ -1,0 +1,23 @@
+import Iterator
+
+type Collection
+	// foldr, foldl, map, isEmpty, reduce, iterator, size, do
+	type E //type of the Collection
+	// reduce the elements in the collection with f from right to left
+	def foldr[T](f:this.E*T->T, x:T):T
+	// reduce the elements in the collection with f from left to right
+	def foldl[T](f:T*this.E->T, x:T):T
+	// reduce the elements in the collection with f in parallel
+	// f must be associative, x must be identity
+	def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
+	// provides an iterator that can be used to iterate the collection
+	def iterator():Iterator[this.E]
+	// gives the size of the collection
+	def size() : Int 
+	// apply f to each element in the collection without alter the collection
+	// f causes some side effects
+	def do(f:this.E -> Unit):Unit
+	// apply f to each element in the collection to get a new collection
+	def map[T](f:this.E->T):LinkedList[T]
+	// check if the collection is empty
+	def isEmpty():Boolean
