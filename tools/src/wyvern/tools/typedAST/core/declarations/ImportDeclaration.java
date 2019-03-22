@@ -233,6 +233,7 @@ public class ImportDeclaration extends Declaration implements CoreAST {
                 importExp = new MethodCall(/*m.getExpression()*/importVar, Util.APPLY_NAME, args, this);
                 ctx = resolver.extendGenContext(ctx, m.getDependencies());
                 if (!ctx.isPresent(internalName, true)) {
+                    ctx = addDepsToCtx(m, ctx);
                     ctx = ctx.extend(internalName, new Variable(internalName), type);
                 }
                 dependencies.add(m.getSpec());
@@ -259,7 +260,8 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             }
             ctx = resolver.extendGenContext(ctx, module.getDependencies());
             if (!ctx.isPresent(internalName, true)) {
-                ctx = ctx.extend(module.getSpec().getSite(), new Variable(site), type);
+                ctx = addDepsToCtx(module, ctx);
+                ctx = ctx.extend(site, new Variable(site), type);
             }
             importExp = new Variable(site);
             dependencies.add(module.getSpec());
@@ -273,6 +275,15 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             ToolError.reportError(ErrorMessage.SCHEME_NOT_RECOGNIZED, this, scheme);
         }
         return new Pair<VarBinding, GenContext>(new VarBinding(this.asName == null ? importName : this.asName, type, importExp), ctx);
+    }
+
+    static GenContext addDepsToCtx(Module module, GenContext ctx) {
+        for (TypedModuleSpec s : module.getDependencies()) {
+            if (!ctx.isPresent(s.getInternalName(), true)) {
+                ctx = ctx.extend(s.getSite(), new Variable(s.getSite()), s.getType());
+            }
+        }
+        return ctx;
     }
 
     @Override
