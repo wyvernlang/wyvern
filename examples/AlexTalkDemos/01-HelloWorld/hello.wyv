@@ -1,0 +1,19 @@
+require stdout
+
+stdout.print("Hello, world!\n")
+
+var sVar:String = "Some mutable text.\n"
+
+val sVal:String = "Some immutable text.\n"
+
+// sVal = "Another text.\n" // ERROR
+
+def factorial(n : Int):Int
+  if (n > 0)
+      factorial(n - 1) * n
+    else
+      1
+
+stdout.print("Factorial of 5 is ")
+stdout.printInt(factorial(5))
+stdout.println()

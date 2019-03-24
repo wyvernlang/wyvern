@@ -1,0 +1,4 @@
+module def editor(logger : Logger) // : {}
+
+def run() : Unit
+  logger.log("Running editor.")

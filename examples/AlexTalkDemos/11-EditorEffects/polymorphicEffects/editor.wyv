@@ -1,0 +1,28 @@
+require java
+
+import polymorphicEffects.Logger
+import lifted polymorphicEffects.newRepeaterPlugin
+import polymorphicEffects.Resource
+import polymorphicEffects.file
+import polymorphicEffects.network
+import polymorphicEffects.logger
+
+val file = file(java)
+val network = network(java)
+
+// Different implementations of Logger
+val fileLogger : Logger[{file.wr}] = logger(file)
+val networkLogger : Logger[{network.wr}] = logger(network)
+
+// Core editor
+
+val plugin = newRepeaterPlugin[{fileLogger.log}](fileLogger)
+
+def main() : {fileLogger.log} String
+  // Succeeds because {fileLogger.log} is a subset of the effect that we chose when
+  // we instantiated the plugin, {fileLogger.log}
+  plugin.setLogger(fileLogger)
+
+  plugin.run("abc")
+
+main()

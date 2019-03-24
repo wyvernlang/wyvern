@@ -1,0 +1,42 @@
+module xml
+
+import wyvern.ast
+import tsls.glexer
+import wyvern.util.matching.regex
+import wyvern.option
+import debug
+import metadata wyvern.collections.list
+
+type AST = ast.AST
+
+// Simple grammar for now:
+// XML = "<xml>"
+
+val tokens = new
+  type Kind = Int
+  val XML:this.Kind = 0
+  val WHITESPACE:this.Kind = 1
+  val EOF:this.Kind = 2
+  val ERROR:this.Kind = 3
+
+val lexer = glexer(tokens)
+
+type XMLExpr
+  def eval() : String
+  
+  metadata new
+    def parseTSL(input : String, ctx:system.Context) : option.Option[AST]
+      val config = lexer.makeScannerConfig(regex("[ \n\t]+"))
+      config.addTokenKind(regex("<xml>"), tokens.XML)
+
+      val scanner = lexer.makeScanner(config, input)
+      val t = scanner.nextToken()
+
+      if (t.kind() == tokens.XML)
+           val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
+               ast.string("Some XML stuff."))
+           val declList : list.List[ast.Decl] = list.make[ast.Decl]()
+           declList.append(defEval)
+           option.Some(ast.object(declList))
+         else
+           option.None[AST]()

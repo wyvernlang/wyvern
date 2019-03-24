@@ -1,0 +1,97 @@
+// module capabilities
+
+require stdout
+
+import wyvern.option
+import wyvern.collections.map
+import wyvern.collections.list
+import wyvern.String
+
+type Option = option.Option
+
+stdout.print("Caretaker Example\n")
+
+resource type Carol
+     def playWith1():Unit
+     def playWith2():Unit
+
+type Bob
+     def playWith(carol:Carol):Unit
+
+var bob:Bob = new
+     def playWith(carol:Carol):Unit
+         carol.playWith1()
+         carol.playWith2()
+
+var carol1:Carol = new
+     def playWith1():Unit
+         stdout.print("Playing on the playground 1\n")
+     def playWith2():Unit
+         stdout.print("Playing on the playground 2\n")
+
+stdout.print("Using Carol directly:\n")
+bob.playWith(carol1)
+
+// See: http://www.hpl.hp.com/techreports/2003/HPL-2003-222.pdf
+// (search for 4.3 Revocation: Redell's 1974 Caretaker Pattern)
+
+/*
+def caretakerMaker {
+  to make(var target) :any {
+    def caretaker {
+      match [verb :String, args :any[]] {
+        E.call(target, verb, args)
+    }   }
+    def revoker {
+        to revoke() :void {
+           target := null
+    }   }
+    ^[caretaker, revoker]
+} }
+
+// So instead of bob.foo(carol) Alice can say:
+
+def [carol2, carol2Rvkr] := caretakerMaker.make(carol)
+bob.foo(carol2)
+*/
+
+
+// FIXME: If it is not resource, it gives this error:
+// method body's type is not a subtype of declared type at location file Caretaker.wyv on line 77 column 13
+// But this is confusing! :-)
+resource type Revoker
+     def revoke():Unit
+
+// TODO: We need Wyvern to support forwarding of methods somehow for this to work generically.
+resource type CarolRevoker
+     def carol():Carol
+     def revoker():Revoker
+
+def makeCarolRevoker(carol:Carol):CarolRevoker
+    var target:Option[Carol] = option.Some(carol)
+    new
+        def carol():Carol
+            new (thisCarol) =>
+                var blankCarol:Carol = new
+                    def playWith1():Unit = stdout.print("playWith1 REVOKED\n")
+                    def playWith2():Unit = stdout.print("playWith2 REVOKED\n")
+                def playWith1():Unit
+                    target.getOrElse(() => thisCarol.blankCarol).playWith1()
+                def playWith2():Unit
+                    target.getOrElse(() => thisCarol.blankCarol).playWith2()
+        def revoker():Revoker
+            new
+                def revoke():Unit
+                    target = option.None[Carol]()
+
+stdout.print("Creating Carol with caretaker.\n")
+var carolRevoker:CarolRevoker = makeCarolRevoker(carol1)
+
+stdout.print("Doing it with Carol via caretaker:\n")
+var carol2:Carol = carolRevoker.carol()
+bob.playWith(carol2)
+
+stdout.print("Doing it with Carol via caretaker after revoking:\n")
+var revoker:Revoker = carolRevoker.revoker()
+revoker.revoke()
+bob.playWith(carol2)

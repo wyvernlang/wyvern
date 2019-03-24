@@ -1,0 +1,27 @@
+require stdout
+
+resource type Pair
+  type T
+  def first():this.T
+  def second():this.T
+  def print():Unit
+
+def makeIntPair(fst:Int, snd:Int):Pair[Int] = new
+  type T = Int
+  var fst:Int = fst
+  var snd:Int = snd
+  def first():this.T = this.fst
+  def second():this.T = this.snd
+  def print():Unit
+    stdout.print("First: ")
+    stdout.printInt(this.fst)
+    stdout.println()
+    stdout.print("Second: ")
+    stdout.printInt(this.snd)
+    stdout.println()
+
+var pair1:Pair[Int] = makeIntPair(3, 2)
+var pair2:Pair[Int] = makeIntPair(4, 5)
+
+pair1.print()
+pair2.print()

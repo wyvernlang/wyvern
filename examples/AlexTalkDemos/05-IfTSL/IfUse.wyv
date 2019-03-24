@@ -1,0 +1,21 @@
+require stdout
+
+import metadata wyvern.IfTSL
+import wyvern.runtime
+
+val blahbooARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => IfTSL.doif(cond, tt, ff)
+val baz = (cond:Boolean, blocks:IfTSL.Blocks) => IfTSL.doifblk(cond, blocks)
+
+blah (5 > 6) { stdout.print("not this one\n") } boo { stdout.print("I print this!\n") }
+
+bla (5 > 6) { stdout.print("not this one\n") } hboo { stdout.print("I print this!\n") }
+
+baz (42 > 0)
+    stdout.print("This prints too!\n")
+  else
+    stdout.print("This will not!\n")
+
+if (3 > 2)
+    stdout.print("True\n")
+  else
+    stdout.print("False\n")
