@@ -12,6 +12,7 @@ import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class Script extends AbstractExpressionAST implements CoreAST {
     private List<ImportDeclaration> imports;
@@ -56,6 +57,11 @@ public class Script extends AbstractExpressionAST implements CoreAST {
     @Override
     public IExpr generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         return this.generateTLC(ctx, expectedType, dependencies).getExpression();
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
 }

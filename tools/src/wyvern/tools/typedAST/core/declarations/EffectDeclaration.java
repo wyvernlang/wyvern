@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class EffectDeclaration extends Declaration {
     private String name;
@@ -45,6 +46,11 @@ public class EffectDeclaration extends Declaration {
             dest.append(effectSet.toString());
         }
         dest.append('\n');
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

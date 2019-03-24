@@ -34,6 +34,7 @@ import wyvern.tools.interop.FObject;
 import wyvern.tools.interop.GenUtil;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.util.Pair;
 
 public class ImportDeclaration extends Declaration implements CoreAST {
@@ -117,6 +118,12 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     public static GenContext extendWithImportCtx(FObject obj, GenContext ctx) {
         if (obj.getWrappedValue() instanceof java.lang.Class) {

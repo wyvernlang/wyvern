@@ -11,6 +11,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.Value;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 
 public final class UnitVal extends AbstractExpressionAST implements Value, CoreAST {
@@ -42,4 +43,10 @@ public final class UnitVal extends AbstractExpressionAST implements Value, CoreA
         sb.append("()");
         return sb;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 }

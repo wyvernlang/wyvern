@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.util.GetterAndSetterGeneration;
 
@@ -76,6 +77,12 @@ public class VarDeclaration extends Declaration implements CoreAST {
                 definitionType.getILType(ctx), definition.generateIL(ctx, null, null), location);
         return varDecl;
 
+    }
+
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

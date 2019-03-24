@@ -28,6 +28,7 @@ import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.NamedType;
 import wyvern.tools.util.Pair;
 
@@ -96,6 +97,12 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     public boolean isAnnotated() {
         return isAnnotated;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     /**
      * Generate the rest part of a module (not import/instantiate/require)

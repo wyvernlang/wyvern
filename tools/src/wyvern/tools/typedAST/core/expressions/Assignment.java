@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.util.GetterAndSetterGeneration;
 
 public class Assignment extends AbstractExpressionAST implements CoreAST {
@@ -55,6 +56,12 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
     public FileLocation getLocation() {
         return this.location;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     private IExpr generateFieldGet(GenContext ctx, List<TypedModuleSpec> dependencies) {
 

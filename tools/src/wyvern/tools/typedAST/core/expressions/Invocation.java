@@ -17,6 +17,7 @@ import wyvern.tools.typedAST.interfaces.Assignable;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class Invocation extends AbstractExpressionAST implements CoreAST, Assignable {
 
@@ -54,6 +55,11 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
 
     public FileLocation getLocation() {
         return this.location;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

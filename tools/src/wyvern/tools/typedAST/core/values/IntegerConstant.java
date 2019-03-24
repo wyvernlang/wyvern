@@ -11,6 +11,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class IntegerConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
     private int value;
@@ -49,4 +50,10 @@ public class IntegerConstant extends AbstractExpressionAST implements InvokableV
     public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         return new IntegerLiteral(value, location);
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 }

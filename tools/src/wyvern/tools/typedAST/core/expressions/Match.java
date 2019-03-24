@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 
 /**
@@ -39,6 +40,11 @@ public class Match extends AbstractExpressionAST implements CoreAST {
 
     public String toString() {
         return "Match: " + matchingOver + " with " + cases + " cases and default: " + defaultCase;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     public Match(TypedAST matchingOver, List<Case> cases, FileLocation location) {

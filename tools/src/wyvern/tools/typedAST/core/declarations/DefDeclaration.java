@@ -34,6 +34,7 @@ import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.GetterAndSetterGeneration;
@@ -114,6 +115,11 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         }
 
         return effectSet;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override
