@@ -385,11 +385,6 @@ public class EffectSystemTests {
     }
 
     @Test
-    public void accepted2() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH, "higherOrderEffects.acceptedClient2", Util.stringType(), new StringLiteral("abc"));
-    }
-
-    @Test
     public void testObjNetwork() throws ParseException {
         /* Object with effect annotations. */
         TestUtil.doTestScriptModularly(PATH, "effects.objNetwork", Util.stringType(), new StringLiteral("ObjNetwork with effects"));
@@ -397,42 +392,49 @@ public class EffectSystemTests {
 
     @Test
     public void testSeparation1() throws ParseException {
-        /* add empty set where effect annotation is not present */
+        /* Add empty effect set where annotation is missing */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client1", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation2() throws ParseException {
+        /* Fully annotated module */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client2", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation3() throws ParseException {
+        /* Unannotated module with type annotated */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client3", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation4() throws ParseException {
+        /* Unannotated module */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client4", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation5() throws ParseException {
+        /* Unannotated moduledef */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client5", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation6() throws ParseException {
+        /* Unannotated moduledef with type annotation */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client6", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation7() throws ParseException {
+        /* Annotated moduledef */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client7", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation8() throws ParseException {
+        /* Annotated moduledef with type annotation */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client8", Util.unitType(), Util.unitValue());
     }
 
@@ -446,16 +448,19 @@ public class EffectSystemTests {
 
     @Test
     public void testSeparation10() throws ParseException {
+        /* importing annotated module from annotated module */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client10", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation11() throws ParseException {
+        /* import lifted unannotated module from annotated module */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client11", Util.unitType(), Util.unitValue());
     }
 
     @Test
     public void testSeparation12() throws ParseException {
+        /* Correctly annotated module def */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client12", Util.unitType(), Util.unitValue());
     }
 

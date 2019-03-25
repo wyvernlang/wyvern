@@ -1,3 +1,4 @@
-module def filedef6(y : Int) : {} effectSeparation.AnnotatedFile
-def x() : {system.ffiEffect} Unit
+module def filedef6(m : effectSeparation.ModuleWithEffect) : {} effectSeparation.AnnotatedFile
+m.functionWithEffect()
+def x() : {} Unit
     unit

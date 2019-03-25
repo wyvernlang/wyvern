@@ -61,6 +61,7 @@ final class EffectAnnotationChecker {
 
             // Effect-check the module declaration
             if (moduleDecl.getEffectSet() != null) {
+                System.out.println(moduleDecl.getEffectSet().getEffects());
                 moduleEffectCheck(ctx, typedAST, moduleDecl.getEffectSet());
             }
         }
