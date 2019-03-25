@@ -11,6 +11,7 @@ import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.AnnotatedEffectVisitor;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,7 +30,7 @@ final class EffectAnnotationChecker {
      * @param moduleDecl declaration of the module
      * @param dependencies dependencies of the module
      */
-   static void checkModule(ModuleResolver resolver, GenContext ctx, ModuleDeclaration moduleDecl,
+    static void checkModule(ModuleResolver resolver, GenContext ctx, ModuleDeclaration moduleDecl,
                                    List<TypedModuleSpec> dependencies) {
         TypedAST typedAST = moduleDecl.getInner();
         if (moduleDecl.isAnnotated()) {
@@ -55,16 +56,16 @@ final class EffectAnnotationChecker {
             }
 
             // Annotate missing annotations with empty effect set
-            annotateModule(ctx, typedAST);
+            typedAST.acceptVisitor(new AnnotatedEffectVisitor(), ctx);
             assert (isAnnotated(ctx, typedAST));
 
             // Effect-check the module declaration
             if (moduleDecl.getEffectSet() != null) {
                 moduleEffectCheck(ctx, typedAST, moduleDecl.getEffectSet());
             }
-
         }
     }
+
 
     /**
      * Recursively check if the effect inside the module is selected in the module declaration
@@ -87,28 +88,6 @@ final class EffectAnnotationChecker {
             EffectSet defEffects = def.getEffectSet(ctx);
             if (!effects.getEffects().containsAll(defEffects.getEffects())) {
                 ToolError.reportError(ErrorMessage.EFFECT_ANNOTATION_DEF, FileLocation.UNKNOWN);
-            }
-        }
-    }
-
-    /**
-     * Make the module fully annotated
-     * @param ctx context
-     */
-    private static void annotateModule(GenContext ctx, TypedAST ast) {
-        if (ast instanceof DeclSequence) {
-            DeclSequence seq = (DeclSequence) ast;
-            Sequence normalSeq = seq.filterNormal();
-            Iterator<TypedAST> astIterator = normalSeq.flatten();
-            while (astIterator.hasNext()) {
-                TypedAST nextAST = astIterator.next();
-                annotateModule(ctx, nextAST);
-            }
-        } else if (ast instanceof wyvern.tools.typedAST.core.declarations.DefDeclaration) {
-            wyvern.tools.typedAST.core.declarations.DefDeclaration def =
-                    (wyvern.tools.typedAST.core.declarations.DefDeclaration) ast;
-            if (def.getEffectSet(ctx) == null) {
-                def.setEmptyEffectSet();
             }
         }
     }

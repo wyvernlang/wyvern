@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class DeclSequence extends Sequence {
 
@@ -151,6 +152,11 @@ public class DeclSequence extends Sequence {
             normalSeq = Sequence.append(normalSeq, recSequence);
         }
         return normalSeq;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     /**

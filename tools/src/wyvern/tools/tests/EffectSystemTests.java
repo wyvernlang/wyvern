@@ -397,6 +397,7 @@ public class EffectSystemTests {
 
     @Test
     public void testSeparation1() throws ParseException {
+        /* add empty set where effect annotation is not present */
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client1", Util.unitType(), Util.unitValue());
     }
 
