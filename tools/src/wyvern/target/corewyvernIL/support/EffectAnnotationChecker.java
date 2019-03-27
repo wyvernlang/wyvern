@@ -12,6 +12,8 @@ import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.typedastvisitor.AnnotatedEffectVisitor;
+import wyvern.tools.typedAST.typedastvisitor.EffectCheckState;
+import wyvern.tools.typedAST.typedastvisitor.EffectCheckVisitor;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,9 +62,16 @@ final class EffectAnnotationChecker {
             assert (isAnnotated(ctx, typedAST));
 
             // Effect-check the module declaration
+//            DefDeclaration x = (DefDeclaration) moduleDecl.topLevelGen(ctx, dependencies);
+//            List<FormalArg> args = x.getFormalArgs();
+//            for (FormalArg arg : args) {
+//                System.out.println(arg);
+//            }
+
             if (moduleDecl.getEffectSet() != null) {
-                System.out.println(moduleDecl.getEffectSet().getEffects());
-                moduleEffectCheck(ctx, typedAST, moduleDecl.getEffectSet());
+                EffectSet upperBound = moduleDecl.getEffectSet();
+                EffectCheckState state = new EffectCheckState(upperBound, ctx);
+                typedAST.acceptVisitor(new EffectCheckVisitor(), state);
             }
         }
     }

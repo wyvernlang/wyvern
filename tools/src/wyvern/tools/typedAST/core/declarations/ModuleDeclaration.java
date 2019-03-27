@@ -64,6 +64,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         return effectSet;
     }
 
+    public List<NameBindingImpl> getArgs() {
+        return args;
+    }
+
     @Override
     public String getName() {
         return name;
