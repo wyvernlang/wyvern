@@ -1,0 +1,16 @@
+module def LightSensor(pubLight: LightPubSubIface, ros: ROS)
+
+import utils
+
+def start(): Unit
+	publish_till_exit()
+
+def publish_till_exit(): Unit
+	if (ros.is_shutdown())
+			unit
+		else
+			val lightValue = utils.randunif(500.0, 1500.0)
+			pubLight.pubNextValue(lightValue)
+			ros.log_pub(lightValue)
+			utils.sleep(0.5)
+			publish_till_exit()

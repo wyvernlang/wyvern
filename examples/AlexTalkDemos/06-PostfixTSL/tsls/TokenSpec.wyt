@@ -1,0 +1,5 @@
+type TokenSpec
+	type Kind
+	val WHITESPACE:this.Kind
+	val EOF:this.Kind
+	val ERROR:this.Kind

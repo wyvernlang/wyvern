@@ -1,0 +1,18 @@
+require python
+require stdout
+
+import ros1
+
+import ROS1TopicProperties
+import LightPubSubIface_requires
+import LightSensor
+
+val tProps: ROS1TopicProperties = new
+	val name: String = "lightValues"
+
+val sensor_pubLight = LightPubSubIface_requires("sensor", tProps, python, stdout)
+
+sensor_pubLight.init()
+
+val sensor = LightSensor(sensor_pubLight, ros1)
+sensor.start()

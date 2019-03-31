@@ -1,0 +1,8 @@
+require python
+
+import python:random
+import python:time
+
+def randunif(a: Float, b: Float): Float = random.uniform(a, b)
+
+def sleep(secs: Float): Unit = time.sleep(secs)

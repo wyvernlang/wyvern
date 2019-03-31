@@ -1,0 +1,15 @@
+module def LightPubSubIface_provides_(prv_init: LightPubSubIfaceProvidesInit_, topic: ROS2TopicProperties, callback: LightPubSubIface, python: Python)
+
+//import python:rclpy
+import python:std_msgs
+import python:std_msgs.msg
+
+// TODO: Why does removing this import give an error?
+import Node_
+
+type Float64
+	val data: Float
+
+def init(): Unit
+	prv_init.init()
+	prv_init.get_node().create_subscription(std_msgs.msg.Float64, topic.name, (v: Float64) => callback.pubNextValue(v.data))

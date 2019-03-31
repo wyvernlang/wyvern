@@ -1,0 +1,109 @@
+options
+{
+    //BUILD_PARSER = false;
+	MULTI = true;
+	//VISITOR = true;
+    STATIC = false;
+    USER_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(DeploymentViewParser)
+
+package wyvern.tools.parsing.coreparser.arch.views.deployment;
+
+import wyvern.tools.parsing.coreparser.TokenManager;
+import wyvern.tools.parsing.coreparser.Token;
+import wyvern.tools.parsing.coreparser.ParseException;
+
+public class DeploymentViewParser {
+
+}
+
+PARSER_END(DeploymentViewParser)
+
+TOKEN : /* Keywords */
+{
+  <DEPLOYMENT: "deployment">
+| <EXTENDS: "extends">
+}
+
+SPECIAL_TOKEN : /* Comments and whitespace */
+{
+  <SINGLE_LINE_COMMENT>
+| <MULTI_LINE_COMMENT>
+| <WHITESPACE>
+}
+
+TOKEN : /* Logical Formatting */
+{
+  <DEDENT>
+| <INDENT>
+| <NEWLINE>
+}
+
+TOKEN : /* Identifiers */
+{
+  <IDENTIFIER>
+}
+
+TOKEN : /* Symbols */
+{
+  <DOT>
+| <EQUALS>
+}
+
+TOKEN: /* Literals */
+{
+  <STRING_LITERAL>
+}
+
+SimpleNode DeploymentDecl() :
+{
+    Token name;
+    Token archName;
+}
+{
+    <DEPLOYMENT> name=<IDENTIFIER> <EXTENDS> archName=<IDENTIFIER>
+    <NEWLINE> <INDENT> Setters() <DEDENT>
+    { }
+    { return jjtThis; }
+}
+
+void Setters() #void:
+{ }
+{
+    Setter() (Setter())*
+}
+
+void Setter() :
+{ }
+{
+    Lhs() <EQUALS> StringLiteral() <NEWLINE>
+}
+
+void Lhs() :
+{ }
+{
+    Identifier() <DOT> LhsRemaining()
+}
+
+void Identifier() :
+{ }
+{
+    <IDENTIFIER>
+}
+
+void LhsRemaining() :
+{ }
+{
+    LOOKAHEAD(2)
+    Identifier() <DOT> LhsRemaining()
+|
+    Identifier()
+}
+
+void StringLiteral() :
+{ }
+{
+    <STRING_LITERAL>
+}

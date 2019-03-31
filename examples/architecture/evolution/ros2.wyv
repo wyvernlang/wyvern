@@ -1,0 +1,22 @@
+require python
+require stdout
+
+import python:rclpy
+
+def is_shutdown(): Boolean
+	val ret_val: Boolean = rclpy.ok()
+	!ret_val
+
+def log_pub(v: Float): Unit
+	stdout.print("Published: ")
+	stdout.printFloat(v)
+	stdout.print("\n")
+
+def log_recv(v: Float): Unit
+	stdout.print("Received: ")
+	stdout.printFloat(v)
+	stdout.print("\n")
+
+def log(s: String): Unit
+	stdout.print(s)
+	stdout.print("\n")

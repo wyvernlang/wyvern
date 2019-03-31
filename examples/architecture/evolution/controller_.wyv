@@ -1,0 +1,36 @@
+require python
+require stdout
+
+import python:rclpy
+
+import LightPubSubIface_provides_init_
+import ROS
+import ROS2TopicProperties
+import VelocityController
+import LightPubSubIface_provides_
+import ros2
+
+val lpsi_prv_init = LightPubSubIface_provides_init_("controller", python, stdout)
+
+val tProps: ROS2TopicProperties = new
+	val name = "lightValues"
+
+val ros: ROS = new
+	def is_shutdown(): Boolean = ros2.is_shutdown()
+	def log_pub(v: Float): Unit = ros2.log_pub(v)
+	def log_recv(v: Float): Unit = ros2.log_recv(v)
+	def log(s: String): Unit = ros2.log(s)
+	def spin(): Unit
+		if (rclpy.ok())
+				rclpy.spin_once(lpsi_prv_init.get_node())
+				this.spin()
+			else
+				unit
+
+val controller = VelocityController(ros)
+val controller_provides = LightPubSubIface_provides_(lpsi_prv_init, tProps, controller.subLight, python)
+
+controller_provides.init()
+controller.start()
+
+unit

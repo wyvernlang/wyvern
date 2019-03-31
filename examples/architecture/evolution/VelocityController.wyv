@@ -1,0 +1,14 @@
+module def VelocityController(ros: ROS)
+
+import LightPubSubIface
+
+val subLight: LightPubSubIface = new
+	def pubNextValue(v: Float): Unit
+		ros.log_recv(v)
+		if (v < 1000.0)
+				ros.log("Changing velocity to 0")
+			else
+				ros.log("Changing velocity to 0.5")
+
+def start(): Unit
+	ros.spin()

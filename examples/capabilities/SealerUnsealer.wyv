@@ -5,7 +5,6 @@ require stdout
 import wyvern.option
 import wyvern.collections.map
 import wyvern.collections.list
-import wyvern.String
 
 // This example would be a lot nicer if parameterised Option[T]
 // worked! Will rewrite when this bug is fixed. :-)
@@ -51,7 +50,7 @@ resource type SealerUnsealer
      var unsealer:Unsealer
 
 def makeSealerUnsealer():SealerUnsealer
-    var map:Map = map.make((b1:Box,b2:Box) => String.equals(b1.name,b2.name))
+    var map:Map = map.make((b1:Box,b2:Box) => b1.name.equals(b2.name))
     var currentKey:String = "S"
     new
         var sealer:Sealer = new

@@ -1,0 +1,25 @@
+module def LightPubSubIface_requires(node_name: String, topic: ROS1TopicProperties, python: Python, stdout: Stdout)
+
+import python:rospy
+import python:std_msgs
+import python:sys
+
+import wyvern.option
+
+type Option = option.Option
+
+resource type Publisher
+	def publish(v: Dyn): Unit
+
+var pub: Option[Publisher] = option.None[Publisher]()
+
+def init(): Unit
+	rospy.init_node(node_name)
+	pub = option.Some[Publisher](rospy.Publisher(topic.name, std_msgs.msg.Float64))
+
+def pubNextValue(v: Float): Unit
+	val err_pub: Publisher = new
+		def publish(v: Dyn): Unit
+			stdout.print("An error occurred while creating the publisher: " + node_name)
+			sys.exit()
+	pub.getOrElse(() => err_pub).publish(v)

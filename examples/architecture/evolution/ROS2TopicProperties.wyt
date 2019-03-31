@@ -1,0 +1,40 @@
+import wyvern.collections.list
+import wyvern.archast
+import wyvern.ast
+import wyvern.option
+
+type ROS2TopicProperties
+	val name: String
+	/*metadata new
+		def checkPortCompatibility(l : list.List[archast.PortDecl]) : Boolean
+			true
+
+		def generateConnectorImpl(l : list.List[archast.PortDecl]) : list.List[ast.AST]
+				var connectorIface : String = ""
+				val portDecl = l.get(0).getOrElse(() => archast.NonePort)
+				if (portDecl.getRequires() =="")
+						connectorIface = portDecl.getProvides()
+					else
+						connectorIface = portDecl.getRequires()
+				val portList = list.make[ast.AST]()
+				val requires_port = "module def " + connectorIface + "_requires(node_name: String, topic: ROS1TopicProperties, python: Python, stdout: Stdout)\nimport python:rospy\nimport python:std_msgs\nimport python:sys\nimport wyvern.option\ntype Option = option.Option\nresource type Publisher\n\tdef publish(v: Dyn): Unit\nvar pub: Option[Publisher] = option.None[Publisher]()\ndef init(): Unit\n\trospy.init_node(node_name)\npub = option.Some[Publisher](rospy.Publisher(topic.name, std_msgs.msg.Int32))\ndef pubNextValue(v: Int): Unit\nval err_pub: Publisher = new\n\t\tdef publish(v: Dyn): Unit\n\t\t\tstdout.print(\"An error occurred while creating the publisher: \" + node_name)\n\t\t\tsys.exit()\n\tpub.getOrElse(() => err_pub).publish(v)""
+				val provides_port = "module def PubSubIface_provides(prv_init: PubSubIfaceProvidesInit, topic: ROS1TopicProperties, callback: PubSubIface, python: Python)\nimport python:rospy\nimport python:std_msgs\ndef init(): Unit\n\tprv_init.init()\n\trospy.Subscriber(topic.name, std_msgs.msg, (v: Int) => callback.pubNextValue(v))"
+
+				val requiresAST = ast.parseGeneratedModule(requires_port)
+				val providesAST = ast.parseGeneratedModule(provides_port)
+
+				portList.append(requiresAST)
+				portList.append(providesAST)
+				portList
+
+		def generateConnectorInit(portInstances : list.List[ast.AST], compInstances : list.List[archast.ComponentDecl], deployAst : archast.DeployDecl) : list.List[ast.AST]
+			val astList = list.make[ast.AST]()
+			
+			val p = "require python\nrequire stdout\nimport ros1\nimport ROS1TopicProperties\nimport PubSubIface_requires\nimport Publisher\nval tProps: ROS1TopicProperties = new\n\tval name: String = \"topic\"\nval p_publish = PubSubIface_requires(\"publisher\", tProps, python, stdout)\np_publish.init()\nval p = Publisher(p_publish, ros1)\np.start()"
+			val s = "require python\nimport PubSubIface_provides_init\nimport ROS1TopicProperties\nimport Subscriber\nimport PubSubIface_provides\nimport ros1\nval psi_prv_init = PubSubIface_provides_init(\"subscriber\", python)\nval tProps: ROS1TopicProperties = new\n\tval name = \"topic\"\nval subscriber = Subscriber(ros1)\nval s_provides = PubSubIface_provides(psi_prv_init, tProps, subscriber.subscribe, python)\ns_provides.init()\nsubscriber.start()"
+
+			val pAST : ast.AST = ast.parseExpressionNoContext(p)
+			val sAST : ast.AST = ast.parseExpressionNoContext(s)
+			astList.append(sAST)
+			astList.append(pAST)
+			astList*/

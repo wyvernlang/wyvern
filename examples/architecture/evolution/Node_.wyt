@@ -1,0 +1,2 @@
+resource type Node_
+	def create_subscription(msg_type: Dyn, topic_name: String, callback: Dyn): Dyn

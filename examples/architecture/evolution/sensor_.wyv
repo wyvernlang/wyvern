@@ -1,0 +1,35 @@
+require python
+require stdout
+
+import python:rclpy
+
+import ros2
+
+import ROS
+import ROS2TopicProperties
+import LightPubSubIface_requires_
+import LightSensor
+
+val tProps: ROS2TopicProperties = new
+	val name: String = "lightValues"
+
+val sensor_pubLight = LightPubSubIface_requires_("sensor", tProps, python, stdout)
+
+sensor_pubLight.init()
+
+val node = sensor_pubLight.get_node()
+
+val ros:ROS = new
+	def is_shutdown(): Boolean = ros2.is_shutdown()
+	def log_pub(v: Float): Unit = ros2.log_pub(v)
+	def log_recv(v: Float): Unit = ros2.log_recv(v)
+	def log(s: String): Unit = ros2.log(s)
+	def spin(): Unit
+		if (rclpy.ok())
+				rclpy.spin_once(node)
+				this.spin()
+			else
+				unit
+
+val sensor_ = LightSensor(sensor_pubLight, ros)
+sensor_.start()
