@@ -2,7 +2,7 @@ type Generic
   effect E
 
 val u : Generic = new
-  effect E = {system.ffiEffect}
+  effect E = {system.FFI}
 
 type Function
   effect E

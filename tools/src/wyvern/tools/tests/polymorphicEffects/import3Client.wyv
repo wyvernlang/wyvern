@@ -4,15 +4,15 @@ import polymorphicEffects.Go
 import polymorphicEffects.UnitFnWithoutEffect
 import lifted polymorphicEffects.import3Lib
 
-val g : Go [{system.ffiEffect}] = new
+val g : Go [{system.FFI}] = new
     def go (x : Unit -> {} Unit) : {} Unit
         x()
 
-val file1 : File[{system.ffiEffect}] = new
-    effect write = {system.ffiEffect}
+val file1 : File[{system.FFI}] = new
+    effect write = {system.FFI}
     def writeToFile() : {this.write} Unit
         unit
 
-val lib1 = import3Lib[{system.ffiEffect}](file1, g)
+val lib1 = import3Lib[{system.FFI}](file1, g)
 
 "abc"

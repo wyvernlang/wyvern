@@ -252,7 +252,8 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));
-        declTypes.add(new EffectDeclType("ffiEffect", null, null));
+        //declTypes.add(new EffectDeclType("ffiEffect", null, null));
+        declTypes.add(new EffectDeclType("FFI", null, null));
         ValueType systemType = new StructuralType(new BindingSite("this"), declTypes);
         return systemType;
     }
