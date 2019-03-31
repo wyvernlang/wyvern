@@ -46,6 +46,7 @@ public class DefDeclaration extends NamedDeclaration {
         this.type = type;
         body = iExpr;
         this.effectSet = effectSet;
+
     }
 
     @Override

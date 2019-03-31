@@ -295,7 +295,9 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
             return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
         }
         /* resource module translated into method */
-        return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
+        wyvern.target.corewyvernIL.decl.DefDeclaration defDecl =
+                new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation(), effectSet);
+        return defDecl;
     }
 
     public List<ImportDeclaration> getImports() {

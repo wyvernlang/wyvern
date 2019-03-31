@@ -119,6 +119,10 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, Application ast) {
+        ast.getFunction().acceptVisitor(this, state);
+        for (TypedAST typedAST : ast.getArguments()) {
+            typedAST.acceptVisitor(this, state);
+        }
         return null;
     }
 
@@ -129,6 +133,8 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, Assignment ast) {
+        ast.getValue().acceptVisitor(this, state);
+        ast.getTarget().acceptVisitor(this, state);
         return null;
     }
 

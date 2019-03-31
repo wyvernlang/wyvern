@@ -328,7 +328,8 @@ public class ModuleResolver {
                         oldDefDecl.getFormalArgs(),
                         oldDefDecl.getType(),
                         oldDefDecl.getBody(),
-                        oldDefDecl.getLocation()
+                        oldDefDecl.getLocation(),
+                        oldDefDecl.getEffectSet()
                 );
 
                 // Wrap in an object

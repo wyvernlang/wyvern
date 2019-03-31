@@ -458,17 +458,18 @@ public class EffectSystemTests {
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client11", Util.unitType(), Util.unitValue());
     }
 
-//    @Test
-//    public void testSeparation12() throws ParseException {
-//        /* Correctly annotated module def */
-//        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client12", Util.unitType(), Util.unitValue());
-//    }
-//
-//    @Test
-//    public void testSeparation13() throws ParseException {
-//        // Module Def has incorrect effect annotation
-//        expectedException.expect(ToolError.class);
-//        expectedException.expectMessage(StringContains.containsString("incorrect annotation"));
-//        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client13", Util.unitType(), Util.unitValue());
-//    }
+    @Test
+    public void testSeparation12() throws ParseException {
+        /* Correctly annotated module def */
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client12", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testSeparation13() throws ParseException {
+        // Module Def has incorrect effect annotation
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("not a subtype of effects that method produces"));
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client13", Util.unitType(), Util.unitValue());
+    }
+
 }
