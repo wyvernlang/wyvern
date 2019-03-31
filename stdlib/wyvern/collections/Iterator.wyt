@@ -15,5 +15,5 @@ resource type Iterator
     
     // requires this.HasNext
     // ensures this.Owned
-    def next():this.E // throws NoSuchElement if there are no more elements
+    def next():Option[this.E] // throws NoSuchElement if there are no more elements
     
