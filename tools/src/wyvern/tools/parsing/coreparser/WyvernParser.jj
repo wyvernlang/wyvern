@@ -219,8 +219,8 @@ AST ModuleDecl(LinkedList<AST> imports) :
   }
 |
   LOOKAHEAD(5)
-  <MODULE> id = <IDENTIFIER> <COLON> <DSL_LITERAL> [ type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), isResource, true, null);
+  <MODULE> id = <IDENTIFIER> <COLON> effects = <DSL_LITERAL> [ type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
+	return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), isResource, true, effects.image);
   }
 |
   <MODULE> id = <IDENTIFIER> [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {

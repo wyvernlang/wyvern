@@ -472,4 +472,12 @@ public class EffectSystemTests {
         TestUtil.doTestScriptModularly(PATH, "effectSeparation.client13", Util.unitType(), Util.unitValue());
     }
 
+    @Test
+    public void testSeparation14() throws ParseException {
+        // Pure module having non-empty annotation
+        expectedException.expect(ToolError.class);
+        expectedException.expectMessage(StringContains.containsString("Pure module should always have empty effect annotation "));
+        TestUtil.doTestScriptModularly(PATH, "effectSeparation.client14", Util.unitType(), Util.unitValue());
+    }
+
 }

@@ -22,7 +22,9 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
@@ -58,6 +60,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.generics = generics;
         this.isAnnotated = isAnnotated;
         this.effectSet = EffectSet.parseEffects(name, effects, false, location);
+        if (args.isEmpty() && imports.isEmpty() && this.effectSet != null
+                && !this.effectSet.getEffects().isEmpty()) {
+            ToolError.reportError(ErrorMessage.PURE_MODULE_ANNOTATION, FileLocation.UNKNOWN);
+        }
     }
 
     public EffectSet getEffectSet() {
