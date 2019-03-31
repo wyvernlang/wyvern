@@ -114,7 +114,6 @@ TOKEN : /* Keywords */
 | < MATCH: "match" >
 | < IMPORT: "import" >
 | < LIFTED: "lifted" >
-| < ANNOT: "annotated" >
 | < DEFLT: "default" >
 //| < : "" >
 // more here

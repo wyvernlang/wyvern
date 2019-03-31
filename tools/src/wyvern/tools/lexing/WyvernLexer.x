@@ -169,7 +169,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); flagTok = RESULT; :};
  	terminal Token importKwd_t   ::= /import/ in (keywds) {: RESULT = token(IMPORT,lexeme); :};
  	terminal Token liftedKwd_t   ::= /lifted/ in (keywds) {: RESULT = token(LIFTED,lexeme); :};
- 	terminal Token annotKwd_t    ::= /annotated/ in (keywds) {: RESULT = token(ANNOT, lexeme); :};
  	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
  	terminal Token comprisesKwd_t   ::= /comprises/ in (keywds) {: RESULT = token(COMPRISES,lexeme); :};
  	terminal Token extendsKwd_t   ::= /extends/ in (keywds) {: RESULT = token(EXTENDS,lexeme); :};
@@ -337,7 +336,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | taggedKwd_t:t {: RESULT = t; :}
 	       | importKwd_t:t {: RESULT = t; :}
 	       | liftedKwd_t:t {: RESULT = t; :}
-	       | annotKwd_t:t {: RESULT = t; :}
 	       | instantiateKwd_t:t {: RESULT = t; :}
 	       | asKwd_t:t {: RESULT = t; :}
 	       | resourceKwd_t:t {: RESULT = t; :}
