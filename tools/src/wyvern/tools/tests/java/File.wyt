@@ -1,0 +1,12 @@
+import java.Reader
+import java.Writer
+import java.RandomAccessFile
+resource type File
+    effect read
+    effect write
+    effect open
+    effect close
+    def makeReader(f : File): {this.open} Reader
+    def makeWriter(f : File): {this.open} Writer
+    def makeAppender(f : File): {this.open} Writer
+    def makeRandomAccessFile(mode : String, f : File): {this.open}  RandomAccessFile

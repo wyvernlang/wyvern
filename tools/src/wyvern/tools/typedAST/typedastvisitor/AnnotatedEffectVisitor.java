@@ -61,6 +61,7 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
         if (ast.getEffectSet(state) == null) {
             ast.setEmptyEffectSet();
         }
+        ast.getBody().acceptVisitor(this, state);
         return null;
     }
 
@@ -217,6 +218,11 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, Sequence ast) {
+        Iterator<TypedAST> iterator = ast.flatten();
+        while (iterator.hasNext()) {
+            TypedAST next = iterator.next();
+            next.acceptVisitor(this, state);
+        }
         return null;
     }
 

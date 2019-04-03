@@ -1,0 +1,33 @@
+module def fileio(java:Java)
+import java:wyvern.stdlib.support.FileIO.file
+
+// === Library Types ===
+
+type PrintWriter
+    def close():Unit
+
+type BufferedWriter
+    def close():Unit
+
+type FileWriter
+    def close():Unit
+
+type BufferedReader
+    def close():Unit
+    def readLine():String
+
+type FileReader
+    def close():Unit
+
+
+def makeBufferedReader(filename: String): BufferedReader
+    getBufferedReader(filename)
+
+def getBufferedReader(filename: String): BufferedReader
+    file.openForRead(filename)
+	
+def readFile(br:Dyn): String
+    file.readFileIntoString(br)
+
+def writeFile(content:String, filename:String):Unit
+    file.writeStringIntoFile(content,filename)

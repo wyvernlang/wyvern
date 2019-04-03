@@ -1,0 +1,33 @@
+module def hashmap()
+
+import java:wyvern.stdlib.support.HashMapWrapper.hashmapwrapper
+
+resource type HashMap
+	type U
+	type V 
+	val hashmap : Dyn
+	def get(key : this.U) : this.V
+	def put(key : this.U, value : this.V) : this.V
+	def containsKey(key : this.U) : Boolean
+	def clear() : Unit
+	def size() : Int
+	def remove(key : this.U) : this.V
+
+def make[T,S]() : HashMap[T,S]  
+	new (self)=>
+		type U = T
+		type V = S
+		val hashmap = hashmapwrapper.makeHashMap()
+		def get(key : self.U) : self.V
+			self.hashmap.get(key)
+		def put(key : self.U, value : self.V) : self.V
+			self.hashmap.put(key,value)
+		def containsKey(key : self.U) : Boolean
+			self.hashmap.containsKey(key)
+		def clear() : Unit
+			self.hashmap.clear()
+		def size() : Int
+			self.hashmap.size()
+		def remove(key : self.U) : self.V
+			self.hashmap.remove(key)
+

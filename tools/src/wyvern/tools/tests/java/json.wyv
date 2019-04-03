@@ -1,0 +1,23 @@
+module def json(java : Java)
+
+import java:wyvern.stdlib.support.Serializer.serializer
+import dataStructures.hashmap
+
+val hashmap = hashmap()
+
+resource type JSON
+	val jsonmap : Dyn
+	def toString() : String
+
+def serializeToJSON(obj : Dyn) : JSON = new
+	val jsonmap = serializer.makeJSONMap(obj)
+	def toString() : String
+		serializer.toJSONString(this.jsonmap)
+
+def deserializeFromJSON(json : JSON) : Dyn
+	serializer.deserializeFromJSON(json.jsonmap)
+
+def stringToJSON(str : String) : JSON = new
+	val jsonmap = serializer.stringToJSONMap(str)
+	def toString() : String
+		serializer.toJSONString(this.jsonmap)

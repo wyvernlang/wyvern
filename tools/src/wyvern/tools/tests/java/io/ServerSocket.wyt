@@ -1,0 +1,4 @@
+import io.Socket
+
+type ServerSocket
+	def accept() : Socket

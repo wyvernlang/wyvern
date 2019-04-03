@@ -1,0 +1,19 @@
+import thread.ThreadGroup
+
+type Thread
+	val thread : Dyn
+	def start() : Unit
+	def join() : Unit
+	def activeCount() : Int
+	def getId() : Int
+	def getName() : String
+	def getPriority() : Int
+	def getThreadGroup() : ThreadGroup
+	def interrupt() : Unit
+	def isAlive() : Boolean
+	def isDaemon() : Boolean
+	def isInterrupted() : Boolean
+	def setDaemon(d : Boolean) : Unit
+	def setName(name : String) : Unit
+	def setPriority(n : Int) : Unit
+	def toString() : String

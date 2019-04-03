@@ -362,8 +362,9 @@ public class ModuleResolver {
         if (isModule) {
             wyvern.tools.typedAST.core.declarations.ModuleDeclaration decl =
                     (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
+            boolean isPure = decl.getArgs().size() == 0;
             return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
-                    loadingType, decl.isAnnotated());
+                    loadingType, isPure || decl.isAnnotated());
         } else {
             return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType, null);
         }

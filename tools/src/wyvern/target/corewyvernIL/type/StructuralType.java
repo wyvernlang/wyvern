@@ -202,6 +202,10 @@ public class StructuralType extends ValueType {
 
         StructuralType st = (StructuralType) t;
         st = (StructuralType) st.adapt(new ReceiverView(new Variable(st.selfSite), new Variable(selfSite)));
+        if(this.toString().contains("def readLine() : MOD$java.Reader.Option[system.String]")) {
+            System.out.println(this);
+            System.out.println(t);
+        }
 
         TypeContext extendedCtx = ctx.extend(selfSite, this);
         for (DeclType dt : st.getDeclTypes()) {
