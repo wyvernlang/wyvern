@@ -1,3 +1,0 @@
-resource type Runnable
-	def apply() : Unit
-
