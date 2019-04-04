@@ -191,7 +191,7 @@ public abstract class ValueType extends Type implements IASTNode {
      * Some types that are effect-annotated and not effect-unannotated:
      *
      *   type T
-     *     def foo() : {system.ffiEffect} Unit
+     *     def foo() : {system.FFI} Unit
      *
      *   type U
      *     effect E [ = ... ]
@@ -209,7 +209,7 @@ public abstract class ValueType extends Type implements IASTNode {
      * Some types that are neither effect-annotated nor effect-unannotated
      *
      *   type T
-     *     def foo() : {system.ffiEffect} Unit
+     *     def foo() : {system.FFI} Unit
      *     def bar() : Unit
      *
      *   type U

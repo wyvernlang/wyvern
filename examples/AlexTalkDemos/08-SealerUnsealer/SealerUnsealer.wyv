@@ -1,0 +1,286 @@
+// module capabilities
+
+require stdout
+
+import wyvern.option
+import wyvern.collections.map
+import wyvern.collections.list
+import wyvern.String
+
+// This example would be a lot nicer if parameterised Option[T]
+// worked! Will rewrite when this bug is fixed. :-)
+type Option = option.Option
+
+type Map = map.Map
+
+type List = list.List
+
+
+/*
+// JavaScript version building on closures:
+function make_sealer () {
+         var boxes = [], values = [];
+         return {
+		sealer: function (value) {
+			var i = boxes.length, box = {};
+			boxes[i] = box;
+			values[i] = value;
+			return box;
+                },
+		unsealer: function (box) {
+			return values[boxes.indexOf(box)];
+                }
+         };
+}
+*/
+
+type Box
+     type T
+     val name:String
+
+resource type Sealer
+     def seal(object:Option):Box[object.T]
+
+resource type Unsealer
+     def unseal(box:Box):Option[box.T]
+
+// This example would be a lot nicer if we can pass tuples or pairs as
+// return type! Will rewrite when supported. :-)
+resource type SealerUnsealer
+     var sealer:Sealer
+     var unsealer:Unsealer
+
+def makeSealerUnsealer():SealerUnsealer
+    var map:Map = map.make((b1:Box,b2:Box) => (b1.name.equals(b2.name)))
+    var currentKey:String = "S"
+    new
+        var sealer:Sealer = new
+            def seal(object:Option):Box[object.T]
+                val newBox = new
+                    type T = object.T
+                    val name:String = currentKey + "S" // This needs to be made more secure than this!!!
+                map.put(newBox,object)
+                newBox
+        var unsealer:Unsealer = new
+            def unseal(box:Box):Option[box.T]
+                map.get(box)
+
+
+/*
+# http://wiki.erights.org/wiki/Walnut/Secure_Distributed_Computing/Capability_Patterns#Sealers_and_Unsealers
+# E version that may have concurrency issues due to using "shared" variable in non-E languages:
+def makeBrandPair(nickname) {
+     def noObject{}
+     var shared := noObject
+     def makeSealedBox(obj) {
+         def box {
+             to shareContent() {shared := obj}
+         }
+         return box
+     }
+     def sealer {
+         to seal(obj) {return makeSealedBox(obj)}
+     }
+     def unsealer {
+         to unseal(box) {
+             shared := noObject
+             box.shareContent()
+             if (shared == noObject) {throw("invalid box")}
+             def contents := shared
+             shared := noObject
+             return contents
+         }
+     }
+     return [sealer, unsealer]
+}
+*/
+
+resource type SealedBox
+    type T
+    def shareContent():Unit
+
+resource type BrandSealer
+    type T
+    def seal(object:Option[this.T]):SealedBox[this.T]
+
+resource type BrandUnsealer
+    type T
+    def unseal(box:SealedBox[this.T]):Option[this.T]
+
+resource type BrandPair
+    type T
+    var name:String
+    var sealer:BrandSealer[this.T]
+    var unsealer:BrandUnsealer[this.T]
+
+def makeBrandPair[T](name:String):BrandPair[T]
+    var shared:Option[T] = option.None[T]()
+    def makeSealedBox(object:Option[T]):SealedBox[T]
+        val newBox:SealedBox[T] = new
+            type T = T
+            def shareContent():Unit
+                shared = object
+        newBox
+    new
+        type T = T
+        var name:String = name
+        var sealer:BrandSealer[T] = new
+            type T = T
+            def seal(object:Option[T]):SealedBox[T]
+                makeSealedBox(object)
+        var unsealer:BrandUnsealer[T] = new
+            type T = T
+            def unseal(box:SealedBox[T]):Option[T]
+                shared = option.None[T]()
+                box.shareContent()
+                var result:Option[T] = shared
+                result
+
+// Simple example of using brand pair from E Wiki:
+var alexBrandPair:BrandPair[String] = makeBrandPair[String]("Alex")
+var jonathanBrandPair:BrandPair[String] = makeBrandPair[String]("Jonathan")
+
+var alexBox:SealedBox[String] = alexBrandPair.sealer.seal(option.Some("Alex's Secret"))
+var jonathanBox:SealedBox[String] = jonathanBrandPair.sealer.seal(option.Some("Jonathan's Secret"))
+
+var string:String = "Sealer and Unsealer Example\n"
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: Alex's Secret\n")
+var result:Option[String] = alexBrandPair.unsealer.unseal(alexBox)
+string = result.getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: Jonathan's Secret\n")
+result = jonathanBrandPair.unsealer.unseal(jonathanBox)
+string = result.getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: NOTHING FOUND IN ALEX BOX\n")
+result = jonathanBrandPair.unsealer.unseal(alexBox)
+string = result.getOrElse(() => "NOTHING FOUND IN ALEX BOX")
+stdout.print(string + "\n")
+
+stdout.print("SHOULD BE: NOTHING FOUND IN JONATHAN BOX\n")
+result = alexBrandPair.unsealer.unseal(jonathanBox)
+string = result.getOrElse(() => "NOTHING FOUND IN JONATHAN BOX")
+stdout.print(string + "\n")
+
+stdout.print("\nMINT EXAMPLE:\n")
+
+// Mint Example from E:
+/*
+def makeMint(name) :any {
+    def [sealer, unsealer] := makeBrandPair(name)
+    def mint {
+        to __printOn(out) :void { out.print(`<$name's mint>`) }
+ 
+        to makePurse(var balance :(int >= 0)) :any {
+            def decr(amount :(0..balance)) :void {
+                balance -= amount
+            }
+            def purse {
+                to __printOn(out) :void {
+                    out.print(`<has $balance $name bucks>`)
+                }
+                to getBalance() :int { return balance }
+                to sprout()     :any { return mint.makePurse(0) }
+                to getDecr()    :any { return sealer.seal(decr) }
+
+                to deposit(amount :int, src) :void {
+                    unsealer.unseal(src.getDecr())(amount)
+                    balance += amount
+                }
+            }
+            return purse
+        }
+    }
+    return mint
+}
+*/
+
+resource type Mint
+     def makePurse(balance:Int):Purse
+     def print():Unit
+
+resource type Purse
+     def getBalance():Int
+     def sprout():Purse
+     def getDecr():SealedBox[Int -> Unit]
+     def deposit(amount:Int, src:Purse):Unit
+     def print():Unit
+
+def makeMint(name:String):Mint
+    var brandPair:BrandPair[Int -> Unit] = makeBrandPair[Int -> Unit](name)
+    val blankBox:SealedBox[Int -> Unit] = new
+        type T = Int -> Unit
+        def shareContent():Unit
+            stdout.print("This is a blank box.")
+    new (selfMint) =>
+        def makePurse(balance:Int):Purse
+            var balance:Int = balance
+            val decr:Int -> Unit = ((amount:Int) => (balance = balance - amount))
+            new (selfPurse) =>
+                def getBalance():Int = balance
+                def sprout():Purse = selfMint.makePurse(0)
+                def getDecr():SealedBox[Int -> Unit] = brandPair.sealer.seal(option.Some(decr))
+                def deposit(amount:Int, src:Purse):Unit
+                    var option:Option[Int -> Unit] = brandPair.unsealer.unseal(src.getDecr())
+                    option.getOrElse(() => (a:Int) => stdout.print("Blank box detected"))(amount)
+                    balance = balance + amount
+                def print():Unit
+                    stdout.print("Purse that has ")
+                    stdout.printInt(balance)
+                    stdout.print(" bucks from mint named " + brandPair.name + "\n")
+        def print():Unit
+            stdout.print("Mint named " + brandPair.name + "\n")
+
+/*
+? def carolMint := makeMint("Carol")
+# value: <Carol's mint>
+
+? def aliceMainPurse := carolMint.makePurse(1000)
+# value: <has 1000 Carol bucks>
+
+? def bobMainPurse := carolMint.makePurse(0)
+# value: <has 0 Carol bucks>
+
+? def paymentForBob := aliceMainPurse.sprout()
+# value: <has 0 Carol bucks>
+
+? paymentForBob.deposit(10, aliceMainPurse)
+
+# See: http://erights.org/elib/capability/ode/ode-capabilities.html
+
+? bobMainPurse.deposit(10, paymentForBob)
+
+? bobMainPurse.getBalance()
+# value: 10
+ 
+? aliceMainPurse.getBalance()
+# value: 990
+*/
+
+var carolMint:Mint = makeMint("Carol")
+carolMint.print()
+
+var aliceMainPurse:Purse = carolMint.makePurse(1000)
+aliceMainPurse.print()
+stdout.print("This should be 1000:\n")
+stdout.printInt(aliceMainPurse.getBalance())
+stdout.print("\n")
+
+var bobMainPurse:Purse = carolMint.makePurse(0)
+bobMainPurse.print()
+
+var paymentForBob:Purse = aliceMainPurse.sprout()
+paymentForBob.print()
+
+paymentForBob.deposit(10, aliceMainPurse)
+paymentForBob.print()
+
+bobMainPurse.deposit(10, paymentForBob)
+stdout.print("Should be 10:\n")
+bobMainPurse.print()
+stdout.print("Should be 990:\n")
+aliceMainPurse.print()

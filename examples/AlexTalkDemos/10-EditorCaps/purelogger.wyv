@@ -1,0 +1,6 @@
+module def purelogger():Logger
+
+effect log = {}
+
+def log(msg : String) : Unit
+  unit // do nothing

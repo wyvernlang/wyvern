@@ -54,7 +54,7 @@ public class EffectAnnotationTests {
     @Test
     public void testBasic2() throws ParseException {
         assertAnnotationStatus(true, false,
-                "def foo() : {system.ffiEffect} Unit"
+                "def foo() : {system.FFI} Unit"
         );
     }
 
@@ -75,7 +75,7 @@ public class EffectAnnotationTests {
     @Test
     public void testBasic5() throws ParseException {
         assertAnnotationStatus(true, false,
-                "effect E = {system.ffiEffect}"
+                "effect E = {system.FFI}"
         );
     }
 
@@ -113,7 +113,7 @@ public class EffectAnnotationTests {
     @Test
     public void testBasic10() throws ParseException {
         assertAnnotationStatus(false, false,
-                "def foo() : {system.ffiEffect} Unit",
+                "def foo() : {system.FFI} Unit",
                 "def bar() : Unit"
         );
     }
@@ -138,7 +138,7 @@ public class EffectAnnotationTests {
     public void testBasic13() throws ParseException {
         assertAnnotationStatus(false, false,
                 "def bar() : Unit",
-                "effect E = {system.ffiEffect}"
+                "effect E = {system.FFI}"
         );
     }
 
@@ -181,7 +181,7 @@ public class EffectAnnotationTests {
     @Test
     public void testBasic19() throws ParseException {
         assertAnnotationStatus(true, false,
-                "type U = MyType[Int, {system.ffiEffect}]"
+                "type U = MyType[Int, {system.FFI}]"
         );
     }
 }

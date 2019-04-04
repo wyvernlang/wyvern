@@ -147,6 +147,7 @@ public final class Globals {
         genCtx = new TypeOrEffectGenContext("String", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Character", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Boolean", system, genCtx);
+        genCtx = new TypeOrEffectGenContext("Any", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Nothing", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Dyn", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Java", system, genCtx);
@@ -231,6 +232,7 @@ public final class Globals {
         ValueType charType = new StructuralType("charSelf", charDeclTypes);
         declTypes.add(new ConcreteTypeMember("Character", charType));
 
+        declTypes.add(new ConcreteTypeMember("Any", Util.anyType()));
         declTypes.add(new ConcreteTypeMember("Nothing", new BottomType()));
         declTypes.add(new ConcreteTypeMember("Dyn", new DynamicType()));
         NominalType systemPlatform = new NominalType("this", "Platform");
@@ -252,7 +254,8 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("Python", pythonTagType));
         declTypes.add(new AbstractTypeMember("Context"));
         declTypes.add(new ValDeclType("unit", Util.unitType()));
-        declTypes.add(new EffectDeclType("ffiEffect", null, null));
+        //declTypes.add(new EffectDeclType("ffiEffect", null, null));
+        declTypes.add(new EffectDeclType("FFI", null, null));
         ValueType systemType = new StructuralType(new BindingSite("this"), declTypes);
         return systemType;
     }
@@ -289,6 +292,7 @@ public final class Globals {
         decls.add(new TypeDeclaration("String", new NominalType("this", "String"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Character", new NominalType("this", "Character"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Dyn", new DynamicType(), FileLocation.UNKNOWN));
+        decls.add(new TypeDeclaration("Any", Util.anyType(), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Nothing", new BottomType(), FileLocation.UNKNOWN));
         decls.add(platformTypeDeclaration("Platform"));
         decls.add(platformTypeDeclaration("Java"));

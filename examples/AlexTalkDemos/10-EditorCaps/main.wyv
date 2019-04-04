@@ -1,0 +1,18 @@
+require stdout
+
+import editor
+
+import Logger
+import logger
+import purelogger
+
+val logger:Logger = logger(stdout)
+val purelogger:Logger = purelogger()
+val editorBad = editor(logger)
+val editorGood = editor(purelogger)
+
+def main() : Unit
+  editorBad.run()
+  editorGood.run()
+
+main()

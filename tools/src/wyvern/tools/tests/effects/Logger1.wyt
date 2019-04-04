@@ -1,2 +1,2 @@
 resource type Logger1
-    def updateLog(x: Int): {system.ffiEffect} Int
+    def updateLog(x: Int): {system.FFI} Int

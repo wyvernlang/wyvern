@@ -2,8 +2,8 @@
 import polymorphicEffects.File
 import lifted polymorphicEffects.lib
 
-val file : File[{system.ffiEffect}] = new
-    effect write = {system.ffiEffect}
+val file : File[{system.FFI}] = new
+    effect write = {system.FFI}
     def writeToFile() : {this.write} Unit
         unit
 

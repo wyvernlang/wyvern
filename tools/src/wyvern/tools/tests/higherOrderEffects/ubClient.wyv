@@ -6,8 +6,8 @@ val ubFile : UbFile[{}] = new
     def writeToFile(f : Unit -> {} Unit) : {} Unit
         unit
 
-// This causes an error since ffiEffect is not in the upper bound
-val ublib = ubLib[{system.ffiEffect}](ubFile)
+// This causes an error since FFI is not in the upper bound
+val ublib = ubLib[{system.FFI}](ubFile)
 
 "abc"
 

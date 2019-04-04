@@ -1,0 +1,84 @@
+require stdout
+
+import wyvern.option
+
+type Option = option.Option
+
+resource type BinaryTree
+  var value:String
+  var left:Option[BinaryTree]
+  var right:Option[BinaryTree]
+  def print():Unit
+  def setLeft(bt:BinaryTree):Unit
+  def setRight(bt:BinaryTree):Unit
+
+def makeSingletonTree(newValue:String):BinaryTree = new
+  var value:String = newValue
+  var left:Option[BinaryTree] = option.None[BinaryTree]()
+  var right:Option[BinaryTree] = option.None[BinaryTree]()
+  def print():Unit = match this.left:
+    l:option.None => match this.right:
+      r:option.None =>
+        stdout.print("Tree with value: \"")
+        stdout.print(this.value)
+        stdout.print("\" that has no left or right children.\n")
+      r:option.Some[BinaryTree] =>
+        stdout.print("Tree with value: \"")
+        stdout.print(this.value)
+        stdout.print("\" that has only right child.\n")
+        stdout.print("Right child is:\n")
+        r.content.print()
+    l:option.Some[BinaryTree] => match this.right:
+      r:option.None =>
+        stdout.print("Tree with value: \"")
+        stdout.print(this.value)
+        stdout.print("\" that has only left child.\n")
+        stdout.print("Left child is:\n")
+        l.content.print()
+      r:option.Some[BinaryTree] =>
+        stdout.print("Tree with value: \"")
+        stdout.print(this.value)
+        stdout.print("\" that has both children.\n")
+        stdout.print("Left child is:\n")
+        l.content.print()
+        stdout.print("Right child is:\n")
+        r.content.print()
+
+/*    
+    if(this.left.isDefined && this.right.isDefined)
+        stdout.print("Tree with value: \"")
+        stdout.print(this.value)
+        stdout.print("\" that has both children.\n")
+        stdout.print("Left child is:\n")
+        this.left.getOrElse(() => makeSingletonTree("null")).print()
+        stdout.print("Right child is:\n")
+        this.right.getOrElse(() => makeSingletonTree("null")).print()
+      else
+        if(this.left.isDefined)
+            stdout.print("Tree with value: \"")
+            stdout.print(this.value)
+            stdout.print("\" that has only left child.\n")
+            stdout.print("Left child is:\n")
+            this.left.getOrElse(() => makeSingletonTree("null")).print()
+          else
+            if(this.right.isDefined)
+                stdout.print("Tree with value: \"")
+                stdout.print(this.value)
+                stdout.print("\" that has only right child.\n")
+                stdout.print("Right child is:\n")
+                this.right.getOrElse(() => makeSingletonTree("null")).print()
+              else
+                stdout.print("Tree with value: \"")
+                stdout.print(this.value)
+                stdout.print("\" that has no left or right children.\n")
+*/
+  def setLeft(bt:BinaryTree):Unit
+    this.left = option.Some[BinaryTree](bt)
+  def setRight(bt:BinaryTree):Unit
+    this.right = option.Some[BinaryTree](bt)
+
+var tree:BinaryTree = makeSingletonTree("root")
+tree.setLeft(makeSingletonTree("left"))
+tree.setRight(makeSingletonTree("right"))
+
+tree.print()

@@ -1,0 +1,5 @@
+module def logger(res : polymorphicEffects.Resource)
+
+effect log = {res.wr}
+def append(contents : String) : {log} Unit
+    unit

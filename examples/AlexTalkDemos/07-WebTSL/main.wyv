@@ -1,0 +1,17 @@
+require stdout
+
+import metadata html
+import metadata xml
+
+val h:html.HTMLExpr = ~
+  <html>
+
+stdout.print(h.eval() + "\n")
+
+val x:xml.XMLExpr = ~
+  <xml>
+
+stdout.print(x.eval() + "\n")
+
+// val hError:html.HTMLExpr = ~
+//   <xml>

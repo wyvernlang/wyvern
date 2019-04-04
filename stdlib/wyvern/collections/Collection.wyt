@@ -1,4 +1,4 @@
-import Iterator
+import wyvern.collections.Iterator
 
 type Collection
 	// foldr, foldl, map, isEmpty, reduce, iterator, size, do
@@ -18,6 +18,6 @@ type Collection
 	// f causes some side effects
 	def do(f:this.E -> Unit):Unit
 	// apply f to each element in the collection to get a new collection
-	def map[T](f:this.E->T):LinkedList[T]
+	def map[T](f:this.E->T):Collection[T]
 	// check if the collection is empty
 	def isEmpty():Boolean

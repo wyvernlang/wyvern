@@ -1,8 +1,8 @@
 type Generic
   effect E
 
-// {system.ffiEffect} is a subset of {system.ffiEffect}, so OK
-val u : Generic[{system.ffiEffect}] = new
-  effect E = {system.ffiEffect}
+// {system.FFI} is a subset of {system.FFI}, so OK
+val u : Generic[{system.FFI}] = new
+  effect E = {system.FFI}
 
 "abc"

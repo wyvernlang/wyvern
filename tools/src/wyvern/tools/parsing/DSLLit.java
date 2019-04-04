@@ -8,6 +8,7 @@ import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
@@ -87,7 +88,11 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
                 ValDeclaration valueDecl = (ValDeclaration) ((ObjectValue) parsedAST).findDecl("value", false);
                 ObjectValue astWrapper = (ObjectValue) valueDecl.getDefinition();
                 ValDeclaration astDecl = (ValDeclaration) ((ObjectValue) astWrapper).findDecl("ast", false);
-                return (Expression) ((JavaValue) astDecl.getDefinition()).getWrappedValue();
+                IExpr definition = astDecl.getDefinition();
+                if (definition instanceof JavaValue) {
+                    definition = (IExpr) ((JavaValue) definition).getWrappedValue();
+                }
+                return (Expression) definition;
             } else {
                 ToolError.reportError(ErrorMessage.TSL_ERROR, this, "[detailed TSL error messages not supported yet]");
                 throw new RuntimeException("can't get here");

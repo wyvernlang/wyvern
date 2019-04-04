@@ -4,7 +4,7 @@ import polymorphicEffects.Go
 import polymorphicEffects.UnitFnWithoutEffect
 import lifted polymorphicEffects.import3Lib
 
-val g : Go [{system.ffiEffect}] = new
+val g : Go [{system.FFI}] = new
     def go (x : Unit -> {} Unit) : {} Unit
         x()
 

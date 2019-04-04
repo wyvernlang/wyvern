@@ -222,6 +222,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
             final BindingSite internalSite = lt.getSpec().getSite();
             methodContext = methodContext.extend(internalSite, new Variable(internalSite), lt.getSpec().getType());
             // include the type abbreviation
+            methodContext = ImportDeclaration.addDepsToCtx(lt, methodContext);
             methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalSite, methodContext);
             if (dependencies != null) {
                 dependencies.add(lt.getSpec());
