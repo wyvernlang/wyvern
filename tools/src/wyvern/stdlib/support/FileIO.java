@@ -12,6 +12,9 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.math.BigInteger;
+
 
 public class FileIO {
     public static final FileIO file = new FileIO();
@@ -171,6 +174,50 @@ public class FileIO {
     
     public void writeByteFileOutputStream(FileOutputStream f, int b) throws IOException {
         f.write(b);
+    }
+    
+    public void writeArbitraryPrecisionInteger(FileOutputStream f, BigInteger n) throws IOException {
+        int size = n.bitLength();
+        if(size > 127) { //might want to catch case where size > 255
+            f.write(size); //need to find out how many bytes needed
+            byte[] realSizeBytes = new byte[size - 128];
+            for(int i = 128; i < size; i++) {
+                f.write(0);
+            }
+            f.write(realSizeBytes);
+        } else {
+            f.write(size);
+        }
+    }
+    
+    public BigInteger readArbitraryPrecisionInteger(FileInputStream f) throws IOException {
+        int size = f.read();
+        if(size > 127) {
+            byte[] realSizeBytes = new byte[size - 128];
+            for(int i = 128; i < size; i++) {
+                //realSizeBytes[i - 128] = f.read();
+            }
+            
+        }
+        return BigInteger.ZERO;
+    }
+    
+    
+    
+    /** for the byte array abstraction **/
+    
+    public byte[] makeByteArray(int size) {
+        return new byte[size];
+    }
+    
+    public void setByteArray(Object b, int i, byte n) {
+        byte[] a = (byte[]) b;
+        a[i] = n;
+    }
+    
+    public byte getByteArray(Object b, int i) {
+        byte[] a = (byte[]) b;
+        return a[i];
     }
 
 

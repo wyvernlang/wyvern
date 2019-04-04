@@ -1,3 +1,6 @@
 import fileSystem.File
 type FileSystem
+    effect Read
+    effect Write
+    effect Append
     def makeFile(path: String): File

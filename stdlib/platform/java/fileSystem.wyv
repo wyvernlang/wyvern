@@ -13,6 +13,10 @@ import fileSystem.BinaryWriter
 import wyvern.option
 type Option = option.Option
 
+effect Read = {system.FFI}
+effect Write = {system.FFI}
+effect Append = {system.FFI}
+
 
 def makeFile(path: String) : File = new
     val f : Unit = file.createNewFile(path)
@@ -20,7 +24,7 @@ def makeFile(path: String) : File = new
     def makeReader() : Reader
         val br = file.openBRForRead(this.f)
         new
-            def read() : Int
+            def read() : {this.f.read} Int
                 file.readCharFromFile(br)
             def readLine() : Option[String]
                 val line = file.readLineFromFile(br)
@@ -95,6 +99,7 @@ def makeFile(path: String) : File = new
                 if (numBytes > 0)
                     this.writeBytes(b/256, numBytes - 1)
                     file.writeByteFileOutputStream(bw, b)
+			
             def close() : Unit
                 file.closeFileOutputStream(bw)
     

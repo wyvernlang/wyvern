@@ -1,4 +1,7 @@
 resource type BinaryReader
     def read():Int
-    def readBytes(numBytes:Int):Int
+	//read/write int (specify integer and size)
+	//write short, write long, specific data sizes
+    def readBytes(numBytes:Int):Int //implement byte array and put in that
+    def readUTF():String
     def close():Unit
