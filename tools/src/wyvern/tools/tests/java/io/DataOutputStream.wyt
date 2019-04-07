@@ -1,3 +1,0 @@
-type DataOutputStream
-	def writeUTF(str : String) : Unit
-	def close() : Unit

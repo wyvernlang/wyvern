@@ -1,3 +1,0 @@
-resource type Writer
-    def write(s: String): {} Unit
-    def close(): {} Unit
