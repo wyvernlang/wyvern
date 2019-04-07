@@ -2,7 +2,11 @@ import fileSystem.Reader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
 resource type File
-    def makeReader():Reader
-    def makeWriter():Writer
-    def makeAppender():Writer
-    def makeRandomAccessFile(mode : String):RandomAccessFile
+    effect read
+    effect write
+    effect open
+    effect close
+    def makeReader(): {this.open} Reader
+    def makeWriter(): {this.open} Writer
+    def makeAppender(): {this.open} Writer
+    def makeRandomAccessFile(mode : String): {this.open} RandomAccessFile

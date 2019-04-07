@@ -1,8 +1,10 @@
 import wyvern.option
 type Option = option.Option
 resource type Reader
+    effect read
+    effect close
     /* add read for UTF and bytes */
-    def read():Int
-    def readLine():Option[String]
-    def readFully():String
-    def close():Unit
+    def read(): {this.read} Int
+    def readLine(): {this.close} Option[String]
+    def readFully(): {this.read} String
+    def close(): {this.close} Unit
