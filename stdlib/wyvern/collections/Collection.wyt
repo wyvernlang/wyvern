@@ -4,9 +4,9 @@ type Collection
 	// foldr, foldl, map, isEmpty, reduce, iterator, size, do
 	type E //type of the Collection
 	// reduce the elements in the collection with f from right to left
-	def foldr[T](f:this.E*T->T, x:T):T
+	def foldRight[T](f:this.E*T->T, x:T):T
 	// reduce the elements in the collection with f from left to right
-	def foldl[T](f:T*this.E->T, x:T):T
+	def foldLeft[T](f:T*this.E->T, x:T):T
 	// reduce the elements in the collection with f in parallel
 	// f must be associative, x must be identity
 	def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
