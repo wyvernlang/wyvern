@@ -1,0 +1,14 @@
+import wyvern.collections.Iterator
+
+type List
+		type E
+		def size() : Int
+		def isEmpty() : Boolean
+		def do(f:this.E->Unit):Unit
+		def iterator(): Iterator[this.E]
+		def map[U](f:this.E->U):List[U]
+		def foldLeft[U](f:U*this.E->U, x:U):U
+		def foldRight[U](f:this.E*U->U, x:U):U
+		def reverse():List[this.E]
+		def reduce(f:this.E*this.E=>this.E, id:this.E):this.E
+		def filter(f:this.E->Boolean):List[this.E]
