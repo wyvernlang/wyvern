@@ -29,7 +29,6 @@ resource type ArrayList
     def reduce(f:this.E*this.E=>this.E, id:this.E):this.E
     def filter(f:this.E->Boolean):ArrayList[this.E]
 
-
 def ArrayList[T](count : Int) : ArrayList[T] = new
     type E = T
     var array : Unit = arr.create(count) 

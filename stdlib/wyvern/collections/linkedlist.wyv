@@ -15,6 +15,8 @@ tagged type LinkedList comprises Cons, Nil
 	def size():Int 
 	def do(f:this.E->Unit):Unit
 	def nth(i:Int):Option[this.E]
+	def get(index:Int):this.E
+	def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
 	def take(n:Int):Option[LinkedList[this.E]]
 	def drop(n:Int):Option[LinkedList[this.E]]
 	def foldRight[T](f:this.E*T->T, x:T):T
@@ -32,6 +34,8 @@ tagged type Nil extends LinkedList
 	def size():Int 
 	def do(f:this.E->Unit):Unit
 	def nth(i:Int):Option[this.E]
+	def get(index:Int):this.E
+	def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
 	def take(n:Int):Option[LinkedList[this.E]]
 	def drop(n:Int):Option[LinkedList[this.E]]
 	def foldRight[T](f:this.E*T->T, x:T):T
@@ -45,23 +49,25 @@ tagged type Nil extends LinkedList
 	def iterator():Iterator[this.E]
 
 tagged type Cons extends LinkedList 
-    type E
-    def size():Int 
-    def do(f:this.E->Unit):Unit
-    val next:LinkedList[this.E]
-    def take(n:Int):Option[LinkedList[this.E]]
-    def drop(n:Int):Option[LinkedList[this.E]]
-    val value:this.E
-    def nth(i:Int):Option[this.E]
-    def foldRight[T](f:this.E*T->T, x:T):T
-    def foldLeft[T](f:T*this.E->T, x:T):T
-    def map[T](f:this.E->T):LinkedList[T]
-    def reverse():LinkedList[this.E]
-    def append(R:LinkedList[this.E]):LinkedList[this.E]
-    def filter(f:this.E->Boolean):LinkedList[this.E]
-    def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
-    def isEmpty():Boolean
-    def iterator():Iterator[this.E]
+	type E
+	val value:this.E
+	def size():Int 
+	def do(f:this.E->Unit):Unit
+	def nth(i:Int):Option[this.E]
+	val next:LinkedList[this.E]
+	def get(index:Int):this.E
+	def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
+	def take(n:Int):Option[LinkedList[this.E]]
+	def drop(n:Int):Option[LinkedList[this.E]]
+	def foldRight[T](f:this.E*T->T, x:T):T
+	def foldLeft[T](f:T*this.E->T, x:T):T
+	def map[T](f:this.E->T):LinkedList[T]
+	def reverse():LinkedList[this.E]
+	def append(R:LinkedList[this.E]):LinkedList[this.E]
+	def filter(f:this.E->Boolean):LinkedList[this.E]
+	def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
+	def isEmpty():Boolean
+	def iterator():Iterator[this.E]
   
 def Nil[U]():Nil[U] = new
 	type E = U
@@ -71,6 +77,10 @@ def Nil[U]():Nil[U] = new
 	def foldRight[T](f:U*T->T, x:T):T = x
 	def foldLeft[T](f:T*U->T, x:T):T = x
 	def nth(i:Int):Option[U] = option.None[U]()
+	def get(i:Int):U
+		runtime.fail("Error: index out of bounds")
+	def indexOf(x:U, compare:U*U->Boolean):Int
+		-1
 	def take(n:Int):Option[LinkedList[U]]
 		if(n<0 || (n>0))
 		  option.None[LinkedList[U]]()
@@ -107,15 +117,27 @@ def Cons[U](x:U, list:LinkedList[U]):Cons[U] = new
 		f(this.value)
 		list.do(f)
 	def nth(i:Int):Option[U] 
-		//assert i>-1
-		//assert i<(this.size())
 		if(i<0 || (i>(list.size())))
 		  option.None[U]()
 		 else
 		  if(i==0) {option.Some[U](this.value)} else {list.nth(i-1)}
+	def get(i:Int):U
+		val nthResult = this.nth(i)
+		match nthResult:
+			n:None => runtime.fail("Error: index out of bounds")
+			s:Some => s.content
+    /* 
+    indexOf is not tail-recursive. 
+	If use this.foldLeft, then we will unnecessarily traverse through
+	the whole linkedlist.  
+    */
+	def indexOf(x: U, compare: U*U->Boolean):Int 
+		if(compare(this.value, x))
+		  0
+		 else 
+		  val listIndexOf = list.indexOf(x, compare)
+		  if(listIndexOf == -1) {-1} else {1+listIndexOf}
 	def take(n:Int):Option[LinkedList[U]]
-		//assert n>-1
-		//assert n<(this.size())
 		if(n<0 || (n>(list.size())))
 		  option.None[LinkedList[U]]()
 		 else
