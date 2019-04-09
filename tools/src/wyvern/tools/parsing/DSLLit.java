@@ -105,6 +105,9 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
                 }
             }
             FileLocation loc = e.getLocation();
+            if (loc == null) {
+                loc = new FileLocation("", 0, 0);
+            }
             FileLocation myLoc = this.getLocation();
             FileLocation newLoc = new FileLocation(myLoc.getFilename(), myLoc.getLine() + loc.getLine() - 1, myLoc.getCharacter() + loc.getCharacter() - 1);
             ToolError updatedE = e.withNewLocation(newLoc);

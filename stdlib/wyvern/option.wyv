@@ -1,10 +1,13 @@
 module option
 
+import wyvern.runtime
+
 tagged type Option comprises Some, None
     type T
     def map[U](f:this.T -> U):Option[U] // T -> U is a resource function type (as opposed to non-resource/pure with =>)
     def flatMap[U](f:this.T -> Option[U]):Option[U]
     def getOrElse(x1:Unit -> this.T):this.T
+    def get():this.T
     def orElse(x:Unit -> Option[this.T]):Option[this.T]
     val isDefined:Boolean
     
@@ -14,6 +17,7 @@ tagged type Some extends Option
     def map[U](f:this.T -> U):Option[U]
     def flatMap[U](f:this.T -> Option[U]):Option[U]
     def getOrElse(x1:Unit -> this.T):this.T
+    def get():this.T
     def orElse(x:Unit -> Option[this.T]):Option[this.T]
     val isDefined:Boolean
 
@@ -22,6 +26,7 @@ tagged type None extends Option
     def map[U](f:this.T -> U):Option[U]
     def flatMap[U](f:this.T -> Option[U]):Option[U]
     def getOrElse(x1:Unit -> this.T):this.T
+    def get():this.T
     def orElse(x:Unit -> Option[this.T]):Option[this.T]
     val isDefined:Boolean 
 	
@@ -31,6 +36,7 @@ def Some[T](x:T):Some[T] = new
     def map[U](f:T -> U):Option[U] = Some[U](f(x))
     def flatMap[U](f:T -> Option[U]):Option[U] = f(x)
     def getOrElse(defaultValue:Unit -> T):T = x
+    def get():T = x
     val value:T = x
     def orElse(x:Unit -> Option[T]):Option[T] = this
     val isDefined:Boolean = true
@@ -40,5 +46,6 @@ def None[T]():None[T] = new
     def map[U](f:T -> U):Option[U] = None[U]()
     def flatMap[U](f:T -> Option[U]):Option[U] = None[U]()
     def getOrElse(defaultValue:Unit -> T):T = defaultValue()
+    def get():T = runtime.fail("called get() on an Option that was None")
     def orElse(x:Unit -> Option[T]):Option[T] = x()
     val isDefined:Boolean = false
