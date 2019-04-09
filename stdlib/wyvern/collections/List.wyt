@@ -5,6 +5,8 @@ type List
 		def size() : Int
 		def isEmpty() : Boolean
 		def do(f:this.E->Unit):Unit
+		def get(index:Int):this.E
+		def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
 		def iterator(): Iterator[this.E]
 		def map[U](f:this.E->U):List[U]
 		def foldLeft[U](f:U*this.E->U, x:U):U
