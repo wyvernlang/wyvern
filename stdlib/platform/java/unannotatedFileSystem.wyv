@@ -1,3 +1,0 @@
-module def unannotatedFileSystem(x : Int)
-def makeFile(path : String) : Unit
-    unit

@@ -1,3 +1,0 @@
-module def filedef2(y : Int) : effectSeparation.File
-def x() : Unit
-    unit

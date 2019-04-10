@@ -1,3 +1,0 @@
-module lib
-def func() : Unit
-    unit

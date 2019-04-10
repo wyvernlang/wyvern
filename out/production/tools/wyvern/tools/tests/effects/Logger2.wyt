@@ -1,2 +1,0 @@
-resource type Logger2
-    def updateLog(x: Int): Int

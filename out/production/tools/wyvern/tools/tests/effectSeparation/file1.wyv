@@ -1,6 +1,0 @@
-module file1 : {} effectSeparation.File
-def x() : {} Unit
-    unit
-
-def y() :  String
-    "abc"

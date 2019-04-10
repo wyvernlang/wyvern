@@ -1,3 +1,0 @@
-module file2 : {}
-def x() : {} Unit
-    unit

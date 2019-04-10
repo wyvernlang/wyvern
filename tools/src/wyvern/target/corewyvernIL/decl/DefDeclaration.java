@@ -104,7 +104,6 @@ public class DefDeclaration extends NamedDeclaration {
 
     @Override
     public DeclType typeCheck(TypeContext ctx, TypeContext thisCtx) {
-
         TypeContext methodCtx = thisCtx;
         for (final FormalArg arg : formalArgs) {
             methodCtx = methodCtx.extend(arg.getSite(), arg.getType());
@@ -146,9 +145,8 @@ public class DefDeclaration extends NamedDeclaration {
     /** check that all effects in annotation exist (assume that those from method calls are valid). */
     private void effectsCheck(TypeContext methodCtx, EffectAccumulator effectAccumulator) {
         // TODO: make uniform, regardless of whether we're in an obj definition or module def
-
         if (effectSet.getEffects() != null) {
-           effectSet.effectsCheck(methodCtx);
+            effectSet.effectsCheck(methodCtx);
 
             final Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
 

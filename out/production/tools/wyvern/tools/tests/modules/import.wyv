@@ -1,3 +1,0 @@
-import testModule 
-import stdout
-stdout.print(testModule.x)

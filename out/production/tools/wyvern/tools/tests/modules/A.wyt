@@ -1,2 +1,0 @@
-type A
-    def m(y : system.Int) : system.Int

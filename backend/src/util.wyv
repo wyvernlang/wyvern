@@ -1,4 +1,4 @@
-module util : {}
+module util
 
 import wyvern.option
 import wyvern.collections.list

@@ -1,3 +1,0 @@
-module client : {}
-    import lifted lib
-    "abc"

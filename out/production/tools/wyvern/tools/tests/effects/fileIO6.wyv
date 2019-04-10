@@ -1,7 +1,0 @@
-module def fileIO6(java: Java)
-
-def read(): {} Int
-    1
-    
-def write(x: Int): {} Int
-    x + 1

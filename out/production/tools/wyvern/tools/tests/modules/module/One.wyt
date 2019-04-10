@@ -1,3 +1,0 @@
-resource type One
-	val f : Int
-	def m(y : system.Int) : system.Int

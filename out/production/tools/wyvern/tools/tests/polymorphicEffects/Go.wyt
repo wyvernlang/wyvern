@@ -1,3 +1,0 @@
-import polymorphicEffects.UnitFnWithoutEffect
-resource type Go
-    def go (x : Unit -> {} Unit) : {} Unit

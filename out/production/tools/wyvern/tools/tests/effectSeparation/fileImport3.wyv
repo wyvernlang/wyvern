@@ -1,5 +1,0 @@
-module fileImport3 : {}
-import lifted effectSeparation.file3
-
-def x() : {} Unit
-    unit

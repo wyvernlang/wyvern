@@ -1,2 +1,0 @@
-resource type UnitFnWithoutEffect
-    def app() : {} Unit

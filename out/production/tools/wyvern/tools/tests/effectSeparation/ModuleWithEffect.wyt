@@ -1,3 +1,0 @@
-resource type ModuleWithEffect
-    effect e
-    def functionWithEffect() : {this.e} Unit

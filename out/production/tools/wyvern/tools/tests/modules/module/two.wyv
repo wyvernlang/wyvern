@@ -1,3 +1,0 @@
-module def b(objOne : modules.module.One) : Two
-import modules.module.three
-val k : system.Int = objOne.m(3)

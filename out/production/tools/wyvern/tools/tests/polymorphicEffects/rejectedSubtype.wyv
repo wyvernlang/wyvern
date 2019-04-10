@@ -1,8 +1,0 @@
-type Generic
-  effect E
-
-// {system.ffiEffect} is NOT a subtype of {}, so NOT OK
-val u : Generic[{}] = new
-  effect E = {system.ffiEffect}
-
-"abc"

@@ -1,3 +1,0 @@
-resource type Logger
-    effect writeToLog
-    def updateLog(x: Int): Int

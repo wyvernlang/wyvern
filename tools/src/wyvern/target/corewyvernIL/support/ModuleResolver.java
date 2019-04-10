@@ -296,6 +296,7 @@ public class ModuleResolver {
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
 
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
+
             if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
                 wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleDecl =
                         (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;

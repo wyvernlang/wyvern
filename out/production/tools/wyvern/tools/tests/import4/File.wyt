@@ -1,5 +1,0 @@
-resource type File
-    effect write
-    def writeToFile() : {write} Unit
-
-

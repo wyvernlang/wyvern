@@ -1,4 +1,4 @@
-module tco : {}
+module tco
 
 import wyvern.option
 import wyvern.collections.list

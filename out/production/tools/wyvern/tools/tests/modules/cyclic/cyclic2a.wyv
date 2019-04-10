@@ -1,3 +1,0 @@
-// imports cyclic2b, which imports cyclic2c, which imports cyclic2a...
-import modules.cyclic.cyclic2b
-1

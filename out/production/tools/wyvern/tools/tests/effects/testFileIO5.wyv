@@ -1,2 +1,0 @@
-require effects.fileIO5
-fileIO5.read()

@@ -1,4 +1,4 @@
-module def from_protobuf(support: PlatformSupport) : {}
+module def from_protobuf(support: PlatformSupport)
 
 import wyvern.collections.list
 import wyvern.option

@@ -1,4 +1,0 @@
-resource type AcceptedFile1
-    effect write
-    def go() : {} ((Unit -> {system.ffiEffect} Unit) -> {} Unit)
-

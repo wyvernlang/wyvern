@@ -1,4 +1,0 @@
-import import4.File
-import lifted import4.Lib
-
-val lib = Lib[{}](unit)

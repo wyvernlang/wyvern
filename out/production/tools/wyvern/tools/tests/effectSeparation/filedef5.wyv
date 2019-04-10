@@ -1,4 +1,0 @@
-module def filedef5(m : effectSeparation.ModuleWithEffect) : {m.e} effectSeparation.AnnotatedFile
-m.functionWithEffect()
-def x() : {} Unit
-    unit

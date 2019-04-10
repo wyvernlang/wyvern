@@ -1,5 +1,0 @@
-module fileImport2 : {}
-import effectSeparation.file1
-
-def x() : {} Unit
-    unit

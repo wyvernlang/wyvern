@@ -1,6 +1,0 @@
-// Effect-unannotated library
-module def rejectedLib4(f : higherOrderEffects.RejectedFile4)
-
-import higherOrderEffects.RejectedFile4
-
-unit
