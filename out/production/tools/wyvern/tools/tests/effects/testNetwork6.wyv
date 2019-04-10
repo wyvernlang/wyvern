@@ -1,0 +1,5 @@
+import effects.network6
+
+val n = network6()
+n.sendData("Network6 with effects")
+n.receiveData()

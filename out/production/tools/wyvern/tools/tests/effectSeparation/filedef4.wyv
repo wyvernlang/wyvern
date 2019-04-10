@@ -1,0 +1,3 @@
+module def filedef4(y : Int) : {} effectSeparation.AnnotatedFile
+def x() : Unit
+    unit

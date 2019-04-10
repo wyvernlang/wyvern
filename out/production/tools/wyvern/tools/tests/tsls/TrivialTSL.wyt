@@ -1,0 +1,12 @@
+import wyvern.option
+import wyvern.ast
+import metadata wyvern.collections.list
+
+/* This TSL always returns an object with an eval method that returns 5 */
+type TrivialTSL
+  def eval() : Int
+  metadata new
+    def parseTSL(input : String, ctx : system.Context) : option.Option[ast.AST]
+      option.Some[ast.AST](ast.int(5))
+      val evalDefn = ast.defDeclaration("eval", {}, ast.types.int(), ast.int(5))
+      option.Some[ast.AST](ast.object({evalDefn}))

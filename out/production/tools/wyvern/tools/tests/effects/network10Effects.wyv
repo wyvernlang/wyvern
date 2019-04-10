@@ -1,0 +1,3 @@
+module network10Effects
+effect sendFx = {}
+effect receiveFx = {system.ffiEffect}

@@ -1,0 +1,28 @@
+module list
+
+type DynListToDynFn
+	def apply(element:Dyn,list:List):Dyn
+	
+type UnitDynFn
+	def apply():Dyn
+	
+resource type DynUnitFn
+	def apply(element:Dyn):Unit
+
+
+type List
+	def caseAnalyze(nilCase:UnitDynFn, consCase:DynListToDynFn):Dyn
+	def do(f:DynUnitFn):Unit
+
+def Cons(element:Dyn, tail:List):List = new
+	def caseAnalyze(nilCase:UnitDynFn, consCase:DynListToDynFn):Dyn
+		consCase(element, tail)
+	def do(f:DynUnitFn):Unit
+		f(element)
+		tail.do(f)
+
+val Nil = new
+	def caseAnalyze(nilCase:UnitDynFn, consCase:DynListToDynFn):Dyn
+		nilCase()
+	def do(f:DynUnitFn):Unit = new // return an empty object
+

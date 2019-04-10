@@ -1,0 +1,56 @@
+// http://wiki.erights.org/wiki/Walnut/Secure_Distributed_Computing/Capability_Patterns#Sealers_and_Unsealers
+
+/*
+// JavaScript version building on closures:
+function make_sealer () {
+         var boxes = [], values = [];
+         return {
+		sealer: function (value) {
+			var i = boxes.length, box = {};
+			boxes[i] = box;
+			values[i] = value;
+			return box;
+                },
+		unsealer: function (box) {
+			return values[boxes.indexOf(box)];
+                }
+         };
+}
+*/
+
+module capabilities
+
+import wyvern.option
+import wyvern.collections.map
+
+// This example would be a lot nicer if parameterised Option[T]
+// worked! Will rewrite when this bug is fixed. :-)
+type Option = map.Option // option.Option
+
+type Map = map.Map
+
+// Instead of the usual Boxes, I will use Strings first.
+type Box = String
+
+type Sealer
+     def seal(object:Option):String
+
+type Unsealer
+     def unseal(box:String):Option
+
+// This example would be a lot nicer if we can pass tuples or pairs as
+// return type! Will rewrite when supported. :-)
+resource type SealerUnsealer
+     var sealer:Sealer
+     var unsealer:Unsealer
+
+def make():SealerUnsealer
+    var map:Map = map.make((s1:String,s2:String) => s1.equals(s2))
+    new
+        var sealer:Sealer = new
+            def seal(object:Option):String
+                // map.put("ABC",object)
+                "ABC"
+        var unsealer:Unsealer = new
+            def unseal(box:String):map.Option
+                map.get(box)

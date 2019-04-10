@@ -1,0 +1,6 @@
+// import-dependent type test, part 3
+
+import modules.idt2
+
+val bark = idt2.baz
+3

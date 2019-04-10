@@ -1,0 +1,7 @@
+import modules.database
+
+val db = database()
+db.setContents(0)
+val db2 = db
+db2.setContents(10)
+db.getContents()

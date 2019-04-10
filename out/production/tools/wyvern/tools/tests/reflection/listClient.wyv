@@ -1,0 +1,19 @@
+require java
+
+import modules.lists
+import java:wyvern.tools.tests.ReflectionTests.tools
+
+type IntObj
+    val contents : Int
+
+def makeInt(x : Int) : IntObj = new
+    val contents = x
+
+// throws null pointer exception
+/* val nil = lists.nil(0)
+val l1 = lists.cons(5, lists.cons(1, nil))
+tools.assertIntEquals(l1.getVal(), 5)
+tools.assertIntEquals(l1.getNext().getVal(), 1)
+tools.assertIntEquals(l1.getNext().getNext().getVal(), 0)
+tools.assertIntEquals(l1.getNext().getNext().isEmpty().ifTrue(() => 1, () => 0), 1) */
+

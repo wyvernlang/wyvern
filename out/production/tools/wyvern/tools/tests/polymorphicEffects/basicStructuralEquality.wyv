@@ -1,0 +1,14 @@
+type Generic
+  effect E
+
+val u : Generic[{system.ffiEffect}] = new
+  effect E = {system.ffiEffect}
+
+def id(g : Generic, x : String) : {g.E} String
+  x
+
+// Structural equality of effects
+def run() : {system.ffiEffect} String
+  id(u, "abc")
+
+run()

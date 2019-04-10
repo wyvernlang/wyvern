@@ -1,0 +1,7 @@
+module def dataProcessor7(net: effects.NetworkType)
+effect genN = {}
+def genNum(): {genN} Int
+    3
+def processData(): {genN, net.send, net.receive} String // more effects than actually produces
+    val n: Int = genNum() // {genN}
+    net.receiveData() // {net.receive}

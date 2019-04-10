@@ -1,0 +1,14 @@
+tagged type Exp comprises Var, Apply, Lambda, Unit
+
+tagged type Var extends Exp
+	val name : String
+
+tagged type Apply extends Exp
+	val fn : Exp
+	val arg: Exp
+	
+tagged type Lambda extends Exp
+	val param : String
+	val body : Exp
+
+tagged type Unit extends Exp

@@ -1,0 +1,14 @@
+type Generic
+  effect E
+
+val u : Generic[{system.ffiEffect}] = new
+  effect E = {system.ffiEffect}
+
+def id[T, effect F](x : T) : {F} T
+  x
+
+def run() : {u.E} String
+  // {u.E} is not inferrable
+  id[String]("abc")
+
+run()

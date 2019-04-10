@@ -1,0 +1,4 @@
+type UserInfo
+    def setName(uName : Int) : Int
+    def init(uName : Int) : Int
+    def getName() : Int

@@ -1,0 +1,25 @@
+import wyvern.collections.llist
+
+type LinkedList = llist.LinkedList
+
+// test construction and empty tests
+// TODO: infer type parameter here
+val end : LinkedList[Int] = llist.empty[Int]()
+assert end.isEmpty()
+val one = llist.cons(1, end)
+assert !one.isEmpty()
+
+// test head and tail
+assert one.tail().isEmpty()
+assert one.head().getOrElse(() => 2)==1
+
+// test iterator
+assert !end.iterator().hasNext()
+val iter = one.iterator()
+assert iter.hasNext()
+assert iter.next() == 1
+assert !iter.hasNext()
+
+// test map
+val two = one.map[Int](x => x+1)
+assert two.iterator().next() == 2

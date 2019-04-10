@@ -1,7 +1,8 @@
 import wyvern.collections.list
 
 type PlatformSupport
-  def loadBytecode(path: String): Dyn
+  effect loadBytecode
+  def loadBytecode(path: String): {this.loadBytecode} Dyn
   def byteStringToInt(byteString: Dyn): Int
   def dynToList(o: Dyn): list.List
   def getFirstCommandLineArg(): String

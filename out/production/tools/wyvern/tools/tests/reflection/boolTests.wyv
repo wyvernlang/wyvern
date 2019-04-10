@@ -1,0 +1,9 @@
+require java
+
+import java:wyvern.tools.tests.ReflectionTests.tools
+
+val x : system.Boolean = true
+tools.assertIntEquals(x.ifTrue(() => 1, () => 2), 1)
+
+val x : system.Boolean = false
+tools.assertIntEquals(x.ifTrue(() => 1, () => 2), 2)

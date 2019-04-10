@@ -1,0 +1,17 @@
+resource type ObjNetworkType
+  effect send
+  effect receive
+  def sendData(data: String): {} Unit
+  def receiveData(): {this.receive} String
+
+val objNetwork: ObjNetworkType = new
+  effect send = {}
+  effect receive = {}
+  var data: String = ""
+  def sendData(data: String): {} Unit
+      this.data = data
+  def receiveData(): {this.receive} String
+      this.data
+
+objNetwork.sendData("ObjNetwork with effects")
+objNetwork.receiveData()

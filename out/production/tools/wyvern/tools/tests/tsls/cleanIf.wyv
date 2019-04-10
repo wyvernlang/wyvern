@@ -1,0 +1,19 @@
+// the following 3 lines can be put in the standard prelude for this example
+// but cause errors for other examples - debug me!
+//import metadata wyvern.IfTSL2
+//val ifelseARG = (cond:Boolean, tt:IfTSL2.FnExpr, ff:IfTSL2.FnExpr) => IfTSL2.doif(cond, tt, ff)
+//val if = (cond:Boolean, blocks:IfTSL2.Blocks) => IfTSL2.doifblk(cond, blocks)
+
+// testing decls
+//val w = asdf + decls.aNum
+
+// testing the nice if from the standard prelude
+val x = -5
+val y : Int = if (x>0) {x} else {-x}
+val z : Int = if (x>0)
+        x
+    else
+        -x
+z
+
+// design question: should we just replace the whole ~ syntax with a scheme more like what's above?

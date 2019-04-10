@@ -1,0 +1,8 @@
+module test simplemod[IntegerConstant(2):Int]
+	file main
+		import wyv:second
+		TestC.C.getNum()
+	file second
+		module TestC
+		class C
+			class def getNum():Int = 2

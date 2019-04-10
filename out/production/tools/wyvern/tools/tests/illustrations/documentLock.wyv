@@ -1,0 +1,5 @@
+module def documentLock(uInfo : illustrations.UserInfo)
+
+def sign() : Int
+	val signee : Int = uInfo.getName()
+	signee

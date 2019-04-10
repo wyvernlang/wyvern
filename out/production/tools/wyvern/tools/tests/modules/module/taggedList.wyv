@@ -1,0 +1,22 @@
+tagged type List comprises Cons, Nil
+	val length:system.Int
+    
+tagged type Cons extends List
+    val value:system.Int
+    val next:List
+    val length:system.Int
+    
+tagged type Nil extends List
+	val length:system.Int
+
+def head(list:List):system.Int
+	match list:
+		c:Cons => c.value
+		n:Nil => 0
+
+val x : Nil = new
+	val length = 0
+	
+val h = head(x)
+
+h

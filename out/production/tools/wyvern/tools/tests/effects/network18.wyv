@@ -1,0 +1,10 @@
+module def network18(): effects.NetworkType
+import effects.network18Effects as fx
+effect send = {fx.sendFx}
+effect receive = {fx.receiveFx}
+var data: String = ""
+def sendData(sd: String): {} Unit
+    fx.f()
+    data = sd
+def receiveData(): {receive} String
+    data

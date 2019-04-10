@@ -1,0 +1,38 @@
+import polymorphicEffects.Logger
+import lifted polymorphicEffects.repeaterPlugin
+
+// Resources
+
+type Resource
+  // theEffect is abstract, so {file.theEffect} != {network.theEffect}
+  effect theEffect
+
+val file : Resource = new
+  effect theEffect = {system.ffiEffect}
+
+val network : Resource = new
+  effect theEffect = {system.ffiEffect}
+
+// Different implementations of Logger
+
+val logger1 : Logger[{file.theEffect}] = new
+  effect log = {file.theEffect}
+  def append(contents : String) : {this.log} Unit
+    unit
+
+val logger2 : Logger[{network.theEffect}] = new
+  effect log = {network.theEffect}
+  def append(contents : String) : {this.log} Unit
+    unit
+
+// Core editor
+
+val plugin = repeaterPlugin[{logger1.log}](logger1, unit)
+
+// Fails because the effect we chose when we instantiated the plugin,
+// {logger1.log}, is not a subset of the effect bound on this method,
+// {logger2.log}.
+def main() : {logger2.log} String
+  plugin.run("abc")
+
+main()

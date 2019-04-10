@@ -1,0 +1,7 @@
+require java
+
+import reflection.modules.base
+
+// filler line of code
+val x : Int = 5
+

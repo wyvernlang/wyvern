@@ -1,0 +1,9 @@
+module expr
+
+type Expr
+    def eval():Int
+
+def Num(i:Int) = // constructor for a numeric literal
+
+def Plus(exp1:Expr, exp2:Expr) = // constructor for plus
+

@@ -1,0 +1,11 @@
+module def dataProcessor5(net: effects.NetworkType)
+effect send = {}
+effect process = {net.receive, send}
+effect receive = {} // to add confusion to the mix
+effect genN = {}
+def genNum(): {genN, receive} Int
+    3
+def processData(): {process, genN, receive} String
+    val n: Int = genNum()
+    net.sendData("From dataProcessor5")
+    net.receiveData()

@@ -1,0 +1,4 @@
+module logger3
+import effects.FileIO
+def updateLog(fio: FileIO, x: Int): {fio.writeF} Int
+  fio.write(x)

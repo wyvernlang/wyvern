@@ -1,0 +1,2 @@
+resource type AnnotatedFile
+    def x() : {} Unit

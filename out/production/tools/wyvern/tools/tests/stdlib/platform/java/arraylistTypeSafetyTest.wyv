@@ -1,0 +1,8 @@
+// Be careful. This file is tested for *not* compiling. If you add a syntax
+// error, the tests will pass and the type safety of arraylist will not be
+// tested.
+require arraylist
+
+val list = arraylist.make[Int]()
+
+list.add("a") // Should not compile

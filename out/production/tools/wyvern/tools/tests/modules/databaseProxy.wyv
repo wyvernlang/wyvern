@@ -1,0 +1,4 @@
+module def databaseProxy(db : modules.TDatabase)
+
+def increment():Unit
+	db.setContents(db.getContents() + 1)

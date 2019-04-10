@@ -1,0 +1,8 @@
+type Generic
+  effect E
+
+// {} is a subtype of {}, so OK
+val u : Generic[{}] = new
+  effect E = {}
+
+"abc"

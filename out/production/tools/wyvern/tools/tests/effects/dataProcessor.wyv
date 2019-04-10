@@ -1,0 +1,4 @@
+module def dataProcessor(net: effects.NetworkType)
+effect process = {net.receive}
+def processData(): {process} String
+    net.receiveData()

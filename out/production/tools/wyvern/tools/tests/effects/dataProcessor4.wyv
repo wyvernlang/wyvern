@@ -1,0 +1,5 @@
+module def dataProcessor4(net: effects.NetworkType)
+effect send = {net.send}
+effect process = {net.receive, process} // recursive; should result in an error
+def processData(): {process} String
+    net.receiveData()

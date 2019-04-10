@@ -1,0 +1,39 @@
+type DynListToDynFn
+	def apply(element:Dyn,list:List):Dyn
+	
+type UnitDynFn
+	def apply():Dyn
+	
+resource type DynUnitFn
+	def apply(element:Dyn):Unit
+
+
+type List
+	def caseAnalyze(nilCase:UnitDynFn, consCase:DynListToDynFn):Dyn
+	def do(f:DynUnitFn):Unit
+
+def Cons(element:Dyn, tail:List):List = new
+	def caseAnalyze(nilCase:UnitDynFn, consCase:DynListToDynFn):Dyn
+		consCase(element, tail)
+	def do(f:DynUnitFn):Unit
+		f(element)
+		tail.do(f)
+
+val Nil = new
+	def caseAnalyze(nilCase:UnitDynFn, consCase:DynListToDynFn):Dyn
+		nilCase()
+	def do(f:DynUnitFn):Unit = new // return an empty object
+
+// some test cases
+
+val aList = Cons(1, Cons(2, Cons(5, Nil)))
+
+var count : Int = 0
+
+aList.do(x => count = x)
+
+def pickLast(list:List, seed:Int):Int
+	list.caseAnalyze(() => seed, (x,l) => pickLast(l,x))
+
+val five = pickLast(aList,0)
+five
