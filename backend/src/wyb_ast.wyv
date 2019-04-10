@@ -1,4 +1,4 @@
-module wyb_ast
+module wyb_ast : {}
 
 import wyvern.collections.list
 import wyvern.option

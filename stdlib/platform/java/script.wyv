@@ -1,2 +1,4 @@
-import fileSystem
+require java
+import fileSystemClient
+val client = fileSystemClient(java)
 "abc"

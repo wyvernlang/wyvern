@@ -1,0 +1,13 @@
+module def repeaterPlugin(defaultLogger : polymorphicEffects.Logger, __MONOMORPHIZE__ : Unit)
+
+import polymorphicEffects.Logger
+
+var logger : Logger = defaultLogger
+
+def setLogger(newLogger : Logger) : Unit
+  logger = newLogger
+
+def run(s : String) : String
+  val t = s + s
+  logger.append(s + "->" + t)
+  t

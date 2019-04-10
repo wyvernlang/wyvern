@@ -1,0 +1,15 @@
+import polymorphicEffects.parametricLib
+
+val u = new
+  effect E = {system.ffiEffect}
+
+val v = new
+  effect E = {}
+
+val lib = parametricLib[String, {u.E}]()
+
+def run() : {v.E} String
+  // Rejected because {u.E} = {system.ffiEffect} is not a subset of {v.E} = {}
+  lib.id("abc")
+
+run()

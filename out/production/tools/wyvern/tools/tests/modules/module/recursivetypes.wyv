@@ -1,0 +1,18 @@
+// Test recursive types
+
+type A
+	def identity(b:B):B
+
+type B
+	def getA():A
+	def getValue():system.Int
+	
+val b:B = new
+	def getA():A = new
+		def identity(bb:B):B = bb
+		
+	def getValue():system.Int = 5
+
+b.getValue()
+
+b.getA().identity(b).getValue()

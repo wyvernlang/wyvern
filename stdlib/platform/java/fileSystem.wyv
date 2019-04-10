@@ -23,8 +23,8 @@ def makeFile(path: String) : {createNewFile} File = new
     def makeReader() : {this.open} Reader
         val br = file.openBRForRead(this.f)
         new (self) =>
-            effect read = {this.read}
             effect close = {this.close}
+            effect read = {this.read}
             def read() : {self.read} Int
                 file.readCharFromFile(br)
             def readLine() : {self.read}  Option[String]

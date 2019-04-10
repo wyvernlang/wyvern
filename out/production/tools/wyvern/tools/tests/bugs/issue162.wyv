@@ -1,0 +1,5 @@
+import wyvern.option
+val obj = new
+  def length():Int = 3
+val x = option.Some(obj)
+x.getOrElse(() => obj).length() + 1

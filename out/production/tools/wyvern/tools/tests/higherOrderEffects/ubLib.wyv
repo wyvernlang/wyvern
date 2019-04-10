@@ -1,0 +1,6 @@
+// Effect-unannotated library
+module def ubLib(f : higherOrderEffects.UbFile)
+
+import higherOrderEffects.UbFile
+
+unit

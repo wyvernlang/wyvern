@@ -1,0 +1,9 @@
+module def example5(io : illustrations.FileIO)
+
+import illustrations.logger
+import illustrations.wavyUnderlineV3
+
+val log = logger(io)
+val wavyUnderliner = wavyUnderlineV3(log)
+
+val x : system.Int = wavyUnderliner.underlineIt()

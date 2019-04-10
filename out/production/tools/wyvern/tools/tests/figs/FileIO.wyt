@@ -1,0 +1,3 @@
+resource type FileIO
+	def read():system.Int
+	def write(x:Int):Int

@@ -1,0 +1,7 @@
+module def dataProcessor6(net: effects.NetworkType)
+effect genN = {}
+def genNum(): {genN} Int
+    3
+def processData(): {genN} String // error: does not have net.receive effect
+    val n: Int = genNum() // {genN}
+    net.receiveData() // {net.receive}

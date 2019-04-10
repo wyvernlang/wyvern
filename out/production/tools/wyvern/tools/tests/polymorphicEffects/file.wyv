@@ -1,0 +1,5 @@
+module def file(java:Java) : polymorphicEffects.Resource
+
+effect wr = {system.ffiEffect}
+def write() : {wr} Unit
+    unit

@@ -1,0 +1,72 @@
+test seven[IntegerConstant(7):Int]
+	7
+test plus[IntegerConstant(9):Int]
+	7 + 2
+test val[IntegerConstant(5):Int]
+	val x = 5
+	x
+test val2[IntegerConstant(2):Int]
+	val x = 2
+	val y = x
+	y
+test val3[IntegerConstant(2):Int]
+	val yx = 2
+	yx
+test var1[IntegerConstant(9):Int]
+	var yx:Int = 3
+	yx = 9
+	yx
+test add[IntegerConstant(11):Int]
+	val yx = 2
+	val ts = 9
+	yx+ts
+test mult[IntegerConstant(25):Int]
+	val yx = 2
+	val ts = 9+7*2
+	yx+ts
+test parens[IntegerConstant(25):Int]
+	val yx = 2
+	val ts = 9+(5+2)*2
+	yx+ts
+test lambdaCall[IntegerConstant(1):Int]
+	(fn x : Int => x)(1)
+test lambdaAdd[IntegerConstant(4):Int]
+	(fn x : Int => x + 1)(3)
+test arith[IntegerConstant(42):Int]
+	3*4+5*6
+test hot[IntegerConstant(13):Int]
+	(fn f : Int -> Int => (fn x : Int => (f(f(x)))))(fn x : Int => x + 2)(9)
+test decls[IntegerConstant(9):Int]
+	def foo():Int = 5
+	def bar():Int
+		9
+	bar()
+test defParams[IntegerConstant(12):Int]
+    def foo(x:Int):Int = 5+x
+    foo(7)
+test tupleMeth[IntegerConstant(13):Int]
+	def mult(n:Int,m:Int):Int = n+5*m
+	mult(3,2)
+test var[IntegerConstant(4):Int]
+	var x:Int = 1
+    x=2
+    var y:Int = 3
+    y=4
+    x=y
+    x
+test genericNew[IntegerConstant(2):Int]
+	val test = new
+		val x = 2
+	test.x
+test simpleIf1[IntegerConstant(1):Int]
+	if true then 1 else 3
+test simpleIf2[IntegerConstant(3):Int]
+	if false then 1 else 3
+test simpleIf3[IntegerConstant(9):Int]
+	if true then if false then 4 else 9 else if true then 3 else 6
+test tuple[TupleValue(IntegerConstant(1), IntegerConstant(2), IntegerConstant(3)):Int*Int*Int]
+	(1,2,3)
+test parseBreak[IntegerConstant(7):Int]
+	val test = 7
+
+	test

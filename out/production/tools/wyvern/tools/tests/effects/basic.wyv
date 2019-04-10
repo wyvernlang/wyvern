@@ -1,0 +1,13 @@
+module def basic(): effects.Basic
+effect e1 = {}
+effect e2 = {e1}
+effect e3 = {e1, e2}
+def m1(): {e1} Int
+    1
+def m2(): {e2} Int
+    m1()
+    2
+def m3(): {e3} String
+    m1()
+    m2()
+    "basic.m3()"

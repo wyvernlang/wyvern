@@ -1,0 +1,7 @@
+resource type Basic
+  effect e1
+  effect e2
+  effect e3
+  def m1(): {this.e1} Int
+  def m2(): {this.e2} Int
+  def m3(): {this.e3} String

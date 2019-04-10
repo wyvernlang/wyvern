@@ -1,0 +1,37 @@
+require stdout
+
+import stdlib.collections.list
+
+// create a integer linked list with contents 1, 2, and 5
+val list125 = list.Cons(1, list.Cons(2, list.Cons(5, list.Nil)))
+
+// print the list
+stdout.print("list contents: ")
+list125.do(x => stdout.printInt(x))
+stdout.println()
+
+// sum the list
+var count : Int = 0
+list125.do(x => count = count + x)
+
+stdout.print("list sum: ")
+stdout.printInt(count)
+stdout.println()
+
+// define a function that picks the last list element
+// or a default value for empty lists
+def pickLast(lst:list.List, defaultValue:Int):Int
+	lst.caseAnalyze(
+	  () => defaultValue,
+	  (x,l) => pickLast(l,x)
+	)
+
+// test the function
+val lastValue = pickLast(list125,0)
+
+stdout.print("last value: ")
+stdout.printInt(lastValue)
+stdout.println()
+
+// make the count the result of the script
+count

@@ -1,0 +1,14 @@
+module def sqlApplication(safeSQL : db.SafeSQL)
+
+//import db.stringSQL
+
+def run() : Int
+    val input = "CouldBeUnsafe"
+	
+	//val query : safeSQL.SQL = ~
+	//	SELECT ID FROM myTable WHERE name=$input
+	
+	//val query = safeSQL.
+	
+    safeSQL.querySelectFromWhereEquals("ID", "myTable", "name", input)
+    //stringSQL.prepare("query")

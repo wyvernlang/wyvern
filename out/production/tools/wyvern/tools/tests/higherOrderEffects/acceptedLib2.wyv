@@ -1,0 +1,5 @@
+// Effect-unannotated library
+module def acceptedLib2(f : higherOrderEffects.AcceptedFile2)
+import higherOrderEffects.AcceptedFile2
+
+unit

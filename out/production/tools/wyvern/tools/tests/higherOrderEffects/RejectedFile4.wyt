@@ -1,0 +1,3 @@
+resource type RejectedFile4
+    effect write
+    def go (f : (Unit -> {this.write} Unit) -> {} Unit) : {} Unit

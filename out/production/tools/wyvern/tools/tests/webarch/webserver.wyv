@@ -1,0 +1,17 @@
+module webserver
+
+import webarch.database
+import wyvern.option
+
+type Option = option.Option
+type KeyVal = database.KeyVal
+
+type Server
+	def setDB(db:KeyVal):Unit
+	def serve(request:String):String
+
+// faked implementation here
+def make():Server = new
+	def setDB(db:KeyVal):Unit = new
+	
+	def serve(request:String):String = "hi"

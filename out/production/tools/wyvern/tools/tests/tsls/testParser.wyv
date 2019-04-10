@@ -1,0 +1,4 @@
+import tsls.parser
+import wyvern.ast
+
+parser.parse("54  *3-").getOrElse(()=>ast.int(-1))

@@ -1,0 +1,5 @@
+import effects.network7
+
+val n = network7()
+n.sendData("Network7 with effects")
+n.receiveData()

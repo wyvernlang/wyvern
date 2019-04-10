@@ -1,0 +1,4 @@
+require effects.fileIO
+import effects.logger3
+
+logger3.updateLog(fileIO, 1)
