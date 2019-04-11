@@ -4,6 +4,9 @@ import fileSystem.RandomAccessFile
 import fileSystem.BinaryReader
 import fileSystem.BinaryWriter
 resource type File
+    effect Read
+    effect Write
+    effect Append
     def makeReader():Reader
     def makeWriter():Writer
     def makeAppender():Writer

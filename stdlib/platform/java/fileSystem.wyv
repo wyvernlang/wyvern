@@ -2,6 +2,8 @@
 module def fileSystem(java:Java): fileSystem.FileSystem
 import java:wyvern.stdlib.support.FileIO.file
 
+import fileSystem.fileEffects
+
 /* Import Types */
 import fileSystem.File
 import fileSystem.Reader
@@ -13,26 +15,29 @@ import fileSystem.BinaryWriter
 import wyvern.option
 type Option = option.Option
 
-effect Read = {system.FFI}
-effect Write = {system.FFI}
-effect Append = {system.FFI}
-
+effect Read = {fileEffects.Read}
+effect Write = {fileEffects.Write}
+effect Append = {fileEffects.Append}
 
 def makeFile(path: String) : File = new
+    effect Read = {fileEffects.Read}
+    effect Write = {fileEffects.Write}
+    effect Append = {fileEffects.Append}
     val f : Unit = file.createNewFile(path)
-        
+    
     def makeReader() : Reader
         val br = file.openBRForRead(this.f)
         new
-            def read() : {this.f.read} Int
+            effect Read = {fileEffects.Read}
+            def read() : {this.Read} Int
                 file.readCharFromFile(br)
-            def readLine() : Option[String]
+            def readLine() : {this.Read} Option[String]
                 val line = file.readLineFromFile(br)
                 if (file.isNull(line))
                     option.None[String]()
                   else
                     option.Some[String](line)
-            def readFully() : String
+            def readFully() : {this.Read} String
                 file.readFullyFile(br)
             def close() : Unit
                 file.closeReader(br)
@@ -40,7 +45,8 @@ def makeFile(path: String) : File = new
     def makeWriter() : Writer
         val bw = file.openBWForWrite(this.f)
         new
-            def write(s : String) : Unit
+            effect Write = {fileEffects.Write, fileEffects.Append}
+            def write(s : String) : {this.Write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
             def close() : Unit
                 file.closeWriter(bw)
@@ -54,7 +60,8 @@ def makeFile(path: String) : File = new
     def makeAppender() : Writer
         val bw = file.openBWForAppend(this.f)
         new
-            def write(s : String) : Unit
+            effect Write = {fileEffects.Append}
+            def write(s : String) : {this.Write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
             def close() : Unit
                 file.closeWriter(bw)
@@ -74,9 +81,10 @@ def makeFile(path: String) : File = new
                             b
         */
         new
-            def read() : Int
-                file.readByteFileInputStream(br)
-            def readBytes(numBytes : Int) : Int
+            effect Read = {fileEffects.Read}
+            def read() : {this.Read} Int
+                file.readArbitraryPrecisionInteger(br)
+            def readBytes(numBytes : Int) : {this.Read} Int
                 def shift (b:Int, iter:Int) : Int
                     if (iter == 0)
                         b
@@ -87,19 +95,22 @@ def makeFile(path: String) : File = new
                           else
                             shift(((b * 256) + readnext), iter - 1)
                 shift(0,numBytes)
+            def readUTF() : {this.Read} String
+                "hello"
             def close() : Unit
                 file.closeFileInputStream(br)
                 
     def makeBinaryWriter() : BinaryWriter
         val bw = file.makeFileOutputStream(this.f)
         new
-            def write(b : Int) : Unit
-                file.writeByteFileOutputStream(bw, b)
-            def writeBytes(b : Int, numBytes : Int) : Unit
+            effect Write = {fileEffects.Write}
+            def write(b : Int) : {this.Write} Unit
+                file.writeArbitraryPrecisionInteger(bw, b)
+            def writeBytes(b : Int, numBytes : Int) : {this.Write} Unit
                 if (numBytes > 0)
                     this.writeBytes(b/256, numBytes - 1)
                     file.writeByteFileOutputStream(bw, b)
-			
+            
             def close() : Unit
                 file.closeFileOutputStream(bw)
     
@@ -109,6 +120,8 @@ def makeFile(path: String) : File = new
     def makeRandomAccessFile(mode : String) : RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new
+            effect Read = {fileEffects.Read}
+            effect Write = {fileEffects.Write}
             def close() : Unit
                 file.closeRandomAccessFile(rf)
             def getPosition() : Int
@@ -117,11 +130,11 @@ def makeFile(path: String) : File = new
                 file.seekFilePointer(rf, pos)
             def length() : Int
                 file.getRandomAccessFileLength(rf)
-            def readLine() : String
+            def readLine() : {this.Read} String
                 file.readLineRandomAccess(rf)
-            def readUTF() : String
+            def readUTF() : {this.Read} String
                 file.readUTFRandomAccess(rf)
-            def write(s : String) : Unit
+            def write(s : String) : {this.Write} Unit
                 file.writeStringRandomAccess(rf, s)            //temporary write method
-            def writeUTF(s : String) : Unit
+            def writeUTF(s : String) : {this.Write} Unit
                 file.writeUTFRandomAccess(rf, s)

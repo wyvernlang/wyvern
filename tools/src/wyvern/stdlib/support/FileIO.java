@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 
 public class FileIO {
@@ -177,17 +178,33 @@ public class FileIO {
     }
     
     public void writeArbitraryPrecisionInteger(FileOutputStream f, BigInteger n) throws IOException {
-        int size = n.bitLength();
+		byte[] contentBytes = n.toByteArray();
+		int size = contentBytes.length;
+		
+        //int size = n.bitLength();
         if(size > 127) { //might want to catch case where size > 255
-            f.write(size); //need to find out how many bytes needed
-            byte[] realSizeBytes = new byte[size - 128];
-            for(int i = 128; i < size; i++) {
-                f.write(0);
+			//calculate the number of bytes needed to represent the number
+			//(definitely a better way to do this
+			int numRealBytes = 0;
+			BigInteger temp = n;
+			BigInteger byteSize = new BigInteger("256");
+			while(temp.compareTo(BigInteger.ZERO) > 0) {
+				temp = temp.divide(byteSize);
+				numRealBytes++;
+			}
+            f.write(128 + numRealBytes); //need to account for exactly 128 bytes
+            byte[] realSizeBytes = new byte[numRealBytes];
+            for(int i = numRealBytes - 1; i >= 0; i--) {
+                realSizeBytes[i] = (byte) (size % 256);
+				size /= 256;
             }
             f.write(realSizeBytes);
         } else {
             f.write(size);
         }
+		
+		f.write(contentBytes);
+		
     }
     
     public BigInteger readArbitraryPrecisionInteger(FileInputStream f) throws IOException {
@@ -195,11 +212,15 @@ public class FileIO {
         if(size > 127) {
             byte[] realSizeBytes = new byte[size - 128];
             for(int i = 128; i < size; i++) {
-                //realSizeBytes[i - 128] = f.read();
+                realSizeBytes[i - 128] = (byte) f.read();
             }
-            
+            size = ByteBuffer.wrap(realSizeBytes).getInt();
         }
-        return BigInteger.ZERO;
+		byte[] contentBytes = new byte[size];
+        for(int i = 0; i < size; i++) {
+			contentBytes[i] = (byte) f.read();
+		}
+		return new BigInteger(contentBytes);
     }
     
     
