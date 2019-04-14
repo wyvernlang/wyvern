@@ -1,12 +1,10 @@
+import fileSystem.fileEffects
 resource type RandomAccessFile //can be renamed later if necessary
-    effect close
-    effect write
-    effect read
-    def close() : {this.close} Unit
-    def getPosition() : {this.read}  Int
-    def seek(pos : Int) : {this.read} Unit
-    def length() : {this.read} Int
-    def readLine() : {this.read} String
-    def readUTF() : {this.read} String
-    def write(s : String) : {this.write} Unit
-    def writeUTF(s : String) : {this.write} Unit
+    def close() : {fileEffects.close} Unit
+    def getPosition() : {fileEffects.read}  Int
+    def seek(pos : Int) : {fileEffects.read} Unit
+    def length() : {fileEffects.read} Int
+    def readLine() : {fileEffects.read} String
+    def readUTF() : {fileEffects.read} String
+    def write(s : String) : {fileEffects.write} Unit
+    def writeUTF(s : String) : {fileEffects.write} Unit

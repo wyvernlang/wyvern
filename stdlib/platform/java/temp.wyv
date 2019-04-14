@@ -1,0 +1,5 @@
+import fileSystem.fileEffects
+effect a = {fileEffects.open}
+
+def a(x : Int) : Int = new
+    effect c = {fileEffects.close}

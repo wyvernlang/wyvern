@@ -1,12 +1,9 @@
+import fileSystem.fileEffects
 import fileSystem.Reader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
 resource type File
-    effect read
-    effect write
-    effect open
-    effect close
-    def makeReader(): {this.open} Reader
-    def makeWriter(): {this.open} Writer
-    def makeAppender(): {this.open} Writer
-    def makeRandomAccessFile(mode : String): {this.open} RandomAccessFile
+    def makeReader(): {fileEffects.open} Reader
+    def makeWriter(): {fileEffects.open} Writer
+    def makeAppender(): {fileEffects.open} Writer
+    def makeRandomAccessFile(mode : String): {fileEffects.open} RandomAccessFile

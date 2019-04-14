@@ -1,0 +1,5 @@
+module fileEffects
+effect read = {system.ffiEffect}
+effect write = {system.ffiEffect}
+effect open = {system.ffiEffect}
+effect close = {system.ffiEffect}

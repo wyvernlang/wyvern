@@ -1,5 +1,5 @@
-
 module def fileSystem(java:Java) : {system.ffiEffect} fileSystem.FileSystem
+import fileSystem.fileEffects
 import java:wyvern.stdlib.support.FileIO.file
 
 /* Import Types */
@@ -14,38 +14,30 @@ type Option = option.Option
 effect createNewFile = {system.ffiEffect}
 
 def makeFile(path: String) : {createNewFile} File = new
-    effect read = {system.ffiEffect}
-    effect write = {system.ffiEffect}
-    effect open = {system.ffiEffect}
-    effect close = {system.ffiEffect}
     val f : Unit = file.createNewFile(path)
 
-    def makeReader() : {this.open} Reader
+    def makeReader() : {fileEffects.open} Reader
         val br = file.openBRForRead(this.f)
         new (self) =>
-            effect close = {this.close}
-            effect read = {this.read}
-            def read() : {self.read} Int
+            def read() : {fileEffects.read} Int
                 file.readCharFromFile(br)
-            def readLine() : {self.read}  Option[String]
+            def readLine() : {fileEffects.read}  Option[String]
                 val line = file.readLineFromFile(br)
                 if (file.isNull(line))
                     option.None[String]()
                   else
                     option.Some[String](line)
-            def readFully() : {self.read} String
+            def readFully() : {fileEffects.read} String
                 file.readFullyFile(br)
-            def close() : {self.close} Unit
+            def close() : {fileEffects.close} Unit
                 file.closeReader(br)
 
-    def makeWriter() : {this.open} Writer
+    def makeWriter() : {fileEffects.open} Writer
         val bw = file.openBWForWrite(this.f)
         new (self) =>
-            effect write = {this.write}
-            effect close = {this.close}
-            def write(s : String) : {self.write} Unit
+            def write(s : String) : {fileEffects.write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
-            def close() : {self.close} Unit
+            def close() : {fileEffects.close} Unit
                 file.closeWriter(bw)
             
     
@@ -54,14 +46,12 @@ def makeFile(path: String) : {createNewFile} File = new
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender() : {this.open} Writer
+    def makeAppender() : {fileEffects.open} Writer
         val bw = file.openBWForAppend(this.f)
         new (self) =>
-            effect write = {this.write}
-            effect close = {this.close}
-            def write(s : String) : {self.write} Unit
+            def write(s : String) : {fileEffects.write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
-            def close() : {self.write} Unit
+            def close() : {fileEffects.write} Unit
                 file.closeWriter(bw)
             
     
@@ -69,25 +59,22 @@ def makeFile(path: String) : {createNewFile} File = new
     /* May want to rename this to something more unique
      * Modify "mode" parameter? and available methods?
      */
-    def makeRandomAccessFile(mode : String) : {this.open} RandomAccessFile
+    def makeRandomAccessFile(mode : String) : {fileEffects.open} RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new (self) =>
-            effect close = {this.close}
-            effect write = {this.write}
-            effect read = {this.read}
-            def close() : {self.close} Unit
+            def close() : {fileEffects.close} Unit
                 file.closeRandomAccessFile(rf)
-            def getPosition() : {self.read} Int
+            def getPosition() : {fileEffects.read} Int
                 file.accessFilePointer(rf)
-            def seek(pos : Int) : {self.read} Unit
+            def seek(pos : Int) : {fileEffects.read} Unit
                 file.seekFilePointer(rf, pos)
-            def length() : {self.read} Int
+            def length() : {fileEffects.read} Int
                 file.getRandomAccessFileLength(rf)
-            def readLine() : {self.read} String
+            def readLine() : {fileEffects.read} String
                 file.readLineRandomAccess(rf)
-            def readUTF() : {self.read} String
+            def readUTF() : {fileEffects.read} String
                 file.readUTFRandomAccess(rf)
-            def write(s : String) : {self.write}  Unit
+            def write(s : String) : {fileEffects.write}  Unit
                 file.writeStringRandomAccess(rf, s)            //temporary write method
-            def writeUTF(s : String) : {self.write} Unit
+            def writeUTF(s : String) : {fileEffects.write} Unit
                 file.writeUTFRandomAccess(rf, s)

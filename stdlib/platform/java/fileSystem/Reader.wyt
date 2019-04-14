@@ -1,10 +1,9 @@
 import wyvern.option
+import fileSystem.fileEffects
 type Option = option.Option
 resource type Reader
-    effect read
-    effect close
     /* add read for UTF and bytes */
-    def read(): {this.read} Int
-    def readLine(): {this.close} Option[String]
-    def readFully(): {this.read} String
-    def close(): {this.close} Unit
+    def read(): {fileEffects.read} Int
+    def readLine(): {fileEffects.close} Option[String]
+    def readFully(): {fileEffects.read} String
+    def close(): {fileEffects.close} Unit
