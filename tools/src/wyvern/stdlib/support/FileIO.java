@@ -225,19 +225,19 @@ public class FileIO {
     
     
     
-    /** for the byte array abstraction **/
+    /** for the byte array abstraction (bytes not int subtype in wyvern) **/
     
-    public byte[] makeByteArray(int size) {
-        return new byte[size];
+    public int[] makeByteArray(int size) {
+        return new int[size];
     }
     
-    public void setByteArray(Object b, int i, byte n) {
-        byte[] a = (byte[]) b;
+    public void setByteArray(Object b, int i, int n) {
+        int[] a = (int[]) b;
         a[i] = n;
     }
     
-    public byte getByteArray(Object b, int i) {
-        byte[] a = (byte[]) b;
+    public int getByteArray(Object b, int i) {
+        int[] a = (int[]) b;
         return a[i];
     }
 

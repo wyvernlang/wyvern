@@ -11,6 +11,7 @@ import fileSystem.Writer
 import fileSystem.RandomAccessFile
 import fileSystem.BinaryReader
 import fileSystem.BinaryWriter
+import fileSystem.ByteArray
 
 import wyvern.option
 type Option = option.Option
@@ -138,3 +139,11 @@ def makeFile(path: String) : File = new
                 file.writeStringRandomAccess(rf, s)            //temporary write method
             def writeUTF(s : String) : {this.Write} Unit
                 file.writeUTFRandomAccess(rf, s)
+                
+def makeByteArray(size : Int) : ByteArray
+    val bytes = file.makeByteArray(size)
+    new
+        def get(i : Int) : Int
+            file.getByteArray(bytes, i)
+        def set(i : Int, n : Int) : Unit
+            file.setByteArray(bytes, i, n)
