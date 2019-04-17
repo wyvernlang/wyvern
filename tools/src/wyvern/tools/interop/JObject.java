@@ -1,6 +1,7 @@
 package wyvern.tools.interop;
 
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class JObject implements FObject {
     for (int i = 0; i < methods.length; ++i) {
       Method m = methods[i];
       if (m.getName().equals(methodName)) {
+        if (methodName.equals("setNum")) {
+            System.out.println();
+        }
         if (isApplicable(m, parameterTypes)) {
           if (bestMethod == null || isMorePrecise(m, bestMethod)) {
             bestMethod = m;
@@ -39,6 +43,7 @@ public class JObject implements FObject {
     }
     if (bestMethod != null) {
       Object[] argArray = args.toArray();
+      adapt(argArray, bestMethod.getParameterTypes());
       Object result = bestMethod.invoke(jObject, argArray);
       return result;
     } else {
@@ -46,7 +51,18 @@ public class JObject implements FObject {
     }
   }
 
-  private boolean isMorePrecise(Method m, Method bestMethod) {
+  private void adapt(Object[] argArray, Class<?>[] parameterTypes) {
+      for (int i = 0; i < argArray.length; ++i) {
+          if (argArray[i] instanceof BigInteger && parameterTypes[i] == int.class) {
+              argArray[i] = ((BigInteger)argArray[i]).intValue();
+          }
+          if (argArray[i] instanceof BigInteger && parameterTypes[i] == long.class) {
+              argArray[i] = ((BigInteger)argArray[i]).longValue();
+          }
+      }
+}
+
+private boolean isMorePrecise(Method m, Method bestMethod) {
     Class<?>[] mFormalTypes = m.getParameterTypes();
     Class<?>[] bFormalTypes = bestMethod.getParameterTypes();
     for (int i = 0; i < mFormalTypes.length; ++i) {
@@ -77,6 +93,10 @@ public class JObject implements FObject {
     }
     // handle numeric hierarchy
     if (c1 == Long.class && c2 == Integer.class) {
+        return true;
+    }
+    // allow BigInteger to be assigned to Integer and Long - and hope we don't get overflow
+    if (c2 == BigInteger.class && (c1 == Integer.class || c1 == Long.class)) {
         return true;
     }
     // default
