@@ -1,0 +1,11 @@
+import effects
+import Effects
+
+def fun1 () : {Effects.e1} Unit
+    unit
+
+def fun2 () : {Effects.e2} Unit
+    unit
+
+def fun3 () : {system.ffiEffect} Unit
+    fun1()

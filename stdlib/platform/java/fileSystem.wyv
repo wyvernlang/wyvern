@@ -11,9 +11,7 @@ import fileSystem.RandomAccessFile
 import wyvern.option
 type Option = option.Option
 
-effect createNewFile = {system.ffiEffect}
-
-def makeFile(path: String) : {createNewFile} File = new
+def makeFile(path: String) : {system.ffiEffect} File = new
     val f : Unit = file.createNewFile(path)
 
     def makeReader() : {fileEffects.open} Reader

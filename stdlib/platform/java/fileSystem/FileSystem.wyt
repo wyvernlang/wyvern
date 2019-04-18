@@ -1,4 +1,3 @@
 import fileSystem.File
 type FileSystem
-    effect createNewFile
-    def makeFile(path: String): {this.createNewFile} File
+    def makeFile(path: String): {system.ffiEffect} File

@@ -4,6 +4,6 @@ type Option = option.Option
 resource type Reader
     /* add read for UTF and bytes */
     def read(): {fileEffects.read} Int
-    def readLine(): {fileEffects.close} Option[String]
+    def readLine(): {fileEffects.read} Option[String]
     def readFully(): {fileEffects.read} String
     def close(): {fileEffects.close} Unit
