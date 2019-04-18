@@ -287,6 +287,7 @@ public class ModuleResolver {
         return loadContinuation(file, qualifiedName, ast, loadingType, toplevel, false);
     }
     private Module loadContinuation(File file, String qualifiedName, TypedAST ast, boolean loadingType, boolean toplevel, boolean isLifted) {
+
         final List<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program;
@@ -294,6 +295,7 @@ public class ModuleResolver {
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
+
 
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
             if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
@@ -315,6 +317,15 @@ public class ModuleResolver {
                     ModuleDeclaration moduleDecl = new ModuleDeclaration(Util.APPLY_NAME, oldModuleDecl.getFormalArgs(),
                             oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
                     program = new New(moduleDecl);
+
+                    if (decl instanceof DefDeclaration) {
+                        // Perform quantification lifting if possible
+                        final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
+                        final New liftResult = QuantificationLifter.liftIfPossible(newGenCtx, program, isLifted);
+                        if (liftResult != null) {
+                            program = liftResult;
+                        }
+                    }
                 }
 
             } else if (decl instanceof DefDeclaration) {
@@ -334,6 +345,7 @@ public class ModuleResolver {
                 // Wrap in an object
                 program = new New(defDecl);
                 List<FormalArg> formalArgs = ((DefDeclType) defDecl.getDeclType()).getFormalArgs();
+
 
                 // Perform quantification lifting if possible
                 final GenContext newGenCtx = extendGenContext(genCtx, dependencies);
@@ -386,6 +398,7 @@ public class ModuleResolver {
     }
 
     private Module load(String qualifiedName, File file, boolean toplevel, boolean isLifted) {
+
         boolean loadingType = file.getName().endsWith(".wyt");
         TypedAST ast = null;
         try {
@@ -398,6 +411,7 @@ public class ModuleResolver {
                 ToolError.reportError(ErrorMessage.PARSE_ERROR, FileLocation.UNKNOWN, e.getMessage());
             }
         }
+
         return loadContinuation(file, qualifiedName, ast, loadingType, toplevel, isLifted);
     }
 

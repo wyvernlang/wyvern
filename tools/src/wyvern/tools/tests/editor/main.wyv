@@ -1,0 +1,14 @@
+require java
+import editor.fileAppender
+import fileSystem.File
+import fileSystem
+import fileSystem.fileEffects
+
+val filesystem = fileSystem(java)
+val path = ""
+val f : File = filesystem.makeFile(path)
+val fappender = fileAppender(java, f)
+def a() : {fileEffects.write} Unit
+    fappender.appendFile(f)
+
+"abc"

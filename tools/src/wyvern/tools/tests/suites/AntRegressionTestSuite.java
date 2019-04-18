@@ -6,6 +6,7 @@ import org.junit.experimental.categories.Categories.IncludeCategory;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
+import wyvern.tools.tests.FileTest;
 import wyvern.tools.tests.HigherOrderTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
@@ -62,7 +63,8 @@ import wyvern.tools.tests.TransformTests;
             PolymorphicEffectTests.class,
             EffectAnnotationTests.class,
             ModuleSystemTests.class,        // tests the new IL
-            HigherOrderTests.class
+            HigherOrderTests.class,
+            FileTest.class
         }
         )
 public class AntRegressionTestSuite { }

@@ -1,0 +1,48 @@
+module def unannotatedFileAppender(java : Java, file : fileSystem.File)
+import fileSystem
+import fileSystem.File
+import fileSystem.fileEffects
+import wyvern.option
+import annotatedArrayList
+
+// Quantification Lifter can not lift this module
+// import lifted arraylist
+
+import wyvern.collections.list
+
+
+// Append file2 to the end of file1
+def appendFile(file2 : File) : Unit
+    val file2Reader = file2.makeReader()
+    val file2content = file2Reader.readFully()
+    val file1Appender = file.makeAppender()
+    file1Appender.write(file2content)
+
+// Append a list of files
+def appendFiles(fileList : list.List[File]) : Unit
+    val fileSys = fileSystem(java)
+    val dummyFile = fileSys.makeFile("")
+    def loop(fileList : list.List[File]) : Unit
+        val length = fileList.length()
+        val d : Unit = if (length == 0)
+                val fileOption = fileList.get(0)
+                val currentFile = fileOption.getOrElse(() => dummyFile)
+                appendFile(currentFile)
+                fileList.remove(0)
+                loop(fileList)
+            else
+                unit
+    loop(fileList)
+
+// Append an arraylist of files
+val arraylist = annotatedArrayList(java)
+def appendArrayListFiles(fileList : arraylist.ArrayList[File]) : Unit
+    def loop(x : Int, fileList : arraylist.ArrayList[File]) : Unit
+        val size = fileList.size()
+        val d : Unit = if (x < size)
+                appendFile(fileList.get(x))
+                loop (x+1, fileList)
+            else
+                unit
+    loop (0, fileList)
+
