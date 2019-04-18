@@ -84,3 +84,21 @@ binwriter.writeBytes(9761,2)
 binwriter.close()
 
 out.println()
+
+
+val fb = filesys.makeFile("binary.txt")
+
+val bw = fb.makeBinaryWriter()
+
+bw.write(123456789123456789)
+
+val br = fb.makeBinaryReader()
+
+out.printInt(br.read())
+
+out.println()
+
+br.close()
+bw.close()
+
+
