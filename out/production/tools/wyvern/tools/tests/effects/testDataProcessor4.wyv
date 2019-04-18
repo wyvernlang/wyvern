@@ -1,6 +1,0 @@
-import effects.network
-import effects.dataProcessor4
-
-val n = network()
-val dp = dataProcessor4(n) 
-dp.processData()

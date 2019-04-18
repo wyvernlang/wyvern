@@ -1,2 +1,0 @@
-resource type File
-    def x() : Unit

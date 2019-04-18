@@ -1,3 +1,0 @@
-module def logger4(fio: effects.FileIO4): effects.Logger1
-def updateLog(x: Int): {system.ffiEffect} Int
-    fio.write(x)

@@ -1,5 +1,0 @@
-import modules.database
-
-val db = database()
-db.setContents(10)
-db.getContents()

@@ -1,5 +1,0 @@
-module nested
-
-val x = new
-  effect e = {system.ffiEffect}
-  def id(x: Int): {this.e} Int = x

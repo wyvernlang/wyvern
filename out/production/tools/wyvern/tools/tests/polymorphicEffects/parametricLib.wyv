@@ -1,4 +1,0 @@
-module def parametricLib[T, effect E]()
-
-def id(x : T) : {E} T
-  x

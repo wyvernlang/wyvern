@@ -1,4 +1,0 @@
-module def wavyUnderlineV1(io : illustrations.FileIO)
-
-def underlineIt() : system.Int
-	io.write(10)

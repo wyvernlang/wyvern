@@ -1,5 +1,0 @@
-resource type FileIO
-    effect read
-    effect write
-    def read(): {this.read} Int
-    def write(x: Int): {this.write} Int

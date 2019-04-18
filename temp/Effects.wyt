@@ -1,3 +1,3 @@
 resource type Effects
-effect e1
-effect e2
+    effect e1
+    effect e2

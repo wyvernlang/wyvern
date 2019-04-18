@@ -1,6 +1,0 @@
-import effects.basic
-import effects.basic1
-
-val b = basic()
-val b1 = basic1(b)
-b1.m5()

@@ -1,11 +1,8 @@
-import effects
+module def main(x : Effects)
 import Effects
 
-def fun1 () : {Effects.e1} Unit
+def fun1 () : {x.e1} Unit
     unit
 
-def fun2 () : {Effects.e2} Unit
-    unit
-
-def fun3 () : {system.ffiEffect} Unit
+def fun3 () : {x.e2} Unit
     fun1()

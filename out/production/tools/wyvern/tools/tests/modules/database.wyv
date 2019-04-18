@@ -1,8 +1,0 @@
-module def database()
-
-var contents : Int = 0
-
-def setContents(newValue: Int): Unit
-	contents = newValue
-	
-def getContents(): Int = contents

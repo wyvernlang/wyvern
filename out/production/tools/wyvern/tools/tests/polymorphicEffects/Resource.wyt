@@ -1,5 +1,0 @@
-type Resource
-  // wr is abstract, so {file.wr} != {network.wr}
-  effect wr
-  def write() : {this.wr} Unit
-
