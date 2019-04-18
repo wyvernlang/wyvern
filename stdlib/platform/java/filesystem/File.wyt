@@ -1,7 +1,7 @@
-import fileSystem.fileEffects
-import fileSystem.Reader
-import fileSystem.Writer
-import fileSystem.RandomAccessFile
+import filesystem.fileEffects
+import filesystem.Reader
+import filesystem.Writer
+import filesystem.RandomAccessFile
 resource type File
     def makeReader(): {fileEffects.open} Reader
     def makeWriter(): {fileEffects.open} Writer

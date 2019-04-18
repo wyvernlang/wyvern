@@ -1,4 +1,4 @@
-import fileSystem.fileEffects
+import filesystem.fileEffects
 resource type Writer
     def write(s: String): {fileEffects.write} Unit
     def close(): {fileEffects.close} Unit

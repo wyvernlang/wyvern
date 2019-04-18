@@ -1,4 +1,4 @@
-import fileSystem.fileEffects
+import filesystem.fileEffects
 resource type RandomAccessFile //can be renamed later if necessary
     def close() : {fileEffects.close} Unit
     def getPosition() : {fileEffects.read}  Int

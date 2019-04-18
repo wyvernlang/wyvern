@@ -1,5 +1,5 @@
 import wyvern.option
-import fileSystem.fileEffects
+import filesystem.fileEffects
 type Option = option.Option
 resource type Reader
     /* add read for UTF and bytes */

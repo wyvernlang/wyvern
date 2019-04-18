@@ -1,12 +1,12 @@
-module def fileSystem(java:Java) : {system.ffiEffect} fileSystem.FileSystem
-import fileSystem.fileEffects
+module def fileSystem(java:Java) : {system.ffiEffect} filesystem.FileSystem
+import filesystem.fileEffects
 import java:wyvern.stdlib.support.FileIO.file
 
 /* Import Types */
-import fileSystem.File
-import fileSystem.Reader
-import fileSystem.Writer
-import fileSystem.RandomAccessFile
+import filesystem.File
+import filesystem.Reader
+import filesystem.Writer
+import filesystem.RandomAccessFile
 
 import wyvern.option
 type Option = option.Option
