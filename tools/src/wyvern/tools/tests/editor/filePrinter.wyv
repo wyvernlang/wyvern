@@ -1,0 +1,23 @@
+module def filePrinter(io : Stdout, fr : filesystem.Reader) : {}
+import wyvern.option
+
+def printLine() : {io.flush, fr.read, io.print} Unit
+    val lineoption : option.Option[String] = fr.readLine()
+    val line : String = lineoption.getOrElse(() => "")
+    io.print(line)
+    io.flush()
+    unit
+
+/*
+def printFile() : {fr.read, io.print} Unit
+    val fileContent = fr.readFully()
+    io.print(fileContent)
+    unit
+*/
+
+def printFile() : {io.print} Unit
+    val fileContent = ""
+    io.print(fileContent)
+    unit
+
+

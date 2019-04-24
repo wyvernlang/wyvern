@@ -1,0 +1,8 @@
+import filesystem.File
+resource type ArrayList
+    effect read
+    effect write
+    def isEmpty() : {} Boolean
+    def add(x : File) : {this.write} Boolean
+    def size() : {} Int
+    def get(index : Int) : {this.read} File

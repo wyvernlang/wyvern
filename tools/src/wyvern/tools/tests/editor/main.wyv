@@ -1,14 +1,13 @@
 require java
-import editor.fileAppender
-import fileSystem.File
+import editor.editor
+import arrayListMaker
 import fileSystem
-import fileSystem.fileEffects
+import stdout
 
-val filesystem = fileSystem(java)
-val path = ""
-val f : File = filesystem.makeFile(path)
-val fappender = fileAppender(java, f)
-def a() : {fileEffects.write} Unit
-    fappender.appendFile(f)
+val arraylistmaker = arrayListMaker(java)
+val filesys = fileSystem(java)
+val out = stdout(java)
+
+val editor = editor(filesys, arraylistmaker, out)
 
 "abc"

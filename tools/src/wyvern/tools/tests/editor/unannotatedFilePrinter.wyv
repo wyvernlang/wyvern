@@ -1,0 +1,14 @@
+module def unannotatedFilePrinter(io : Stdout, file : filesystem.File) : {file.openForRead} // This is a bug here because the effect shouldn't be checked
+import wyvern.option
+
+val reader = file.makeReader()
+
+def printLine() : Unit
+    val lineoption : option.Option[String] = reader.readLine()
+    val line : String = lineoption.getOrElse(() => "")
+    io.print(line)
+    io.flush()
+
+def printFile() : Unit
+    val fileContent = reader.readFully()
+    io.print(fileContent)

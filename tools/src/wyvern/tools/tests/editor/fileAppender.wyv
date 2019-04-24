@@ -1,52 +1,31 @@
-module def fileAppender(java : Java, file : fileSystem.File) : {}
-
+module def fileAppender(arraylist : ArrayList, filewriter : filesystem.Writer) : {}
 import fileSystem
-import fileSystem.File
-import fileSystem.fileEffects
+import filesystem.File
 import wyvern.option
-import annotatedArrayList
+import arrayListMaker
+import ArrayList
+import filesystem.Reader
 
-// Quantification Lifter can not lift this module
-// import lifted arraylist
-
-import wyvern.collections.list
-
-effect appendFile = {fileEffects.open, fileEffects.read, fileEffects.write}
 
 // Append file2 to the end of file1
-def appendFile(file2 : File) : {fileEffects.open, fileEffects.read, fileEffects.write} Unit
-    val file2Reader = file2.makeReader()
+def appendFile(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
     val file2content = file2Reader.readFully()
-    val file1Appender = file.makeAppender()
-    file1Appender.write(file2content)
+    filewriter.write(file2content)
+    filewriter.close()
 
-// Append a list of files
-def appendFiles(fileList : list.List[File]) : {appendFile} Unit
-    val fileSys = fileSystem(java)
-    val dummyFile = fileSys.makeFile("")
-    def loop(fileList : list.List[File]) : {} Unit
-        val length = fileList.length()
-        val d : Unit = if (length == 0)
-                val fileOption = fileList.get(0)
-                val currentFile = fileOption.getOrElse(() => dummyFile)
-                appendFile(currentFile)
-                fileList.remove(0)
-                loop(fileList)
-            else
-                unit
-    loop(fileList)
-
-// Append an arraylist of files
-val arraylist = annotatedArrayList(java)
-def appendArrayListFiles(fileList : arraylist.ArrayList[File]) : {appendFile, arraylist.arraylistread, arraylist.arraylistwrite} Unit
-    def loop(x : Int, fileList : arraylist.ArrayList[File]) : {appendFile, arraylist.arraylistread, arraylist.arraylistwrite} Unit
-        val size = fileList.size()
+def appendArrayListFiles() : {arraylist.read} Unit
+    def loop(x : Int, fileList : ArrayList) : {fileList.read} Unit
+        val size = arraylist.size()
         val d : Unit = if (x < size)
-                appendFile(fileList.get(x))
+                val file : File = fileList.get(x)
+                val fileReader = file.makeReader()
+                appendFile(fileReader)
                 loop (x+1, fileList)
             else
                 unit
-    loop (0, fileList)
+    loop (0, arraylist)
+
+
 
 
 

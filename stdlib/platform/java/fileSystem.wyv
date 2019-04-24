@@ -11,31 +11,41 @@ import filesystem.RandomAccessFile
 import wyvern.option
 type Option = option.Option
 
-def makeFile(path: String) : {system.ffiEffect} File = new
-    val f : Unit = file.createNewFile(path)
+effect createNewFile = {system.ffiEffect}
 
-    def makeReader() : {fileEffects.open} Reader
+def makeFile(path: String) : {createNewFile} File = new
+    val f : Unit = file.createNewFile(path)
+    effect openForRead = {system.ffiEffect}
+    effect openForWrite = {system.ffiEffect}
+    effect openForAppend = {system.ffiEffect}
+    effect openForRandomAccess = {system.ffiEffect}
+
+    def makeReader() : {this.openForRead} Reader
         val br = file.openBRForRead(this.f)
         new (self) =>
-            def read() : {fileEffects.read} Int
+            effect read = {system.ffiEffect}
+            effect close = {system.ffiEffect}
+            def read() : {self.read} Int
                 file.readCharFromFile(br)
-            def readLine() : {fileEffects.read}  Option[String]
+            def readLine() : {self.read}  Option[String]
                 val line = file.readLineFromFile(br)
                 if (file.isNull(line))
                     option.None[String]()
                   else
                     option.Some[String](line)
-            def readFully() : {fileEffects.read} String
+            def readFully() : {self.read} String
                 file.readFullyFile(br)
-            def close() : {fileEffects.close} Unit
+            def close() : {self.close} Unit
                 file.closeReader(br)
 
-    def makeWriter() : {fileEffects.open} Writer
+    def makeWriter() : {this.openForWrite} Writer
         val bw = file.openBWForWrite(this.f)
         new (self) =>
-            def write(s : String) : {fileEffects.write} Unit
+            effect write = {system.ffiEffect}
+            effect close = {system.ffiEffect}
+            def write(s : String) : {self.write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
-            def close() : {fileEffects.close} Unit
+            def close() : {self.close} Unit
                 file.closeWriter(bw)
             
     
@@ -44,12 +54,14 @@ def makeFile(path: String) : {system.ffiEffect} File = new
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender() : {fileEffects.open} Writer
+    def makeAppender() : {this.openForAppend} Writer
         val bw = file.openBWForAppend(this.f)
         new (self) =>
-            def write(s : String) : {fileEffects.write} Unit
+            effect write = {system.ffiEffect}
+            effect close = {system.ffiEffect}
+            def write(s : String) : {self.write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
-            def close() : {fileEffects.write} Unit
+            def close() : {self.close} Unit
                 file.closeWriter(bw)
             
     
@@ -57,22 +69,26 @@ def makeFile(path: String) : {system.ffiEffect} File = new
     /* May want to rename this to something more unique
      * Modify "mode" parameter? and available methods?
      */
-    def makeRandomAccessFile(mode : String) : {fileEffects.open} RandomAccessFile
+    def makeRandomAccessFile(mode : String) : {this.openForRandomAccess} RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new (self) =>
-            def close() : {fileEffects.close} Unit
+            effect close = {system.ffiEffect}
+            effect seek = {system.ffiEffect}
+            effect read  = {system.ffiEffect}
+            effect write = {system.ffiEffect}
+            def close() : {self.close} Unit
                 file.closeRandomAccessFile(rf)
-            def getPosition() : {fileEffects.read} Int
+            def getPosition() : {} Int
                 file.accessFilePointer(rf)
-            def seek(pos : Int) : {fileEffects.read} Unit
+            def seek(pos : Int) : {self.seek} Unit
                 file.seekFilePointer(rf, pos)
-            def length() : {fileEffects.read} Int
+            def length() : {} Int
                 file.getRandomAccessFileLength(rf)
-            def readLine() : {fileEffects.read} String
+            def readLine() : {self.read} String
                 file.readLineRandomAccess(rf)
-            def readUTF() : {fileEffects.read} String
+            def readUTF() : {self.read} String
                 file.readUTFRandomAccess(rf)
-            def write(s : String) : {fileEffects.write}  Unit
+            def write(s : String) : {self.write}  Unit
                 file.writeStringRandomAccess(rf, s)            //temporary write method
-            def writeUTF(s : String) : {fileEffects.write} Unit
+            def writeUTF(s : String) : {self.write} Unit
                 file.writeUTFRandomAccess(rf, s)

@@ -3,7 +3,11 @@ import filesystem.Reader
 import filesystem.Writer
 import filesystem.RandomAccessFile
 resource type File
-    def makeReader(): {fileEffects.open} Reader
-    def makeWriter(): {fileEffects.open} Writer
-    def makeAppender(): {fileEffects.open} Writer
-    def makeRandomAccessFile(mode : String): {fileEffects.open} RandomAccessFile
+    effect openForRead
+    effect openForWrite
+    effect openForAppend
+    effect openForRandomAccess
+    def makeReader(): {this.openForRead} Reader
+    def makeWriter(): {this.openForWrite} Writer
+    def makeAppender(): {this.openForAppend} Writer
+    def makeRandomAccessFile(mode : String): {this.openForRandomAccess} RandomAccessFile

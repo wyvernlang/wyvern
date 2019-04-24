@@ -1,4 +1,6 @@
 import filesystem.fileEffects
 resource type Writer
-    def write(s: String): {fileEffects.write} Unit
-    def close(): {fileEffects.close} Unit
+    effect write
+    effect close
+    def write(s: String): {this.write} Unit
+    def close(): {this.close} Unit

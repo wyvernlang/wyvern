@@ -440,7 +440,8 @@ public class MethodCall extends Expression {
             }
 
         }
-        checkHigherOrderEffect(newCtx, formalArgTypes, actualArgTypes, args);
+        // TODO (@anlunx) skip this for now
+//        checkHigherOrderEffect(newCtx, formalArgTypes, actualArgTypes, args);
         return new MatchResult(formalArgTypes, newCtx, calleeCtx, failureReason, v, argsTypechecked);
     }
     

@@ -1,8 +1,0 @@
-module def main(x : Effects)
-import Effects
-
-def fun1 () : {x.e1} Unit
-    unit
-
-def fun3 () : {x.e2} Unit
-    fun1()

@@ -1,4 +1,0 @@
-module effects
-
-effect e1 = {system.ffiEffect}
-effect e2 = {system.ffiEffect}
