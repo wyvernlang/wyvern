@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.values;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -13,14 +14,14 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
 
 public class IntegerConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
-    private int value;
+    private BigInteger value;
 
-    public IntegerConstant(int i, FileLocation loc) {
+    public IntegerConstant(BigInteger i, FileLocation loc) {
         value = i;
         location = loc;
     }
 
-    public int getValue() {
+    public BigInteger getValue() {
         return value;
     }
 
@@ -42,7 +43,7 @@ public class IntegerConstant extends AbstractExpressionAST implements InvokableV
 
     @Override
     public int hashCode() {
-        return value;
+        return value.hashCode();
     }
 
     @Override
