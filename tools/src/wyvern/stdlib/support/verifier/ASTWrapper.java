@@ -15,7 +15,7 @@ public class ASTWrapper {
     }
     
     public Object oper(String name) {
-        switch(name) {
+        switch (name) {
         case "+": return AST.Expop.Plus;
         case "-": return AST.Expop.Minus;
         case "*": return AST.Expop.Times;

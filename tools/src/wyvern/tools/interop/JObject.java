@@ -54,10 +54,10 @@ public class JObject implements FObject {
   private void adapt(Object[] argArray, Class<?>[] parameterTypes) {
       for (int i = 0; i < argArray.length; ++i) {
           if (argArray[i] instanceof BigInteger && parameterTypes[i] == int.class) {
-              argArray[i] = ((BigInteger)argArray[i]).intValue();
+              argArray[i] = ((BigInteger) argArray[i]).intValue();
           }
           if (argArray[i] instanceof BigInteger && parameterTypes[i] == long.class) {
-              argArray[i] = ((BigInteger)argArray[i]).longValue();
+              argArray[i] = ((BigInteger) argArray[i]).longValue();
           }
       }
 }
