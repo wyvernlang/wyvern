@@ -24,4 +24,8 @@ public class StringHelper {
     public String ofCharacter(char c) {
         return String.valueOf(c);
     }
+
+    public String valueOf(int i) {
+        return String.valueOf(i);
+    }
 }
