@@ -46,7 +46,6 @@ final class EffectAnnotationChecker {
             for (TypedModuleSpec spec : dependencies) {
                 if (!spec.getIsAnnotated()) {
                     if (!liftedModules.contains(spec.getModule())) {
-                        System.out.println(spec);
                         ToolError.reportError(ErrorMessage.EFFECT_ANNOTATION_SEPARATION, FileLocation.UNKNOWN);
                     }
                 }

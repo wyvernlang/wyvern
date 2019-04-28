@@ -140,16 +140,24 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, Case ast) {
+        ast.getAST().acceptVisitor(this, state);
         return null;
     }
 
     @Override
     public Void visit(GenContext state, Fn ast) {
+        ast.getBody().acceptVisitor(this, state);
         return null;
     }
 
     @Override
     public Void visit(GenContext state, Invocation ast) {
+        if (ast.getArgument() != null) {
+            ast.getArgument().acceptVisitor(this, state);
+        }
+        if (ast.getArgument() != null) {
+            ast.getReceiver().acceptVisitor(this, state);
+        }
         return null;
     }
 
@@ -161,6 +169,11 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, Match ast) {
+        ast.getMatchingOver().acceptVisitor(this, state);
+        ast.getDefaultCase().getAST().acceptVisitor(this, state);
+        for (Case cse : ast.getCases()) {
+            cse.getAST().acceptVisitor(this, state);
+        }
         return null;
     }
 
@@ -217,6 +230,9 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, Sequence ast) {
+        for (TypedAST exp : ast.getExps()) {
+            exp.acceptVisitor(this, state);
+        }
         return null;
     }
 
