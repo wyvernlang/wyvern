@@ -365,7 +365,8 @@ public class ModuleResolver {
             return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
                     loadingType, decl.isAnnotated());
         } else {
-            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType, null);
+            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
+                    loadingType, true);
         }
     }
 
@@ -403,7 +404,8 @@ public class ModuleResolver {
 
     private Module createAdaptedModule(File file, String qualifiedName, String valueName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
-                                       TypeContext ctx, boolean toplevel, boolean loadingType, Boolean isAnnotated) {
+                                       TypeContext ctx, boolean toplevel, boolean loadingType, boolean isAnnotated
+                                       ) {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
@@ -455,7 +457,9 @@ public class ModuleResolver {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
+
+        TypedModuleSpec spec;
+        spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
         return new Module(spec, program, dependencies);
     }
 
