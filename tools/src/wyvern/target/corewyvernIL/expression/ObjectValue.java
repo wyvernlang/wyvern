@@ -89,13 +89,13 @@ public class ObjectValue extends New implements Invokable {
             }
         } catch (StackOverflowError e) {
             System.err.println("Stack overflow.  Method stack:");
-            for (int i = theStack.size()-1; i >= 0; --i) {
+            for (int i = theStack.size() - 1; i >= 0; --i) {
                 System.err.println(theStack.get(i) + "(...)");
             }
             ToolError.reportError(ErrorMessage.STACK_OVERFLOW, loc);
             throw new RuntimeException("stack overflow"); // never get here
         } finally {
-            theStack.remove(theStack.size()-1);
+            theStack.remove(theStack.size() - 1);
         }
     }
 
