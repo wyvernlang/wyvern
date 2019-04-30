@@ -165,6 +165,10 @@ public class Sequence extends AbstractExpressionAST implements CoreAST, Iterable
         };
     }
 
+    public List<TypedAST> getExps() {
+        return exps;
+    }
+
     public TypedAST getLast() {
         return exps.getLast();
     }

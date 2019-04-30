@@ -42,6 +42,18 @@ public class Match extends AbstractExpressionAST implements CoreAST {
         return "Match: " + matchingOver + " with " + cases + " cases and default: " + defaultCase;
     }
 
+    public ExpressionAST getMatchingOver() {
+        return matchingOver;
+    }
+
+    public List<Case> getCases() {
+        return cases;
+    }
+
+    public Case getDefaultCase() {
+        return defaultCase;
+    }
+
     @Override
     public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
         return visitor.visit(state, this);

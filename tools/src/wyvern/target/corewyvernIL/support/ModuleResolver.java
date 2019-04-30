@@ -373,11 +373,11 @@ public class ModuleResolver {
         if (isModule) {
             wyvern.tools.typedAST.core.declarations.ModuleDeclaration decl =
                     (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
-            boolean isPure = decl.getArgs().size() == 0;
             return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
-                    loadingType, isPure || decl.isAnnotated());
+                    loadingType, decl.isAnnotated());
         } else {
-            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType, null);
+            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
+                    loadingType, true);
         }
     }
 
@@ -417,7 +417,8 @@ public class ModuleResolver {
 
     private Module createAdaptedModule(File file, String qualifiedName, String valueName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
-                                       TypeContext ctx, boolean toplevel, boolean loadingType, Boolean isAnnotated) {
+                                       TypeContext ctx, boolean toplevel, boolean loadingType, boolean isAnnotated
+                                       ) {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
@@ -469,7 +470,9 @@ public class ModuleResolver {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
+
+        TypedModuleSpec spec;
+        spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
         return new Module(spec, program, dependencies);
     }
 

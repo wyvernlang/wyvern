@@ -44,7 +44,7 @@ final class EffectAnnotationChecker {
 
             // Check if dependencies are annotated or lifted
             for (TypedModuleSpec spec : dependencies) {
-                if (spec.getIsAnnotated() != null && !spec.getIsAnnotated()) {
+                if (!spec.getIsAnnotated()) {
                     if (!liftedModules.contains(spec.getModule())) {
                         ToolError.reportError(ErrorMessage.EFFECT_ANNOTATION_SEPARATION, FileLocation.UNKNOWN);
                     }

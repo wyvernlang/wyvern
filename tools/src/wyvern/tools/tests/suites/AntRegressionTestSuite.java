@@ -28,6 +28,7 @@ import wyvern.tools.tests.ReflectionTests;
 import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
 import wyvern.tools.tests.TransformTests;
+import wyvern.tools.tests.EffectSeparationTests;
 
 /**
  * This test suite includes all working tests (as of this writing) that
@@ -64,6 +65,7 @@ import wyvern.tools.tests.TransformTests;
             EffectAnnotationTests.class,
             ModuleSystemTests.class,        // tests the new IL
             HigherOrderTests.class,
+            EffectSeparationTests.class,
             FileTest.class
         }
         )

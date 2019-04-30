@@ -7,9 +7,18 @@ public class TypedModuleSpec extends ModuleSpec {
     private final String definedTypeName;
     private final String definedValueName;
     private Module module = null;
-    private Boolean isAnnotated;
+    private boolean isAnnotated;
 
-    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName, Boolean isAnnotated) {
+    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName, boolean isAnnotated) {
+        super(qualifiedName);
+        this.type = type;
+        this.definedTypeName = typeName;
+        this.definedValueName = valueName;
+        this.isAnnotated = isAnnotated;
+    }
+
+    public TypedModuleSpec(String qualifiedName, ValueType type, String typeName, String valueName, boolean isAnnotated,
+                           boolean isModule) {
         super(qualifiedName);
         this.type = type;
         this.definedTypeName = typeName;

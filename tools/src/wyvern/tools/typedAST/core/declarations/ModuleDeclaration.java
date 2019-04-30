@@ -62,7 +62,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.effectSet = EffectSet.parseEffects(name, effects, false, location);
         if (args.isEmpty() && imports.isEmpty() && this.effectSet != null
                 && !this.effectSet.getEffects().isEmpty()) {
-            ToolError.reportError(ErrorMessage.PURE_MODULE_ANNOTATION, FileLocation.UNKNOWN);
+            ToolError.reportError(ErrorMessage.PURE_MODULE_ANNOTATION, location);
         }
     }
 
