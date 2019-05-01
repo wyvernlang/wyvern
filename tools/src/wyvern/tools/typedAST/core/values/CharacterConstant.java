@@ -11,6 +11,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class CharacterConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
     private char value;
@@ -44,4 +45,10 @@ public class CharacterConstant extends AbstractExpressionAST implements Invokabl
         sb.append(")");
         return sb;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 }

@@ -31,6 +31,7 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class Application extends AbstractExpressionAST implements CoreAST {
     private ExpressionAST function;
@@ -72,6 +73,12 @@ public class Application extends AbstractExpressionAST implements CoreAST {
     public FileLocation getLocation() {
         return this.location;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     @Override
     public IExpr generateIL(

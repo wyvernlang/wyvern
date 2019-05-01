@@ -11,6 +11,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class Assertion extends AbstractExpressionAST {
     private FileLocation location;
@@ -35,5 +36,11 @@ public class Assertion extends AbstractExpressionAST {
     public FileLocation getLocation() {
         return location;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
 }

@@ -300,10 +300,19 @@ public class ModuleResolver {
         if (ast instanceof ExpressionAST) {
             program = ((ExpressionAST) ast).generateIL(genCtx, null, dependencies);
         } else if (ast instanceof wyvern.tools.typedAST.abs.Declaration) {
+
             Declaration decl = ((wyvern.tools.typedAST.abs.Declaration) ast).topLevelGen(genCtx, dependencies);
+
+            if (ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration) {
+                wyvern.tools.typedAST.core.declarations.ModuleDeclaration moduleDecl =
+                        (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
+                EffectAnnotationChecker.checkModule(this, genCtx, moduleDecl, dependencies);
+            }
+
             if (decl instanceof ValDeclaration) {
                 program = ((ValDeclaration) decl).getDefinition();
                 //program = wrap(program, dependencies);
+
             } else if (decl instanceof ModuleDeclaration) {
                 ModuleDeclaration oldModuleDecl = (ModuleDeclaration) decl;
                 valueName = decl.getName();
@@ -314,6 +323,7 @@ public class ModuleResolver {
                             oldModuleDecl.getType(), oldModuleDecl.getBody(), oldModuleDecl.getDependencies(), oldModuleDecl.getLocation());
                     program = new New(moduleDecl);
                 }
+
             } else if (decl instanceof DefDeclaration) {
                 DefDeclaration oldDefDecl = (DefDeclaration) decl;
                 valueName = decl.getName();
@@ -324,7 +334,8 @@ public class ModuleResolver {
                         oldDefDecl.getFormalArgs(),
                         oldDefDecl.getType(),
                         oldDefDecl.getBody(),
-                        oldDefDecl.getLocation()
+                        oldDefDecl.getLocation(),
+                        oldDefDecl.getEffectSet()
                 );
 
                 // Wrap in an object
@@ -338,21 +349,9 @@ public class ModuleResolver {
                     program = liftResult;
                 }
 
-//                for(FormalArg arg : formalArgs) {
-//                    Set<EffectDeclType> effects = getEffects(arg, newGenCtx);
-//                    for(DeclType declType : arg.getType().getStructuralType(newGenCtx).getDeclTypes()) {
-//                        if(declType instanceof EffectDeclType) {
-//                            EffectDeclType effectDecl = (EffectDeclType) declType;
-//                            effectDecl.adapt(View.from(program, newGenCtx));
-//                            System.out.println(effectDecl);
-//                        }
-//                    }
-//                }
+                // Perform effect annotation check
+//                boolean result = EffectAnnotationChecker.isAnnotated(genCtx, program);
 
-//                List<DeclType> firstDeclTypes = (h.getFormalArgs().get(0).getType().getStructuralType(newGenCtx).getDeclTypes());
-//                List<DeclType> secondDeclTypes = (h.getFormalArgs().get(1).getType().getStructuralType(newGenCtx).getDeclTypes());
-//                System.out.println(firstDeclTypes);
-//                System.out.println(secondDeclTypes);
 
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);
@@ -365,7 +364,16 @@ public class ModuleResolver {
 
         TypeContext ctx = extendContext(Globals.getStandardTypeContext(), dependencies);
 
-        return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel, loadingType);
+        boolean isModule = ast instanceof wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
+        if (isModule) {
+            wyvern.tools.typedAST.core.declarations.ModuleDeclaration decl =
+                    (wyvern.tools.typedAST.core.declarations.ModuleDeclaration) ast;
+            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
+                    loadingType, decl.isAnnotated());
+        } else {
+            return createAdaptedModule(file, qualifiedName, valueName, dependencies, program, ctx, toplevel,
+                    loadingType, true);
+        }
     }
 
 
@@ -402,7 +410,8 @@ public class ModuleResolver {
 
     private Module createAdaptedModule(File file, String qualifiedName, String valueName,
                                        final List<TypedModuleSpec> dependencies, IExpr program,
-                                       TypeContext ctx, boolean toplevel, boolean loadingType) {
+                                       TypeContext ctx, boolean toplevel, boolean loadingType, boolean isAnnotated
+                                       ) {
 
         ValueType moduleType = program.typeCheck(ctx, null);
         // if this is a platform module, adapt any arguments to take the system.Platform object
@@ -454,7 +463,9 @@ public class ModuleResolver {
         if (!toplevel) {
             moduleType.checkWellFormed(ctx);
         }
-        TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName);
+
+        TypedModuleSpec spec;
+        spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
         return new Module(spec, program, dependencies);
     }
 

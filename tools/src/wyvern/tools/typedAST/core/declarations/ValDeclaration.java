@@ -18,6 +18,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 
@@ -62,6 +63,12 @@ public class ValDeclaration extends Declaration implements CoreAST {
     private FileLocation location = FileLocation.UNKNOWN;
     public FileLocation getLocation() {
         return this.location; //TODO
+    }
+
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

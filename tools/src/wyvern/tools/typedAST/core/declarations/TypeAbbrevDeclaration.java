@@ -19,6 +19,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 
 // TODO: this represents an abstract type when the reference is null.
@@ -99,4 +100,10 @@ public class TypeAbbrevDeclaration extends Declaration implements CoreAST {
         DeclType dt = genILType(tlc.getContext());
         tlc.addModuleDecl(decl, dt);
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 }

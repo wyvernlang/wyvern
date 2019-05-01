@@ -11,6 +11,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.CoreAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 
 /** Represents the contents of a structural type.  Not used at the top level to my knowledge;
@@ -84,5 +85,11 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
         // TODO Auto-generated method stub
         return name;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
 }

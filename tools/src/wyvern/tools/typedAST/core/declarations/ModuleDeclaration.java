@@ -10,6 +10,7 @@ import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -21,12 +22,15 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
+import wyvern.tools.errors.ToolError;
 import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.NamedType;
 import wyvern.tools.util.Pair;
 
@@ -39,10 +43,13 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     private final List<NameBindingImpl> args;
 
     private final List<ImportDeclaration> imports;
+    private boolean isAnnotated;
+    private EffectSet effectSet;
     //private final List<GenericParameter> generics;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
-                             TypedAST inner, NamedType type, FileLocation location, boolean isResource) {
+                             TypedAST inner, NamedType type, FileLocation location, boolean isResource,
+                             boolean isAnnotated, String effects) {
         this.name = name;
         this.inner = inner;
         this.location = location;
@@ -51,6 +58,20 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.args = args;
         this.imports = imports;
         this.generics = generics;
+        this.isAnnotated = isAnnotated;
+        this.effectSet = EffectSet.parseEffects(name, effects, false, location);
+        if (args.isEmpty() && imports.isEmpty() && this.effectSet != null
+                && !this.effectSet.getEffects().isEmpty()) {
+            ToolError.reportError(ErrorMessage.PURE_MODULE_ANNOTATION, location);
+        }
+    }
+
+    public EffectSet getEffectSet() {
+        return effectSet;
+    }
+
+    public List<NameBindingImpl> getArgs() {
+        return args;
     }
 
     @Override
@@ -68,6 +89,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         return location;
     }
 
+    public TypedAST getInner() {
+        return inner;
+    }
+
     @Override
     public DeclType genILType(GenContext ctx) {
         // TODO Auto-generated method stub
@@ -78,6 +103,16 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
         return null;
     }
+
+    public boolean isAnnotated() {
+        return isAnnotated;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     /**
      * Generate the rest part of a module (not import/instantiate/require)
@@ -99,7 +134,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
      * loadedTypes is updated with all the types that had to be loaded in
      * order to specify the required types.
      *
-     * @param reqSeq
      * @param ctx
      * @param loadedTypes
      * @return
@@ -268,7 +302,9 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
             return new wyvern.target.corewyvernIL.decl.ValDeclaration(name, returnType, body, getLocation());
         }
         /* resource module translated into method */
-        return new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation());
+        wyvern.target.corewyvernIL.decl.DefDeclaration defDecl =
+                new wyvern.target.corewyvernIL.decl.DefDeclaration(name, formalArgs, returnType, body, getLocation(), effectSet);
+        return defDecl;
     }
 
     public List<ImportDeclaration> getImports() {

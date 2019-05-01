@@ -75,9 +75,9 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 
     @Override
-    public TypedAST moduleDecl(String name, List<TypedAST> imports, List<GenericParameter> generics,
-                               List args, TypedAST ast, Type type, FileLocation loc, boolean isResource) {
-        return new ModuleDeclaration(name, imports, generics, args, ast, (NamedType) type, loc, isResource);
+    public TypedAST moduleDecl(String name, List<TypedAST> imports, List<GenericParameter> generics, List args,
+                               TypedAST ast, Type type, FileLocation loc, boolean isResource, boolean isAnnotated, String effects) {
+        return new ModuleDeclaration(name, imports, generics, args, ast, (NamedType) type, loc, isResource, isAnnotated, effects);
     }
 
     @Override

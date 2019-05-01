@@ -25,6 +25,7 @@ import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 
 /** Represents a declaration of a structural type.
@@ -98,6 +99,12 @@ public class TypeVarDecl extends Declaration {
         }
         return selfSite;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     private wyvern.target.corewyvernIL.type.Type computeInternalILType(GenContext ctx) {
         TypeDeclaration td = this.body;

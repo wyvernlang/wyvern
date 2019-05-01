@@ -50,6 +50,9 @@ public enum ErrorMessage {
     ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
     ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),
     VAL_NEEDS_TYPE("val declaration %ARG is inside a new statement and thus needs a type annotation", 1),
+    EFFECT_ANNOTATION_SEPARATION("Effect-annotated module depends on an effect-unannotated module", 0),
+    EFFECT_ANNOTATION_DEF("Module definition has incorrect annotation", 0),
+    PURE_MODULE_ANNOTATION("Pure module should always have empty effect annotation", 0),
 
     // Syntax errors
     LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),

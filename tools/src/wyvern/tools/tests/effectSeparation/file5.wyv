@@ -1,0 +1,4 @@
+// Pure module, but with a non-empty effect annotation
+module file5 : {system.ffiEffect}
+def x() : Unit
+    unit

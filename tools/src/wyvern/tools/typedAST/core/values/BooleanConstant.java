@@ -11,6 +11,7 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class BooleanConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
     private boolean value;
@@ -26,6 +27,11 @@ public class BooleanConstant extends AbstractExpressionAST implements InvokableV
     private FileLocation location = FileLocation.UNKNOWN;
     public FileLocation getLocation() {
         return this.location;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

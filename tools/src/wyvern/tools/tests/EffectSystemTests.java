@@ -387,4 +387,6 @@ public class EffectSystemTests {
         /* Object with effect annotations. */
         TestUtil.doTestScriptModularly(PATH, "effects.objNetwork", Util.stringType(), new StringLiteral("ObjNetwork with effects"));
     }
+
+
 }
