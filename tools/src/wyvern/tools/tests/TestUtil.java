@@ -50,6 +50,7 @@ public final class TestUtil {
     public static final String STDLIB_PATH = BASE_PATH + "stdlib/";
     public static final String LIB_PATH = WYVERN_HOME == null ? "../stdlib/" : WYVERN_HOME + "/stdlib/";
     public static final String EXAMPLES_PATH = WYVERN_HOME == null ? "../examples/" : WYVERN_HOME + "/examples/";
+    public static final String BACKEND_PATH = WYVERN_HOME == null ? "../backend/src/" : WYVERN_HOME + "/backend/src/";
     private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
 
     private TestUtil() { }

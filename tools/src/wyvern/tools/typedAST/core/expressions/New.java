@@ -21,6 +21,7 @@ import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 import wyvern.tools.typedAST.core.declarations.VarDeclaration;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 
 public class New extends AbstractExpressionAST implements CoreAST {
@@ -66,6 +67,11 @@ public class New extends AbstractExpressionAST implements CoreAST {
     public New(DeclSequence seq, FileLocation fileLocation) {
         this.seq = seq;
         this.location = fileLocation;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     public void setBody(DeclSequence seq) {

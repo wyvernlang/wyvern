@@ -1,6 +1,7 @@
 package wyvern.tools.typedAST.core.declarations;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.util.GetterAndSetterGeneration;
@@ -91,6 +93,16 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         return isClass;
     }
 
+    /**
+     * Set the effectset to be empty set
+     * This function is used to make modules fully annotated
+     */
+    public void setEmptyEffectSet() {
+        if (effectSet == null) {
+            effectSet = new EffectSet(new HashSet<>());
+        }
+    }
+
     @Override
     public String getName() {
         return name;
@@ -103,6 +115,11 @@ public class DefDeclaration extends DeclarationWithGenerics implements CoreAST, 
         }
 
         return effectSet;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

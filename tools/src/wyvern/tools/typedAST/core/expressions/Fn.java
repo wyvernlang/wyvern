@@ -27,6 +27,7 @@ import wyvern.tools.typedAST.interfaces.BoundCode;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
     public static final String LAMBDA_STRUCTUAL_DECL = "@lambda-structual-decl";
@@ -50,6 +51,11 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
     @Override
     public List<NameBinding> getArgBindings() {
         return bindings;
+    }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
     }
 
     @Override

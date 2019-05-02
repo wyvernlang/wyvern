@@ -15,7 +15,7 @@ resource type List
     /** Removes the n'th element from the List; indexing starts with 0.
      *  Returns true if the removal succeeded (i.e. if n was in range) */
     def remove(n:Int):Boolean
-    def do(f:this.E -> Unit):Unit
+    def do(f:this.E -> Any):Unit
     def map[F](f:this.E -> F):List[F] // functional map
     
     
@@ -26,7 +26,7 @@ def make[E]():List[E]
         def find(pred:E -> Boolean):Option[E]
         def get(n:Int):Option[E]
         def getCell(n:Int):Option[Cell]
-        def do(f:E -> Unit):Unit
+        def do(f:E -> Any):Unit
     def makeCell(e:E, n:Option[Cell]):Cell = new (self) =>
         var element:E = e
         var next:Option[Cell] = n
@@ -42,7 +42,7 @@ def make[E]():List[E]
             (n == 0).ifTrue(
                 () => option.Some[Cell](self),
                 () => self.next.flatMap[Cell]((c:Cell) => c.getCell(n-1)))
-        def do(f:E -> Unit):Unit
+        def do(f:E -> Any):Unit
             f(self.element)
             self.next.map[Unit](c:Cell => c.do(f))
     def makeOneCell(e:E):Cell = makeCell(e, option.None[Cell]())
@@ -96,7 +96,7 @@ def make[E]():List[E]
                 () => false,
                 () => definitelyRemove()
             )
-        def do(f:E -> Unit):Unit = self.first.map[Unit](c:Cell => c.do(f))
+        def do(f:E -> Any):Unit = self.first.map[Unit](c:Cell => c.do(f))
         def map[F](f:self.E -> F):List[F]
             val newList:List[F] = make[F]()
             self.do(e => newList.append(f(e)))

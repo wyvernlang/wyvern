@@ -1,0 +1,6 @@
+module def filedef6(m : effectSeparation.ModuleWithEffect) : {} effectSeparation.AnnotatedFile
+m.functionWithEffect()
+// If change unit into m.fuinctionWithEffect() then there will be an error?
+def x() : {} Unit
+    unit
+

@@ -24,6 +24,7 @@ import wyvern.tools.interop.JavaWrapper;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 /**
  * Created by Ben Chung on 3/11/14.
@@ -57,6 +58,12 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
     public FileLocation getLocation() {
         return location;
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 
     @Override
     public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
@@ -105,6 +112,9 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
                 }
             }
             FileLocation loc = e.getLocation();
+            if (loc == null) {
+                loc = new FileLocation("", 0, 0);
+            }
             FileLocation myLoc = this.getLocation();
             FileLocation newLoc = new FileLocation(myLoc.getFilename(), myLoc.getLine() + loc.getLine() - 1, myLoc.getCharacter() + loc.getCharacter() - 1);
             ToolError updatedE = e.withNewLocation(newLoc);

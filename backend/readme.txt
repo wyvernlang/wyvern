@@ -45,3 +45,13 @@ Then rebuild:
 
 $ cd ../tools
 $ ant build
+
+================================================================================
+
+This directory also contains code that connects the backend to the verifier.
+This relies on the protobuf definitions in the wyvern/grad-ver project,
+in protobuf-mock/AST.proto.  Run this with:
+
+$ protoc AST.proto --java_out=<<path to wyvern/tools/src>>
+
+As above, add "// CHECKSTYLE:OFF" to the top of the generated file and rebuild.

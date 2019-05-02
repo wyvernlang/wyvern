@@ -1,5 +1,6 @@
 package wyvern.tools.typedAST.core.values;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.expression.Expression;
@@ -11,16 +12,17 @@ import wyvern.tools.errors.FileLocation;
 import wyvern.tools.typedAST.abs.AbstractExpressionAST;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.InvokableValue;
+import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class IntegerConstant extends AbstractExpressionAST implements InvokableValue, CoreAST {
-    private int value;
+    private BigInteger value;
 
-    public IntegerConstant(int i, FileLocation loc) {
+    public IntegerConstant(BigInteger i, FileLocation loc) {
         value = i;
         location = loc;
     }
 
-    public int getValue() {
+    public BigInteger getValue() {
         return value;
     }
 
@@ -42,11 +44,17 @@ public class IntegerConstant extends AbstractExpressionAST implements InvokableV
 
     @Override
     public int hashCode() {
-        return value;
+        return value.hashCode();
     }
 
     @Override
     public Expression generateIL(GenContext ctx, ValueType expectedType, List<TypedModuleSpec> dependencies) {
         return new IntegerLiteral(value, location);
     }
+
+    @Override
+    public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
+        return visitor.visit(state, this);
+    }
+
 }
