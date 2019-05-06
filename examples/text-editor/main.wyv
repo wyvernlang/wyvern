@@ -1,0 +1,16 @@
+require java
+
+import fileSystem
+import logger
+import textEditor
+import TextEditor
+
+val fs = fileSystem(java)
+val logFile = fs.makeFile("log.txt") // We create the log file, but not an appender for it to be able to handle several text-editor windows, each of which is a text-editor instance.
+val logger = logger(logFile)
+
+def createTextEditorInstance(): TextEditor
+  textEditor(java, logger, () => createTextEditorInstance())
+
+val te = createTextEditorInstance()
+te.run()

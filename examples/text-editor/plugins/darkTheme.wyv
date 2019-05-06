@@ -1,0 +1,17 @@
+module def darkTheme(logger: Logger, nativeUIManager: NativeUIManager, jFrame: JFrame): Plugin
+// N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
+
+def getName(): String
+  "Dark Theme"
+
+def run(): Unit
+  nativeUIManager.paintUIAttributeGray("MenuBar", "background")
+  nativeUIManager.paintUIAttributeDarkGray("MenuItem", "background")
+  nativeUIManager.paintUIAttributeWhite("MenuItem", "foreground")
+  nativeUIManager.paintUIAttributeDarkGray("TextArea", "background")
+  nativeUIManager.paintUIAttributeWhite("TextArea", "foreground")
+  nativeUIManager.paintUIAttributeWhite("TextArea", "caretForeground")
+  nativeUIManager.paintUIAttributeGray("ScrollPane", "background")
+  nativeUIManager.paintUIAttributeDarkGray("ScrollBar", "background")
+  nativeUIManager.updateLookAndFeel(jFrame)
+  logger.updateLog("Set text editor theme to dark.\n")
