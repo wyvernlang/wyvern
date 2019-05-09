@@ -1,0 +1,2 @@
+type JTextArea
+  def getText(): String

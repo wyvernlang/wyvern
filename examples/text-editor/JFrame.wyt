@@ -1,0 +1,2 @@
+type JFrame
+  def setTitle(title: String): Unit

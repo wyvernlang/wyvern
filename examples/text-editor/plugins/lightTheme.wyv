@@ -1,0 +1,16 @@
+module def lightTheme(logger: Logger, nativeUIManager: NativeUIManager, jFrame: JFrame): Plugin
+// N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
+
+def getName(): String
+  "Light Theme"
+
+def run(): Unit
+  nativeUIManager.paintUIAttributeWhite("MenuBar", "background")
+  nativeUIManager.paintUIAttributeWhite("MenuItem", "background")
+  nativeUIManager.paintUIAttributeBlack("MenuItem", "foreground")
+  nativeUIManager.paintUIAttributeWhite("TextArea", "background")
+  nativeUIManager.paintUIAttributeBlack("TextArea", "foreground")
+  nativeUIManager.paintUIAttributeWhite("ScrollPane", "background")
+  nativeUIManager.paintUIAttributeWhite("ScrollBar", "background")
+  nativeUIManager.updateLookAndFeel(jFrame)
+  logger.updateLog("Set text editor theme to light.\n")

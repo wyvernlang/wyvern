@@ -1,0 +1,175 @@
+module def textEditor(java: Java, logger: Logger, createTextEditorInstance: Dyn): TextEditor
+// FIX: Use the arrow type instead of Dyn. Currently gives the cast error: can't cast Arrow into NamedType
+
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJTextArea
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJFileChooser
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJScrollPane
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJFrame
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJMenuBar
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJMenu
+import java:wyvern.stdlib.support.TextEditorHelper.nativeJOptionPane
+import java:wyvern.stdlib.support.TextEditorHelper.nativeUtils
+import java:wyvern.stdlib.support.TextEditorHelper.nativeActionCreator
+import java:wyvern.stdlib.support.TextEditorHelper.nativeKeyListenerCreator
+import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
+
+import fileSystem
+import fileSystem.Reader
+import fileSystem.Writer
+import Plugin
+
+/******* Step 1: Import plugins *********************************************/
+
+import plugins.wordCount
+import plugins.darkTheme
+import plugins.lightTheme
+import plugins.questionnaireCreator
+
+/****************************************************************************/
+
+nativeUIManager.enableSettingLookAndFeel() // This must happen before jFrame is created.
+val jFrame = nativeJFrame.create()
+val textArea = nativeJTextArea.create(20, 60)
+val dialog = nativeJFileChooser.create(nativeUtils.getSystemProperty("user.dir"))
+var currentFile: String = "Untitled"
+var changed: Boolean = false
+val scroll = nativeJScrollPane.create(textArea, nativeJScrollPane.getVerticalScrollbarAlwaysValue(), nativeJScrollPane.getHorizontalScrollbarAlwaysValue())
+val jmb = nativeJMenuBar.create()
+val file = nativeJMenu.create("File")
+val edit = nativeJMenu.create("Edit")
+val plugins = nativeJMenu.create("Plugins")
+val fs = fileSystem(java)
+val save = nativeActionCreator.create("Save")
+
+def registerPlugin(plugin: Plugin): Unit
+  plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
+  logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
+
+def runPluginOnSetup(plugin: Plugin): Unit
+  logger.updateLog("Running plugin " + plugin.getName() + "...\n")
+  plugin.run()
+  logger.updateLog("Ran plugin " + plugin.getName() + ".\n")
+
+def saveFile(fileName: String): Unit // N.B.: File exceptions aren't handled.
+  val fileWriter = fs.makeFile(fileName).makeWriter()
+  fileWriter.write(textArea.getText())
+  fileWriter.close()
+  logger.updateLog("File was saved as " + fileName + ".\n")
+  currentFile = fileName
+  jFrame.setTitle(currentFile)
+  changed = false
+  save.setEnabled(false)
+
+def saveFileAs(): Unit
+  if (dialog.showSaveDialog(nativeUtils.getNullValue()) == nativeJFileChooser.getApproveOption())
+    saveFile(dialog.getSelectedFile().getAbsolutePath())
+
+def saveOld(): Unit
+  if (changed)
+    if (nativeJOptionPane.showConfirmDialog("Would you like to save " + currentFile + " ?", "Save", nativeJOptionPane.getYesNoOptionValue()) == nativeJOptionPane.getYesOptionValue())
+      saveFile(currentFile)
+
+def performNewAction(): Unit
+  createTextEditorInstance().run()
+  logger.updateLog("New text editor was created.\n")
+
+def performSaveAction(): Unit
+  if ("Untitled".equals(currentFile))
+      saveFileAs()
+    else
+      saveFile(currentFile)
+
+def performSaveAsAction(): Unit
+  saveFileAs()
+
+val saveAs = nativeActionCreator.createWithAction("Save as...", () => performSaveAsAction())
+
+def performOpenAction(): Unit // N.B.: File exceptions aren't handled.
+  saveOld()
+  if (dialog.showOpenDialog(nativeUtils.getNullValue()) == nativeJFileChooser.getApproveOption())
+    val fileName = dialog.getSelectedFile().getAbsolutePath()
+    val fileReader = fs.makeFile(fileName).makeReader()
+    textArea.setText(fileReader.readFully())
+    fileReader.close()
+    currentFile = fileName
+    jFrame.setTitle(currentFile)
+    changed = false
+    logger.updateLog("File " + fileName + " was opened.\n")
+  saveAs.setEnabled(true)
+
+def performQuitAction(): Unit
+  saveOld()
+  logger.updateLog("Closing text editor...\n")
+  nativeUtils.exitSystem()
+
+val newFile = nativeActionCreator.createWithAction("New", () => performNewAction())
+val open = nativeActionCreator.createWithAction("Open", () => performOpenAction())
+save.setAction(() => performSaveAction())
+val quit = nativeActionCreator.createWithAction("Quit", () => performQuitAction())
+
+def performKeyPressedAction(): Unit
+  changed = true
+  save.setEnabled(true)
+  saveAs.setEnabled(true)
+
+val kl = nativeKeyListenerCreator.create(() => performKeyPressedAction())
+val m = textArea.getActionMap()
+
+def run(): Unit
+  logger.updateLog("New text-editor window is starting...\n")
+  jFrame.add(scroll, "Center") // "Center" = BorderLayout.CENTER
+  jFrame.setJMenuBar(jmb)
+
+  jmb.add(file)
+  jmb.add(edit)
+  jmb.add(plugins)
+
+  file.add(newFile)
+  file.add(open)
+  file.add(save)
+  file.add(saveAs)
+  file.add(quit)
+
+  // FIX? There is a bug that if the content of the file is simply pasted from
+  // the clipboard right after the file is open, the save options are
+  // disabled, and so the file can't be saved unless it is manually modified.
+  edit.add(m.get("cut-to-clipboard")) // "cut-to-clipboard" = DefaultEditorKit.cutAction
+  edit.add(m.get("copy-to-clipboard")) // "copy-to-clipboard" = DefaultEditorKit.copyAction
+  edit.add(m.get("paste-from-clipboard")) // "paste-from-clipboard" = DefaultEditorKit.pasteAction
+
+  edit.getItem(0).setText("Cut")
+  edit.getItem(1).setText("Copy")
+  edit.getItem(2).setText("Paste")
+
+  save.setEnabled(false)
+  saveAs.setEnabled(false)
+
+/******* Step 2: Instantiate plugins passing in appropriate resources *******/
+
+  val darkTheme = darkTheme(logger, nativeUIManager, jFrame)
+  val lightTheme = lightTheme(logger, nativeUIManager, jFrame)
+  val wordCount = wordCount(logger, textArea, nativeJOptionPane) // Must pass in JTextArea and not just String because need to get the latest version of the text
+  val questionnaireCreator = questionnaireCreator(logger, textArea, fs) // Must pass in JTextArea and not just String because need to get the latest version of the text
+
+/****************************************************************************/
+
+//******* Step 3: Register plugins with menu or run them on setup ***********/
+
+  // Register plugins to be displayed in the menu so that the user can activate them on demand during the execution
+  registerPlugin(wordCount)
+  registerPlugin(questionnaireCreator)
+
+  // Run plugins that should be run once on setup
+  // Choose a theme: In Java, once the theme is changed, apparently, there is no way to change it again,
+  // so only one theme can be used at a time.
+  runPluginOnSetup(darkTheme)
+  //runPluginOnSetup(lightTheme)
+
+/****************************************************************************/
+
+  jFrame.setDefaultCloseOperation(nativeJFrame.getExitOnClose())
+  jFrame.pack()
+  textArea.addKeyListener(kl)
+  jFrame.setTitle(currentFile)
+  jFrame.setVisible(true)
+  logger.updateLog("New text-editor window started.\n")
