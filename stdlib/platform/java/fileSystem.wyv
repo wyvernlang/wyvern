@@ -69,18 +69,7 @@ def makeFile(path: String) : File = new
             
     def makeBinaryReader() : BinaryReader
         val br = file.makeFileInputStream(this.f)
-        /*
-        val shift : Int * Int -> Int =
-                (b:Int, iter:Int) => 
-                    if (iter == 0)
-                        b
-                    else
-                        val readnext = file.readByteFileInputStream(br)
-                        if (readnext != -1)
-                            shift(((b * 256) + readnext), iter - 1)
-                        else
-                            b
-        */
+        
         new
             effect Read = {fileEffects.Read}
             def read() : {this.Read} Int

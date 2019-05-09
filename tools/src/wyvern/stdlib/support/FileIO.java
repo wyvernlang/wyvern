@@ -180,11 +180,14 @@ public class FileIO {
     public void writeArbitraryPrecisionInteger(FileOutputStream f, BigInteger n) throws IOException {
 		byte[] contentBytes = n.toByteArray();
 		int size = contentBytes.length;
+		//System.out.print("num bytes: ");
+		//System.out.println(size);
 		
         //int size = n.bitLength();
         if(size > 127) { //might want to catch case where size > 255
 			//calculate the number of bytes needed to represent the number
 			//(definitely a better way to do this
+			/*
 			int numRealBytes = 0;
 			BigInteger temp = n;
 			BigInteger byteSize = new BigInteger("256");
@@ -199,6 +202,17 @@ public class FileIO {
 				size /= 256;
             }
             f.write(realSizeBytes);
+			*/
+			//ArrayList<Byte> sizeBytes = new ArrayList<Byte>();
+			
+			byte[] sizeBytes = BigInteger.valueOf(size).toByteArray();
+			f.write(128 + sizeBytes.length);
+			/*
+			for(byte b : sizeBytes) {
+				System.out.println(b);
+			}
+			*/
+			f.write(sizeBytes);
         } else {
             f.write(size);
         }
@@ -209,18 +223,57 @@ public class FileIO {
     
     public BigInteger readArbitraryPrecisionInteger(FileInputStream f) throws IOException {
         int size = f.read();
+		//System.out.print("read size: ");
+		//System.out.println(size);
         if(size > 127) {
             byte[] realSizeBytes = new byte[size - 128];
             for(int i = 128; i < size; i++) {
                 realSizeBytes[i - 128] = (byte) f.read();
             }
-            size = ByteBuffer.wrap(realSizeBytes).getInt();
-        }
-		byte[] contentBytes = new byte[size];
-        for(int i = 0; i < size; i++) {
-			contentBytes[i] = (byte) f.read();
+			//System.out.println("begin wrapping size bytes");
+			BigInteger realSize = new BigInteger(realSizeBytes);
+            //size = ByteBuffer.wrap(realSizeBytes).getInt();
+			//System.out.print("real byte size: ");
+			//System.out.println(realSize);
+			//need to get realSize many bytes
+			if(realSize.compareTo(new BigInteger("256")) < 0) {
+				size = realSize.intValue();
+				byte[] contentBytes = new byte[size];
+				for(int i = 0; i < size; i++) {
+					contentBytes[i] = (byte) f.read();
+				}
+				return new BigInteger(contentBytes);
+			} else {
+				byte[] contentBytes = new byte[256];
+				for(int i = 0; i < 256; i++) {
+					contentBytes[i] = (byte) f.read();
+				}
+				BigInteger sum = new BigInteger(contentBytes);
+				realSize.add((new BigInteger("256")).negate());
+				sum.shiftLeft(realSize.intValue()); 
+				while(realSize.compareTo(new BigInteger("256")) > 0) {
+					contentBytes = new byte[256];
+					for(int i = 0; i < 256; i++) {
+						contentBytes[i] = (byte) f.read();
+					}
+					realSize.add((new BigInteger("256")).negate());
+					sum.add(((new BigInteger(contentBytes)).abs()).shiftLeft(realSize.intValue()));
+				}
+				size = realSize.intValue();
+				contentBytes = new byte[size];
+				for(int i = 0; i < size; i++) {
+					contentBytes[i] = (byte) f.read();
+				}
+				sum.add(new BigInteger(contentBytes));
+				return sum;
+			}
+        } else {
+			byte[] contentBytes = new byte[size];
+			for(int i = 0; i < size; i++) {
+				contentBytes[i] = (byte) f.read();
+			}
+			return new BigInteger(contentBytes);
 		}
-		return new BigInteger(contentBytes);
     }
     
     
