@@ -48,7 +48,7 @@ def makeFile(path: String) : File = new
         new
             effect Write = {fileEffects.Write, fileEffects.Append}
             def write(s : String) : {this.Write} Unit
-                file.writeString(bw, s)        //again temporary limits on write format
+                file.writeString(bw, s)
             def close() : Unit
                 file.closeWriter(bw)
             
@@ -63,7 +63,7 @@ def makeFile(path: String) : File = new
         new
             effect Write = {fileEffects.Append}
             def write(s : String) : {this.Write} Unit
-                file.writeString(bw, s)        //again temporary limits on write format
+                file.writeString(bw, s)
             def close() : Unit
                 file.closeWriter(bw)
             
@@ -74,6 +74,7 @@ def makeFile(path: String) : File = new
             effect Read = {fileEffects.Read}
             def read() : {this.Read} Int
                 file.readArbitraryPrecisionInteger(br)
+            /*
             def readBytes(numBytes : Int) : {this.Read} Int
                 def shift (b:Int, iter:Int) : Int
                     if (iter == 0)
@@ -85,8 +86,9 @@ def makeFile(path: String) : File = new
                           else
                             shift(((b * 256) + readnext), iter - 1)
                 shift(0,numBytes)
+            */
             def readUTF() : {this.Read} String
-                "hello"
+                file.readUTFFileInputStream(br)
             def close() : Unit
                 file.closeFileInputStream(br)
                 
@@ -96,17 +98,17 @@ def makeFile(path: String) : File = new
             effect Write = {fileEffects.Write}
             def write(b : Int) : {this.Write} Unit
                 file.writeArbitraryPrecisionInteger(bw, b)
+            /*
             def writeBytes(b : Int, numBytes : Int) : {this.Write} Unit
                 if (numBytes > 0)
                     this.writeBytes(b/256, numBytes - 1)
                     file.writeByteFileOutputStream(bw, b)
-            
+            */
+            def writeUTF(s : String) : {this.Write} Unit
+                file.writeUTFFileOutputStream(bw, s)
             def close() : Unit
                 file.closeFileOutputStream(bw)
     
-    /* May want to rename this to something more unique
-     * Modify "mode" parameter? and available methods?
-     */
     def makeRandomAccessFile(mode : String) : RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new
@@ -125,7 +127,7 @@ def makeFile(path: String) : File = new
             def readUTF() : {this.Read} String
                 file.readUTFRandomAccess(rf)
             def write(s : String) : {this.Write} Unit
-                file.writeStringRandomAccess(rf, s)            //temporary write method
+                file.writeStringRandomAccess(rf, s)
             def writeUTF(s : String) : {this.Write} Unit
                 file.writeUTFRandomAccess(rf, s)
                 
