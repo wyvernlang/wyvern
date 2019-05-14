@@ -13,7 +13,6 @@ import java.io.RandomAccessFile;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 
 
 public class FileIO {
@@ -182,7 +181,7 @@ public class FileIO {
     //reads UTF-16 encoding, little endian with no byte marker for cleaner reads
     public String readUTFFileInputStream(FileInputStream f) throws IOException {
         byte[] readData = new byte[2];
-        for(int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             readData[i] = (byte) f.read();
         }
         return new String(readData, "UTF-16LE");
@@ -191,7 +190,7 @@ public class FileIO {
     public void writeArbitraryPrecisionInteger(FileOutputStream f, BigInteger n) throws IOException {
         byte[] contentBytes = n.toByteArray();
         int size = contentBytes.length;
-        if(size > 127) { //might need to catch case where size > 255
+        if (size > 127) { //might need to catch case where size > 255
             byte[] sizeBytes = BigInteger.valueOf(size).toByteArray();
             f.write(128 + sizeBytes.length);
             f.write(sizeBytes);
@@ -204,33 +203,33 @@ public class FileIO {
     public BigInteger readArbitraryPrecisionInteger(FileInputStream f) throws IOException {
         int size = f.read();
         //determine whether or not to interpret as number of real size bytes
-        if(size > 127) {
+        if (size > 127) {
             byte[] realSizeBytes = new byte[size - 128];
-            for(int i = 128; i < size; i++) {
+            for (int i = 128; i < size; i++) {
                 realSizeBytes[i - 128] = (byte) f.read();
             }
             //store as a big integer for big sizes
             BigInteger realSize = new BigInteger(realSizeBytes);
             //uses BigInteger operations to get correctly sized content
-            if(realSize.compareTo(new BigInteger("256")) < 0) {
+            if (realSize.compareTo(new BigInteger("256")) < 0) {
                 size = realSize.intValue();
                 byte[] contentBytes = new byte[size];
-                for(int i = 0; i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     contentBytes[i] = (byte) f.read();
                 }
                 return new BigInteger(contentBytes);
             } else {
                 //lots of byte operations for really big content with BigInteger size
                 byte[] contentBytes = new byte[256];
-                for(int i = 0; i < 256; i++) {
+                for (int i = 0; i < 256; i++) {
                     contentBytes[i] = (byte) f.read();
                 }
                 BigInteger sum = new BigInteger(contentBytes);
                 realSize.add((new BigInteger("256")).negate());
                 sum.shiftLeft(realSize.intValue()); 
-                while(realSize.compareTo(new BigInteger("256")) > 0) {
+                while (realSize.compareTo(new BigInteger("256")) > 0) {
                     contentBytes = new byte[256];
-                    for(int i = 0; i < 256; i++) {
+                    for (int i = 0; i < 256; i++) {
                         contentBytes[i] = (byte) f.read();
                     }
                     realSize.add((new BigInteger("256")).negate());
@@ -238,7 +237,7 @@ public class FileIO {
                 }
                 size = realSize.intValue();
                 contentBytes = new byte[size];
-                for(int i = 0; i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     contentBytes[i] = (byte) f.read();
                 }
                 sum.add(new BigInteger(contentBytes));
@@ -246,7 +245,7 @@ public class FileIO {
             }
         } else { //default small size read
             byte[] contentBytes = new byte[size];
-            for(int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++) {
                 contentBytes[i] = (byte) f.read();
             }
             return new BigInteger(contentBytes);
