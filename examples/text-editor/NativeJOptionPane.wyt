@@ -1,0 +1,7 @@
+type NativeJOptionPane
+  def showMessageDialog(message: String, title: String, messageType: Int): Unit
+  def showConfirmDialog(message: String, title: String, optionType: Int): Unit
+  def getPlainMessageValue(): Int
+  def getErrorMessageValue(): Int
+  def getYesNoOptionValue(): Int
+  def getYesOptionValue(): Int

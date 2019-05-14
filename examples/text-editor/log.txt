@@ -1,0 +1,39 @@
+New text-editor window is starting.
+Registered plugin Word Count.
+Registered plugin Questionnaire Creator.
+Running plugin Dark Theme...
+Set text editor theme to dark.
+Ran plugin Dark Theme.
+New text-editor window started.
+Running the Word Count plugin...
+Result: The document contains 0 words.
+File /Users/dkurilov/workspace/wyvern/examples/text-editor/JFrame.wyt was opened.
+New text-editor window is starting.
+Registered plugin Word Count.
+Registered plugin Questionnaire Creator.
+Running plugin Dark Theme...
+Set text editor theme to dark.
+Ran plugin Dark Theme.
+New text-editor window started.
+New text editor was created.
+Running the Questionnaire Creator plugin...
+Result: The created questionnaire is:
+Alia wisi prodesset vel ei, appetere platonem honestatis vix ut?
+Vis ex sonet alterum?
+File was saved as /Users/dkurilov/workspace/wyvern/examples/text-editor/tmp.txt.
+File was saved as /Users/dkurilov/workspace/wyvern/examples/text-editor/tmp2.txt.
+Closing text editor...
+New text-editor window is starting.
+Registered plugin Word Count.
+Registered plugin Questionnaire Creator.
+Running plugin Dark Theme...
+Set text editor theme to dark.
+Ran plugin Dark Theme.
+New text-editor window started.
+New text-editor window is starting.
+Registered plugin Word Count.
+Registered plugin Questionnaire Creator.
+Running plugin Dark Theme...
+Set text editor theme to dark.
+Ran plugin Dark Theme.
+New text-editor window started.

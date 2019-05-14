@@ -1,0 +1,2 @@
+resource type Logger
+  def updateLog(msg: String): Unit

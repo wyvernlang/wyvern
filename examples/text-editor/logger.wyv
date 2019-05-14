@@ -1,0 +1,11 @@
+module def logger(logFile: fileSystem.File): Logger
+// N.B.: Alternatively, this module could be pure and the updateLog method would take the log file as an argument.
+// This way is more secure because the alternative way requires plugins to have an instance of the log file, 
+// which allowS more operations on the log file than just updating it.
+
+def updateLog(msg: String): Unit
+  // Opening and closing the log file is necessary to be able to handle several text-editor windows, each of which is a text-editor instance.
+  // This also allows the log file to be written when quitting the text editor with a shortcut.
+  val logAppender = logFile.makeAppender()
+  logAppender.write(msg)
+  logAppender.close()
