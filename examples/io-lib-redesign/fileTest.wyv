@@ -6,7 +6,7 @@ type Option = option.Option
 val filesys = fileSystem(java)
 val out = stdout(java)
 
-val f = filesys.makeFile("example.txt")	     //should this create the file in itself? or only make existing?
+val f = filesys.makeFile("example.txt")         //should this create the file in itself? or only make existing?
 
 val w = f.makeWriter()                       //automatically creates file
 w.write("Hello World!")
@@ -68,34 +68,25 @@ raf.close()
 out.print("/** BINARY READER TESTS **/")
 out.println()
 
-val binreader = f.makeBinaryReader()
-
-out.printInt(binreader.readBytes(12))
-
-binreader.close()
-
-/* Binary Writer */
-
-val binwriter = fe.makeBinaryWriter()
-
-//binwriter.write(33)
-binwriter.writeBytes(9761,2)
-
-binwriter.close()
-
-out.println()
-
 
 val fb = filesys.makeFile("binary.txt")
 
 val bw = fb.makeBinaryWriter()
 
-bw.write(179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137216)
+bw.write(1797693134862315907729305190789024733617976978942306572734300811577326758055009631327084773224075360211201138798713933576587897688144166224928474306394741243777678934248654852763022196012460941194530829520850057688381506823424628814739131105408272371633505106845862982399472459384797163048353563296242241372167890)
+
+bw.writeUTF("ab!")
 
 val br = fb.makeBinaryReader()
 
 out.printInt(br.read())
+out.println()
 
+val s = br.readUTF()
+val s = "\"" + s + br.readUTF() + br.readUTF() +"\""
+out.print(s)
+//out.print(br.readUTF())
+//out.print(br.readUTF())
 out.println()
 
 br.close()
