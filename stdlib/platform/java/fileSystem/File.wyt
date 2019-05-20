@@ -1,4 +1,4 @@
-import fileSystem.Reader
+import fileSystem.BoundedReader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
 import fileSystem.BinaryReader
@@ -7,7 +7,7 @@ resource type File
     effect Read
     effect Write
     effect Append
-    def makeReader():Reader
+    def makeReader():BoundedReader
     def makeWriter():Writer
     def makeAppender():Writer
     def makeBinaryReader():BinaryReader

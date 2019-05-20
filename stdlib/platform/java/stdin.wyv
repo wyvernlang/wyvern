@@ -1,0 +1,27 @@
+module def stdin(java : Java) : fileSystem.Reader
+
+import java:wyvern.stdlib.support.Stdio.stdio
+
+import fileSystem.fileEffects
+
+import fileSystem.Reader
+
+import wyvern.option
+type Option = option.Option
+
+effect Read = {fileEffects.Read}
+
+val sc = stdio.initStdin()
+
+def read() : {this.Read} Int
+    stdio.read(sc)
+
+def readLine() : {this.Read} Option[String]
+    val line = stdio.readLine(sc)
+    if (stdio.isNull(line))
+        option.None[String]()
+      else
+        option.Some[String](line)
+
+def close() : Unit
+    stdio.closeScanner(sc)

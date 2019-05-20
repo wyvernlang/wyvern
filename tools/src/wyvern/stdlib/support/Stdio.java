@@ -1,6 +1,7 @@
 package wyvern.stdlib.support;
 
 import java.math.BigInteger;
+import java.util.Scanner;
 
 public class Stdio {
     public static final Stdio stdio = new Stdio();
@@ -26,4 +27,32 @@ public class Stdio {
     public void printFloat(Double f) {
         java.lang.System.out.print(f);
     }
+	
+	/** Stdin methods **/
+	public Scanner initStdin() {
+		return new Scanner(java.lang.System.in);
+	}
+	public String readLine(Object ob) {
+		Scanner sc = (Scanner) ob;
+		if (sc.hasNextLine()) {
+			return sc.nextLine();
+		} else {
+			return null; //instead return an option
+		}
+	}
+	public BigInteger read(Object ob) {
+		Scanner sc = (Scanner) ob;
+		if (sc.hasNextBigInteger()) {
+			return sc.nextBigInteger();
+		} else {
+			return null;
+		}
+	}
+	public void closeScanner(Object ob) {
+		Scanner s = (Scanner) ob;
+		s.close();
+	}
+	public boolean isNull(Object ob) {
+		return ob == null;
+	}
 }

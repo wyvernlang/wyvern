@@ -6,7 +6,7 @@ import fileSystem.fileEffects
 
 /* Import Types */
 import fileSystem.File
-import fileSystem.Reader
+import fileSystem.BoundedReader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
 import fileSystem.BinaryReader
@@ -26,7 +26,7 @@ def makeFile(path: String) : File = new
     effect Append = {fileEffects.Append}
     val f : Unit = file.createNewFile(path)
     
-    def makeReader() : Reader
+    def makeReader() : BoundedReader
         val br = file.openBRForRead(this.f)
         new
             effect Read = {fileEffects.Read}
