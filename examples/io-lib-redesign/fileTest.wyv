@@ -6,7 +6,7 @@ type Option = option.Option
 val filesys = fileSystem(java)
 val out = stdout(java)
 
-val f = filesys.makeFile("example.txt")         //should this create the file in itself? or only make existing?
+val f = filesys.fileFor("example.txt")         //should this create the file in itself? or only make existing?
 
 val w = f.makeWriter()                       //automatically creates file
 w.write("Hello World!")
@@ -30,7 +30,7 @@ out.println()
 
 r.close()
 
-val fe = filesys.makeFile("empty.txt")
+val fe = filesys.fileFor("empty.txt")
 out.print("/** READ FULLY TEST **/")
 out.println()
 val re = fe.makeReader()
@@ -69,7 +69,7 @@ out.print("/** BINARY READER TESTS **/")
 out.println()
 
 
-val fb = filesys.makeFile("binary.txt")
+val fb = filesys.fileFor("binary.txt")
 
 val bw = fb.makeBinaryWriter()
 

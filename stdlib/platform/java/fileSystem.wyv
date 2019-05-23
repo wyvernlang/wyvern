@@ -20,7 +20,7 @@ effect Read = {fileEffects.Read}
 effect Write = {fileEffects.Write}
 effect Append = {fileEffects.Append}
 
-def makeFile(path: String) : File = new
+def fileFor(path: String) : File = new
     effect Read = {fileEffects.Read}
     effect Write = {fileEffects.Write}
     effect Append = {fileEffects.Append}
