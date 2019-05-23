@@ -18,8 +18,7 @@ import wyvern.tools.tests.suites.RegressionTests;
 @Category(RegressionTests.class)
 public class FileTest {
     public static final String PATH = "../stdlib/platform/java/";
-    public static final String PATH2 = "../backend/src/";
-    public static final String PATH3 = TestUtil.BASE_PATH;
+    public static final String PATH2 = TestUtil.BASE_PATH;
 
 
     @BeforeClass
@@ -36,21 +35,9 @@ public class FileTest {
         TestUtil.doTestScriptModularly(PATH, "script", Util.stringType(), new StringLiteral("abc"));
     }
 
-
-
-    @Test
-    public void backend() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH2, "main", Util.stringType(), new StringLiteral("abc"));
-    }
-
-    @Test
-    public void client() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH2, "script", Util.stringType(), new StringLiteral("abc"));
-    }
-
     @Test
     public void editor() throws ParseException {
-        TestUtil.doTestScriptModularly(PATH3, "editor.main", Util.stringType(), new StringLiteral("abc"));
+        TestUtil.doTestScriptModularly(PATH2, "editor.main", Util.stringType(), new StringLiteral("abc"));
     }
 
 

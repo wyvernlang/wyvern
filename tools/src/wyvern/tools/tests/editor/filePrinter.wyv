@@ -8,16 +8,16 @@ def printLine() : {io.flush, fr.read, io.print} Unit
     io.flush()
     unit
 
-/*
-def printFile() : {fr.read, io.print} Unit
+def printFile() : {fr.read, io.print, io.flush} Unit
     val fileContent = fr.readFully()
     io.print(fileContent)
+    io.flush()
     unit
-*/
 
-def printFile() : {io.print} Unit
-    val fileContent = ""
+def printEmptyLine() : {io.print, io.flush} Unit
+    val fileContent = "\n"
     io.print(fileContent)
+    io.flush()
     unit
 
 

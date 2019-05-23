@@ -15,6 +15,29 @@ public final class EffectUtil {
     private EffectUtil() {
     }
 
+    private static EffectSet addEffects (EffectSet effects, ValueType type, GenContext ctx) {
+        EffectSet argEffects = getEffects(type, ctx);
+        if (argEffects != null) {
+            if (effects == null) {
+                effects = new EffectSet(new HashSet<>());
+            }
+            effects.getEffects().addAll(argEffects.getEffects());
+        }
+        return effects;
+    }
+
+    private static EffectSet addHOEffects (EffectSet effects, ValueType type, GenContext ctx) {
+        EffectSet argEffects = getHOEffects(type, ctx);
+        if (argEffects != null) {
+            if (effects == null) {
+                effects = new EffectSet(new HashSet<>());
+            }
+            effects.getEffects().addAll(argEffects.getEffects());
+        }
+        return effects;
+    }
+
+
     public static EffectSet getEffects(ValueType type, GenContext ctx) {
         EffectSet effects = null;
         List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
@@ -34,29 +57,18 @@ public final class EffectUtil {
                 for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
                     if (!argType.equalsInContext(type, ctx, new FailureReason())) {
-                        EffectSet argEffects = getHOEffects(argType, ctx);
-                        if (argEffects != null) {
-                            if (effects == null) {
-                                effects = new EffectSet(new HashSet<>());
-                            }
-                            effects.getEffects().addAll(argEffects.getEffects());
-                        }
+                        addHOEffects(effects, argType, ctx);
                     }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
                 if (!resultType.equalsInContext(type, ctx, new FailureReason())) {
-                    EffectSet effects2 = getEffects(resultType, ctx);
-                    if (effects2 != null) {
-                        if (effects == null) {
-                            effects = new EffectSet(new HashSet<>());
-                        }
-                        effects.getEffects().addAll(effects2.getEffects());
-                    }
+                    addEffects(effects, resultType, ctx);
                 }
             }
         }
         return effects;
     }
+
 
     public static EffectSet getHOEffects(ValueType type, GenContext ctx) {
         EffectSet effects = null;
@@ -66,25 +78,13 @@ public final class EffectUtil {
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
                 for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
-                    if (!type.equalsInContext(argType, ctx, new FailureReason())) {
-                        EffectSet argEffects = getEffects(argType, ctx);
-                        if (argEffects != null) {
-                            if (effects == null) {
-                                effects = new EffectSet(new HashSet<>());
-                            }
-                            effects.getEffects().addAll(argEffects.getEffects());
-                        }
+                    if (!argType.equalsInContext(type, ctx, new FailureReason())) {
+                        effects = addEffects(effects, argType, ctx);
                     }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
                 if (!type.equalsInContext(resultType, ctx, new FailureReason())) {
-                    EffectSet hoEffects = getHOEffects(resultType, ctx);
-                    if (hoEffects != null) {
-                        if (effects == null) {
-                            effects = new EffectSet(new HashSet<>());
-                        }
-                        effects.getEffects().addAll(hoEffects.getEffects());
-                    }
+                    effects = addHOEffects(effects, resultType, ctx);
                 }
             }
         }

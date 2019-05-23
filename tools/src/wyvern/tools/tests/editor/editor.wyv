@@ -12,6 +12,9 @@ import fileSystem
 import filesystem.fileEffects
 import ArrayList
 import Stdout
+import editor.Resource
+
+import lifted editor.writerPlugin
 
 val path = "C:/Users/anlun/Projects/file.txt"
 val f : File = filesys.makeFile(path)
@@ -34,10 +37,21 @@ val filelist2 : ArrayList[{system.ffiEffect}, {system.ffiEffect}] = new
     def get(index : Int) : {filelist.read} File
         filelist.get(index)
 
+val fwriter : Writer = f.makeAppender()
+
+val x : Resource[{}, {}] = new
+    effect read = {}
+    effect write = {}
+    def read() : {this.read} Unit
+        unit
+    def write() : {this.read} Unit
+        unit
+
+val plugin = writerPlugin[{}](x)
+
 // Append every file in filelist to f
-def appendAllFiles(f : File) : {f.openForAppend, filelist2.read, filelist2.write} Unit
-    val writer = f.makeAppender()
-    val appender = unannotatedFileAppender[{filelist2.read, filelist2.write}](filelist2, writer)
+def appendAllFiles() : {f.openForAppend, filelist2.read, filelist2.write, fwriter.write, fwriter.close} Unit
+    val appender = unannotatedFileAppender[{filelist2.write, filelist2.read, fwriter.write, fwriter.close}](fwriter, filelist2)
     appender.appendArrayListFiles()
 
 def appendAllFiles2(f: File) : {f.openForAppend, filelist.read} Unit
@@ -71,7 +85,7 @@ def printfiles(f : File) : {f.openForRead, out.print, out.flush} Unit
 def printfiles2(f : File) : {f.openForRead, out.print, out.flush} Unit
     val reader = f.makeReader()
     val printer = filePrinter(out, reader)
-    printer.printFile()
+    printer.printEmptyLine()
 
 
 

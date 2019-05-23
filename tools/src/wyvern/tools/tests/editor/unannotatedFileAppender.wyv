@@ -1,4 +1,4 @@
-module def unannotatedFileAppender(arraylist: ArrayList, filewriter : filesystem.Writer)
+module def unannotatedFileAppender(filewriter : filesystem.Writer, arraylist: ArrayList)
 import fileSystem
 import filesystem.File
 import filesystem.fileEffects
@@ -8,6 +8,7 @@ def appendFile(file2 : File) : Unit
     val file2Reader = file2.makeReader()
     val file2content = file2Reader.readFully()
     filewriter.write(file2content)
+    filewriter.close()
 
 // Append an arraylist of files
 def appendArrayListFiles() : Unit

@@ -6,10 +6,28 @@ import arrayListMaker
 import ArrayList
 import filesystem.Reader
 
-
 // Append file2 to the end of file1
+def close() : {filewriter.close} Unit
+    filewriter.close()
+
+def getFirst() : {arraylist.read} File
+    arraylist.get(0)
+
 def appendFile(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
     val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.close()
+
+def appendFileTwice(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
+    val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.write(file2content)
+    filewriter.close()
+
+def appendFileThreeTimes(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
+    val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.write(file2content)
     filewriter.write(file2content)
     filewriter.close()
 
