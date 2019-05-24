@@ -1,3 +1,8 @@
 import fileSystem.File
+import fileSystem.ByteArray
 type FileSystem
-    def makeFile(path: String): File
+    effect Read
+    effect Write
+    effect Append
+    def fileFor(path: String): File
+    def makeByteArray(size:Int) : ByteArray

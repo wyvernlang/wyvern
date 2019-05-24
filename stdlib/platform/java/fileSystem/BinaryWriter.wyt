@@ -1,0 +1,12 @@
+resource type BinaryWriter
+    effect Write
+    def write(b:Int):{this.Write}Unit
+    def writeUTF(s:String):{this.Write}Unit
+    /*
+    def writeBytes(b:Int, numBytes:Int):{this.Write}Unit
+    def writeInt(b:Int):Unit
+    def writeUTF(s:String):Unit
+    def writeShort(b:Int):Unit
+    def writeLong(b:Int):Unit
+    */
+    def close():Unit
