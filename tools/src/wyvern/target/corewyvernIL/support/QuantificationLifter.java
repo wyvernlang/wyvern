@@ -128,9 +128,9 @@ public final class QuantificationLifter {
         EffectSet ub = new EffectSet(new HashSet<>());
         for (FormalArg arg : oldFormalArgs) {
             ValueType argType = arg.getType();
-            EffectSet effects;
+            EffectSet effects = null;
             // TODO: (@anlunx) Skip this for now, add this back when bug in quantificationLifter is fixed
-            effects = EffectUtil.getEffects(argType, ctx);
+//            effects = EffectUtil.getEffects(argType, ctx);
             if (effects != null) {
                 lb.getEffects().addAll(effects.getEffects());
             }

@@ -3,6 +3,8 @@ package wyvern.target.corewyvernIL.effects;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
+import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -56,12 +58,12 @@ public final class EffectUtil {
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
                 for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
-                    if (!argType.equalsInContext(type, ctx, new FailureReason())) {
+                    if (goodType(argType) && !argType.equalsInContext(type, ctx, new FailureReason())) {
                         addHOEffects(effects, argType, ctx);
                     }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                if (!resultType.equalsInContext(type, ctx, new FailureReason())) {
+                if (goodType(resultType) && !resultType.equalsInContext(type, ctx, new FailureReason())) {
                     addEffects(effects, resultType, ctx);
                 }
             }
@@ -69,6 +71,9 @@ public final class EffectUtil {
         return effects;
     }
 
+    private static boolean goodType(ValueType t) {
+        return !t.toString().contains("this.T") && !t.toString().contains("generic__U");
+    }
 
     public static EffectSet getHOEffects(ValueType type, GenContext ctx) {
         EffectSet effects = null;
@@ -78,12 +83,12 @@ public final class EffectUtil {
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
                 for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
-                    if (!argType.equalsInContext(type, ctx, new FailureReason())) {
+                    if (goodType(argType) && !argType.equalsInContext(type, ctx, new FailureReason())) {
                         effects = addEffects(effects, argType, ctx);
                     }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                if (!type.equalsInContext(resultType, ctx, new FailureReason())) {
+                if (goodType(resultType) && !type.equalsInContext(resultType, ctx, new FailureReason())) {
                     effects = addHOEffects(effects, resultType, ctx);
                 }
             }

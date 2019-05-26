@@ -237,7 +237,8 @@ public class MethodCall extends Expression {
 
     private static EffectSet computeUpperBound(TypeContext ctx, List<ValueType> actualArgTypes) {
         EffectSet ub = null;
-        for (ValueType argType : actualArgTypes) {
+        for (int i = 0; i < actualArgTypes.size(); i++) {
+            ValueType argType = actualArgTypes.get(i);
             EffectSet hoEffects = EffectUtil.getHOEffects(argType, (GenContext) ctx);
             if (hoEffects != null) {
                 if (ub == null) {
@@ -280,11 +281,21 @@ public class MethodCall extends Expression {
             return;
         }
 
+        HashSet<String> ub = new HashSet<>();
+        for (Effect e : upperBound.getEffects()) {
+            ub.add(e.getName());
+        }
+
+        if (selectedEffect.getEffectSet() == null) {
+            return;
+        }
+
         // Check if selected effects are in upper bound
         for (Effect e : selectedEffect.getEffectSet().getEffects()) {
-            if (!upperBound.getEffects().contains(e)) {
+            if (!ub.contains(e.getName())) {
                  ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
                                 "Selected an effect which is outside of the upper bound");
+
             }
         }
     }
@@ -354,6 +365,7 @@ public class MethodCall extends Expression {
 //            }
 //        }
 
+        // TODO(@anlunx): Consider using args to adapt the scope
         checkUpperBound(ctx, actualArgTypes);
     }
 
