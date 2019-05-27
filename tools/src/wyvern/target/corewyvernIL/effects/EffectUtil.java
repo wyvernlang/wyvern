@@ -3,8 +3,6 @@ package wyvern.target.corewyvernIL.effects;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
-import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.type.ValueType;
@@ -17,7 +15,7 @@ public final class EffectUtil {
     private EffectUtil() {
     }
 
-    private static EffectSet addEffects (EffectSet effects, ValueType type, GenContext ctx) {
+    private static EffectSet addEffects(EffectSet effects, ValueType type, GenContext ctx) {
         EffectSet argEffects = getEffects(type, ctx);
         if (argEffects != null) {
             if (effects == null) {
@@ -28,7 +26,7 @@ public final class EffectUtil {
         return effects;
     }
 
-    private static EffectSet addHOEffects (EffectSet effects, ValueType type, GenContext ctx) {
+    private static EffectSet addHOEffects(EffectSet effects, ValueType type, GenContext ctx) {
         EffectSet argEffects = getHOEffects(type, ctx);
         if (argEffects != null) {
             if (effects == null) {

@@ -302,69 +302,6 @@ public class MethodCall extends Expression {
 
     private static void checkHigherOrderEffect(TypeContext ctx, List<ValueType> formalArgTypes,
                                                 List<ValueType> actualArgTypes, List<? extends IExpr> args) {
-//        HashMap<String, EffectSet> effectDecls = getEffectDeclarations(ctx, args, actualArgTypes);
-//        for (int i = 0; i < formalArgTypes.size(); i++) {
-//            ValueType formalArgType = formalArgTypes.get(i);
-//            ValueType actualArgType = actualArgTypes.get(i);
-//            if (actualArgType.toString().contains("__generic__X.X")) {
-//                continue;
-//            }
-//            List<DeclType> formalDecls = formalArgType.getStructuralType(ctx).getDeclTypes();
-//            if (!formalDecls.isEmpty() && formalDecls.get(0) instanceof EffectDeclType) {
-//                DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
-//                EffectDeclType formalDeclType = (EffectDeclType) argType;
-//                EffectSet lb = formalDeclType.getLowerBound();
-//
-//                if (lb == null) {
-//                    continue;
-//                }
-//
-//                EffectDeclType actualDeclType = (EffectDeclType) actualArgType.getStructuralType(ctx).getDeclTypes().get(0);
-//                EffectSet effectSet = actualDeclType.getEffectSet();
-//
-//                // Checking each effect in the lower bound is present
-//                for (Effect lbEffect : lb.getEffects()) {
-//                    boolean found = false;
-//                    String name = lbEffect.getName();
-//                    for (Effect effect : effectSet.getEffects()) {
-//
-//                        // Find the declaration of the effect
-//                        EffectDeclType decl = effect.findEffectDeclType(ctx);
-//
-//                        // TODO: Should not check the effect using its name
-//                        // the lbEffect is in the given effect
-//                        if (effect.getName().equals(name)) {
-//                            found = true;
-//                        }
-//
-//                        EffectSet declared = decl.getEffectSet();
-//                        if (declared != null) {
-//                            for (Effect declaredEffect : declared.getEffects()) {
-//                                if (declaredEffect.getName().equals(name)) {
-//                                    found = true;
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    // the lbEffect is defined to be other effect in the argument
-//                    for (String effectName : effectDecls.keySet()) {
-//                        EffectSet declaration = effectDecls.get(effectName);
-//                        if (name.equals(effectName)) {
-//                            if (effectSet.getEffects().containsAll(declaration.getEffects())) {
-//                                found = true;
-//                            }
-//                        }
-//                    }
-//
-//                    if (!found) {
-//                        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
-//                                "Selected effect does not contain lower bound");
-//                    }
-//                }
-//            }
-//        }
-
         // TODO(@anlunx): Consider using args to adapt the scope
         checkUpperBound(ctx, actualArgTypes);
     }
