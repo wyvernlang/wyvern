@@ -1,0 +1,355 @@
+require stdout
+require java
+
+import wyvern.collections.ArrayList
+import wyvern.collections.Iterator
+import wyvern.option
+import wyvern.collections.List 
+
+//val ArrayList = ArrayList(java)
+
+type Option = option.Option
+type ArrayList = ArrayList.ArrayList
+type Some = option.Some
+type None = option.None
+
+
+//####################################Testing ArrayList###################################################
+
+def twoLine():Unit
+    stdout.print("\n")
+    stdout.print("\n")
+
+def printWithSpace(x:String):Unit
+    stdout.print(x)
+    stdout.print(" ")
+
+def printIntWithSpace(x:Int):Unit
+    stdout.printInt(x)
+    stdout.print(" ")
+
+def printBoolWithSpace(x:Boolean):Unit
+    stdout.printBoolean(x)
+    stdout.print(" ")
+
+def printIntOption(x:Option[Int]):Unit
+  match x:
+    n:None => stdout.print("None ")
+    s:Some => 
+      val v = s.content
+      stdout.print("Some(")
+      stdout.printInt(v)
+      stdout.print(") ")
+
+def printStrOption(x:Option[String]):Unit
+  match x:
+    n:None => stdout.print("None ")
+    s:Some => 
+      val v = s.content
+      stdout.print("Some(")
+      stdout.print(v)
+      stdout.print(") ")
+
+def iterateIntArrayPrint(name:String, l: ArrayList[Int], i:Int):Unit
+    val liter : Iterator[Int] = l.iterator()
+    stdout.print("For list ")
+    stdout.print(name)
+    stdout.print("\n")
+    def iterateIntArrayPrintH(iter:Iterator[Int], name:String, l: ArrayList[Int], i:Int):Unit
+        if(iter.hasNext())
+          stdout.print("\t")
+          stdout.print(name)
+          stdout.print("[")
+          stdout.printInt(i)
+          stdout.print("]: ")
+          printIntOption(iter.next())
+          stdout.print("\n")
+          iterateIntArrayPrintH(liter, name, l, i+1)
+         else
+          unit
+    iterateIntArrayPrintH(liter, name, l, i)
+
+
+def iterateStrArrayPrint(name:String, l: ArrayList[String], i:Int):Unit
+    val liter : Iterator[String] = l.iterator()
+    stdout.print("For list ")
+    stdout.print(name)
+    stdout.print("\n")
+    def iterateStrArrayPrintH(iter:Iterator[String], name:String, l: ArrayList[String], i:Int):Unit
+        if(iter.hasNext())
+          stdout.print("\t")
+          stdout.print(name)
+          stdout.print("[")
+          stdout.printInt(i)
+          stdout.print("]: ")
+          printStrOption(iter.next())
+          stdout.print("\n")
+          iterateStrArrayPrintH(liter, name, l, i+1)
+         else
+          unit
+    iterateStrArrayPrintH(liter, name, l, i)
+
+
+def twoAAEqH[U](L:ArrayList[U], R:ArrayList[U], p:U*U->Boolean, i:Int):Boolean
+    if(i==L.size())
+            true 
+        else
+            val fstP = p(L.get(i), R.get(i))
+            val sndP = twoAAEqH[U](L,R, p,i+1)
+            fstP && sndP
+
+def twoAAEq[U](L:ArrayList[U], R:ArrayList[U], p:U*U->Boolean):Boolean
+    if(L.size() == R.size())
+            if(L.size()==0)
+                    true 
+                else
+                    twoAAEqH[U](L,R,p,0)
+        else
+            false 
+
+def checkPredH[U](L:ArrayList[U], p:U->Boolean,i:Int):Boolean
+    if(i==L.size())
+            true 
+        else
+            val sndP = checkPredH[U](L, p,i+1)
+            p(L.get(i)) && sndP
+
+def checkPred[U](L:ArrayList[U], p:U->Boolean):Boolean
+    checkPredH[U](L,p,0)
+
+var arrayTab : ArrayList[Int] = ArrayList.tabulate[Int]((i:Int)=>i*2, 8)
+// iterateIntArrayPrint("arrayTab", arrayTab, 0)
+// twoLine()
+
+// stdout.print("arrayTab length is: ")
+// stdout.printInt(arrayTab.length())
+// twoLine()
+
+var array1 : ArrayList[Int] = ArrayList.ArrayList[Int](0)
+/*Error should be thrown*/
+//array1.set(0, 1)
+
+array1.add(1)
+array1.add(2)
+array1.add(3)
+
+val array1iter : Iterator[Int] = array1.iterator()
+// stdout.print("Does array1 has next one? ")
+// stdout.printBoolean(array1iter.hasNext())
+// twoLine()
+// stdout.print("array1[0]: ")
+assert array1iter.hasNext()
+//stdout.printInt(array1iter.next())
+// printIntOption(array1iter.next())
+// twoLine()
+// stdout.print("array1[1]: ")
+assert array1iter.next().get()==1
+//stdout.printInt(array1iter.next())
+// printIntOption(array1iter.next())
+// twoLine()
+// stdout.print("Does array1 has next one? ")
+// stdout.printBoolean(array1iter.hasNext())
+// twoLine()
+// stdout.print("array1[2]: ")
+// printIntOption(array1iter.next())
+// twoLine()
+// stdout.print("Does array1 has next one? ")
+// printBoolWithSpace(array1iter.hasNext())
+// twoLine()
+// iterateIntArrayPrint("array1", array1, 0)
+// twoLine()
+// stdout.print("array 1 length is: ")
+// stdout.printInt(array1.length())
+// twoLine()
+assert array1iter.next().get()==2
+assert array1iter.next().get()==3
+assert array1.size()==3
+
+
+array1.add(4)
+array1.add(5)
+array1.add(6)
+array1.add(7)
+array1.add(8)
+
+// stdout.print("After adding 4,5,6,7,8 to array1: ")
+// iterateIntArrayPrint("array1", array1, 0)
+// twoLine()
+// stdout.print("array 1 length is: ")
+// stdout.printInt(array1.length())
+// twoLine()
+assert array1.size()==8
+
+array1.add(9)
+// stdout.print("After adding 9, array 1 length is: ")
+// stdout.printInt(array1.length())
+// twoLine()
+assert array1.size()==9
+
+// stdout.print("array1[2] before adding 1: ")
+// stdout.printInt(array1.get(2))
+// twoLine()
+assert array1.get(2)==3
+array1.set(2, ((x:Int) => x+1)(array1.get(2)))
+// stdout.print("array1[2] after adding 1: ")
+// stdout.printInt(array1.get(2))
+// twoLine()
+assert array1.get(2)==4
+
+// stdout.print("array1[0] before adding 1: ")
+// stdout.printInt(array1.get(0))
+// twoLine()
+assert array1.get(0)==1
+array1.set(0, ((x:Int) => x+1)(array1.get(0)))
+
+
+// stdout.print("array1[0] after adding 1: ")
+// stdout.printInt(array1.get(0))
+// twoLine()
+// iterateIntArrayPrint("array1", array1, 0)
+// twoLine()
+assert array1.get(0)==2
+
+val array2 = array1.map[Int]((x:Int) => x+1)
+// iterateIntArrayPrint("array2", array2, 0)
+// twoLine()
+assert twoAAEq[Int](array1, array2, (x:Int,y:Int)=>y==x+1)
+
+// stdout.print("array2 added together using foldLeft: ")
+// stdout.printInt(array2.foldLeft[Int](((x:Int, y:Int) => x+y), 0))
+// twoLine()
+// stdout.print("array2 multiplied together using foldLeft: ")
+// stdout.printInt(array2.foldLeft[Int](((x:Int, y:Int) => x*y), 1))
+// twoLine()
+assert array2.foldLeft[Int](((x:Int, y:Int) => x+y),0)==56
+assert array2.foldLeft[Int](((x:Int, y:Int) => x*y), 1)==6804000
+
+val array3 = array1.map[Int]((x:Int) => x+10)
+// iterateIntArrayPrint("array3", array3, 0)
+// iterateIntArrayPrint("array3", array3, 0)
+assert twoAAEq[Int](array1, array3, (x:Int,y:Int)=>y==x+10)
+val array3_rev = array3.reverse()
+val array3_revrev = array3_rev.reverse()
+// stdout.print("After array 3 is reversed: ")
+// iterateIntArrayPrint("array3_rev", array3_rev, 0)
+// twoLine()
+assert twoAAEq[Int](array3, array3_revrev, (x:Int,y:Int)=>y==x)
+
+// stdout.print("array3 added together using foldRight: ")
+// stdout.printInt(array3.foldRight[Int](((x:Int, y:Int) => x+y), 0))
+// twoLine()
+val array3_sum = array3.foldRight[Int](((x:Int, y:Int) => x+y), 0)
+val array3_sum_red = array3.reduce(((x:Int, y:Int) => x+y), 0)
+assert array3_sum==137
+assert array3_sum==array3_sum_red
+// stdout.print("After array 3 is reversed and foldRight: \n")
+// iterateIntArrayPrint("array3", array3, 0)
+// twoLine()
+
+// stdout.print("array3 added together using reduce: ")
+// stdout.printInt(array3.reduce(((x:Int, y:Int) => x+y), 0))
+// twoLine()
+
+array3.add(5)
+array3.add(8)
+array3.add(7)
+// iterateIntArrayPrint("array3", array3, 0)
+// twoLine()
+// stdout.print("array3 added together after adding [5,8,7] using reduce: ")
+// stdout.printInt(array3.reduce(((x:Int, y:Int) => x+y), 0))
+// twoLine()
+val array3_sum_new = array3.foldRight[Int](((x:Int, y:Int) => x+y), 0)
+assert array3_sum_new==157
+
+// stdout.print("array4 is array3 with only even numbers: ")
+val array4 = array3.filter((x:Int) => (x%2)==0)
+//iterateIntArrayPrint("array4", array4, 0)
+// twoLine()
+// stdout.print("Print array4 using do: ")
+// array4.do((x:Int)=>printIntWithSpace(x))
+// twoLine()
+assert checkPred[Int](array4, (x:Int) => (x % 2)==0)
+
+// stdout.print("array4 length is: ")
+// stdout.printInt(array4.length())
+// twoLine()
+assert array4.size()==7
+def intCmp(x:Int, y:Int):Boolean
+    x==y
+
+// stdout.print("indexOf 12 in array4 is: ")
+// stdout.printInt(array4.indexOf(12, ((x:Int, y:Int)=>intCmp(x,y))))
+// twoLine()
+assert array4.indexOf(12, ((x:Int, y:Int)=>intCmp(x,y)))==0
+// stdout.print("indexOf 18 in array4 is: ")
+// stdout.printInt(array4.indexOf(18, ((x:Int, y:Int)=>intCmp(x,y))))
+// twoLine()
+assert array4.indexOf(18, ((x:Int, y:Int)=>intCmp(x,y)))==5
+
+// stdout.print("indexOf 14 in array4 is: ")
+// stdout.printInt(array4.indexOf(14, ((x:Int, y:Int)=>intCmp(x,y))))
+// twoLine()
+assert array4.indexOf(14, ((x:Int, y:Int)=>intCmp(x,y)))==2
+
+val array5 = ArrayList.ArrayList[String](5)
+array5.add("First")
+array5.add("Second")
+// iterateStrArrayPrint("array5", array5, 0)
+// twoLine()
+// stdout.print("array5 length is: ")
+// stdout.printInt(array5.length())
+// twoLine()
+assert array5.length()==5
+assert array5.get(0)=="First"
+// stdout.print("array5 size is: ")
+// stdout.printInt(array5.size())
+// twoLine()
+assert array5.size()==2
+
+
+val array6 = ArrayList.ArrayList[String](4)
+array6.add("6 First")
+array6.add("6 Second")
+array6.add("6 Third")
+array6.add("6 Fourth")
+
+array5.addAll(array6)
+// iterateStrArrayPrint("array5", array5, 0)
+// twoLine()
+// stdout.print("array5 length is: ")
+// stdout.printInt(array5.length())
+// twoLine()
+// stdout.print("array5 size is: ")
+// stdout.printInt(array5.size())
+// twoLine()
+assert array5.length()==10
+assert array5.size()==6
+
+// stdout.print("array5[2]: ")
+// stdout.print(array5.get(2))
+// twoLine()
+array5.addAt(2, "Add at 2")
+// iterateStrArrayPrint("array5", array5, 0)
+// twoLine()
+// stdout.print("array5 length is: ")
+// stdout.printInt(array5.length())
+// twoLine()
+// stdout.print("array5 size is: ")
+// stdout.printInt(array5.size())
+// twoLine()
+assert array5.get(2)=="Add at 2"
+
+array5.addAll(array6)
+// iterateStrArrayPrint("array5", array5, 0)
+// twoLine()
+// stdout.print("array5 length is: ")
+// stdout.printInt(array5.length())
+// twoLine()
+// stdout.print("array5 size is: ")
+// stdout.printInt(array5.size())
+// twoLine()
+assert array5.length()==20
+assert array5.size()==11
+
+// val testList1 :List[String] = array6
+
