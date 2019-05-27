@@ -46,7 +46,7 @@ final class EffectAnnotationChecker {
             for (TypedModuleSpec spec : dependencies) {
                 if (!spec.getIsAnnotated()) {
                     if (!liftedModules.contains(spec.getModule())
-                            && !spec.getModule().toString().equals("Module(wyvern.runtime)")) {
+                            && !spec.getModule().toString().contains("Module(wyvern")) {
                         System.out.println(spec.getModule());
                         ToolError.reportError(ErrorMessage.EFFECT_ANNOTATION_SEPARATION, FileLocation.UNKNOWN);
                     }
