@@ -360,10 +360,6 @@ public class ModuleResolver {
                     program = liftResult;
                 }
 
-                // Perform effect annotation check
-//                boolean result = EffectAnnotationChecker.isAnnotated(genCtx, program);
-
-
             } else if (decl instanceof TypeDeclaration) {
                 program = new New((NamedDeclaration) decl);
             } else {

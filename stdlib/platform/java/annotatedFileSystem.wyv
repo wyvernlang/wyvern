@@ -1,4 +1,4 @@
-module def annotatedFileSystem(java:Java) : {system.FFI} filesystem.FileSystem
+module def annotatedFileSystem(java:Java) : {} filesystem.FileSystem
 import filesystem.fileEffects
 import java:wyvern.stdlib.support.FileIO.file
 

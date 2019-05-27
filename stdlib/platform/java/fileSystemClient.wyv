@@ -1,5 +1,8 @@
-module def fileSystemClient(java:Java) : {system.FFI}
+module def fileSystemClient(fileSys : filesystem.FileSystem) : {system.FFI}
 import annotatedFileSystem
-val fileSys = annotatedFileSystem(java)
-fileSys.makeFile("~/file")
+
+def make() : Unit
+    fileSys.makeFile("~/file")
+    unit
+
 
