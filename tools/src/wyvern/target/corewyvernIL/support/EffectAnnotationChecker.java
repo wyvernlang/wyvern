@@ -45,8 +45,9 @@ final class EffectAnnotationChecker {
             // Check if dependencies are annotated or lifted
             for (TypedModuleSpec spec : dependencies) {
                 if (!spec.getIsAnnotated()) {
-                    if (!liftedModules.contains(spec.getModule())) {
-                        System.out.println(spec);
+                    if (!liftedModules.contains(spec.getModule())
+                            && !spec.getModule().toString().equals("Module(wyvern.runtime)")) {
+                        System.out.println(spec.getModule());
                         ToolError.reportError(ErrorMessage.EFFECT_ANNOTATION_SEPARATION, FileLocation.UNKNOWN);
                     }
                 }

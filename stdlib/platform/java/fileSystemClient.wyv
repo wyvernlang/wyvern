@@ -1,5 +1,5 @@
-module def fileSystemClient(java:Java) : {system.ffiEffect}
-import fileSystem
-val fileSys = fileSystem(java)
+module def fileSystemClient(java:Java) : {system.FFI}
+import annotatedFileSystem
+val fileSys = annotatedFileSystem(java)
 fileSys.makeFile("~/file")
 

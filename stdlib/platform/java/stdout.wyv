@@ -11,8 +11,8 @@ type Printable = Unit
 either add a '\n' to the string you want to print, to use println()
 instead, or call flush() right after print(). */
 
-effect print = {system.ffiEffect}
-effect flush = {system.ffiEffect}
+effect print = {system.FFI}
+effect flush = {system.FFI}
 def print(text:String): {print} Unit
 	stdio.print(text)
 

@@ -4,7 +4,7 @@ import java:wyvern.stdlib.support.backend.BytecodeWrapper.bytecode
 
 import wyvern.collections.list
 
-effect loadBytecode = {system.ffiEffect}
+effect loadBytecode = {system.FFI}
 
 def loadBytecode(path: String): {loadBytecode} Dyn
 	bytecode.loadBytecode(path)
