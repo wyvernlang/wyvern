@@ -1,4 +1,4 @@
-module option
+module option : {}
 
 tagged type Option comprises Some, None
     type T

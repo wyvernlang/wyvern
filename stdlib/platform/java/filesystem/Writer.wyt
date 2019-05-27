@@ -1,4 +1,3 @@
-import filesystem.fileEffects
 resource type Writer
     effect write
     effect close

@@ -16,7 +16,7 @@ import editor.Resource
 
 import lifted editor.writerPlugin
 
-val path = "C:/Users/anlun/Projects/file.txt"
+val path = "~/"
 val f : File = filesys.makeFile(path)
 
 val filelist : ArrayList = arraylistmaker.make()

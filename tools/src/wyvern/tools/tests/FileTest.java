@@ -39,10 +39,4 @@ public class FileTest {
     public void editor() throws ParseException {
         TestUtil.doTestScriptModularly(PATH2, "editor.main", Util.stringType(), new StringLiteral("abc"));
     }
-
-
-
-
-
-
 }
