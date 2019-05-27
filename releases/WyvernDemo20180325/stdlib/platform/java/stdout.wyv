@@ -2,6 +2,8 @@ module def stdout(java : Java) : Stdout
 
 import java:wyvern.stdlib.support.Stdio.stdio
 
+effect print = {}
+effect flush = {}
 // TODO: define me, probably using a stream abstraction for efficiency
 // actually this should probably go in a stream library
 // not associated with the standard output stream in particular
