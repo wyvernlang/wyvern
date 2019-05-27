@@ -16,14 +16,3 @@ type List
     def reduce(f:this.E*this.E=>this.E, id:this.E):this.E
     def filter(f:this.E->Boolean):List[this.E]
 
-
-
-
-
-
-
-
-
-
-
-
