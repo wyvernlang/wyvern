@@ -1,4 +1,4 @@
-module def stdout(javascript : JavaScript) : Stdout
+module def stdout(javascript : JavaScript) : UnannotatedStdout
 
 import javascript:stdlib.support.stdio
 
