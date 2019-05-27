@@ -1,5 +1,4 @@
 module def unannotatedFileAppender(filewriter : filesystem.Writer, arraylist: ArrayList)
-import fileSystem
 import filesystem.File
 import filesystem.fileEffects
 

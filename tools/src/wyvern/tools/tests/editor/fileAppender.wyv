@@ -1,5 +1,4 @@
 module def fileAppender(arraylist : ArrayList, filewriter : filesystem.Writer) : {}
-import fileSystem
 import filesystem.File
 import wyvern.option
 import arrayListMaker
