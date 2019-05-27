@@ -1,8 +1,8 @@
 type Generic
   effect E
 
-// {system.ffiEffect} is NOT a subtype of {}, so NOT OK
+// {system.FFI} is NOT a subtype of {}, so NOT OK
 val u : Generic[{}] = new
-  effect E = {system.ffiEffect}
+  effect E = {system.FFI}
 
 "abc"

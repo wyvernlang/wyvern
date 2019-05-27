@@ -1,0 +1,64 @@
+module def questionnaireCreator(logger: Logger, textArea: JTextArea, fs: fileSystem.FileSystem): Plugin
+// N.B.: Must pass in JTextArea and not just String because need to get the latest version of the text.
+
+def getName(): String
+  "Questionnaire Creator"
+
+def run(): Unit
+  logger.updateLog("Running the " + getName() + " plugin...\n")
+  val text = textArea.getText()
+  val length = text.length()
+  var questionnaire: String = ""
+  var questionnaire: String = ""
+  if (length > 0)
+    questionnaire = extractQuestions(text, "")
+  val fileName = "questionnaire.txt"
+  val fileWriter = fs.makeFile(fileName).makeWriter()
+  fileWriter.write(questionnaire)
+  fileWriter.close()
+  logger.updateLog("Result: The created questionnaire is:\n" + questionnaire)
+
+
+def extractQuestions(text: String, result: String): String
+  val length = text.length()
+  if (length < 1)
+      result
+    else
+      val questionMarkPosition = text.indexOf(63) // 63 is '?'
+      if (questionMarkPosition == -1)
+          result
+        else
+          val periodPosition = text.indexOf(46) // 46 is '.'
+          val exclamationPointPosition = text.indexOf(33) // 33 is '!'
+          if ((periodPosition > questionMarkPosition && exclamationPointPosition > questionMarkPosition) || (periodPosition == -1 && exclamationPointPosition == -1))
+              extractQuestions(text.substring(questionMarkPosition + 1, length), result + trimSpaces(text.substring(0, questionMarkPosition + 1)) + "\n")
+            else
+              if (periodPosition < questionMarkPosition && exclamationPointPosition < questionMarkPosition)
+                  var largerPosition: Int = periodPosition
+                  if (periodPosition < exclamationPointPosition)
+                      largerPosition = exclamationPointPosition
+                  extractQuestions(text.substring(largerPosition + 1, length), result)
+                else
+                  var smallerPosition: Int = periodPosition
+                  if (periodPosition > exclamationPointPosition)
+                      smallerPosition = exclamationPointPosition
+                  if (smallerPosition == -1)
+                      extractQuestions(text.substring(questionMarkPosition + 1, length), result + trimSpaces(text.substring(0, questionMarkPosition + 1)) + "\n")
+                    else
+                      extractQuestions(text.substring(smallerPosition + 1, length), result)
+
+def trimSpaces(text: String): String
+  var changed: Boolean = false
+  var firstIndex: Int = 0
+  if (text.charAt(0) == #" " || text.charAt(0) == #"\n" || text.charAt(0) == #"\t")
+    firstIndex = 1
+    changed = true
+  var lastIndex: Int = text.length()
+  if (text.charAt(lastIndex - 1) == #" " || text.charAt(lastIndex - 1) == #"\n" || text.charAt(lastIndex - 1) == #"\t")
+    lastIndex = text.length() - 1
+    changed = true
+  if (changed)
+      trimSpaces(text.substring(firstIndex, lastIndex))
+    else
+      text.substring(firstIndex, lastIndex)
+

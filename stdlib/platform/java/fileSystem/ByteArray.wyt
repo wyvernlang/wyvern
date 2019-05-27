@@ -1,0 +1,3 @@
+resource type ByteArray
+    def get(i:Int):Int
+    def set(i:Int,n:Int):Unit

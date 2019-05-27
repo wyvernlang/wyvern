@@ -1,0 +1,72 @@
+module def writeVerif(java:Java)
+
+import java:wyvern.stdlib.support.verifier.ASTWrapper.ast
+import verifProtobuf
+
+val vp = verifProtobuf
+
+// calls build() on the expressionBuilder before exiting
+def writeFormula(expression:verifProtobuf.Expression, formulaBuilder:Dyn):Unit
+    match expression:
+        b:verifProtobuf.Binop =>
+            val cbuilder = formulaBuilder.getCmpfBuilder()
+            cbuilder.setOper(ast.oper(b.oper))
+            writeExpression(b.left, cbuilder.getLeftBuilder())
+            writeExpression(b.right, cbuilder.getRightBuilder())
+            cbuilder.build()
+        default => 
+            // fake output for now
+            formulaBuilder.getValBuilder().setNum(0).build()
+
+    formulaBuilder.build()
+
+// calls build() on the expressionBuilder before exiting
+def writeExpression(expression:verifProtobuf.Expression, expressionBuilder:Dyn):Unit
+    match expression:
+        lit:verifProtobuf.Literal =>
+            val x:Int = lit.value
+            expressionBuilder.getValBuilder().setNum(x).build()
+        v:verifProtobuf.Variable =>
+            expressionBuilder.getVarBuilder().setName(v.name).build()
+        b:verifProtobuf.Binop =>
+            val bbuilder = expressionBuilder.getBinopBuilder()
+            bbuilder.setOper(ast.oper(b.oper))
+            writeExpression(b.left, bbuilder.getLeftBuilder())
+            writeExpression(b.right, bbuilder.getRightBuilder())
+            bbuilder.build()
+        default => 
+            // fake output for now
+            expressionBuilder.getValBuilder().setNum(0).build()
+
+    expressionBuilder.build()
+
+// if this is an analyzable statement, writes it to the programBuilder
+def writeStatement(statement:verifProtobuf.Statement, programBuilder:Dyn):Unit
+    match statement:
+        a:verifProtobuf.Assign =>
+            val stmtBuilder = programBuilder.addStmtsBuilder()
+            val assignBuilder = stmtBuilder.getAssignBuilder()
+            assignBuilder.getNameBuilder().setName(a.name).build()
+            
+            writeExpression(a.value, assignBuilder.getValueBuilder())
+            
+            assignBuilder.build()
+            stmtBuilder.build()
+        a:verifProtobuf.Assert =>
+            val stmtBuilder = programBuilder.addStmtsBuilder()
+            val assertBuilder = stmtBuilder.getAssertBuilder()
+            
+            writeFormula(a.formula, assertBuilder)
+            
+            assertBuilder.build()
+            stmtBuilder.build()
+        default => unit
+    
+
+// BUG: should be able to use vp in place of verifProtobuf here
+def writeVerifierFile(program:verifProtobuf.Program, filename:String):Unit
+    val builder:Dyn = ast.newProgramBuilder()
+    
+    program.stmts.do(s => writeStatement(s, builder))
+    val protobufProgram = builder.build()
+    ast.writeAST(filename, protobufProgram)

@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
+import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.util.Pair;
@@ -119,6 +120,15 @@ public class SeqExpr extends Expression {
         }
         setExprType(result);
         return getType();
+    }
+
+    @Override
+    public FileLocation getLocation() {
+        FileLocation loc = super.getLocation();
+        if (loc == null && !elements.isEmpty()) {
+            loc = elements.getLast().getLocation();
+        }
+        return loc;
     }
 
     public GenContext extendContext(GenContext ctx) {

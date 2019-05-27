@@ -1,6 +1,7 @@
 package wyvern.tools.parsing.coreparser;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Arrays;
@@ -348,7 +349,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
 
     @Override
-    public TypedAST integerLit(int value, FileLocation loc) {
+    public TypedAST integerLit(BigInteger value, FileLocation loc) {
         return new IntegerConstant(value, loc);
     }
 

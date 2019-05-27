@@ -1,0 +1,11 @@
+require java
+//import fileSystem
+import stdout
+import stdin
+import wyvern.option
+type Option = option.Option
+val filesys = fileSystem(java)
+val out = stdout(java)
+val in = stdin(java)
+
+in.read()

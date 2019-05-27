@@ -37,6 +37,7 @@ import wyvern.tools.errors.*;
 import wyvern.tools.lexing.LexerUtils;
 import wyvern.tools.generics.*;
 
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.*;
 
@@ -912,7 +913,7 @@ AST Literal() :
 |
   lit = <CHARACTER_LITERAL>  { return build.characterLit(lit.image.charAt(0), loc(lit)); }
 |
-  lit = <DECIMAL_LITERAL> { return build.integerLit(Integer.parseInt(lit.image), loc(lit)); }
+  lit = <DECIMAL_LITERAL> { return build.integerLit(new BigInteger(lit.image), loc(lit)); }
 |
   lit = <BOOLEAN_LITERAL> { return build.booleanLit(Boolean.parseBoolean(lit.image), loc(lit)); }
 |

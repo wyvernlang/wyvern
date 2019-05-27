@@ -148,6 +148,12 @@ public class ModuleResolver {
             }};*/
     }
 
+    /** Creates an EvalContext with the specified modules.
+     * Note that you must include all transitively dependent modules in the list.
+     * 
+     * @param qualifiedNames
+     * @return
+     */
     public EvalContext contextWith(String... qualifiedNames) {
         EvalContext ctx = Globals.getStandardEvalContext();
         for (String qualifiedName : qualifiedNames) {

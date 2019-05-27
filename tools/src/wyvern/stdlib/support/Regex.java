@@ -14,7 +14,7 @@ public class Regex {
 
     public ObjectValue findPrefixOf(String regex, String source) {
         Matcher m = Pattern.compile(regex).matcher(source);
-        EvalContext ctx = ModuleResolver.getLocal().contextWith("wyvern.option");
+        EvalContext ctx = ModuleResolver.getLocal().contextWith("wyvern.runtime", "wyvern.option");
         Expression call = null;
         Expression typeParam = ExpressionUtils.typeParam("T", AST.utils.nominalType("system", "String"));
         if (m.find() && m.start() == 0) {

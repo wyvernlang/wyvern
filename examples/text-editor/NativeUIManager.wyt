@@ -1,0 +1,7 @@
+type NativeUIManager
+  def paintUIAttributeBlack(element: String, attribute: String): Unit
+  def paintUIAttributeDarkGray(element: String, attribute: String): Unit
+  def paintUIAttributeGray(element: String, attribute: String): Unit
+  def paintUIAttributeLightGray(element: String, attribute: String): Unit
+  def paintUIAttributeWhite(element: String, attribute: String): Unit
+  def updateLookAndFeel(jFrame: Dyn): Unit // FIX: Substitute Dyn with JFrame type. Currently gives an error.

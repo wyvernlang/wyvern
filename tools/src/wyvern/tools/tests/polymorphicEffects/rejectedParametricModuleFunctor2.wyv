@@ -1,7 +1,7 @@
 import polymorphicEffects.parametricLib
 
 val u = new
-  effect E = {system.ffiEffect}
+  effect E = {system.FFI}
 
 val v = new
   effect E = {}
@@ -9,7 +9,7 @@ val v = new
 val lib = parametricLib[String, {u.E}]()
 
 def run() : {v.E} String
-  // Rejected because {u.E} = {system.ffiEffect} is not a subset of {v.E} = {}
+  // Rejected because {u.E} = {system.FFI} is not a subset of {v.E} = {}
   lib.id("abc")
 
 run()

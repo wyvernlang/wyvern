@@ -373,8 +373,6 @@ public class MethodCall extends Expression {
             FailureReason r = new FailureReason();
             try {
                 if (!actualArgType.isSubtypeOf(formalArgType, newCtx, r)) {
-                    DeclType actualDecl = actualArgType.getStructuralType(newCtx).getDeclTypes().get(0);
-                    DeclType formalDecl = formalArgType.getStructuralType(newCtx).getDeclTypes().get(0);
                     argsTypechecked = false;
                     if (failureReason == null) {
                         failureReason = r.getReason();

@@ -1,5 +1,6 @@
 package wyvern.tools.parsing.coreparser;
 
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
 
@@ -42,7 +43,7 @@ interface ASTBuilder<AST, Type> {
     AST var(String name, FileLocation loc);
     AST stringLit(String value, FileLocation loc);
     AST characterLit(char value, FileLocation loc);
-    AST integerLit(int value, FileLocation loc);
+    AST integerLit(BigInteger value, FileLocation loc);
     AST booleanLit(boolean value, FileLocation loc);
     AST invocation(AST receiver, String name, AST argument, FileLocation loc);
     AST application(AST function, List<AST> arguments, FileLocation loc, List<GenericArgument> genericArguments, boolean recur);

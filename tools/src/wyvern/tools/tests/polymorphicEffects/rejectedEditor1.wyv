@@ -8,10 +8,10 @@ type Resource
   effect theEffect
 
 val file : Resource = new
-  effect theEffect = {system.ffiEffect}
+  effect theEffect = {system.FFI}
 
 val network : Resource = new
-  effect theEffect = {system.ffiEffect}
+  effect theEffect = {system.FFI}
 
 // Different implementations of Logger
 

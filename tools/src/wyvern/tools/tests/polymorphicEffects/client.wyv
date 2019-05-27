@@ -1,8 +1,8 @@
 import lifted polymorphicEffects.unannotatedPlugin
 import polymorphicEffects.Logger
 
-val logger : Logger[{system.ffiEffect}] = new
-    effect log = {system.ffiEffect}
+val logger : Logger[{system.FFI}] = new
+    effect log = {system.FFI}
     def append(contents : String) : {this.log} Unit
         unit
 

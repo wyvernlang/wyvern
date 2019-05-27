@@ -1,5 +1,6 @@
 package wyvern.target.corewyvernIL.expression;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import wyvern.tools.errors.RuntimeError;
 import wyvern.tools.errors.ToolError;
 
 public class ObjectValue extends New implements Invokable {
+    private static final ThreadLocal<List<String>> stack = ThreadLocal.withInitial(() -> new ArrayList<String>());
     private final EvalContext evalCtx; // captured eval context
     private final boolean hasDelegate;
     private ObjectValue delegateTarget;
@@ -62,25 +64,38 @@ public class ObjectValue extends New implements Invokable {
 
     @Override
     public Value invoke(String methodName, List<Value> args, FileLocation loc) {
-        EvalContext methodCtx = evalCtx;
-        DefDeclaration dd = (DefDeclaration) findDecl(methodName, false);
-        if (dd != null) {
-            if (args.size() != dd.getFormalArgs().size()) {
-                throw new RuntimeException("invoke called on " + methodName + " with " + args.size() + " arguments, "
-                        + "but " + dd.getFormalArgs().size() + " were expected");
+        List<String> theStack = stack.get();
+        try {
+            theStack.add(methodName);
+            EvalContext methodCtx = evalCtx;
+            DefDeclaration dd = (DefDeclaration) findDecl(methodName, false);
+            if (dd != null) {
+                if (args.size() != dd.getFormalArgs().size()) {
+                    throw new RuntimeException("invoke called on " + methodName + " with " + args.size() + " arguments, "
+                            + "but " + dd.getFormalArgs().size() + " were expected");
+                }
+                for (int i = 0; i < args.size(); ++i) {
+                    methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getSite(), args.get(i));
+                }
+                return dd.getBody().interpret(methodCtx);
+            } else if (hasDelegate) {
+                return delegateTarget.invoke(methodName, args);
+            } else {
+                if (Util.isJavaNull(this)) {
+                    ToolError.reportError(ErrorMessage.JAVA_NULL_EXCEPTION, loc, methodName);
+                }
+                ToolError.reportError(ErrorMessage.DYNAMIC_METHOD_ERROR, loc, methodName);
+                throw new RuntimeException("can't reach here");
             }
-            for (int i = 0; i < args.size(); ++i) {
-                methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getSite(), args.get(i));
+        } catch (StackOverflowError e) {
+            System.err.println("Stack overflow.  Method stack:");
+            for (int i = theStack.size() - 1; i >= 0; --i) {
+                System.err.println(theStack.get(i) + "(...)");
             }
-            return dd.getBody().interpret(methodCtx);
-        } else if (hasDelegate) {
-            return delegateTarget.invoke(methodName, args);
-        } else {
-            if (Util.isJavaNull(this)) {
-                ToolError.reportError(ErrorMessage.JAVA_NULL_EXCEPTION, loc, methodName);
-            }
-            ToolError.reportError(ErrorMessage.DYNAMIC_METHOD_ERROR, loc, methodName);
-            throw new RuntimeException("can't reach here");
+            ToolError.reportError(ErrorMessage.STACK_OVERFLOW, loc);
+            throw new RuntimeException("stack overflow"); // never get here
+        } finally {
+            theStack.remove(theStack.size() - 1);
         }
     }
 

@@ -15,6 +15,7 @@ import wyvern.target.corewyvernIL.type.BottomType;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.StructuralType;
+import wyvern.target.corewyvernIL.type.Type;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 public final class Util {
@@ -28,6 +29,7 @@ public final class Util {
     private static final ValueType theCharType = new NominalType("system", "Character");
     private static final ValueType theStringType = new NominalType("system", "String");
     private static final ValueType theUnitType = new StructuralType("unitSelf", new LinkedList<DeclType>());
+    private static final ValueType theAnyType = new StructuralType("anySelf", new LinkedList<DeclType>(), true);
     private static final ValueType theDynType = new DynamicType();
     private static final ValueType theBottomType = new BottomType();
 
@@ -51,6 +53,9 @@ public final class Util {
     }
     public static ValueType unitType() {
         return theUnitType;
+    }
+    public static Type anyType() {
+        return theAnyType;
     }
     public static ValueType dynType() {
         return theDynType;

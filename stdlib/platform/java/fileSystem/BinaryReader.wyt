@@ -1,0 +1,6 @@
+resource type BinaryReader
+    effect Read
+    def read():{this.Read}Int
+    //def readBytes(numBytes:Int):{this.Read}Int
+    def readUTF():{this.Read}String
+    def close():Unit

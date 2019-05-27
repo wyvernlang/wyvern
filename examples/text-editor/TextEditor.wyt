@@ -1,0 +1,14 @@
+import Plugin
+resource type TextEditor
+  def run(): Unit
+  def saveFile(fileName: String): Unit // N.B.: File exceptions aren't handled.
+  def saveFileAs(): Unit
+  def saveOld(): Unit
+  def performNewAction(): Unit
+  def performSaveAction(): Unit
+  def performSaveAsAction(): Unit
+  def performOpenAction(): Unit // N.B.: File exceptions aren't handled.
+  def performQuitAction(): Unit
+  def performKeyPressedAction(): Unit
+  def registerPlugin(plugin: Plugin): Unit
+  def runPluginOnSetup(plugin: Plugin): Unit
