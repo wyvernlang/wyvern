@@ -66,4 +66,14 @@ public class StdlibTests {
         TestUtil.doTestScriptModularly("stdlib.collections.linkedListTest", null, null);
     }
 
+    @Test
+    public void testLinkedListNew() throws ParseException {
+        TestUtil.doTestScriptModularly("stdlib.collections.linkedListTest_new", null, null);
+    }
+
+    @Test
+    public void arrayListTest() throws ParseException {
+        TestUtil.doTestScriptModularly("stdlib.collections.arrayListTest", null, null);
+    }
+
 }

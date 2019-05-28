@@ -1,0 +1,233 @@
+module ArrayList
+
+import java:wyvern.stdlib.support.ArrayWrapper.arr
+import wyvern.collections.Iterator
+import wyvern.option
+
+type Option = option.Option
+type Some = option.Some 
+type None = option.None
+
+resource type ArrayList
+    type E
+    def size() : Int
+    def isEmpty() : Boolean
+    def do(f:this.E->Unit):Unit
+    def length() : Int
+    def get(index : Int) : this.E
+    /* Can only set elements that are already initialized */
+    def set(index : Int, elem : this.E) : Unit
+    def add(x : this.E) : Unit 
+    def addAt(i:Int, x:this.E):Unit 
+    def addAll(l:ArrayList[this.E]):Unit
+    def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
+    def iterator(): Iterator[this.E]
+    def map[T](f:this.E->T):ArrayList[T]
+    def foldLeft[T](f:T*this.E->T, x:T):T
+    def foldRight[T](f:this.E*T->T, x:T):T
+    def reverse():ArrayList[this.E]
+    def reduce(f:this.E*this.E=>this.E, id:this.E):this.E
+    def filter(f:this.E->Boolean):ArrayList[this.E]
+
+def ArrayList[U](count : Int) : ArrayList[U] = new
+    type E = U
+    var array : Unit = arr.create(count) 
+    
+    var arrSize : Int = 0
+    def size() : Int = this.arrSize
+    
+    def isEmpty() : Boolean
+        this.arrSize == 0
+    
+    def do(f:U->Unit):Unit
+        def setNewArray(i:Int, x:U):Int
+            f(this.get(i))
+            i+1
+        this.foldLeft[Int]((i:Int, x:U) \
+            => setNewArray(i, x), 0)
+        unit
+    
+    def length() : Int
+        arr.length(this.array) 
+    
+    def get(index : Int) : U
+        if(index<0 || index > this.arrSize-1)
+                runtime.fail("Error: index out of bounds")
+            else
+                arr.get(this.array, index)
+    
+    def set(index : Int, elem : U) : Unit 
+        if(index < 0 || index > this.arrSize-1)
+                runtime.fail("Error: Index out of bounds")
+            else
+                arr.set(this.array, index, elem)
+
+    /* implicitly requires that i starts at 0 */
+    def copyToFrom(newArr : Unit, oldArr : Unit, i : Int, j : Int) : Unit 
+        if(i<0 || i > j-1)
+                unit
+            else
+                arr.set(newArr, i, arr.get(oldArr, i))
+                this.copyToFrom(newArr, oldArr, i+1, j)
+
+    /* grow the internal java array to at least targetLength */
+    def growArray(targetLength : Int) : Unit
+        var newLength : Int = this.length() * 2
+        if(newLength < targetLength)
+                newLength = targetLength
+        var newArray : Unit = arr.create(newLength)
+        newArray
+
+    def growArrayAndCopy(targetLength:Int) : Unit 
+        var newArray : Unit = this.growArray(targetLength)
+        this.copyToFrom(newArray, this.array, 0, this.arrSize)
+        newArray
+
+    def add(x : U) : Unit
+        var newArray : Unit = this.array
+        if(this.arrSize + 1 > this.length())
+                newArray = this.growArrayAndCopy(this.arrSize + 1)
+        this.arrSize = this.arrSize + 1
+        this.array = newArray
+        this.set(this.arrSize-1, x)
+        unit
+
+    /* coping oldArr[i:j] (exlude j) to newArr starting at h, but not >= k */
+    def copyToFromRange(newArr : Unit, oldArr : Unit, h : Int, k : Int, i : Int, j : Int) : Unit 
+        def copyToFromRangeH(z:Int) : Unit
+            if(i<0 || i > j-1 || h+z > k-1)
+                    unit 
+                else
+                    arr.set(newArr, h+z, arr.get(oldArr, i+z) )
+                    copyToFromRangeH(z+1)
+        copyToFromRangeH(0)
+
+    def addAt(i:Int, x:U):Unit 
+        val oldSize = this.arrSize
+        val newSize = this.arrSize+1
+        if(i<0 || i > oldSize)
+                runtime.fail("Error: Index out of bounds")
+            else
+                var newArray : Unit = unit 
+                if(newSize > this.length())
+                        newArray = this.growArray(newSize)
+                    else
+                        if(i==oldSize)
+                                newArray = this.array 
+                            else 
+                                newArray = arr.create(this.length())
+                this.copyToFromRange(newArray, this.array, 0, i, 0, i)
+                arr.set(newArray, i, x)
+                this.copyToFromRange(newArray, this.array, i+1, newSize, i, oldSize)
+                this.array = newArray
+                this.arrSize = newSize
+                unit
+
+    def addAll(l:ArrayList[U]):Unit
+        val lSize = l.size()
+        val newSize = this.arrSize+lSize
+        var newArray : Unit = this.array
+        if(newSize > this.length())
+                newArray = this.growArrayAndCopy(newSize)
+        def addAllH(Arr: Unit, i:Int):Unit 
+            if(i < lSize)
+                    arr.set(Arr, this.arrSize+i, l.get(i))
+                    addAllH(Arr, i+1)
+                else
+                    unit 
+        addAllH(newArray, 0)
+        this.array = newArray
+        this.arrSize = newSize
+        unit
+
+    def indexOf(x: U, compare: U*U->Boolean):Int
+        def indexOfH(i:Int):Int
+            if(i< this.arrSize)
+                    if(compare(this.get(i), x))
+                            i 
+                        else
+                            indexOfH(i+1)
+                else
+                    -1
+        indexOfH(0)
+
+    def iterator():Iterator[U] = new (self) => 
+        type E = U
+        var currentIndex : Int = 0
+        def hasNext():Boolean = self.currentIndex < this.arrSize
+        def next(): Option[U]
+            if(self.hasNext())
+                    val lastIndex = self.currentIndex
+                    self.currentIndex = self.currentIndex + 1
+                    option.Some[U](this.get(lastIndex))
+                else
+                    option.None[U]()
+
+    def map[T](f:U->T): ArrayList[T]
+        var newArray : ArrayList[T] = ArrayList[T](this.arrSize)
+        def mapH[T](f:U->T, newarr:ArrayList[T], i:Int): Unit
+            if(i < this.arrSize)
+                    val nextelem = f(this.get(i))
+                    newarr.add(nextelem)
+                    mapH[T](f, newarr, i+1)
+                else
+                    unit
+        mapH[T](f, newArray, 0)
+        newArray
+
+    def foldLeft[T](f:T*U->T, x:T):T
+        def foldLeftH[T](f:T*U->T, y:T, i:Int):T
+            if(i < this.arrSize)
+                    foldLeftH[T](f, f(y, this.get(i)), i+1)
+                else
+                    y
+        foldLeftH[T](f,x,0)
+
+    def reverse():ArrayList[U]
+        var newArrayList : ArrayList[U] = ArrayList[U](this.arrSize)
+        def setNewArray(newArr: ArrayList[U], i:Int):Unit
+            if(i<0 || i > this.arrSize-1)
+                    unit 
+                else
+                    newArr.add(this.get(i))
+                    setNewArray(newArr, i-1)
+        setNewArray(newArrayList, this.arrSize-1)
+        newArrayList
+
+    def foldRight[T](f:U*T->T, x:T):T
+        var revArrayList : ArrayList[U] = this.reverse()
+        revArrayList.foldLeft[T]((foldRes:T, ele:U) => f(ele,foldRes), x)
+
+    def reduce(f:U*U=>U, id:U):U
+        def reduceH(f:U*U=>U, id:U, i:Int, j:Int):U
+            if(j-i < 2)
+                    this.get(i)
+                else
+                    val mid : Int = i + ((j-i) / 2)
+                    val fstHalf = reduceH(f, id, i, mid)
+                    val sndHalf = reduceH(f, id, mid, j)
+                    f(fstHalf, sndHalf)
+        reduceH(f, id, 0, this.arrSize)
+
+    def filter(f:U->Boolean): ArrayList[U] 
+        var revArrayList : ArrayList[U] = this.reverse()
+        var newArrayList : ArrayList[U] = ArrayList[U](0)
+        def setNewArray(newArr : ArrayList[U], x:U): ArrayList[U]
+            if(f(x))
+                    newArr.add(x)
+                    newArr
+                else
+                    newArr
+        this.foldLeft[ArrayList[U]]((newArr : ArrayList[U], x:U) \
+            => setNewArray(newArr, x), newArrayList)
+
+def tabulate[T](f:Int->T, n:Int):ArrayList[T]
+    var newArrayList : ArrayList[T] = ArrayList[T](n) //arraylist internal contructor
+    def tabulateH[T](f:Int->T, n:Int, arr:ArrayList[T], i:Int):ArrayList[T]
+        if(n==0)
+                arr
+            else
+                val thisVal : T = f(i)
+                arr.add(thisVal)
+                tabulateH[T](f, n-1, arr, i+1)
+    tabulateH[T](f,n,newArrayList, 0)

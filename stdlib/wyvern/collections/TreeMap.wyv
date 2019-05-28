@@ -1,0 +1,906 @@
+require stdout
+require java
+
+import wyvern.collections.Collection 
+import wyvern.collections.ArrayList
+import wyvern.collections.LinkedList
+import wyvern.runtime
+import java:wyvern.stdlib.support.StringHelper.utils
+import wyvern.option
+
+
+type ArrayList = ArrayList.ArrayList
+type LinkedList = LinkedList.LinkedList
+type Cons = LinkedList.Cons
+type Nil = LinkedList.Nil
+type Option = option.Option
+type Some = option.Some 
+type None = option.None
+
+
+datatype Color 
+    Red 
+    Black
+
+type Comparator 
+    type T
+    def compare(x:this.T, y:this.T):Int 
+    def equal(x:this.T, y:this.T):Boolean 
+
+resource type TreeMap 
+    type KE
+    type VE
+    def size(): Int 
+    def isEmpty():Boolean
+    def get(key:this.KE):Option[this.VE]
+    def put(key:this.KE, value:this.VE):Unit
+    def remove(key:this.KE): Unit 
+    def hasKey(key: this.KE):Boolean
+    // def values():Collection[this.V]
+    /*** ONLY for testing purpose, shouldn't expose these functions*/
+    def printTree(toString:this.KE*this.VE->String):String //maybe Unit?
+    /******/
+    
+
+def TreeMap[K,V](cmp:Comparator[K], toString:K*V->String):TreeMap[K,V] 
+
+    tagged resource type Entry comprises Entrye, Entryn
+        type K
+        type V
+        val isDefined:Boolean 
+        def getKey(): this.K
+        def getValue(): this.V
+        def getColor(): Color
+        def getLeft(): Entry[this.K, this.V]
+        def getRight(): Entry[this.K, this.V]
+        def getParent():Entry[this.K, this.V]
+        def setColor(c:Color):Unit
+        def setValue(v:this.V):Unit
+        def setLeft(node : Entry[this.K, this.V]) : Unit
+        def setRight(node : Entry[this.K, this.V]) :Unit
+        def setParent(node : Entry[this.K, this.V]) :Unit
+
+    tagged resource type Entrye extends Entry
+        type K
+        type V 
+        val key : this.K
+        var value: this.V
+        var color :Color 
+        var right : Entry[this.K, this.V]
+        var left : Entry[this.K, this.V]
+        var parent : Entry[this.K, this.V]
+        val isDefined:Boolean 
+        // 
+        def getKey(): this.K
+        def getValue(): this.V
+        def getColor(): Color
+        def getLeft(): Entry[this.K, this.V]
+        def getRight(): Entry[this.K, this.V]
+        def getParent():Entry[this.K, this.V]
+        // 
+        def setColor(c:Color):Unit
+        def setValue(v:this.V):Unit
+        def setLeft(node : Entry[this.K, this.V]) : Unit
+        def setRight(node : Entry[this.K, this.V]) :Unit
+        def setParent(node : Entry[this.K, this.V]) :Unit
+
+    tagged resource type Entryn extends Entry
+        type K
+        type V 
+        val isDefined:Boolean 
+        // 
+        def getKey(): this.K
+        def getValue(): this.V
+        def getColor(): Color
+        def getLeft(): Entry[this.K, this.V]
+        def getRight(): Entry[this.K, this.V]
+        def getParent():Entry[this.K, this.V]
+        //
+        def setColor(c:Color):Unit
+        def setValue(v:this.V):Unit
+        def setLeft(node : Entry[this.K, this.V]) : Unit
+        def setRight(node : Entry[this.K, this.V]) :Unit
+        def setParent(node : Entry[this.K, this.V]) :Unit
+
+    def Entrye[T,U](key:T, value:U, c:Color):Entrye[T,U] = new (ent) => 
+        type K = T
+        type V = U
+        val key : T = key
+        var value: U= value
+        var color :Color  = c
+        var right : Entry[T,U] = Entryn[T,U]()
+        var left : Entry[T,U] = Entryn[T,U]()
+        var parent : Entry[T,U] = Entryn[T,U]()
+        val isDefined  = true
+        //
+        def getKey(): T
+            ent.key
+        def getValue(): U
+            ent.value
+        def getColor(): Color
+            ent.color
+        def getLeft(): Entry[T,U]
+            ent.left
+        def getRight(): Entry[T,U]
+            ent.right
+        def getParent(): Entry[T,U]
+            ent.parent
+        def setColor(c:Color):Unit
+            ent.color = c
+        def setValue(v:U):Unit
+            ent.value = v
+        def setLeft(node:Entry[T,U]): Unit
+            ent.left = node
+            match node:
+                n:Entryn => unit 
+                entry:Entrye => entry.setParent(ent)
+        def setRight(node:Entry[T,U]): Unit
+            ent.right = node
+            match node:
+                n:Entryn => unit 
+                entry:Entrye => entry.setParent(ent)
+        def setParent(node:Entry[T,U]): Unit
+            ent.parent = node
+
+    def Entryn[T,U]():Entryn[T,U] = new (ent) => 
+        type K = T
+        type V = U
+        val isDefined = false
+        //var parent : Entry[T,U] = Entryn[T,U]()
+        // 
+        def getKey(): T = runtime.fail("called getKey() on an Entry that was Null")
+        def getValue(): U = runtime.fail("called getValue() on an Entry that was Null")
+        def getColor(): Color = Black()
+        def getLeft(): Entry[T,U] = runtime.fail("called getLeft() on an Entry that was Null")
+        def getRight(): Entry[T,U] = runtime.fail("called getRight() on an Entry that was Null")
+        def getParent():Entry[T,U] = runtime.fail("called getParent() on an Entry that was Null")
+        // 
+        def setColor(c:Color):Unit  
+            match c:
+                r:Red => runtime.fail("Error: cannot set null entry red")
+                b:Black => unit
+        def setValue(v:U):Unit = runtime.fail("called setValue() on an Entry that was Null")
+        def setLeft(node : Entry[T,U]) : Unit = runtime.fail("called setLeft() on an Entry that was Null")
+        def setRight(node : Entry[T,U]) :Unit = runtime.fail("called setRight() on an Entry that was Null")
+        def setParent(node : Entry[T,U]) :Unit = runtime.fail("called setParent() on an Entry that was Null")
+
+    new (self) =>
+        type KE = K
+        type VE = V
+        var mapSize : Int = 0
+        var root : Entry[K,V] = Entryn[K,V]()
+        def size():Int 
+            self.mapSize
+        def isEmpty():Boolean
+            self.size() == 0
+        //*******************************************Printing Helpers********************************************
+        def zipWithL[T](f:T*T->T, defaultV:T, l1:LinkedList[T], l2:LinkedList[T]):LinkedList[T]
+            val NilList :LinkedList[T] = LinkedList.Nil[T]()
+            match l1:
+                n:Nil => 
+                    match l2:
+                        m:Nil => NilList
+                        d:Cons => 
+                            val l2Head : T = d.value
+                            val l2Tail :LinkedList[T] = d.drop(1).getOrElse(() => runtime.fail("should be non-empty list"))
+                            val recRes = self.zipWithL[T](f, defaultV, l1, l2Tail)
+                            LinkedList.Cons[T](f(defaultV,l2Head), recRes)
+                c:Cons =>
+                    val l1Head : T = c.value
+                    val l1Tail :LinkedList[T] = c.drop(1).getOrElse(() => runtime.fail("should be non-empty list"))
+                    match l2:
+                        m:Nil =>
+                            //val l1Head : T = c.value
+                            //val l1Tail :LinkedList[T] = c.drop(1).getOrElse(()=> runtime.fail("should be non-empty list"))
+                            val recRes = self.zipWithL[T](f, defaultV, l1Tail, l2)
+                            LinkedList.Cons[T](f(l1Head,defaultV), recRes)
+                        d:Cons =>
+                            val l2Head : T = d.value
+                            val l2Tail :LinkedList[T] = d.drop(1).getOrElse(()=> runtime.fail("should be non-empty list"))
+                            val recRes = self.zipWithL[T](f, defaultV, l1Tail, l2Tail)
+                            LinkedList.Cons[T](f(l1Head,l2Head), recRes)
+
+        def printTreeH(entryOpt : Entry[K,V], toString:K*V->String):LinkedList[String]
+            val emtryLL :LinkedList[String] = LinkedList.Nil[String]()
+            def padStr(one:String, two:String, inp:LinkedList[String]) :LinkedList[String]
+                match inp:
+                    m:Nil => emtryLL
+                    c:Cons => 
+                        val llwithOne : LinkedList[String] = LinkedList.Cons[String](one, emtryLL)
+                        self.zipWithL[String]((s1:String, s2:String)=>s1+s2, two, llwithOne, inp)
+
+            def formatTree(l:Entry[K,V], r:Entry[K,V]) :LinkedList[String]
+                val lPad :LinkedList[String] = padStr("+- ", "|  ", self.printTreeH(l, toString))
+                val rPad :LinkedList[String] = padStr("`- ", "   ", self.printTreeH(r, toString))
+                rPad.append(lPad)
+            match entryOpt:
+                n:Entryn => emtryLL
+                entry:Entrye =>
+                    val entryString : String = toString(entry.key, entry.value)
+                    if(self.isRed(entry))
+                            LinkedList.Cons[String](entryString+"R", formatTree(entry.left, entry.right))
+                        else
+                            LinkedList.Cons[String](entryString+"B", formatTree(entry.left, entry.right))
+
+        def concatWith(x:String, l:LinkedList[String]):String
+            match l:
+                n:Nil => ""
+                c:Cons => 
+                    val head = c.value
+                    val tail = c.drop(1).getOrElse(()=>runtime.fail("should be non empty"))
+                    match tail:
+                        m:Nil => head 
+                        d:Cons => 
+                            head+x+(self.concatWith(x,tail))
+
+        def printTree(toString:K*V->String):String
+            match self.root:
+                n:Entryn => "empty"
+                entry:Entrye => 
+                    val res = self.concatWith("\n", self.printTreeH(self.root, toString))
+                    res+"\n"
+        /**********************************************************************************************************/
+        
+        def get(key:K):Option[V] 
+            self.uniformTraverse[Option[V]](key, self.root, (x:Entryn[K,V])=>option.None[V](), \
+                (x:Entrye[K,V])=>option.Some[V](x.value))
+        
+        def hasKey(key:K):Boolean
+            self.uniformTraverse[Boolean](key, self.root, (x:Entryn[K,V])=>false, (x:Entrye[K,V])=>true)
+        
+        def uniformTraverse[RT](key:K, ent:Entry[K,V], bc:Entryn[K,V]->RT, ic:Entrye[K,V]->RT):RT
+            match ent:
+                n:Entryn => bc(n)
+                entry:Entrye => 
+                    if(cmp.equal(key, entry.key))
+                            ic(entry) 
+                        else
+                            if(cmp.compare(key, entry.key)<0)
+                                    self.uniformTraverse[RT](key, entry.getLeft(), bc, ic)
+                                else
+                                    self.uniformTraverse[RT](key, entry.getRight(), bc, ic)
+        /***************************************************************************************************************/
+        /*************************************************** Helpers ***************************************************/
+        def isRed(entry : Entrye[K,V]):Boolean
+            val entryColor:Color = entry.color 
+            match entryColor:
+                b:Black => false
+                r:Red => true
+
+        def isRedEntry(entryOpt:Entry[K,V]):Boolean
+            match entryOpt:
+                n:Entryn => false
+                entry: Entrye => self.isRed(entry)
+
+        def equalEntry(x:Entrye[K,V], y:Entrye[K,V]):Boolean 
+            cmp.equal(x.key, y.key)
+
+        def equalOpt(x:Entry[K,V], y:Entrye[K,V]):Boolean
+            match x:
+                n:Entryn => false //!(y.isDefined)
+                entry:Entrye => 
+                    cmp.equal(entry.key, y.key)
+
+        def changeColor(entry:Entrye[K,V]):Unit 
+            val entryColor:Color = entry.color
+            match entryColor:
+                b:Black => entry.setColor(Red())
+                r:Red => entry.setColor(Black())
+        
+        def checkBlackPathInvariant(thisEntry:Entry[K,V]): Int
+            match thisEntry:
+                n:Entryn => 0
+                entry:Entrye => 
+                    val leftRes : Int = self.checkBlackPathInvariant(entry.left)
+                    val rightRes : Int = self.checkBlackPathInvariant(entry.right)
+                    if(leftRes == rightRes)
+                            if(self.equalOpt(self.root, entry))
+                                    0
+                                else
+                            if(! self.isRed(entry))
+                                    leftRes+1
+                                else
+                                    leftRes
+                        else
+                            runtime.fail("number of black nodes on the path from the root to the null child is not the same")
+
+        def checkRedInvariantH(thisEntry:Entry[K,V], parentEntry:Entrye[K,V]) : Unit
+            match thisEntry:
+                n:Entryn => unit
+                entry:Entrye =>  
+                    if(self.isRed(parentEntry) && self.isRed(entry))
+                            runtime.fail("number of black nodes on the path from the root to the null child is not the same")
+                    self.checkRedInvariantH(entry.left, entry) 
+                    self.checkRedInvariantH(entry.right, entry)
+                                            
+        def checkRedInvariant():Unit
+            match self.root:
+                n:Entryn => unit
+                entry:Entrye => 
+                    self.checkRedInvariantH(entry.left, entry) 
+                    self.checkRedInvariantH(entry.right, entry)
+        
+        def checkNonCircularH(thisEntry:Entry[K,V], parentEntry:Entrye[K,V]):Unit
+            match thisEntry:
+                n:Entryn => unit
+                entry:Entrye => 
+                    if(!self.equalOpt(entry.parent, parentEntry))
+                            runtime.fail("Left child's parent is not parent's left child " \
+                                +toString(parentEntry.key, parentEntry.value)+" "+toString(entry.key, entry.value)\
+                                +"\n") 
+                    self.checkNonCircularH(entry.left, entry)
+                    self.checkNonCircularH(entry.right, entry)
+
+        def checkNonCircular():Unit
+            match self.root:
+                n:Entryn => unit
+                entry:Entrye => 
+                    self.checkNonCircularH(entry.left, entry) 
+                    self.checkNonCircularH(entry.right, entry)
+
+        def checkInvariant():Unit
+            match self.root:
+                n:Entryn => unit
+                entry:Entrye => 
+                    if(self.isRed(entry))
+                            runtime.fail("root is red")
+                    self.checkNonCircular()
+                    self.checkBlackPathInvariant(self.root)
+                    self.checkRedInvariant()      
+
+        /*************************************************** Put ***************************************************/
+        def put(key:K, value:V): Unit 
+            /*special values for key and value?*/
+            match self.root:
+                n:Entryn => 
+                    var newEntry : Entrye[K,V]= Entrye[K,V](key, value, Black())
+                    self.root = newEntry
+                    unit 
+                rootEntry:Entrye =>
+                    if(cmp.equal(key, rootEntry.getKey()))
+                            rootEntry.setValue(value)
+                        else
+                            if(cmp.compare(key, rootEntry.getKey())<0)
+                                    self.putH(key, value, rootEntry.getLeft(), rootEntry)
+                                else 
+                                    self.putH(key, value, rootEntry.getRight(), rootEntry)
+            self.root.setColor(Black())
+            self.root.setParent(Entryn[K,V]())
+
+        def putH(key:K, value:V, thisEntry: Entry[K,V], parentEntry: Entrye[K,V]) : Unit// Entry[K,V] //Option[Entry[K,V]] //Unit
+            match thisEntry:
+                n:Entryn => 
+                    var newEntry : Entrye[K,V]= Entrye[K,V](key, value, Red())
+                    self.setParentChild(parentEntry,newEntry)
+                    newEntry.setParent(parentEntry)
+                    self.adjustAtEntry(newEntry)
+                    //self.checkInvariant(key)
+                    self.mapSize = self.mapSize+1
+                    unit
+                entry:Entrye => 
+                    if(cmp.equal(key, entry.getKey()))
+                            entry.setValue(value)
+                        else
+                            if(cmp.compare(key, entry.key)<0)
+                                    self.putH(key, value, entry.getLeft(), entry)
+                                else
+                                    self.putH(key, value, entry.getRight(), entry)
+                    unit
+
+        def setParentChild(parentEntry: Entrye[K,V], childEntry:Entrye[K,V]):Unit 
+            if(cmp.compare(childEntry.getKey(), parentEntry.getKey()) < 0)
+                    parentEntry.setLeft(childEntry) 
+                else
+                    parentEntry.setRight(childEntry)
+
+        /* 
+            uncle is left, parent is right
+            uncle is black OR null */
+        def adjustAtEntryLeftBlackUncle(entry:Entrye[K,V], entryParent:Entrye[K,V], entryGrandP : Entrye[K,V]):Unit
+            if(self.equalOpt(entryParent.getLeft(), entry)) //right parent, left entry 
+                    self.rightRotate(entryParent) 
+                    self.adjustAtEntryRight(entryParent, entry, entryGrandP)
+                else
+                    self.adjustAtEntryRight(entry, entryParent, entryGrandP)
+            // runtime.fail("uncle left and undefined; self is left of parent; after whole")
+        /*
+        uncle is left, parent is right
+        */
+        def adjustAtEntryUncleLeft(entry:Entrye[K,V], entryParent:Entrye[K,V], entryGrandP : Entrye[K,V]):Unit 
+            var entryUncleOpt : Entry[K,V] = entryGrandP.getLeft()
+            match entryUncleOpt:
+                n:Entryn => self.adjustAtEntryLeftBlackUncle(entry, entryParent, entryGrandP) //uncle null
+                entryUncle:Entrye =>
+                    if(self.isRed(entryUncle))
+                            self.adjustAtEntry(self.adjustAtEntryUncleRed(entry, entryParent, entryGrandP, entryUncle))
+                        else 
+                            self.adjustAtEntryLeftBlackUncle(entry, entryParent, entryGrandP)
+
+        def adjustAtEntryH(entry:Entrye[K,V], entryParent:Entrye[K,V]):Unit
+            /* 
+            uncle is right, parent is left
+            uncle is black*/
+            def adjustAtEntryRightBlackUncle(entryGrandP : Entrye[K,V]):Unit
+                if(self.equalOpt(entryParent.getRight(), entry)) //left parent, right entry 
+                        self.leftRotate(entryParent) 
+                        self.adjustAtEntryLeft(entryParent, entry, entryGrandP)
+                    else    
+                        self.adjustAtEntryLeft(entry, entryParent, entryGrandP)
+            /*
+            uncle is right, parent is left
+            */
+            def adjustAtEntryUncleRight(entryGrandP : Entrye[K,V]):Unit 
+                var entryUncleOpt : Entry[K,V] = entryGrandP.getRight()
+                match entryUncleOpt:
+                    n:Entryn => adjustAtEntryRightBlackUncle(entryGrandP) //uncle null
+                    entryUncle:Entrye =>
+                        if(self.isRed(entryUncle)) 
+                                self.adjustAtEntry(self.adjustAtEntryUncleRed(entry, entryParent, entryGrandP, entryUncle))
+                            else 
+                                adjustAtEntryRightBlackUncle(entryGrandP)
+                
+            var entryGrandPOpt: Entry[K,V] = entryParent.getParent()
+            if(self.isRed(entryParent) && entryGrandPOpt.isDefined) //parent is red => gradparent must be black 
+                    match entryGrandPOpt:
+                        n:Entryn => runtime.fail("Root node in tree should be colored Black")
+                        entryGrandP:Entrye => 
+                            if(self.equalOpt(entryGrandP.getLeft(), entryParent)) 
+                                    adjustAtEntryUncleRight(entryGrandP)
+                                else 
+                                    self.adjustAtEntryUncleLeft(entry, entryParent, entryGrandP)
+
+        def adjustAtEntry(entry : Entrye[K,V]):Unit
+            var entryParentOpt : Entry[K,V] = entry.getParent()
+            if(self.equalOpt(self.root, entry)) 
+                    entry.setColor(Black())
+                    entry.setParent(Entryn[K,V]()) 
+                else
+                    match entryParentOpt:
+                        n:Entryn => runtime.fail("AdjustAtEntry: non-root node in tree has None parent")
+                        entryParent:Entrye => self.adjustAtEntryH(entry, entryParent)
+        
+        /* uncle is not null and red */
+        def adjustAtEntryUncleRed(e:Entrye[K,V], p:Entrye[K,V], g:Entrye[K,V], \
+            u:Entrye[K,V]) : Entrye[K,V]
+            p.setColor(Black())
+            u.setColor(Black())
+            if(! self.equalOpt(self.root, g))
+                    g.setColor(Red()) 
+            g
+
+        /* all the cases where entry is left child of parent */
+        def adjustAtEntryLeft(e:Entrye[K,V], p:Entrye[K,V], g:Entrye[K,V]) : Unit
+            self.rightRotate(g)
+            val pColor = p.color
+            val gColor = g.color
+            p.setColor(gColor)
+            g.setColor(pColor)
+            unit
+        /* all the cases where entry is right child of parent */
+        def adjustAtEntryRight(e:Entrye[K,V], p:Entrye[K,V], g:Entrye[K,V]) : Unit
+            val pColor = p.color
+            val gColor = g.color
+            self.leftRotate(g)
+            // runtime.fail("uncle left and undefined; self is left of parent; after rotate")
+            p.setColor(gColor)
+            g.setColor(pColor)
+            unit
+
+        /************************************************************************************************************/
+        /*************************************************** Delete ***************************************************/
+        def remove(key:K): Option[V] 
+            match self.root:
+                n:Entryn => 
+                    option.None[V]()
+                rootEntry:Entrye =>
+                    if(cmp.equal(key, rootEntry.getKey()))
+                            self.delete(rootEntry)
+                            option.Some[V](rootEntry.value)
+                        else
+                            if(cmp.compare(key, rootEntry.getKey())<0)
+                                    self.removeH(key, rootEntry.getLeft())
+                                else 
+                                    self.removeH(key, rootEntry.getRight())
+
+        def removeH(key:K, entryOpt: Entry[K,V]) : Option[V]
+            match entryOpt:
+                n:Entryn => 
+                    option.None[V]()
+                entry:Entrye => 
+                    if(cmp.equal(key, entry.getKey()))
+                            self.delete(entry)
+                            option.Some[V](entry.value)
+                        else
+                            if(cmp.compare(key, entry.key)<0)
+                                    self.removeH(key, entry.getLeft())
+                                else
+                                    self.removeH(key, entry.getRight()) 
+
+        
+        def delete(entry:Entrye[K,V]):Unit 
+            var leftChild : Entry[K,V] = entry.getLeft()
+            var rightChild : Entry[K,V] = entry.getRight()
+            var entryParentOpt : Entry[K,V] = entry.getParent()
+            match leftChild:
+                ln: Entryn => 
+                    match rightChild:
+                        rn:Entryn =>  //both are null, leaf 
+                            self.removeLeaf(entry)
+                            self.adjustAfterDeletion(entry, Entryn[K,V](), entryParentOpt)
+                        rightEntry:Entrye => 
+                            self.removeEntryWithOneChild(entry, rightEntry, 1)
+                            //adjustAfterDeletion(entry:Entrye[K,V], replce:Entry[K,V])
+                leftEntry:Entrye =>
+                    match rightChild:
+                        rn:Entryn =>  //both are null, leaf 
+                            self.removeEntryWithOneChild(entry, leftEntry, 0)
+                            //adjustAfterDeletion(entry:Entrye[K,V], replce:Entry[K,V])
+                        rightEntry:Entrye => 
+                            var entrySuccessor : Entry[K,V] = self.successor(entry)
+                            match entrySuccessor:
+                                sucN:Entryn => runtime.fail("Delete: since have 2 children, should have successor")
+                                sucE:Entrye => 
+                                    var entryParentOpt : Entry[K,V] = entry.getParent()
+                                    var entrySucDup : Entrye[K,V] = self.duplicateEntrye(sucE, leftEntry, rightEntry, entryParentOpt)
+                                    if(! self.equalOpt(self.root, entry))
+                                            //self.root = entrySucDup
+                                            // runtime.fail("self root reset")
+                                            if(! entryParentOpt.isDefined)
+                                                    runtime.fail("delete: non root node should have parent")
+                                                else
+                                                    if(self.equalOpt(entryParentOpt.getLeft(),entry))
+                                                            entryParentOpt.setLeft( entrySucDup )
+                                                        else
+                                                            entryParentOpt.setRight( entrySucDup )
+                                    if(self.equalOpt(self.root, entry))
+                                            entrySucDup.setParent(Entryn[K,V]())
+                                            entrySucDup.setColor(Black())
+                                            self.root = entrySucDup
+                                    self.delete(sucE)
+
+        def removeLeaf(entry:Entrye[K,V]): Unit
+            if(self.equalOpt(self.root, entry) && self.equalOptOpt(entry.getParent(), Entryn[K,V]()))
+                    self.root = Entryn[K,V]()
+                else
+                    var entryParentOpt : Entry[K,V] = entry.getParent() 
+                    if(! entryParentOpt.isDefined)
+                            runtime.fail("removeLeaf: non-root node should have parents")
+                        else
+                            if(self.equalOpt(entryParentOpt.getLeft(),entry))
+                                    entryParentOpt.setLeft( Entryn[K,V]() )
+                                else
+                                    entryParentOpt.setRight( Entryn[K,V]() )
+
+        def duplicateEntrye(entry:Entrye[K,V], left:Entry[K,V], right:Entry[K,V], parent:Entry[K,V]):Entrye[K,V] 
+            var newEntry : Entrye[K,V] = Entrye[K,V](entry.key, entry.value, entry.color)
+            newEntry.setRight(right)
+            newEntry.setLeft(left)
+            newEntry.setParent(parent)
+            newEntry
+
+        def removeEntryWithOneChild(entry:Entrye[K,V], child:Entrye[K,V], dir:Int): Unit 
+            if(self.equalOpt(self.root, entry) && self.equalOptOpt(entry.getParent(), Entryn[K,V]()))
+                    self.root = child 
+                    child.setParent(Entryn[K,V]()) //children of this child must all be null
+                    child.setColor(Black())
+                else
+                    var entryParentOpt : Entry[K,V] = entry.getParent() 
+                    if(! entryParentOpt.isDefined)
+                            runtime.fail("removeEntryWithOneChild: non-root node should have parents")
+                        else
+                            var childDup : Entrye[K,V] = if(dir==0) {self.duplicateEntrye(child, child, Entryn[K,V](),entryParentOpt)} else {self.duplicateEntrye(child, Entryn[K,V](), child, entryParentOpt)}
+                            if(self.equalOpt(entryParentOpt.getLeft(),entry))
+                                    entryParentOpt.setLeft( childDup )
+                                else
+                                    entryParentOpt.setRight( childDup )
+                            self.delete(child)
+
+        def successorRightChildNull(entry : Entrye[K,V], entryParent : Entry[K,V]):Entry[K,V]
+            if(! entryParent.isDefined)
+                    entryParent
+                else
+                    if(self.equalOpt(entryParent.getLeft(),entry))
+                            entryParent
+                        else
+                            match entryParent:
+                                n:Entryn => runtime.fail("Just tested that entryParent is defined")
+                                p:Entrye => 
+                                    self.successorRightChildNull(p, p.getParent())
+        
+        def successorRightChildNotNull(entry : Entrye[K,V]):Entry[K,V]
+            var leftChild :Entry[K,V] = entry.getLeft()
+            match leftChild:
+                n:Entryn => entry
+                leftEntry:Entrye => self.successorRightChildNotNull(leftEntry)
+
+        def successor(entry:Entrye[K,V]): Entry[K,V]
+            var rightChild : Entry[K,V] = entry.getRight()
+            match rightChild:
+                rn:Entryn =>  
+                    var entryParent : Entry[K,V] = entry.getParent()
+                    self.successorRightChildNull(entry, entryParent)
+                rightEntry:Entrye => self.successorRightChildNotNull(rightEntry)
+
+
+        def isRoot(entryOpt:Entry[K,V]):Boolean
+            match entryOpt:
+                n:Entryn => 
+                    !self.root.isDefined
+                entry:Entrye => 
+                    self.equalOpt(self.root, entry)
+        
+        def equalOptOpt(entryOpt1:Entry[K,V], entryOpt2:Entry[K,V]): Boolean //assume they have the same parent
+            match entryOpt1:
+                n1:Entryn => 
+                    match entryOpt2:
+                        n2:Entryn => true 
+                        e2:Entrye => false
+                e1:Entrye => 
+                    match entryOpt2:
+                        n2:Entryn => false 
+                        e2:Entrye => cmp.equal(e2.getKey(),e1.getKey())
+        
+        /*********************************************** Delete Adjust ***********************************************/
+        def adjustAfterDeletion(entry:Entrye[K,V], replaceOpt:Entry[K,V], entryParentOpt : Entry[K,V]) : Unit 
+            if(self.isRed(entry) || self.isRedEntry(replaceOpt))
+                    replaceOpt.setColor(Black())
+                else
+                    self.adjustAfterDeletionHelper(replaceOpt, entryParentOpt)
+                           
+        /* entry and replace are both black */
+        def adjustAfterDeletionHelper(replaceOpt:Entry[K,V], entryParentOpt : Entry[K,V]) : Unit 
+            if(self.isRoot(replaceOpt)) //3.3
+                    replaceOpt.setColor(Black())
+                else 
+                    match entryParentOpt:
+                        n:Entryn => runtime.fail("adjustAfterDeletionHelper: non-root node should have parent")
+                        entryParent:Entrye => 
+                            var siblingOpt:Entry[K,V] = Entryn[K,V]()
+                            if(self.equalOptOpt(entryParent.getLeft(), replaceOpt))
+                                    siblingOpt = entryParent.getRight()
+                                else
+                                    siblingOpt = entryParent.getLeft()
+                            if(self.isRedEntry(siblingOpt))
+                                    self.deleteRedSibling(replaceOpt, siblingOpt, entryParent)
+                                else
+                                    self.deleteBlackSibling(siblingOpt, entryParent)
+
+        def adjustAfterDeletionHelperWrapper(replaceOpt:Entry[K,V]) : Unit 
+            match replaceOpt:
+                n:Entryn => unit 
+                replace:Entrye => 
+                    var replaceParent : Entry[K,V] = replace.getParent()
+                    self.adjustAfterDeletionHelper(replace, replaceParent)
+        
+        /* sibling is red */
+        def deleteRedSibling(replaceOpt:Entry[K,V], siblingOpt:Entry[K,V], entryParent:Entrye[K,V]): Unit
+            match siblingOpt:
+                n:Entryn => runtime.fail("deleteRedSibling: red node cannot be null")
+                sibling:Entrye => 
+                    if(self.equalOpt(entryParent.getLeft(), sibling))
+                            self.rightRotate(entryParent)
+                        else 
+                            self.leftRotate(entryParent)
+                    val entryParentColor = entryParent.color
+                    val siblingColor = sibling.color 
+                    entryParent.setColor(siblingColor)
+                    sibling.setColor(entryParentColor)
+                    self.adjustAfterDeletionHelperWrapper(replaceOpt)
+                            
+        def deleteBlackSibling(siblingOpt:Entry[K,V], entryParent:Entrye[K,V]): Unit 
+            match siblingOpt:
+                siblingN:Entryn => 
+                    runtime.fail("old entry that we adjust at is not null and parent not null, impossible that sibling is null")
+                sibling:Entrye =>
+                    if(self.equalOpt(entryParent.getRight(), sibling))
+                            self.blackSiblingRight(sibling, entryParent)
+                        else 
+                            self.blackSiblingLeft(sibling, entryParent)
+
+        def deleteBlackSiblingTwoBlackChild(sibling:Entrye[K,V], entryParent:Entrye[K,V]):Unit
+            sibling.setColor(Red())
+            if(self.isRedEntry(entryParent))
+                    entryParent.setColor(Black())
+                else
+                    self.adjustAfterDeletionHelperWrapper(entryParent)
+        
+        def blackSiblingRight(sibling:Entrye[K,V], entryParent:Entrye[K,V]):Unit 
+            var siblingLeft : Entry[K,V] = sibling.getLeft()
+            var siblingRight : Entry[K,V] = sibling.getRight()
+            if(self.isRedEntry(siblingRight))
+                    self.blackSiblingRightRight(sibling, entryParent)
+                else
+                    if(self.isRedEntry(siblingRight))
+                            self.rightRotate(sibling)
+                            val siblingColor = sibling.getColor()
+                            var siblingNewParentOpt : Entry[K,V] = sibling.getParent()
+                            match siblingNewParentOpt:
+                                n:Entryn => runtime.fail("blackSiblingRight: left child of sibling is red but null")
+                                siblingNewParent : Entrye => 
+                                    val newPColor = siblingNewParent.getColor()
+                                    sibling.setColor(Red())
+                                    siblingNewParent.setColor(Black())
+                                    self.blackSiblingRightRight(siblingNewParent, entryParent)
+                        else
+                            self.deleteBlackSiblingTwoBlackChild(sibling, entryParent)
+
+        def blackSiblingRightRight(sibling:Entrye[K,V], entryParent:Entrye[K,V]):Unit 
+            self.leftRotate(entryParent)
+            val entryParentColor = entryParent.getColor()
+            sibling.setColor(entryParentColor)
+            entryParent.setColor(Black())
+            var siblingNewRight : Entry[K,V] = sibling.getRight()
+            siblingNewRight.setColor(Black())
+
+        def blackSiblingLeft(sibling:Entrye[K,V], entryParent:Entrye[K,V]):Unit 
+            var siblingLeft : Entry[K,V] = sibling.getLeft()
+            var siblingRight : Entry[K,V] = sibling.getRight()
+            if(self.isRedEntry(siblingLeft))
+                    self.blackSiblingLeftLeft(sibling, entryParent)
+                else     
+                    if(self.isRedEntry(siblingRight))
+                            self.leftRotate(sibling)
+                            val siblingColor = sibling.getColor()
+                            var siblingNewParentOpt : Entry[K,V] = sibling.getParent()
+                            match siblingNewParentOpt:
+                                n:Entryn => runtime.fail("blackSiblingRight: left child of sibling is red but null")
+                                siblingNewParent : Entrye => 
+                                    val newPColor = siblingNewParent.getColor()
+                                    sibling.setColor(newPColor)
+                                    siblingNewParent.setColor(siblingColor)
+                                    self.blackSiblingLeftLeft(siblingNewParent, entryParent)
+                        else
+                            self.deleteBlackSiblingTwoBlackChild(sibling, entryParent)
+
+        def blackSiblingLeftLeft(sibling:Entrye[K,V], entryParent:Entrye[K,V]):Unit 
+            self.rightRotate(entryParent)
+            val entryParentColor = entryParent.getColor()
+            sibling.setColor(entryParentColor)
+            entryParent.setColor(Black())
+            var siblingNewLeft : Entry[K,V] = sibling.getLeft()
+            siblingNewLeft.setColor(Black())
+
+        /**************************************************************************************************************/
+        /*************************************************** Rotate ***************************************************/
+        def rightRotate(entry:Entrye[K,V]):Unit
+            var oldEntryLeftOpt : Entry[K,V] = entry.getLeft() 
+            match oldEntryLeftOpt:
+                n:Entryn => runtime.fail("Right rotate when left entry is null")
+                oldEntryLeft:Entrye =>
+                    var oldEntryLeftRight : Entry[K,V] = oldEntryLeft.getRight()
+                    var entryParent : Entry[K,V] = entry.getParent()
+                    if(oldEntryLeftRight.isDefined)
+                            oldEntryLeftRight.setParent(entry)
+                    entry.setLeft(oldEntryLeftRight)
+                    if(self.equalOpt(self.root, entry))
+                            oldEntryLeft.setColor(Black())
+                            self.root = oldEntryLeft
+                        else
+                            if(!entryParent.isDefined)
+                                    runtime.fail("RightRotate: non-root node in tree has None parent")
+                                else
+                                    oldEntryLeft.setParent(entryParent)
+                                    if(self.equalOpt(entryParent.getLeft(), entry))
+                                            entryParent.setLeft(oldEntryLeft)
+                                        else
+                                            entryParent.setRight(oldEntryLeft)
+                    entry.setParent(oldEntryLeft)
+                    oldEntryLeft.setRight(entry)
+            self.checkNonCircular()
+            unit
+
+        def leftRotate(entry:Entrye[K,V]):Unit
+            var oldEntryRightOpt : Entry[K,V] = entry.getRight() 
+            match oldEntryRightOpt:
+                n:Entryn => runtime.fail("left rotate when right entry is null")
+                oldEntryRight:Entrye =>
+                    var oldEntryRightLeft : Entry[K,V] = oldEntryRight.left
+                    var entryParent : Entry[K,V] = entry.parent
+                    if(oldEntryRightLeft.isDefined)
+                            oldEntryRightLeft.setParent(entry)
+                    entry.setRight(oldEntryRightLeft)
+                    if(self.equalOpt(self.root, entry))
+                            oldEntryRight.setColor(Black())
+                            self.root = oldEntryRight
+                        else
+                            if(!entryParent.isDefined)
+                                    runtime.fail("LeftRotate: non-root node in tree has None parent")
+                                else
+                                    oldEntryRight.setParent(entryParent)
+                                    if(self.equalOpt(entryParent.getLeft(), entry))
+                                            entryParent.setLeft(oldEntryRight)
+                                        else
+                                            entryParent.setRight(oldEntryRight)
+                    entry.setParent(oldEntryRight)
+                    oldEntryRight.setLeft(entry)
+            // self.checkNonCircular()
+            unit
+
+
+/*************************************************** TEST ***************************************************/
+
+def intCmp():Comparator[Int] = new (icmp)=>
+    type T = Int 
+    def compare(x:Int, y:Int):Int 
+        if(x==y)
+          0
+         else
+          if(x < y)
+            -1
+           else
+            1
+    def equal(x:Int, y:Int):Boolean
+        x==y
+
+val intCmp1 : Comparator[Int,Int] = intCmp()
+
+def toStringTwoInt(x:Int, y:Int):String
+    "("+utils.ofInt(x)+","+utils.ofInt(y)+")"
+//stdout.print(toStringTwoInt(1,2))
+
+var testMap1 : TreeMap[Int,Int] = TreeMap[Int,Int](intCmp1, (x:Int, y:Int)=>toStringTwoInt(x,y))
+testMap1.put(0,0)
+testMap1.put(2,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(3,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(1,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(5,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(9,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(-2,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(3,0)
+stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap1.put(-4,0)
+testMap1.put(11,0)
+testMap1.put(7,0)
+
+var testMap2 : TreeMap[Int,Int] = TreeMap[Int,Int](intCmp1, (x:Int, y:Int)=>toStringTwoInt(x,y))
+testMap2.put(30,0)
+testMap2.put(20,0)
+testMap2.put(40,0)
+testMap2.put(25,0)
+testMap2.put(15,0)
+stdout.print("\n\n")
+stdout.print(testMap2.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap2.remove(30)
+stdout.print("\n\n")
+stdout.print(testMap2.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap2.remove(20)
+stdout.print("\n\n")
+stdout.print(testMap2.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap2.remove(25)
+stdout.print("\n\n")
+stdout.print(testMap2.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap2.remove(40)
+stdout.print("\n\n")
+stdout.print(testMap2.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+testMap2.remove(15)
+stdout.print("\n\n")
+stdout.print(testMap2.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+stdout.print("\n\n")
+//stdout.print("\n\n")
+// testMap1.remove(3)
+// stdout.print(testMap1.printTree((x:Int, y:Int)=>toStringTwoInt(x,y)))
+// stdout.print("\n\n")
+
+
+
+
+
+
