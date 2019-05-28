@@ -1,0 +1,5 @@
+resource type Writer
+    effect write
+    effect close
+    def write(s: String): {this.write} Unit
+    def close(): {this.close} Unit

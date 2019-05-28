@@ -1,0 +1,7 @@
+require java
+import fileSystemClient
+import annotatedFileSystem
+val fileSys = annotatedFileSystem(java)
+val client = fileSystemClient(fileSys)
+client.make()
+"abc"

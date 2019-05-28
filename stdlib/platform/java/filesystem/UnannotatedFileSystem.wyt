@@ -1,0 +1,2 @@
+type UnannotatedFileSystem
+    def makeFile(path: String): Unit

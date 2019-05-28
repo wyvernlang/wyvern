@@ -1,4 +1,4 @@
-module def stdout(python : Python) : Stdout
+module def stdout(python : Python) : UnannotatedStdout
 
 import wyvern.String
 

@@ -70,3 +70,4 @@ def compile(wyb: Dyn): Unit
 val filename = support.getFirstCommandLineArg()
 val wyb = support.loadBytecode(filename)
 compile(wyb)
+"abc"

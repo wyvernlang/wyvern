@@ -1,0 +1,4 @@
+import ArrayList
+resource type ArrayListMaker
+    effect makelist
+    def make() : {this.makelist} ArrayList

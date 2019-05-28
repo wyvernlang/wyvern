@@ -1,0 +1,13 @@
+require java
+import editor.editor
+import arrayListMaker
+import annotatedFileSystem
+import stdout
+
+val arraylistmaker = arrayListMaker(java)
+val filesys = annotatedFileSystem(java)
+val out = stdout(java)
+
+val editor = editor(filesys, arraylistmaker, out)
+
+"abc"

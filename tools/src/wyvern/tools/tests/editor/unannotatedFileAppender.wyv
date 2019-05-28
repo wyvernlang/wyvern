@@ -1,0 +1,22 @@
+module def unannotatedFileAppender(filewriter : filesystem.Writer, arraylist: ArrayList)
+import filesystem.File
+import filesystem.fileEffects
+
+// Append file2 to the end of file1
+def appendFile(file2 : File) : Unit
+    val file2Reader = file2.makeReader()
+    val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.close()
+
+// Append an arraylist of files
+def appendArrayListFiles() : Unit
+    def loop(x : Int, fileList : ArrayList) : Unit
+        val size = fileList.size()
+        val d : Unit = if (x < size)
+                appendFile(fileList.get(x))
+                loop (x+1, fileList)
+            else
+                unit
+    loop (0, arraylist)
+

@@ -237,20 +237,28 @@ public class MethodCall extends Expression {
 
     private static EffectSet computeUpperBound(TypeContext ctx, List<ValueType> actualArgTypes) {
         EffectSet ub = null;
-        for (ValueType argType : actualArgTypes) {
+        for (int i = 0; i < actualArgTypes.size(); i++) {
+            ValueType argType = actualArgTypes.get(i);
             EffectSet hoEffects = EffectUtil.getHOEffects(argType, (GenContext) ctx);
             if (hoEffects != null) {
                 if (ub == null) {
                     ub = new EffectSet(new HashSet<>());
+                    ub.getEffects().addAll(hoEffects.getEffects());
+                } else {
+                    // Delete effects in ub that are not in the hoEffect of argType
+                    // ub can only shrink smaller once initiated
+                    for (Effect e : ub.getEffects()) {
+                        if (!hoEffects.getEffects().contains(e)) {
+                            ub.getEffects().remove(e);
+                        }
+                    }
                 }
-                ub.getEffects().addAll(hoEffects.getEffects());
             }
         }
         return ub;
     }
 
-    private static void checkUpperBound(TypeContext ctx, List<ValueType> formalArgTypes, List<ValueType> actualArgTypes,
-                                      List<? extends IExpr> args) {
+    private static void checkUpperBound(TypeContext ctx,  List<ValueType> actualArgTypes) {
         if (actualArgTypes.size() == 0) {
             return;
         }
@@ -268,84 +276,34 @@ public class MethodCall extends Expression {
         EffectDeclType selectedEffect = (EffectDeclType) firstDeclType;
         EffectSet upperBound = computeUpperBound(ctx, actualArgTypes.subList(1, actualArgTypes.size()));
 
+        // There is no upperbound
         if (upperBound == null) {
             return;
         }
 
+        HashSet<String> ub = new HashSet<>();
+        for (Effect e : upperBound.getEffects()) {
+            ub.add(e.getName());
+        }
+
+        if (selectedEffect.getEffectSet() == null) {
+            return;
+        }
+
+        // Check if selected effects are in upper bound
         for (Effect e : selectedEffect.getEffectSet().getEffects()) {
-            if (!upperBound.getEffects().contains(e)) {
+            if (!ub.contains(e.getName())) {
                  ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
                                 "Selected an effect which is outside of the upper bound");
+
             }
         }
     }
 
     private static void checkHigherOrderEffect(TypeContext ctx, List<ValueType> formalArgTypes,
                                                 List<ValueType> actualArgTypes, List<? extends IExpr> args) {
-        HashMap<String, EffectSet> effectDecls = getEffectDeclarations(ctx, args, actualArgTypes);
-        for (int i = 0; i < formalArgTypes.size(); i++) {
-            ValueType formalArgType = formalArgTypes.get(i);
-            ValueType actualArgType = actualArgTypes.get(i);
-            if (actualArgType.toString().contains("__generic__X.X")) {
-                continue;
-            }
-            List<DeclType> formalDecls = formalArgType.getStructuralType(ctx).getDeclTypes();
-            if (!formalDecls.isEmpty() && formalDecls.get(0) instanceof EffectDeclType) {
-                DeclType argType = formalArgType.getStructuralType(ctx).getDeclTypes().get(0);
-                EffectDeclType formalDeclType = (EffectDeclType) argType;
-                EffectSet lb = formalDeclType.getLowerBound();
-
-                if (lb == null) {
-                    continue;
-                }
-
-                EffectDeclType actualDeclType = (EffectDeclType) actualArgType.getStructuralType(ctx).getDeclTypes().get(0);
-                EffectSet effectSet = actualDeclType.getEffectSet();
-
-                // Checking each effect in the lower bound is present
-                for (Effect lbEffect : lb.getEffects()) {
-                    boolean found = false;
-                    String name = lbEffect.getName();
-                    for (Effect effect : effectSet.getEffects()) {
-
-                        // Find the declaration of the effect
-                        EffectDeclType decl = effect.findEffectDeclType(ctx);
-
-                        // TODO: Should not check the effect using its name
-                        // the lbEffect is in the given effect
-                        if (effect.getName().equals(name)) {
-                            found = true;
-                        }
-
-                        EffectSet declared = decl.getEffectSet();
-                        if (declared != null) {
-                            for (Effect declaredEffect : declared.getEffects()) {
-                                if (declaredEffect.getName().equals(name)) {
-                                    found = true;
-                                }
-                            }
-                        }
-                    }
-
-                    // the lbEffect is defined to be other effect in the argument
-                    for (String effectName : effectDecls.keySet()) {
-                        EffectSet declaration = effectDecls.get(effectName);
-                        if (name.equals(effectName)) {
-                            if (effectSet.getEffects().containsAll(declaration.getEffects())) {
-                                found = true;
-                            }
-                        }
-                    }
-
-                    if (!found) {
-                        ToolError.reportError(ErrorMessage.NO_METHOD_WITH_THESE_ARG_TYPES, (FileLocation) null,
-                                "Selected effect does not contain lower bound");
-                    }
-                }
-            }
-        }
-
-        checkUpperBound(ctx, formalArgTypes, actualArgTypes, args);
+        // TODO(@anlunx): Consider using args to adapt the scope
+        checkUpperBound(ctx, actualArgTypes);
     }
 
     public static class MatchResult {
@@ -438,6 +396,7 @@ public class MethodCall extends Expression {
             }
 
         }
+        // TODO (@anlunx) skip this for now
         checkHigherOrderEffect(newCtx, formalArgTypes, actualArgTypes, args);
         return new MatchResult(formalArgTypes, newCtx, calleeCtx, failureReason, v, argsTypechecked);
     }
