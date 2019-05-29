@@ -18,5 +18,8 @@ def ofFormattedFloat(format: String, f: Float): String
 def ofCharacter(c: Character): String
     utils.ofCharacter(c)
 
+def ofASCII(i:Int ): String
+    utils.ofASCII(i)
+
 def valueOf(i: Int): String
     utils.valueOf(i)

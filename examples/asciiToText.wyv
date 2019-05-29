@@ -1,0 +1,9 @@
+require stdout
+
+import wyvern.collections.list
+import wyvern.String
+
+def asciiToText(chars:list.List[Int]):Unit
+    chars.do(c => stdout.print(String.ofASCII(c)))
+
+asciiToText({72 73 33})

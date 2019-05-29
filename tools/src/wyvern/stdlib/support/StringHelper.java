@@ -25,6 +25,10 @@ public class StringHelper {
         return String.valueOf(c);
     }
 
+    public String ofASCII(int i) {
+        return Character.toString((char) i);
+    }
+
     public String valueOf(int i) {
         return String.valueOf(i);
     }

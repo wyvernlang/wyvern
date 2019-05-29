@@ -3,4 +3,5 @@ type String
   def ofFloat(f: Float): String
   def ofFormattedFloat(format: String, f: Float): String
   def ofCharacter(c: Character): String
+  def ofASCII(i: Int): String
   def valueOf(i: Int): String

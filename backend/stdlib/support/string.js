@@ -15,3 +15,7 @@ exports.ofFormattedFloat = function(format, f) {
 exports.ofCharacter = function(c) {
     return c;
 }
+
+exports.fromCharCode = function(i) {
+	return String.fromCharCode(i)
+}

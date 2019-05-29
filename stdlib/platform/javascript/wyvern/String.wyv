@@ -20,3 +20,6 @@ def ofFormattedFloat(format : String, f : Float) : String
 
 def ofCharacter(c : Character) : String
   string.ofCharacter(c)
+
+def ofASCII(i : Int) : String
+  string.fromCharCode(i)

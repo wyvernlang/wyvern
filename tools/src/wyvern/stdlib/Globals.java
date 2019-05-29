@@ -246,6 +246,7 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("JavaScript", javascriptType));
         List<DeclType> pyDeclTypes = new LinkedList<DeclType>();
         pyDeclTypes.add(new DefDeclType("toString", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
+        pyDeclTypes.add(new DefDeclType("chr", Util.stringType(), Arrays.asList(new FormalArg("other", Util.dynType()))));
         pyDeclTypes.add(new DefDeclType("isEqual", Util.booleanType(),
                 Arrays.asList(new FormalArg("arg1", Util.dynType()), new FormalArg("arg2", Util.dynType()))));
         ValueType pythonType = new StructuralType("Python", pyDeclTypes);
