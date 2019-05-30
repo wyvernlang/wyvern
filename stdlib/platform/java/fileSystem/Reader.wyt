@@ -1,9 +1,0 @@
-import wyvern.option
-type Option = option.Option
-
-resource type Reader
-    effect Read
-    def read():{this.Read}Int
-    def readLine():{this.Read}Option[String]
-    //def readFully():{this.Read}String //reader default, bounded reader as subclass
-    def close():Unit

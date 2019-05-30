@@ -1,5 +1,0 @@
-module fileEffects : {}
-effect read = {system.FFI}
-effect write = {system.FFI}
-effect open = {system.FFI}
-effect close = {system.FFI}
