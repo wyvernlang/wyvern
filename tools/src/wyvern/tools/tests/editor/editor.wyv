@@ -1,0 +1,90 @@
+module def editor(filesys : filesystem.FileSystem, arraylistmaker : ArrayListMaker, out : Stdout) : {arraylistmaker.makelist}
+
+// Importing plugins for editor
+import lifted editor.unannotatedFileAppender
+import editor.fileAppender
+import lifted editor.unannotatedFilePrinter
+import editor.filePrinter
+
+import filesystem.File
+import filesystem.Writer
+import filesystem.fileEffects
+import ArrayList
+import Stdout
+import editor.Resource
+
+import lifted editor.writerPlugin
+
+val path = "~/"
+val f : File = filesys.makeFile(path)
+
+val filelist : ArrayList = arraylistmaker.make()
+def createFile(path : String) : {filesys.createNewFile, filelist.write} File
+    val file = filesys.makeFile(path)
+    filelist.add(file)
+    file
+
+val filelist2 : ArrayList[{system.FFI}, {system.FFI}] = new
+    effect read = {system.FFI}
+    effect write = {system.FFI}
+    def isEmpty() : {} Boolean
+        filelist.isEmpty()
+    def add(f : File) : {filelist.write} Boolean
+        filelist.add(f)
+    def size() : {} Int
+        filelist.size()
+    def get(index : Int) : {filelist.read} File
+        filelist.get(index)
+
+val fwriter : Writer = f.makeAppender()
+
+val x : Resource[{}, {}] = new
+    effect read = {}
+    effect write = {}
+    def read() : {this.read} Unit
+        unit
+    def write() : {this.read} Unit
+        unit
+
+val plugin = writerPlugin[{}](x)
+
+// Append every file in filelist to f
+def appendAllFiles() : {f.openForAppend, filelist2.read, filelist2.write, fwriter.write, fwriter.close} Unit
+    val appender = unannotatedFileAppender[{filelist2.write, filelist2.read, fwriter.write, fwriter.close}](fwriter, filelist2)
+    appender.appendArrayListFiles()
+
+def appendAllFiles2(f: File) : {f.openForAppend, filelist.read} Unit
+    val writer = f.makeAppender()
+    val appender = fileAppender(filelist, writer)
+    appender.appendArrayListFiles()
+
+
+// Print file
+def printfiles(f : File) : {f.openForRead, out.print, out.flush} Unit
+    val newout : Stdout[{out.print}, {out.flush}] = new
+        effect print = {out.print}
+        effect flush = {out.flush}
+        type Printable = out.Printable
+        def print(text : String) : {this.print} Unit
+            out.print(text)
+        def printInt(n : Int) : {this.print} Unit
+            out.printInt(n)
+        def printBoolean(b : Boolean) : {this.print} Unit
+            out.printBoolean(b)
+        def println() : {this.print} Unit
+            out.println()
+        def flush() : {this.flush} Unit
+            out.flush()
+        def printFloat(f : Float) : {this.print} Unit
+            out.printFloat(f)
+    val printer = unannotatedFilePrinter[{out.print, out.flush}](newout, f)
+    printer.printFile()
+
+
+def printfiles2(f : File) : {f.openForRead, out.print, out.flush} Unit
+    val reader = f.makeReader()
+    val printer = filePrinter(out, reader)
+    printer.printEmptyLine()
+
+
+

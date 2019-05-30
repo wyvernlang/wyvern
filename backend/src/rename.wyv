@@ -1,4 +1,4 @@
-module rename
+module rename : {}
 
 import wyvern.option
 import wyvern.collections.list

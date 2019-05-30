@@ -1,0 +1,4 @@
+module def writerPlugin(writer : editor.Resource)
+
+def writeToFile(s : String) : Unit
+    writer.read()

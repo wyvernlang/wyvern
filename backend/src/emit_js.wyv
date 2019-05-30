@@ -1,4 +1,4 @@
-module emit_js
+module emit_js : {}
 
 import wyvern.collections.list
 import wyvern.option

@@ -1,4 +1,4 @@
-module def stdout(java : Java) : Stdout
+module def stdout(java : Java) : {} Stdout
 
 import java:wyvern.stdlib.support.Stdio.stdio
 
@@ -10,20 +10,23 @@ type Printable = Unit
 /* Note: print() may not print right away. To print right away,
 either add a '\n' to the string you want to print, to use println()
 instead, or call flush() right after print(). */
-def print(text:String):Unit
+
+effect print = {system.FFI}
+effect flush = {system.FFI}
+def print(text:String): {print} Unit
 	stdio.print(text)
 
-def printInt(n:Int):Unit
+def printInt(n:Int): {print} Unit
 	stdio.printInt(n)
 
-def printBoolean(b:Boolean):Unit
+def printBoolean(b:Boolean): {print} Unit
 	stdio.printBoolean(b)
 
-def printFloat(f:Float):Unit
+def printFloat(f:Float): {print} Unit
 	stdio.printFloat(f)
 
-def println():Unit
+def println(): {print} Unit
 	stdio.println()
 
-def flush():Unit
+def flush(): {flush} Unit
 	stdio.flush()

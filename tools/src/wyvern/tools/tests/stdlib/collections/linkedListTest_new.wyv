@@ -1,0 +1,356 @@
+require stdout
+//require java
+
+//import java:wyvern.stdlib.support.RandomWrapper.rand
+import wyvern.collections.LinkedList
+import wyvern.collections.Iterator
+import wyvern.option
+import wyvern.collections.List 
+
+
+type Option = option.Option
+type LinkedList = LinkedList.LinkedList
+type Cons = LinkedList.Cons
+type Nil = LinkedList.Nil
+type Some = LinkedList.Some
+type None = LinkedList.None
+
+//####################################Testing LinkedList###################################################
+
+//####################################Int Option Print###################################################
+
+def printIntWithSpace (x:Int) : Unit
+    stdout.printInt(x)
+    stdout.print(" ")
+
+def printIntOption(x:Option[Int]):Unit
+    match x:
+        n:None => stdout.print("None ")
+        s:Some => 
+            val v = s.content
+            stdout.print("Some(")
+            stdout.printInt(v)
+            stdout.print(") ")
+
+def printIntListOption(L:Option[LinkedList[Int]]):Unit
+    match L:
+        n:None => stdout.print("None")
+        s:Some =>
+            val ll = s.content     
+            stdout.print("Some([")
+            ll.do((x:Int) => printIntWithSpace(x))
+            stdout.print("])")
+
+def printIntListWithIterator(iter:Iterator[Int]):Unit
+    if(iter.hasNext())
+      stdout.print("Has next: ")
+      printIntOption(iter.next())
+      stdout.print(" ")
+      printIntListWithIterator(iter)
+     else
+      stdout.print(" end")
+
+//####################################Option Assert###################################################
+
+def intOptionEq(x:Option[Int], y:Option[Int]):Boolean
+    match x:
+        n:None => 
+            match y:
+                m:None => true 
+                t:Some => false
+        s:Some =>
+            match y:
+                m:None => false
+                t:Some => s.content == t.content
+
+
+def twoLLEq[U](L:LinkedList[U], R:LinkedList[U], p:U*U->Boolean):Boolean
+    match L:
+        n:Nil => 
+            match R:
+                m:Nil => true 
+                t:Cons => false
+        s:Cons =>
+            match R:
+                m:Nil => false 
+                t:Cons => 
+                    val fstP = p(s.value, t.value)
+                    val sndP = twoLLEq[U](s.next, t.next, p)
+                    fstP && sndP
+
+def checkPred[U](L:LinkedList[U], p:U->Boolean):Boolean
+    match L:
+        n:Nil => true 
+        s:Cons =>
+            val fstP = p(s.value)
+            val sndP = checkPred[U](s.next, p)
+            fstP && sndP
+
+def addIntListWithIterator(iter:Iterator[Int], acc:Int):Int
+    if(iter.hasNext())
+            val nextEle = iter.next()
+            match nextEle:
+                n:None => runtime.fail("Iterator hasNext but cannot get next element")
+                s:Some => addIntListWithIterator(iter, acc+s.content)
+        else
+            acc
+
+//#######################################################################################
+
+
+val testNil1 = LinkedList.Nil[Int]()
+val testCons1 = LinkedList.Cons[Int](1,LinkedList.Nil[Int]())
+val testCons2 = LinkedList.Cons[Int](3,LinkedList.Cons[Int](2,testCons1))
+val testNil1Head = LinkedList.head[Int](testNil1)
+val testCons1Head = LinkedList.head[Int](testCons1)
+// stdout.print("Head of testNil1 [] \n")
+// printIntOption(testNil1Head)
+// stdout.print("\n\n")
+assert intOptionEq(testNil1Head, option.None[Int]())
+
+// stdout.print("Head of testCons1 [1] \n")
+// printIntOption(testCons1Head)
+// stdout.print("\n\n")
+assert intOptionEq(testCons1Head, option.Some[Int](1))
+
+// stdout.print("testCons2 is \n")
+// testCons2.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+var counter : Int = 0
+testCons2.do((x:Int) => counter = counter+1)
+assert counter==3
+
+val testCons2Size = testCons2.size()
+// stdout.print("Size of testCons2 [3,2,1]: ")
+// stdout.printInt(testCons2Size)
+// stdout.print("\n\n")
+assert testCons2Size==3
+
+val testCons2Head = LinkedList.head[Int](testCons2)
+assert intOptionEq(option.Some[Int](3), testCons2Head)
+// stdout.print("Head of testCons2 [3,2,1]: ")
+// val b = testCons2Head.map[Unit]((x:Int) => stdout.printInt(x))
+// stdout.print("\n\n")
+
+val testConsTake = testCons2.take(2)
+match testConsTake:
+    n:None => 
+        assert 1==0
+    s:Some => 
+        assert s.content.get(0)==3
+        assert s.content.get(1)==2
+// stdout.print("Take 2 elements from testCons2 [3,2,1]: ")
+// val a = testConsTake.map[Unit]((L:LinkedList[Int]) => L.do((x:Int) => printIntWithSpace(x)))
+// stdout.print("\n\n")
+
+val testConsTake0 = testCons2.take(0)
+match testConsTake0:
+    n:None => 
+        assert 1==0
+    s:Some => 
+        assert s.content.size()==0
+// stdout.print("Take 0 elements from testCons2 [3,2,1]: ")
+// val b = printIntListOption(testConsTake0)
+// stdout.print("\n\n")
+
+val testConsTakeneg2 = testCons2.take(-2)
+match testConsTakeneg2:
+    n:None => 
+        assert 1==1
+    s:Some => 
+        assert 1==0
+// stdout.print("Take -2 elements from testCons2 [3,2,1]: ")
+// // val a = testConsTakeneg2.map[Unit]((L:LinkedList[Int]) => L.do((x:Int) => printIntWithSpace(x)))
+// val b = printIntListOption(testConsTakeneg2)
+// stdout.print("\n\n")
+
+/* couldn't assert for random list */
+//val l1 = LinkedList.tabulate[Int]((i : Int) => rand.nextInt(1000), rand.nextInt(20))
+// stdout.print("l1 generated randomly: ")
+// val a = l1.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+
+val l1 = LinkedList.tabulate[Int]((i : Int) => 19*i+129, 106)
+
+val l2 = l1.map[Int]((x:Int)=> x*2)
+// stdout.print("l2 generated by multiply all integers in l1 by 2: ")
+// val a = l2.do((x:Int) => printIntWithSpace(x))
+
+val l1l2Cmp = (x:Int, y:Int)=> y == x*2
+assert twoLLEq[Int](l1,l2,l1l2Cmp)
+
+val l1sum = l1.foldRight((x:Int, y:Int)=>x+y, 0)
+val l2sum = l2.foldLeft((x:Int, y:Int)=>x+y, 0)
+assert l1sum*2==l2sum
+// stdout.print("\n\n")
+// stdout.print("l1sum is: ")
+// stdout.printInt(l1sum)
+// stdout.print("\n\n")
+// stdout.print("l2sum is: ")
+// stdout.printInt(l2sum)
+// assert l1sum*2==l2sum
+// stdout.print("\n\n")
+
+val l1_appendl2 = l1.append(l2)
+// val a = l1_appendl2.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+val l1_appendl2sum = l1_appendl2.foldRight((x:Int, y:Int)=>x+y, 0)
+// stdout.print("l1_appendl2 sum is: ")
+// stdout.printInt(l1_appendl2sum)
+// stdout.print("\n\n")
+assert l1_appendl2sum==l1sum+l2sum
+
+// stdout.print("l1 size is: ")
+// stdout.printInt(l1.size())
+// stdout.print("\n\n")
+
+// stdout.print("l2 size is: ")
+// stdout.printInt(l2.size())
+// stdout.print("\n\n")
+
+// stdout.print("l1_appendl2 size is: ")
+// stdout.printInt(l1_appendl2.size())
+assert l1_appendl2.size()==l1.size()+l2.size()
+// stdout.print("\n\n")
+
+val l1_10th = l1.nth(10)
+// stdout.print("l1 10th element is: ")
+// printIntOption(l1_10th)
+// stdout.print("\n\n")
+// match l1_10th
+assert intOptionEq(l1_10th, option.Some[Int](19*10+129))
+
+val l1_0th = l1.nth(0)
+// stdout.print("l1 0th element is: ")
+// printIntOption(l1_0th)
+// stdout.print("\n\n")
+assert intOptionEq(l1_0th, option.Some[Int](129))
+
+
+val l1_reverse = l1.reverse()
+val l1_revrev = l1_reverse.reverse()
+val l1revrevCmp = (x:Int, y:Int)=> y == x
+assert twoLLEq[Int](l1,l1_revrev,l1revrevCmp)
+// stdout.print("l1_reverse is: ")
+// l1_reverse.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+
+val l1_no_odd = l1.filter((x:Int) => (x % 2)==0)    
+// stdout.print("l1_no_odd is: ")
+// l1_no_odd.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+assert checkPred[Int](l1_no_odd, (x:Int) => (x % 2)==0)
+
+val l1_no_even = l1.filter((x:Int) => (x % 2)==1)    
+// stdout.print("l1_no_even is: ")
+// l1_no_even.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+assert checkPred[Int](l1_no_even, (x:Int) => (x % 2)==1)
+
+
+val l1_sum_reduce = l1.reduce((x:Int, y:Int)=>x+y, 0)
+val l1_rev_sum = l1_reverse.reduce((x:Int, y:Int)=>x+y, 0)
+assert l1_sum_reduce==l1_rev_sum
+// stdout.print("l1_sum_reduce is: ")
+// printIntWithSpace(l1_sum_reduce)
+// stdout.print("\n\n")
+
+val l1_iterator = l1.iterator()
+// stdout.print("Use l1_iterator to print l1: ")
+// printIntListWithIterator(l1_iterator)
+// stdout.print("\n\n")
+assert addIntListWithIterator(l1_iterator,0)==l1_sum_reduce
+
+val testNil1_iterator = testNil1.iterator()
+// stdout.print("Use testNil1_iterator to print testNil1: ")
+// printIntListWithIterator(testNil1_iterator)
+// stdout.print("\n\n")
+assert addIntListWithIterator(testNil1_iterator,0)==0
+
+
+val l3 = LinkedList.Cons[LinkedList[Int]](l1,LinkedList.Cons[LinkedList[Int]](l2,LinkedList.Nil[LinkedList[Int]]()))
+val l3_flatten = LinkedList.flatten[Int](l3)
+// stdout.print("l3_flatten: ")
+// l3_flatten.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+val l3sum = l3_flatten.reduce((x:Int, y:Int)=>x+y, 0)
+assert l3sum==l1sum+l2sum
+
+val l4 = LinkedList.tabulate[Int]((i : Int) => i, 20)
+// stdout.print("l4 tabulated from fn(i) i: ")
+// l4.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+val l41 = l4.get(2)
+// stdout.print("l4[2]: ")
+// stdout.printInt(l41)
+// stdout.print("\n\n")
+assert l41==2
+val l42= l4.get(19)
+// stdout.print("l4[19]: ")
+// stdout.printInt(l42)
+// stdout.print("\n\n")
+assert l42==19
+// stdout.print("l4 size is : ")
+// stdout.printInt(l4.size())
+// stdout.print("\n\n")
+assert l4.size()==20
+val l43= l4.nth(19)
+// stdout.print("using nth, l4[19]: ")
+// printIntOption(l43)
+// stdout.print("\n\n")
+assert intOptionEq(l43, option.Some[Int](19))
+def intCmp(x:Int, y:Int):Boolean
+    x==y
+val l44 = l4.indexOf(19, (x:Int, y:Int)=>intCmp(x,y))
+// stdout.print("l4, index of 19: ")
+// stdout.printInt(l44)
+// stdout.print("\n\n")
+assert l44==19
+val l45 = l4.indexOf(20, (x:Int, y:Int)=>intCmp(x,y))
+// stdout.print("l4, index of 20: ")
+// stdout.printInt(l45)
+// stdout.print("\n\n")
+assert l45==-1
+
+val l5 = l4.append(l4)
+// stdout.print("l5 is l4 appended with l4: ")
+// l5.do((x:Int) => printIntWithSpace(x))
+// stdout.print("\n\n")
+val l51 = l4.indexOf(19, (x:Int, y:Int)=>intCmp(x,y))
+assert l51==19
+val l52= l5.get(20)
+// stdout.print("l5[20]: ")
+// stdout.printInt(l52)
+// stdout.print("\n\n")
+assert l52==0
+
+val testList : List[Int] = LinkedList.Nil[Int]()
+val testList1 : List[Int] = LinkedList.Cons[Int](1,LinkedList.Nil[Int]())
+
+// /************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

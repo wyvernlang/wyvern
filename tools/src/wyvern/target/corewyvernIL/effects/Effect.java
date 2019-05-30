@@ -119,7 +119,6 @@ public class Effect {
         if (eDT == null || !(eDT instanceof EffectDeclType)) {
             ToolError.reportError(ErrorMessage.EFFECT_NOT_IN_SCOPE, getLocation(), toString());
         }
-
         return (EffectDeclType) eDT;
     }
 

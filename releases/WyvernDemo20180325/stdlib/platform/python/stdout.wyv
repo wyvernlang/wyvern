@@ -4,6 +4,8 @@ import wyvern.String
 
 import python:sys
 
+effect print = {}
+effect flush = {}
 type Printable = Unit
 
 type PySysStdout

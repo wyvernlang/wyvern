@@ -1,0 +1,18 @@
+module def arrayListMaker(java : Java) : {} ArrayListMaker
+import java:wyvern.stdlib.support.ArrayListWrapper.arraylist
+import filesystem.File
+import ArrayList
+
+effect makelist = {system.FFI}
+def make() : {makelist} ArrayList = new
+    effect read = {system.FFI}
+    effect write = {system.FFI}
+    val l = arraylist.makeArrayList()
+    def isEmpty() : {} Boolean
+        this.l.isEmpty()
+    def add(x : File) : {this.write} Boolean
+        this.l.add(x)
+    def size() : {} Int
+        this.l.size()
+    def get(index : Int) : {this.read} File
+        this.l.get(index)

@@ -24,7 +24,6 @@ import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.decltype.VarDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
-import wyvern.target.corewyvernIL.effects.EffectUtil;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.New;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -126,13 +125,6 @@ public final class QuantificationLifter {
         // Construct effect bounds
         EffectSet lb = new EffectSet(new HashSet<>());
         EffectSet ub = new EffectSet(new HashSet<>());
-        for (FormalArg arg : oldFormalArgs) {
-            ValueType argType = arg.getType();
-            EffectSet effects = EffectUtil.getEffects(argType, ctx);
-            if (effects != null) {
-                lb.getEffects().addAll(effects.getEffects());
-            }
-        }
 
         final ValueType boundedType = wyvern.tools.typedAST.core.declarations.DefDeclaration.boundedStructuralType(
                 MONOMORPHIZED_EFFECT, genericArgSite, lb, ub

@@ -4,7 +4,7 @@ import java:wyvern.stdlib.support.backend.BytecodeWrapper.bytecode
 
 import wyvern.collections.list
 
-def loadBytecode(path: String): Dyn
+def loadBytecode(path: String):  Dyn
 	bytecode.loadBytecode(path)
 
 def byteStringToInt(byteString: Dyn): Int

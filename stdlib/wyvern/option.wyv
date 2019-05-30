@@ -1,4 +1,4 @@
-module option
+module option : {}
 
 import wyvern.runtime
 

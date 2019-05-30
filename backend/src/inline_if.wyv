@@ -1,4 +1,4 @@
-module inline_if
+module inline_if : {}
 
 import wyvern.option
 import wyvern.collections.list

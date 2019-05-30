@@ -1,0 +1,94 @@
+module def annotatedFileSystem(java:Java) : {} filesystem.FileSystem
+import filesystem.fileEffects
+import java:wyvern.stdlib.support.FileIO.file
+
+/* Import Types */
+import filesystem.File
+import filesystem.Reader
+import filesystem.Writer
+import filesystem.RandomAccessFile
+
+import wyvern.option
+type Option = option.Option
+
+effect createNewFile = {system.FFI}
+
+def makeFile(path: String) : {createNewFile} File = new
+    val f : Unit = file.createNewFile(path)
+    effect openForRead = {system.FFI}
+    effect openForWrite = {system.FFI}
+    effect openForAppend = {system.FFI}
+    effect openForRandomAccess = {system.FFI}
+
+    def makeReader() : {this.openForRead} Reader
+        val br = file.openBRForRead(this.f)
+        new (self) =>
+            effect read = {system.FFI}
+            effect close = {system.FFI}
+            def read() : {self.read} Int
+                file.readCharFromFile(br)
+            def readLine() : {self.read}  Option[String]
+                val line = file.readLineFromFile(br)
+                if (file.isNull(line))
+                    option.None[String]()
+                  else
+                    option.Some[String](line)
+            def readFully() : {self.read} String
+                file.readFullyFile(br)
+            def close() : {self.close} Unit
+                file.closeReader(br)
+
+    def makeWriter() : {this.openForWrite} Writer
+        val bw = file.openBWForWrite(this.f)
+        new (self) =>
+            effect write = {system.FFI}
+            effect close = {system.FFI}
+            def write(s : String) : {self.write} Unit
+                file.writeString(bw, s)        //again temporary limits on write format
+            def close() : {self.close} Unit
+                file.closeWriter(bw)
+            
+    
+    /* For now this seems a little messy, considering the typical default
+     * is to have a FileWriter append to a file, not overwrite...
+     * Consider how to design this better
+     * Name method openForAppend or openForWrite? Since they're just returning Writer
+     */
+    def makeAppender() : {this.openForAppend} Writer
+        val bw = file.openBWForAppend(this.f)
+        new (self) =>
+            effect write = {system.FFI}
+            effect close = {system.FFI}
+            def write(s : String) : {self.write} Unit
+                file.writeString(bw, s)        //again temporary limits on write format
+            def close() : {self.close} Unit
+                file.closeWriter(bw)
+            
+    
+    
+    /* May want to rename this to something more unique
+     * Modify "mode" parameter? and available methods?
+     */
+    def makeRandomAccessFile(mode : String) : {this.openForRandomAccess} RandomAccessFile
+        val rf = file.makeRandomAccessFile(this.f, mode)
+        new (self) =>
+            effect close = {system.FFI}
+            effect seek = {system.FFI}
+            effect read  = {system.FFI}
+            effect write = {system.FFI}
+            def close() : {self.close} Unit
+                file.closeRandomAccessFile(rf)
+            def getPosition() : {} Int
+                file.accessFilePointer(rf)
+            def seek(pos : Int) : {self.seek} Unit
+                file.seekFilePointer(rf, pos)
+            def length() : {} Int
+                file.getRandomAccessFileLength(rf)
+            def readLine() : {self.read} String
+                file.readLineRandomAccess(rf)
+            def readUTF() : {self.read} String
+                file.readUTFRandomAccess(rf)
+            def write(s : String) : {self.write}  Unit
+                file.writeStringRandomAccess(rf, s)            //temporary write method
+            def writeUTF(s : String) : {self.write} Unit
+                file.writeUTFRandomAccess(rf, s)

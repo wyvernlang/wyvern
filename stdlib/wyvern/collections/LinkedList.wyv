@@ -1,0 +1,209 @@
+module LinkedList 
+
+import wyvern.option
+import wyvern.collections.Iterator
+import wyvern.collections.List 
+import wyvern.pair 
+
+type Option = option.Option
+type Some = option.Some 
+type None = option.None 
+type Pair = pair.Pair
+// type List = List.List
+
+tagged type LinkedList comprises Cons, Nil
+    type E
+    def size():Int 
+    def do(f:this.E->Unit):Unit
+    def nth(i:Int):Option[this.E]
+    def get(index:Int):this.E
+    def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
+    def take(n:Int):Option[LinkedList[this.E]]
+    def drop(n:Int):Option[LinkedList[this.E]]
+    def foldRight[T](f:this.E*T->T, x:T):T
+    def foldLeft[T](f:T*this.E->T, x:T):T
+    def map[T](f:this.E->T):LinkedList[T]
+    def reverse():LinkedList[this.E]
+    def append(R:LinkedList[this.E]):LinkedList[this.E]
+    def filter(f:this.E->Boolean):LinkedList[this.E]
+    def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
+    def isEmpty():Boolean
+    def iterator():Iterator[this.E]
+
+tagged type Nil extends LinkedList
+    type E
+    def size():Int 
+    def do(f:this.E->Unit):Unit
+    def nth(i:Int):Option[this.E]
+    def get(index:Int):this.E
+    def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
+    def take(n:Int):Option[LinkedList[this.E]]
+    def drop(n:Int):Option[LinkedList[this.E]]
+    def foldRight[T](f:this.E*T->T, x:T):T
+    def foldLeft[T](f:T*this.E->T, x:T):T
+    def map[T](f:this.E->T):LinkedList[T]
+    def reverse():LinkedList[this.E]
+    def append(R:LinkedList[this.E]):LinkedList[this.E]
+    def filter(f:this.E->Boolean):LinkedList[this.E]
+    def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
+    def isEmpty():Boolean
+    def iterator():Iterator[this.E]
+
+tagged type Cons extends LinkedList 
+    type E
+    val value:this.E
+    def size():Int 
+    def do(f:this.E->Unit):Unit
+    def nth(i:Int):Option[this.E]
+    val next:LinkedList[this.E]
+    def get(index:Int):this.E
+    def indexOf(x: this.E, compare: this.E*this.E->Boolean):Int
+    def take(n:Int):Option[LinkedList[this.E]]
+    def drop(n:Int):Option[LinkedList[this.E]]
+    def foldRight[T](f:this.E*T->T, x:T):T
+    def foldLeft[T](f:T*this.E->T, x:T):T
+    def map[T](f:this.E->T):LinkedList[T]
+    def reverse():LinkedList[this.E]
+    def append(R:LinkedList[this.E]):LinkedList[this.E]
+    def filter(f:this.E->Boolean):LinkedList[this.E]
+    def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
+    def isEmpty():Boolean
+    def iterator():Iterator[this.E]
+ 
+def Nil[U]():Nil[U] = new
+    type E = U
+    def size():Int = 0
+    def do(f:U -> Unit):Unit 
+        unit
+    def foldRight[T](f:U*T->T, x:T):T = x
+    def foldLeft[T](f:T*U->T, x:T):T = x
+    def nth(i:Int):Option[U] = option.None[U]()
+    def get(i:Int):U
+        runtime.fail("Error: index out of bounds")
+    def indexOf(x:U, compare:U*U->Boolean):Int
+        -1
+    def take(n:Int):Option[LinkedList[U]]
+        if(n<0 || (n>0))
+          option.None[LinkedList[U]]()
+         else
+          option.Some[LinkedList[U]](Nil[U]())
+    def drop(n:Int):Option[LinkedList[U]]
+        if(n<0 || (n>0))
+          option.None[LinkedList[U]]()
+         else
+          option.Some[LinkedList[U]](Nil[U]()) 
+    def map[T](f:U->T):LinkedList[T] = Nil[T]()
+    def reverse():LinkedList[U] = Nil[U]()
+    def append(R:LinkedList[U]):LinkedList[U] = R
+    def filter(f:U->Boolean):LinkedList[U] = Nil[U]()
+    def reduce(f:U*U=>U, x:U):U = x
+    def isEmpty():Boolean = true
+    def iterator():Iterator[U] = new (self) =>
+        type E = U
+        def hasNext():Boolean = false
+        def next(): Option[U] = option.None[U]()
+
+
+/*dummy code to solve
+This new statement captures a resource and must be 
+assigned to a resource type at location file
+*/
+val a = Nil[Int]()
+
+def Cons[U](x:U, list:LinkedList[U]):Cons[U] = new
+    type E = U
+    def size():Int = 1 + list.size()
+    val value:U = x
+    val next:LinkedList[U] = list
+    def do(f:U-> Unit):Unit 
+        f(this.value)
+        list.do(f)
+    def nth(i:Int):Option[U] 
+        if(i<0 || (i>(list.size())))
+          option.None[U]()
+         else
+          if(i==0) {option.Some[U](this.value)} else {list.nth(i-1)}
+    def get(i:Int):U
+        val nthResult = this.nth(i)
+        match nthResult:
+            n:None => runtime.fail("Error: index out of bounds")
+            s:Some => s.content
+    /* 
+    indexOf is not tail-recursive. 
+    If use this.foldLeft, then we will unnecessarily traverse through
+    the whole linkedlist.  
+    */
+    def indexOf(x: U, compare: U*U->Boolean):Int 
+        if(compare(this.value, x))
+          0
+         else 
+          val listIndexOf = list.indexOf(x, compare)
+          if(listIndexOf == -1) {-1} else {1+listIndexOf}
+    def take(n:Int):Option[LinkedList[U]]
+        if(n<0 || (n>(list.size())))
+          option.None[LinkedList[U]]()
+         else
+          val thisrev = this.reverse()
+          val resrev = thisrev.drop(thisrev.size()-n)
+          resrev.map[LinkedList[U]]((L:LinkedList[U])=>L.reverse())
+    def drop(n:Int):Option[LinkedList[U]]
+        if(n<0 || (n>(list.size())))
+          option.None[LinkedList[U]]()
+        if(n==0)
+          option.Some[LinkedList[U]](this)
+         else
+          list.drop(n-1)
+    def foldLeft[T](f:T*U->T, x:T):T = list.foldLeft[T](f,f(x, this.value))
+    def reverse():LinkedList[U] 
+        this.foldLeft[LinkedList[U]]( (xs:LinkedList[U], x:U) => Cons[U](x,xs) , Nil[U]() ) 
+    def foldRight[T](f:U*T->T, x:T):T
+        val thisrev = this.reverse()
+        thisrev.foldLeft[T]((a:T, b:U) => f(b,a), x) 
+    def map[T](f:U->T):LinkedList[T] 
+        val thisrev = this.reverse()
+        thisrev.foldLeft[LinkedList[T]]( (xs:LinkedList[T], x:U) => Cons[T](f(x),xs) , Nil[T]())
+    def append(R:LinkedList[U]):LinkedList[U] 
+        val thisrev = this.reverse()
+        thisrev.foldLeft[LinkedList[U]]( (xs:LinkedList[U], x:U) => Cons[U](x,xs) , R)
+    def filter(f:U->Boolean):LinkedList[U] 
+        val thisrev = this.reverse()
+        val g = (xs:LinkedList[U], x:U) => if (f(x)) {Cons[U](x,xs)} else {xs}
+        thisrev.foldLeft[LinkedList[U]](g, Nil[U]())
+    def reduce(f:U*U=>U, x:U):U = this.foldLeft(f,x)
+    def isEmpty():Boolean = false
+    def iterator():Iterator[U] = new (self) =>
+        type E = U
+        var current : LinkedList[U] = this
+        // var current : Iterator[U] = self 
+        def hasNext():Boolean = !(self.current.isEmpty())
+        def next(): Option[U] //Not Some[U]
+            match self.current:
+                n:Nil => option.None[U]()
+                c:Cons => 
+                    self.current = (c.next)
+                    option.Some[U](c.value)
+            
+            
+
+val b = Nil[String]()
+
+def head[U](list:LinkedList[U]):Option[U]
+    match list:
+        n:Nil => option.None[U]()
+        c:Cons => option.Some[U](c.value)
+
+/*
+The callee method cannot accept actual arguments with types: 
+'LinkedList[T]; expected types List[x.E]' at location file LinkedList.wyv on line 205 column 54
+*/
+def flatten[T](L:LinkedList[LinkedList[T]]):LinkedList[T]
+    val id = Nil[T]() //LinkedList[T]
+    val g = (x:LinkedList[T], xs:LinkedList[T]) => x.append(xs)
+    L.foldRight[LinkedList[T]](g,id)
+
+
+def tabulate[U](f:Int->U, n:Int):LinkedList[U]
+    if(n==0)
+      Nil[U]()
+     else
+      Cons[U](f(0), tabulate[U]((i:Int) => f(i+1), n-1))

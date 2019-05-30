@@ -1,0 +1,49 @@
+module def fileAppender(arraylist : ArrayList, filewriter : filesystem.Writer) : {}
+import filesystem.File
+import wyvern.option
+import arrayListMaker
+import ArrayList
+import filesystem.Reader
+
+// Append file2 to the end of file1
+def close() : {filewriter.close} Unit
+    filewriter.close()
+
+def getFirst() : {arraylist.read} File
+    arraylist.get(0)
+
+def appendFile(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
+    val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.close()
+
+def appendFileTwice(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
+    val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.write(file2content)
+    filewriter.close()
+
+def appendFileThreeTimes(file2Reader : Reader) : {filewriter.close, filewriter.write, file2Reader.read} Unit
+    val file2content = file2Reader.readFully()
+    filewriter.write(file2content)
+    filewriter.write(file2content)
+    filewriter.write(file2content)
+    filewriter.close()
+
+def appendArrayListFiles() : {arraylist.read} Unit
+    def loop(x : Int, fileList : ArrayList) : {fileList.read} Unit
+        val size = arraylist.size()
+        val d : Unit = if (x < size)
+                val file : File = fileList.get(x)
+                val fileReader = file.makeReader()
+                appendFile(fileReader)
+                loop (x+1, fileList)
+            else
+                unit
+    loop (0, arraylist)
+
+
+
+
+
+
