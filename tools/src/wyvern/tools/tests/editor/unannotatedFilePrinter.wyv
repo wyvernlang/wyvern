@@ -1,4 +1,4 @@
-module def unannotatedFilePrinter(io : Stdout, file : filesystem.File) : {file.openForRead} // This is a bug here because the effect shouldn't be checked
+module def unannotatedFilePrinter(io : Stdout, file : fileSystem.File) : {file.openForRead} // This is a bug here because the effect shouldn't be checked
 import wyvern.option
 
 val reader = file.makeReader()

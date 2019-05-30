@@ -1,0 +1,15 @@
+import fileSystem.BoundedReader
+import fileSystem.Writer
+import fileSystem.RandomAccessFile
+import fileSystem.BinaryReader
+import fileSystem.BinaryWriter
+resource type File
+    effect Read
+    effect Write
+    effect Append
+    def makeReader():{}BoundedReader
+    def makeWriter():{}Writer
+    def makeAppender():{}Writer
+    def makeBinaryReader():{}BinaryReader
+    def makeBinaryWriter():{}BinaryWriter
+    def makeRandomAccessFile(mode : String):{}RandomAccessFile

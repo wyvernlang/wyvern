@@ -1,4 +1,4 @@
-module def editor(filesys : filesystem.FileSystem, arraylistmaker : ArrayListMaker, out : Stdout) : {arraylistmaker.makelist}
+module def editor(filesys : fileSystem.FileSystem, arraylistmaker : ArrayListMaker, out : Stdout) : {arraylistmaker.makelist}
 
 // Importing plugins for editor
 import lifted editor.unannotatedFileAppender
@@ -6,9 +6,9 @@ import editor.fileAppender
 import lifted editor.unannotatedFilePrinter
 import editor.filePrinter
 
-import filesystem.File
-import filesystem.Writer
-import filesystem.fileEffects
+import fileSystem.File
+import fileSystem.Writer
+import fileSystem.fileEffects
 import ArrayList
 import Stdout
 import editor.Resource

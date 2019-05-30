@@ -1,6 +1,6 @@
 module def arrayListMaker(java : Java) : {} ArrayListMaker
 import java:wyvern.stdlib.support.ArrayListWrapper.arraylist
-import filesystem.File
+import fileSystem.File
 import ArrayList
 
 effect makelist = {system.FFI}

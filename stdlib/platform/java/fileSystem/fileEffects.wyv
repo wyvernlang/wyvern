@@ -1,0 +1,6 @@
+module fileEffects : {}
+effect Read = {system.FFI}
+effect Write = {system.FFI}
+effect Append = {system.FFI} //probably difficult to distinguish
+//Close effect? should it be needed to indicate flushing streams?
+//Create effect, for when writing/reading files whether they already exist or not

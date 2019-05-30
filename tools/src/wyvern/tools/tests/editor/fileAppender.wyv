@@ -1,9 +1,9 @@
-module def fileAppender(arraylist : ArrayList, filewriter : filesystem.Writer) : {}
-import filesystem.File
+module def fileAppender(arraylist : ArrayList, filewriter : fileSystem.Writer) : {}
+import fileSystem.File
 import wyvern.option
 import arrayListMaker
 import ArrayList
-import filesystem.Reader
+import fileSystem.Reader
 
 // Append file2 to the end of file1
 def close() : {filewriter.close} Unit

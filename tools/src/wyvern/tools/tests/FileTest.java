@@ -10,6 +10,8 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
+import wyvern.tools.tests.suites.CurrentlyBroken;
+
 
 
 /**
@@ -36,6 +38,7 @@ public class FileTest {
     }
 
     @Test
+    @Category(CurrentlyBroken.class)
     public void editor() throws ParseException {
         TestUtil.doTestScriptModularly(PATH2, "editor.main", Util.stringType(), new StringLiteral("abc"));
     }

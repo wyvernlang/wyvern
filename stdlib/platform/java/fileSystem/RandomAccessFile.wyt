@@ -1,0 +1,11 @@
+resource type RandomAccessFile //can be renamed later if necessary
+    effect Read
+    effect Write
+    def close() : {} Unit
+    def getPosition() : {} Int
+    def seek(pos : Int) : {} Unit
+    def length() : {} Int
+    def readLine() : {this.Read} String
+    def readUTF() : {this.Read} String
+    def write(s : String) : {this.Write} Unit
+    def writeUTF(s : String) : {this.Write} Unit

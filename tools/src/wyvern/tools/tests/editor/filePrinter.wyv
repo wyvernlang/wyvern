@@ -1,4 +1,4 @@
-module def filePrinter(io : Stdout, fr : filesystem.Reader) : {}
+module def filePrinter(io : Stdout, fr : fileSystem.Reader) : {}
 import wyvern.option
 
 def printLine() : {io.flush, fr.read, io.print} Unit

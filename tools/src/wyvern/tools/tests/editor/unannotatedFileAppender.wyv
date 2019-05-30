@@ -1,6 +1,6 @@
-module def unannotatedFileAppender(filewriter : filesystem.Writer, arraylist: ArrayList)
-import filesystem.File
-import filesystem.fileEffects
+module def unannotatedFileAppender(filewriter : fileSystem.Writer, arraylist: ArrayList)
+import fileSystem.File
+import fileSystem.fileEffects
 
 // Append file2 to the end of file1
 def appendFile(file2 : File) : Unit
