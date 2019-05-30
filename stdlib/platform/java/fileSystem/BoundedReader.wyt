@@ -6,4 +6,4 @@ resource type BoundedReader
     def read():{this.Read}Int
     def readLine():{this.Read}Option[String]
     def readFully():{this.Read}String
-    def close():Unit
+    def close():{}Unit

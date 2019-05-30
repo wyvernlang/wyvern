@@ -1,4 +1,0 @@
-import filesystem.File
-type FileSystem
-    effect createNewFile
-    def makeFile(path: String): {this.createNewFile} File

@@ -6,4 +6,4 @@ resource type Reader
     def read():{this.Read}Int
     def readLine():{this.Read}Option[String]
     //def readFully():{this.Read}String //reader default, bounded reader as subclass
-    def close():Unit
+    def close():{}Unit

@@ -4,5 +4,5 @@ type FileSystem
     effect Read
     effect Write
     effect Append
-    def fileFor(path: String): File
-    def makeByteArray(size:Int) : ByteArray
+    def fileFor(path: String): {} File
+    def makeByteArray(size:Int) : {} ByteArray

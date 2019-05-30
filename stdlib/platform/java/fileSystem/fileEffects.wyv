@@ -1,4 +1,4 @@
-module fileEffects
+module fileEffects : {}
 effect Read = {system.FFI}
 effect Write = {system.FFI}
 effect Append = {system.FFI} //probably difficult to distinguish

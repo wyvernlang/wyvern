@@ -1,51 +1,59 @@
-module def annotatedFileSystem(java:Java) : {} filesystem.FileSystem
-import filesystem.fileEffects
+module def annotatedFileSystem(java:Java) : {} fileSystem.FileSystem
+import fileSystem.fileEffects
 import java:wyvern.stdlib.support.FileIO.file
 
 /* Import Types */
-import filesystem.File
-import filesystem.Reader
-import filesystem.Writer
-import filesystem.RandomAccessFile
+import fileSystem.File
+import fileSystem.Reader
+import fileSystem.BinaryReader
+import fileSystem.BinaryWriter
+import fileSystem.BoundedReader
+import fileSystem.Writer
+import fileSystem.RandomAccessFile
+import fileSystem.ByteArray
 
 import wyvern.option
 type Option = option.Option
 
 effect createNewFile = {system.FFI}
+effect Read = {fileEffects.Read}
+effect Write = {fileEffects.Write}
+effect Append = {fileEffects.Append}
 
-def makeFile(path: String) : {createNewFile} File = new
+def fileFor(path: String) : {} File = new
     val f : Unit = file.createNewFile(path)
+    effect Read = {fileEffects.Read}
+    effect Write = {fileEffects.Write}
+    effect Append = {fileEffects.Append}
     effect openForRead = {system.FFI}
     effect openForWrite = {system.FFI}
     effect openForAppend = {system.FFI}
     effect openForRandomAccess = {system.FFI}
 
-    def makeReader() : {this.openForRead} Reader
+    def makeReader() : {} BoundedReader
         val br = file.openBRForRead(this.f)
         new (self) =>
-            effect read = {system.FFI}
-            effect close = {system.FFI}
-            def read() : {self.read} Int
+            effect Read = {system.FFI}
+            def read() : {self.Read} Int
                 file.readCharFromFile(br)
-            def readLine() : {self.read}  Option[String]
+            def readLine() : {self.Read}  Option[String]
                 val line = file.readLineFromFile(br)
                 if (file.isNull(line))
                     option.None[String]()
                   else
                     option.Some[String](line)
-            def readFully() : {self.read} String
+            def readFully() : {self.Read} String
                 file.readFullyFile(br)
-            def close() : {self.close} Unit
+            def close() : {} Unit
                 file.closeReader(br)
 
-    def makeWriter() : {this.openForWrite} Writer
+    def makeWriter() : {} Writer
         val bw = file.openBWForWrite(this.f)
         new (self) =>
-            effect write = {system.FFI}
-            effect close = {system.FFI}
-            def write(s : String) : {self.write} Unit
+            effect Write = {system.FFI}
+            def write(s : String) : {self.Write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
-            def close() : {self.close} Unit
+            def close() : {} Unit
                 file.closeWriter(bw)
             
     
@@ -54,41 +62,71 @@ def makeFile(path: String) : {createNewFile} File = new
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender() : {this.openForAppend} Writer
+    def makeAppender() : {} Writer
         val bw = file.openBWForAppend(this.f)
         new (self) =>
-            effect write = {system.FFI}
-            effect close = {system.FFI}
-            def write(s : String) : {self.write} Unit
+            effect Write = {system.FFI}
+            def write(s : String) : {self.Write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
-            def close() : {self.close} Unit
+            def close() : {} Unit
                 file.closeWriter(bw)
             
+    def makeBinaryReader() : {} BinaryReader
+        val br = file.makeFileInputStream(this.f)
+
+        new
+            effect Read = {fileEffects.Read}
+            def read() : {this.Read} Int
+                file.readArbitraryPrecisionInteger(br)
+            def readUTF() : {this.Read} String
+                file.readUTFFileInputStream(br)
+            def close() : Unit
+                file.closeFileInputStream(br)
+
+    def makeBinaryWriter() : {} BinaryWriter
+        val bw = file.makeFileOutputStream(this.f)
+        new
+            effect Write = {fileEffects.Write}
+            def write(b : Int) : {this.Write} Unit
+                file.writeArbitraryPrecisionInteger(bw, b)
+            def writeUTF(s : String) : {this.Write} Unit
+                file.writeUTFFileOutputStream(bw, s)
+            def close() : Unit
+                file.closeFileOutputStream(bw)
+
+
     
     
     /* May want to rename this to something more unique
      * Modify "mode" parameter? and available methods?
      */
-    def makeRandomAccessFile(mode : String) : {this.openForRandomAccess} RandomAccessFile
+    def makeRandomAccessFile(mode : String) : {} RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new (self) =>
-            effect close = {system.FFI}
-            effect seek = {system.FFI}
-            effect read  = {system.FFI}
-            effect write = {system.FFI}
-            def close() : {self.close} Unit
+            effect Read  = {system.FFI}
+            effect Write = {system.FFI}
+            def close() : {} Unit
                 file.closeRandomAccessFile(rf)
             def getPosition() : {} Int
                 file.accessFilePointer(rf)
-            def seek(pos : Int) : {self.seek} Unit
+            def seek(pos : Int) : {} Unit
                 file.seekFilePointer(rf, pos)
             def length() : {} Int
                 file.getRandomAccessFileLength(rf)
-            def readLine() : {self.read} String
+            def readLine() : {self.Read} String
                 file.readLineRandomAccess(rf)
-            def readUTF() : {self.read} String
+            def readUTF() : {self.Read} String
                 file.readUTFRandomAccess(rf)
-            def write(s : String) : {self.write}  Unit
+            def write(s : String) : {self.Write}  Unit
                 file.writeStringRandomAccess(rf, s)            //temporary write method
-            def writeUTF(s : String) : {self.write} Unit
+            def writeUTF(s : String) : {self.Write} Unit
                 file.writeUTFRandomAccess(rf, s)
+
+def makeByteArray(size : Int) : {} ByteArray
+    val bytes = file.makeByteArray(size)
+    new
+        def get(i : Int) : {} Int
+            file.getByteArray(bytes, i)
+        def set(i : Int, n : Int) : {} Unit
+            file.setByteArray(bytes, i, n)
+
