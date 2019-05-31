@@ -13,7 +13,7 @@ def run(): Unit
   if (length > 0)
     questionnaire = extractQuestions(text, "")
   val fileName = "questionnaire.txt"
-  val fileWriter = fs.makeFile(fileName).makeWriter()
+  val fileWriter = fs.fileFor(fileName).makeWriter()
   fileWriter.write(questionnaire)
   fileWriter.close()
   logger.updateLog("Result: The created questionnaire is:\n" + questionnaire)

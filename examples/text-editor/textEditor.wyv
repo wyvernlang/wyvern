@@ -51,7 +51,7 @@ def runPluginOnSetup(plugin: Plugin): Unit
   logger.updateLog("Ran plugin " + plugin.getName() + ".\n")
 
 def saveFile(fileName: String): Unit // N.B.: File exceptions aren't handled.
-  val fileWriter = fs.makeFile(fileName).makeWriter()
+  val fileWriter = fs.fileFor(fileName).makeWriter()
   fileWriter.write(textArea.getText())
   fileWriter.close()
   logger.updateLog("File was saved as " + fileName + ".\n")
@@ -88,7 +88,7 @@ def performOpenAction(): Unit // N.B.: File exceptions aren't handled.
   saveOld()
   if (dialog.showOpenDialog(nativeUtils.getNullValue()) == nativeJFileChooser.getApproveOption())
     val fileName = dialog.getSelectedFile().getAbsolutePath()
-    val fileReader = fs.makeFile(fileName).makeReader()
+    val fileReader = fs.fileFor(fileName).makeReader()
     textArea.setText(fileReader.readFully())
     fileReader.close()
     currentFile = fileName

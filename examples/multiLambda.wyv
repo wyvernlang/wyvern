@@ -1,0 +1,14 @@
+require stdout
+
+import wyvern.collections.list
+
+val list : list.List[Int] = {1, 2, 3}
+
+val func : Unit -> Unit = {stdout.print("hi\n")}
+
+func()
+
+list.do({x =>
+    stdout.printInt(x)
+    stdout.println()
+    })
