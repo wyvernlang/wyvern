@@ -242,8 +242,6 @@ public final class Globals {
         charDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
-        
-        // modifications for Characters
         charDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
