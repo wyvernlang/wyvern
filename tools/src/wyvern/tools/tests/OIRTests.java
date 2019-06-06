@@ -697,22 +697,22 @@ public class OIRTests {
     
     @Test
     public void testComparisonOperator() throws ParseException {
-    	String input =
-    			"require stdout\n" + 
-    			"stdout.printBoolean(1 >= 2)\n" + 
-    			"stdout.printBoolean(1 <= 2)\n" +
-    			"stdout.printBoolean(1 == 2)\n" +
-    			"stdout.printBoolean(1 > 2)\n" +
-    			"stdout.printBoolean(1 < 2)\n" +
-    			"stdout.printBoolean(1 != 2)\n" +
-    			"stdout.printBoolean(\"a\" >= \"b\")\n" + 
-    			"stdout.printBoolean(\"a\" <= \"b\")\n" + 
-    			"stdout.printBoolean(\"a\" == \"b\")\n" +
-    			"stdout.printBoolean(\"a\" > \"b\")\n" + 
-    			"stdout.printBoolean(\"a\" < \"b\")\n" + 
-    			"stdout.printBoolean(\"a\" != \"b\")\n" +
-                "stdout.println()\n" +
-                "0";
-    	testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrue\n0");
+      String input =
+        "require stdout\n"
+            + "stdout.printBoolean(1 >= 2)\n"
+            + "stdout.printBoolean(1 <= 2)\n"
+            + "stdout.printBoolean(1 == 2)\n"
+            + "stdout.printBoolean(1 > 2)\n"
+            + "stdout.printBoolean(1 < 2)\n"
+            + "stdout.printBoolean(1 != 2)\n"
+            + "stdout.printBoolean(\"a\" >= \"b\")\n"
+            + "stdout.printBoolean(\"a\" <= \"b\")\n"
+            + "stdout.printBoolean(\"a\" == \"b\")\n"
+            + "stdout.printBoolean(\"a\" > \"b\")\n"
+            + "stdout.printBoolean(\"a\" < \"b\")\n"
+            + "stdout.printBoolean(\"a\" != \"b\")\n"
+            + "stdout.println()\n"
+            + "0";
+      testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrue\n0");
     }
 }
