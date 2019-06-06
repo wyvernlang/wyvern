@@ -218,8 +218,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token and_t ::= /&/ {: RESULT = token(AND,lexeme); :};
  	terminal Token gt_t ::= />/ {: RESULT = token(GT,lexeme); :};
  	terminal Token lt_t ::= /</ {: RESULT = token(LT,lexeme); :};
- 	
- 	
  	terminal Token ge_t ::= />=/ {: RESULT = token(GE,lexeme); :};
  	terminal Token le_t ::= /<=/ {: RESULT = token(LE,lexeme); :};
  	terminal Token notequals_t ::= /!=/ {: RESULT = token(NOTEQUALS,lexeme); :};

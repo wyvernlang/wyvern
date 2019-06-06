@@ -696,7 +696,7 @@ public class OIRTests {
     }
     
     @Test
-    public void testComparison() throws ParseException {
+    public void testComparisonOperator() throws ParseException {
     	String input =
     			"require stdout\n" + 
     			"stdout.printBoolean(1 >= 2)\n" + 

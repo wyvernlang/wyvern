@@ -18,19 +18,16 @@ import wyvern.tools.errors.ToolError;
 public final class Interpreter {
     private Interpreter() { }
     /**
-     * The interpreter accepts at least 1 argument, which is the path to the Wyvern
+     * The interpreter only supports 1 argument, which is the path to the Wyvern
      * file. If more arguments are supplied, it will exit with an error. Then,
      * the file is read in to memory in it's entirety, before being executed in
      * an empty context. The resulting value is printed to the screen.
      */
     public static void main(String[] args) {
-    	// prompt error message when no command line argument is supplied.
-        if (args.length == 0) {
+        if (args.length != 1) {
             System.err.println("usage: wyvern <filename>");
             System.exit(1);
         }
-        
-        // get the 0th index (first) command line argument
         String filename = args[0];
         Path filepath = Paths.get(filename);
         if (!Files.isReadable(filepath)) {
