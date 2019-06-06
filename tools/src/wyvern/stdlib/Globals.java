@@ -191,7 +191,11 @@ public final class Globals {
         intDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
         intDeclTypes.add(new DefDeclType("negate", Util.intType(), Arrays.asList()));
+        intDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
+        intDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.intType()))));
 
+        
         List<DeclType> floatDeclTypes = new LinkedList<DeclType>();
         floatDeclTypes.add(new DefDeclType("+", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
         floatDeclTypes.add(new DefDeclType("-", Util.floatType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
@@ -202,7 +206,11 @@ public final class Globals {
         floatDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
         floatDeclTypes.add(new DefDeclType("negate", Util.floatType(), Arrays.asList()));
         floatDeclTypes.add(new DefDeclType("floor", Util.intType(), Arrays.asList()));
-
+        floatDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        floatDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.floatType()))));
+        
+        
         ValueType intType = new StructuralType("intSelf", intDeclTypes);
         ValueType boolType = new StructuralType("boolean", boolDeclTypes);
         ValueType floatType = new StructuralType("float", floatDeclTypes);
@@ -216,6 +224,10 @@ public final class Globals {
         stringDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("+", Util.stringType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        stringDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
+        
         stringDeclTypes.add(new DefDeclType("equals", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.stringType()))));
         stringDeclTypes.add(new DefDeclType("length", Util.intType(), new LinkedList<FormalArg>()));
         stringDeclTypes.add(new DefDeclType("charAt", Util.charType(), Arrays.asList(new FormalArg("index", Util.intType()))));
@@ -230,6 +242,12 @@ public final class Globals {
         charDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        
+        // modifications for Characters
+        charDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        charDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        charDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
+        
         ValueType charType = new StructuralType("charSelf", charDeclTypes);
         declTypes.add(new ConcreteTypeMember("Character", charType));
 

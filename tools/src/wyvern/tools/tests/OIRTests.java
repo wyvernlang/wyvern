@@ -694,4 +694,25 @@ public class OIRTests {
                       + "\"typechecked!\"";
         testPyFromInput(input, "typechecked!");
     }
+    
+    @Test
+    public void testComparison() throws ParseException {
+    	String input =
+    			"require stdout\n" + 
+    			"stdout.printBoolean(1 >= 2)\n" + 
+    			"stdout.printBoolean(1 <= 2)\n" +
+    			"stdout.printBoolean(1 == 2)\n" +
+    			"stdout.printBoolean(1 > 2)\n" +
+    			"stdout.printBoolean(1 < 2)\n" +
+    			"stdout.printBoolean(1 != 2)\n" +
+    			"stdout.printBoolean(\"a\" >= \"b\")\n" + 
+    			"stdout.printBoolean(\"a\" <= \"b\")\n" + 
+    			"stdout.printBoolean(\"a\" == \"b\")\n" +
+    			"stdout.printBoolean(\"a\" > \"b\")\n" + 
+    			"stdout.printBoolean(\"a\" < \"b\")\n" + 
+    			"stdout.printBoolean(\"a\" != \"b\")\n" +
+                "stdout.println()\n" +
+                "0";
+    	testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrue\n0");
+    }
 }
