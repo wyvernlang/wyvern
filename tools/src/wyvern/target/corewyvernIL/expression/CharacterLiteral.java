@@ -88,6 +88,9 @@ public class CharacterLiteral extends Literal implements Invokable {
         case "<": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) < 0);
         case ">": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) > 0);
         case "==": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) == 0);
+        case "<=": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) <= 0);
+        case ">=": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) >= 0);
+        case "!=": return new BooleanLiteral(this.value.compareTo(((CharacterLiteral) args.get(0)).getValue()) != 0);
         default: throw new RuntimeException("runtime error: character operation " + methodName + "not supported by the runtime");
         }
     }

@@ -82,6 +82,10 @@ public class FloatLiteral extends Literal implements Invokable  {
       case "<": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) < 0);
       case ">": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) > 0);
       case "==": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) == 0);
+      case "<=": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) <= 0);
+      case ">=": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) >= 0);
+      case "!=": return new BooleanLiteral(this.value.compareTo(((FloatLiteral) args.get(0)).getFullValue()) != 0);
+      
       default: throw new RuntimeException("runtime error: float operation " + methodName + "not supported by the runtime");
       }
     }
