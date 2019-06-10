@@ -96,6 +96,9 @@ public class StringLiteral extends Literal implements Invokable {
         case "<": return new BooleanLiteral(value.compareTo(((StringLiteral) args.get(0)).getValue()) < 0);
         case ">": return new BooleanLiteral(value.compareTo(((StringLiteral) args.get(0)).getValue()) > 0);
         case "==": return new BooleanLiteral(value.compareTo(((StringLiteral) args.get(0)).getValue()) == 0);
+        case "<=": return new BooleanLiteral(value.compareTo(((StringLiteral) args.get(0)).getValue()) <= 0);
+        case ">=": return new BooleanLiteral(value.compareTo(((StringLiteral) args.get(0)).getValue()) >= 0);
+        case "!=": return new BooleanLiteral(value.compareTo(((StringLiteral) args.get(0)).getValue()) != 0);
         case "+": return new StringLiteral(value + ((StringLiteral) args.get(0)).getValue());
         case "equals": return new BooleanLiteral(value.equals(((StringLiteral) args.get(0)).getValue()));
         case "length": return new IntegerLiteral(value.length());

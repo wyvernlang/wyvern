@@ -259,6 +259,11 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token and_t ::= /&/ {: RESULT = token(AND,lexeme); :};
  	terminal Token gt_t ::= />/ {: RESULT = token(GT,lexeme); :};
  	terminal Token lt_t ::= /</ {: RESULT = token(LT,lexeme); :};
+ 	terminal Token ge_t ::= />=/ {: RESULT = token(GE,lexeme); :};
+ 	terminal Token le_t ::= /<=/ {: RESULT = token(LE,lexeme); :};
+ 	terminal Token notequals_t ::= /!=/ {: RESULT = token(NOTEQUALS,lexeme); :};
+
+ 	
     terminal Token oSquareBracket_t ::= /\[/ {: RESULT = token(LBRACK,lexeme); :};
     terminal Token cSquareBracket_t ::= /\]/ {: RESULT = token(RBRACK,lexeme); :};
     terminal Token booleanand_t ::= /&&/ {: RESULT = token(BOOLEANAND,lexeme); :};
@@ -459,7 +464,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	           | and_t:t {: RESULT = t; :}
 	           | gt_t:t {: RESULT = t; :}
 	           | lt_t:t {: RESULT = t; :}
-               | equalsequals_t:t {: RESULT = t; :}
+	           | ge_t:t {: RESULT = t; :}
+	           | le_t:t {: RESULT = t; :}
+	           | notequals_t:t {: RESULT = t; :}
                | booleanand_t:t {: RESULT = t; :}
                | booleanor_t:t {: RESULT = t; :}
                | booleannot_t:t {: RESULT = t; :}

@@ -85,6 +85,9 @@ public class BoundedIntLiteral extends Literal implements Invokable {
         case "/": return new BoundedIntLiteral(this.value / ((BoundedIntLiteral) args.get(0)).getValue());
         case "<": return new BooleanLiteral(this.value < ((BoundedIntLiteral) args.get(0)).getValue());
         case ">": return new BooleanLiteral(this.value > ((BoundedIntLiteral) args.get(0)).getValue());
+        case "<=": return new BooleanLiteral(this.value <= ((BoundedIntLiteral) args.get(0)).getValue());
+        case ">=": return new BooleanLiteral(this.value >= ((BoundedIntLiteral) args.get(0)).getValue());
+        case "!=": return new BooleanLiteral(this.value != ((BoundedIntLiteral) args.get(0)).getValue());
         default: throw new RuntimeException("runtime error: integer operation " + methodName + "not supported by the runtime");
         }
     }
