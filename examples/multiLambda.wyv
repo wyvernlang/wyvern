@@ -4,11 +4,29 @@ import wyvern.collections.list
 
 val list : list.List[Int] = {1, 2, 3}
 
-val func : Unit -> Unit = {stdout.print("hi\n")}
+def outer(f:Unit->Unit):Unit = f()
 
-func()
+def foo():Unit
+    outer(() =>
+        stdout.print("life's")
+        stdout.print("good!\n")
+    )
 
-list.do({x =>
-    stdout.printInt(x)
-    stdout.println()
-    })
+val func1 = (() =>
+    stdout.print("hi")
+    stdout.print("world!\n")
+)
+
+func1()
+foo()
+    
+val func2 = (() =>
+    stdout.print("hi\n")
+)
+
+list.do(x =>
+        stdout.printInt(x)
+        stdout.println()
+    )
+
+func2()

@@ -686,11 +686,8 @@ Object CaseArm() :
   ((id=<IDENTIFIER> <COLON> type=NonArrowType())
   | id=<DEFLT>) t=<EQARROW>
   ( exp=ExpressionLine(false)
-  | <NEWLINE> dslTok=DSLLines()
+  | <NEWLINE> <INDENT> exp = DeclSequence(false) <DEDENT>
   ) {
-    if (dslTok != null) {
-	    exp = build.parseExpr(dslTok.image, loc(dslTok));
-    }
     return build.caseArm(id.image,type,exp,loc(t));
   }
 }
@@ -718,7 +715,10 @@ AST AssignmentExpression(ExpFlags flags) :
 AST LambdaFn(ExpFlags flags) :
 { List formals; AST body; Token t; }
 {
-    formals = Formals_Lambda() t=<EQARROW> body = Expression(flags) {
+    formals = Formals_Lambda() t=<EQARROW>
+    (body = Expression(flags) 
+    | <INDENT> body = DeclSequence(false) <DEDENT>
+    ) {
         return build.fn(formals, body, loc(t));
     }
 }

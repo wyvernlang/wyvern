@@ -78,6 +78,12 @@ public class ExampleTests {
   }
 
   @Test
+  public void testMultiLambda() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "multiLambda",
+        Util.unitType(), Util.unitValue());
+  }
+
+  @Test
   public void testListParameterized() throws ParseException {
     TestUtil.doTestScriptModularly(PATH, "introductory.listClient",
         Util.intType(), new IntegerLiteral(28));
