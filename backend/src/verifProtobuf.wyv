@@ -1,0 +1,46 @@
+module verifProtobuf
+
+import wyvern.collections.list
+import wyvern.option
+import wyvern.String
+
+type List = list.List
+type Option = option.Option
+
+/*datatype Formula
+    Compare(left:Expression, oper:String, right:Expression)*/
+
+datatype Expression
+    Binop(left:Expression, oper:String, right:Expression)
+    Literal(value:Int)
+    Variable(name:String)
+
+datatype Statement
+    Declare(t:String, name:String)
+    Assign(name:String, value:Expression)
+    Assert(formula:Expression)
+
+resource type Program
+    val stmts: List[Statement]
+
+def Program(stmts:List[Statement]):Program = new
+    val stmts: List[Statement] = stmts
+
+/*def showFormula(f:Formula):String = match f:
+    c:Compare => showExpr(c.left) + c.oper + showExpr(c.right)
+*/
+
+def showExpr(e:Expression):String = match e:
+    b:Binop => showExpr(b.left) + b.oper + showExpr(b.right)
+    l:Literal => String.ofInt(l.value)
+    v:Variable => v.name
+
+def showStmt(s:Statement):String = match s:
+    d:Declare => "decl " + d.name + ":" + d.t + "\n"
+    a:Assign => "assign " + a.name + "=" + showExpr(a.value) + "\n"
+    a:Assert => "assert " + showExpr(a.formula) + "\n"
+    
+def showProgram(p:Program):String
+    var result:String = ""
+    p.stmts.do(x => result = result + showStmt(x))
+    result

@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import wyvern.tools.tests.FileTest;
 import wyvern.tools.tests.HigherOrderTests;
+import wyvern.tools.tests.BackEndTests;
 import wyvern.tools.tests.CoreParserTests;
 import wyvern.tools.tests.DemoTests;
 import wyvern.tools.tests.EffectAnnotationTests;
@@ -66,7 +67,8 @@ import wyvern.tools.tests.EffectSeparationTests;
             ModuleSystemTests.class,        // tests the new IL
             HigherOrderTests.class,
             EffectSeparationTests.class,
-            FileTest.class
+            FileTest.class,
+            BackEndTests.class
         }
         )
 public class AntRegressionTestSuite { }
