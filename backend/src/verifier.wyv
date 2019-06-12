@@ -1,6 +1,4 @@
-require stdout
-require writeVerif
-require support
+module def verifier(stdout:Stdout,support:Dyn)
 
 import from_protobuf
 import wyb_ast
@@ -151,13 +149,3 @@ def analyzeBytecode(wyb:Dyn):verifProtobuf.Program
             recur moduleLoop(i - 1)
     moduleLoop(m - 1)
 
-// TESTING CODE
-// FIX ME - one less .. to run in test suite
-val filename = "../../examples/verification/verifyTest.wyb"
-val wyb = support.loadBytecode(filename)
-val prog = analyzeBytecode(wyb)
-stdout.print("writing to file...")
-writeVerif.writeVerifierFile(prog, "out.gradver")
-    
-// magic number for testing
-17

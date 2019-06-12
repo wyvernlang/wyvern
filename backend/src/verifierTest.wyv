@@ -1,0 +1,18 @@
+require stdout
+require writeVerif
+require support
+
+import verifier
+val verifier = verifier.apply(stdout, support)
+
+
+// TESTING CODE
+
+val filename = "../examples/verification/verifyTest.wyb"
+val wyb = support.loadBytecode(filename)
+val prog = verifier.analyzeBytecode(wyb)
+stdout.print("writing to file...")
+writeVerif.writeVerifierFile(prog, "out.gradver")
+
+// magic number for testing - makes sure we at least got here
+17

@@ -40,7 +40,7 @@ public class BackEndTests {
       BytecodeCompiler.wyvernHome.set(TestUtil.WYVERN_HOME);
       BytecodeCompiler.main(new String[] {"../examples/verification/verifyTest.wyv"});
       // run the verifier
-      TestUtil.doTestScriptModularly(PATH, "verifier", Util.intType(),
+      TestUtil.doTestScriptModularly(PATH, "verifierTest", Util.intType(),
           Util.intValue(17));
   }
   
