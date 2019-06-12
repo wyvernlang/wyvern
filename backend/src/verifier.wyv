@@ -1,72 +1,36 @@
-require java
-require platform
 require stdout
 require writeVerif
+require support
 
-import support
 import from_protobuf
 import wyb_ast
 import wyvern.collections.list
 import wyvern.option
 import verifProtobuf
 
+val from_protobuf = from_protobuf.apply(support)
+
 type List = list.List
 type Option = option.Option
 
-val support = support.apply(platform)
-val from_protobuf = from_protobuf.apply(support)
-
-
-val filename = "../examples/verification/verifyTest.wyb"
-val wyb = support.loadBytecode(filename)
-
+// Verification accumulator
 resource type VerifAcc
     var hasAssert:Boolean
     val functions:List[String]
     val program:verifProtobuf.Program
 
+// Constructor
 def verifAcc():VerifAcc = new
     var hasAssert:Boolean = false
     val functions:List[String] = list.make[String]()
     val program:verifProtobuf.Program = verifProtobuf.Program(list.make[verifProtobuf.Statement]())
 
+// Analysis of statements, expressions, and declarations
 def visitStatement(s:wyb_ast.Statement, a:VerifAcc):Unit
     match s:
         d: wyb_ast.D => analyzeDecl(d.declaration,a)
         e: wyb_ast.E => analyze(e.expression,a)
 
-/*
-def getFormula(e:wyb_ast.Expression):Option[verifProtobuf.Formula]
-    match e:
-        ce: wyb_ast.StaticCallExpression =>
-            if (ce.method.equals(">"))
-                stdout.print("found >")
-                val e1o:Option[verifProtobuf.Expression] = analyze(ce.receiver, verifAcc())
-                val e2o:Option[verifProtobuf.Expression] = ce.arguments.get(0).flatMap[verifProtobuf.Expression](x:wyb_ast.Expression => analyze(x, verifAcc()))
-                match e1o:
-                 e1:option.Some =>
-                  val e11:verifProtobuf.Expression = e1.content
-                  match e2o:
-                   e2:option.Some =>
-                    val some:Option[verifProtobuf.Formula] = option.Some[verifProtobuf.Formula](verifProtobuf.Compare(e11,">",e2.content))
-                    stdout.print("some formula")
-                    some
-                   default =>
-                    val none:Option[verifProtobuf.Formula] = option.None[verifProtobuf.Formula]()
-                    stdout.print("no formula arg")
-                    none
-                 default =>
-                  val none:Option[verifProtobuf.Formula] = option.None[verifProtobuf.Formula]()
-                  stdout.print("no formula")
-                  none
-              else
-                stdout.print("found another static call")
-                option.None[verifProtobuf.Formula]()
-        default =>
-            stdout.print("found nothing")
-            option.None[verifProtobuf.Formula]()
-*/
-      
 def analyze(e:wyb_ast.Expression, a:VerifAcc):Option[verifProtobuf.Expression]
     match e:
         se: wyb_ast.SequenceExpression =>
@@ -155,34 +119,45 @@ def analyzeDecl(d:wyb_ast.Declaration, a:VerifAcc):Unit
         default =>
             stdout.print("  other decl\n")
 
-val c: Int = wyb.getImportsCount()
-def importLoop(i: Int, c: Int): Unit
-    if (i < c)
-        val imp = wyb.getImports(i)
-        val p: String = imp.getPath()
-        val n: String = imp.getName()
-        recur importLoop(i + 1, c)
-importLoop(0, c)
+// Analysis of bytecode
+def analyzeBytecode(wyb:Dyn):verifProtobuf.Program
+    val c: Int = wyb.getImportsCount()
+    def importLoop(i: Int, c: Int): Unit
+        if (i < c)
+            val imp = wyb.getImports(i)
+            val p: String = imp.getPath()
+            val n: String = imp.getName()
+            recur importLoop(i + 1, c)
+    importLoop(0, c)
 
-val m: Int = wyb.getModulesCount()
-def moduleLoop(i: Int): Unit
-    val m = wyb.getModules(i)
-    val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
-    val p = m.getPath()
-    stdout.print(p)
-    stdout.println()
-    if (p.equals("toplevel"))
-        stdout.print("analyzing...\n")
-        val v = verifAcc()
-        analyze(e,v)
-        stdout.print(verifProtobuf.showProgram(v.program))
-        stdout.print("methods with assert: ")
-        stdout.printInt(v.functions.length())
+    val m: Int = wyb.getModulesCount()
+    def moduleLoop(i: Int): verifProtobuf.Program
+        val m = wyb.getModules(i)
+        val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
+        val p = m.getPath()
+        stdout.print(p)
         stdout.println()
-        stdout.print("writing to file...")
-        val prog:verifProtobuf.Program = v.program
-        writeVerif.writeVerifierFile(prog, "out.gradver")
-    if (i > 0)
-        recur moduleLoop(i - 1)
-moduleLoop(m - 1)
+        if (p.equals("toplevel"))
+            // we only analyze the top-level function, it's always last
+            stdout.print("analyzing...\n")
+            val v = verifAcc()
+            analyze(e,v)
+            stdout.print(verifProtobuf.showProgram(v.program))
+            stdout.print("methods with assert: ")
+            stdout.printInt(v.functions.length())
+            stdout.println()
+            v.program
+          else
+            recur moduleLoop(i - 1)
+    moduleLoop(m - 1)
+
+// TESTING CODE
+// FIX ME - one less .. to run in test suite
+val filename = "../../examples/verification/verifyTest.wyb"
+val wyb = support.loadBytecode(filename)
+val prog = analyzeBytecode(wyb)
+stdout.print("writing to file...")
+writeVerif.writeVerifierFile(prog, "out.gradver")
+    
+// magic number for testing
 17
