@@ -3,12 +3,26 @@ module formatstring
 import wyvern.internal.ast
 import wyvern.option
 import wyvern.util.matching.regex
+import metadata wyvern.collections.list
 
 type AST = ast.AST
 
-type FormatString
+val prefixRegex : regex.Regex = regex("[^%]+")
+def parseExpr(input : String, ctx: system.Context) : option.Option[AST]
+    option.Some[AST](ast.string(input)) //temporary placeholder
+
+type FormatString = String
     metadata new
         def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
+            val regxMatch : option.Option[regex.Match] = prefixRegex.findPrefixMatchOf(input)
+            val prefixString : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.matched())
+            val rest : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.after())
+            
+            (prefixString.isDefined).ifTrue(
+                () => ast.call(ast.string(prefixString.get()), "+", {parseExpr(rest.getOrElse(() => ""), ctx)}),
+                () => parseExpr(rest.getOrElse(() => ""), ctx)
+            )
+            
             
 
 
@@ -32,20 +46,21 @@ continue parsing and appending strings recursively
 
 */    
     
-
+/*
 def parseString(input:String):option.Option[AST]
     //start by pulling the string before the next % character
     val prefixRegex : regex.Regex = regex("[^%]+")
     val prefixString : option.Option[String] = prefixRegex.findPrefixMatchOf(input).map[String](
                                              (m:regex.Match) => m.after())
     val appendString : String = prefixString.getOrElse(() => input)
-	//append appendString to the result of parseExpr()
+    //append appendString to the result of parseExpr()
 
 
 def parseExpr(input:String):option.Option[AST]
     val exp =
     
     ast.cast(exp, ast.types.string())
+*/
     
 //%\{.*\}
 // shouldn't need to account for {} in primitive Wyvern expressions?? but maybe list methods...
