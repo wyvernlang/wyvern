@@ -1,0 +1,87 @@
+module formatstring
+
+import wyvern.internal.ast
+import wyvern.option
+import wyvern.util.matching.regex
+
+type AST = ast.AST
+
+type FormatString
+    metadata new
+        def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
+            
+
+
+
+
+
+
+
+
+
+
+    
+
+    
+/** OUTLINE
+
+pull off individual string characters until you reach a % (account for esc later)
+then look for either a number, ., or { (regexp matching)
+continue parsing and appending strings recursively
+
+
+*/    
+    
+
+def parseString(input:String):option.Option[AST]
+    //start by pulling the string before the next % character
+    val prefixRegex : regex.Regex = regex("[^%]+")
+    val prefixString : option.Option[String] = prefixRegex.findPrefixMatchOf(input).map[String](
+                                             (m:regex.Match) => m.after())
+    val appendString : String = prefixString.getOrElse(() => input)
+	//append appendString to the result of parseExpr()
+
+
+def parseExpr(input:String):option.Option[AST]
+    val exp =
+    
+    ast.cast(exp, ast.types.string())
+    
+//%\{.*\}
+// shouldn't need to account for {} in primitive Wyvern expressions?? but maybe list methods...
+// ^maybe account for this later
+// still need to account for escape characters
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+/*
+EXAMPLES
+printf(~)
+    some sort of dollar amt $%{5} -> some sort of dollar amt $5
+    floating %.2{6.0} -> floating 6.00
+    
+    (val str = "bar")
+    foo%{str}
+    foo%{"bar"}
+
+not really much use for quotes
+use %__ identifiers to detail how to print the data
+formatting specs based on C
+
+
+*/
+
+
