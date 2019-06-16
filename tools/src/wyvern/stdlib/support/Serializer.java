@@ -129,13 +129,15 @@ public class Serializer {
     }
 
     private Object matchPrimValue(String value) {
-        if (value.equals("true") | value.equals("false")) {
-            return new Boolean(value);
+        if (value.equals("true")) {
+            return true;
+        } else if (value.equals("false")) {
+            return false;
         } else if (value.matches("[0-9]+")) {
             return new BigInteger(value);
         } else if (value.matches(
                 "([0].[0-9]*)|([1-9][0-9]*.[0-9]+)|(.[0-9]+)|([1-9][0-9]*.)")) {
-            return new Double(value);
+            return (Double) Double.parseDouble(value);
         } else {
             return value.substring(1, value.length() - 1);
         }

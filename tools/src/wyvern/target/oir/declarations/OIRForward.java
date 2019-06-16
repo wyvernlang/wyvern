@@ -3,11 +3,11 @@ package wyvern.target.oir.declarations;
 import wyvern.target.oir.ASTVisitor;
 import wyvern.target.oir.OIRAST;
 
-public class OIRDelegate extends OIRAST {
+public class OIRForward extends OIRAST {
     private OIRType type;
     private String field;
 
-    public OIRDelegate(OIRType type, String field) {
+    public OIRForward(OIRType type, String field) {
         super();
         this.type = type;
         this.field = field;

@@ -25,7 +25,7 @@ interface ASTBuilder<AST, Type> {
             String name, List<GenericParameter> generics, AST body, Object tagInfo, AST metadata, FileLocation loc, boolean isResource, String selfName
     );
 
-    AST delegateDecl(Type type, AST exp, FileLocation loc);
+    AST forwardDecl(Type type, AST exp, FileLocation loc);
     AST effectDecl(String name, String effects, FileLocation loc);
     AST assertion(String description, AST exp, FileLocation loc);
 

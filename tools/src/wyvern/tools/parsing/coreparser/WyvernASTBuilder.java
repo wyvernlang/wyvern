@@ -24,7 +24,7 @@ import wyvern.tools.typedAST.core.binding.NameBindingImpl;
 //import wyvern.tools.typedAST.core.declarations.ConstructDeclaration;
 import wyvern.tools.typedAST.core.declarations.DeclSequence;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
-import wyvern.tools.typedAST.core.declarations.DelegateDeclaration;
+import wyvern.tools.typedAST.core.declarations.ForwardDeclaration;
 import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.Instantiation;
@@ -442,8 +442,8 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
-    public TypedAST delegateDecl(Type type, TypedAST exp, FileLocation loc) {
-        return new DelegateDeclaration(type, exp, loc);
+    public TypedAST forwardDecl(Type type, TypedAST exp, FileLocation loc) {
+        return new ForwardDeclaration(type, exp, loc);
     }
 
     @Override

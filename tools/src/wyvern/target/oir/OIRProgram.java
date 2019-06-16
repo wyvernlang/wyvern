@@ -38,16 +38,16 @@ public final class OIRProgram extends OIRAST {
 
     public static final OIRProgram PROGRAM = new OIRProgram();
 
-    public enum DelegateImplementation {
+    public enum ForwardImplementation {
         HASH_TABLE_NAIVE, /* Every call will do Hash Table Lookup */
         PIC, /* Using PIC */
     }
 
-    private static DelegateImplementation delegateImplementation = DelegateImplementation.HASH_TABLE_NAIVE;
+    private static ForwardImplementation forwardImplementation = ForwardImplementation.HASH_TABLE_NAIVE;
 
 
-    public static void setDelegateImplementation(DelegateImplementation delegateImpl) {
-        delegateImplementation = delegateImpl;
+    public static void setForwardImplementation(ForwardImplementation forwardImpl) {
+        forwardImplementation = forwardImpl;
     }
 
     public OIRExpression getMainExpression() {
@@ -135,16 +135,16 @@ public final class OIRProgram extends OIRAST {
 
     public MethodAddress getClassNameForCallSite(long objectAddress, int classID,
             int callSiteID, String methodName) {
-        if (delegateImplementation == DelegateImplementation.HASH_TABLE_NAIVE) {
-            return delegateHashTableNaive(objectAddress, classID, methodName);
-        } else if (delegateImplementation == DelegateImplementation.PIC) {
+        if (forwardImplementation == ForwardImplementation.HASH_TABLE_NAIVE) {
+            return forwardHashTableNaive(objectAddress, classID, methodName);
+        } else if (forwardImplementation == ForwardImplementation.PIC) {
             PIC pic = picArray[callSiteID];
             return pic.search(classID, objectAddress);
         }
-        throw new WyvernException("Invalid Delegate Implementation selected");
+        throw new WyvernException("Invalid Forward Implementation selected");
     }
 
-    public MethodAddress delegateHashTableBuildPICEntry(long objectAddress,
+    public MethodAddress forwardHashTableBuildPICEntry(long objectAddress,
             int classID, OIRClassDeclaration oirClassDecl, String methodName, PICEntry classPICEntry,
             long fieldAddress, int fieldPos, int fieldClassID) {
         PICEntry lastFinalEntry;
@@ -164,15 +164,15 @@ public final class OIRProgram extends OIRAST {
              * Then go to the object's field
              * */
             oirClassDecl = getClassDeclaration(classID);
-            fieldPos = oirClassDecl.getDelegateMethodFieldHashMap(methodName);
+            fieldPos = oirClassDecl.getForwardMethodFieldHashMap(methodName);
 
             if (fieldPos == -1) {
                 System.out.println("Error: Cannot find method in any of the fields");
                 System.exit(-1);
             }
 
-            fieldAddress = DelegateNative.getFieldAddress(oirClassDecl.getName(), objectAddress, fieldPos);
-            fieldClassID = DelegateNative.getObjectClassID(fieldAddress);
+            fieldAddress = ForwardNative.getFieldAddress(oirClassDecl.getName(), objectAddress, fieldPos);
+            fieldClassID = ForwardNative.getObjectClassID(fieldAddress);
             OIRClassDeclaration fieldClassDecl = getClassDeclaration(fieldClassID);
             PICEntry fieldPICEntry = new PICEntry(fieldClassID, fieldClassDecl);
 
@@ -205,13 +205,13 @@ public final class OIRProgram extends OIRAST {
         /* Now start looking in the object's fields */
         while (true) {
             oirClassDecl = getClassDeclaration(classID);
-            fieldPos = oirClassDecl.getDelegateMethodFieldHashMap(methodName);
+            fieldPos = oirClassDecl.getForwardMethodFieldHashMap(methodName);
             if (fieldPos == -1) {
                 System.out.println("Error: Cannot find method in any of the fields");
                 System.exit(-1);
             }
-            fieldAddress = DelegateNative.getFieldAddress(oirClassDecl.getName(), objectAddress, fieldPos);
-            fieldClassID = DelegateNative.getObjectClassID(fieldAddress);
+            fieldAddress = ForwardNative.getFieldAddress(oirClassDecl.getName(), objectAddress, fieldPos);
+            fieldClassID = ForwardNative.getObjectClassID(fieldAddress);
             OIRClassDeclaration fieldClassDecl = getClassDeclaration(fieldClassID);
             PICEntry fieldPICEntry = new PICEntry(fieldClassID, fieldClassDecl);
             if (oirClassDecl.getFieldDeclarationForPos(fieldPos).isFinal()) {
@@ -239,20 +239,20 @@ public final class OIRProgram extends OIRAST {
         }
     }
 
-    public MethodAddress delegateHashTableNaive(long objectAddress, int classID, String methodName) {
+    public MethodAddress forwardHashTableNaive(long objectAddress, int classID, String methodName) {
         OIRClassDeclaration oirClassDecl = getClassDeclaration(classID);
         boolean ans = oirClassDecl.isMethodInClass(methodName);
         if (ans) {
             return new MethodAddress(oirClassDecl.getName(), objectAddress);
         }
         while (true) {
-            int fieldPos = oirClassDecl.getDelegateMethodFieldPosNaive(methodName);
+            int fieldPos = oirClassDecl.getForwardMethodFieldPosNaive(methodName);
             if (fieldPos == -1) {
                 System.out.println("Error: Cannot find method");
                 System.exit(-1);
             }
-            objectAddress = DelegateNative.getFieldAddress(oirClassDecl.getName(), objectAddress, fieldPos);
-            classID = DelegateNative.getObjectClassID(objectAddress);
+            objectAddress = ForwardNative.getFieldAddress(oirClassDecl.getName(), objectAddress, fieldPos);
+            classID = ForwardNative.getObjectClassID(objectAddress);
             oirClassDecl = getClassDeclaration(classID);
             if (oirClassDecl.isMethodInClass(methodName)) {
                 return new MethodAddress(oirClassDecl.getName(), objectAddress);

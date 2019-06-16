@@ -17,7 +17,7 @@ public class FloatLiteral extends Literal implements Invokable  {
   private final Double value;
   @Override
   public int hashCode() {
-      return (new Double(value)).hashCode();
+    return ((Double) value).hashCode();
   }
   @Override
   public boolean equals(Object obj) {
@@ -43,7 +43,7 @@ public class FloatLiteral extends Literal implements Invokable  {
       this(value, FileLocation.UNKNOWN);
     }
     public FloatLiteral(double value, FileLocation loc) {
-      this(new Double(value), loc);
+      this((Double) value, loc);
     }
     public FloatLiteral(Double value, FileLocation loc) {
       super(Util.floatType(), loc);

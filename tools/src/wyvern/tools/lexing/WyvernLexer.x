@@ -197,7 +197,13 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
 	terminal Token assertKwd_t 	::= /assert/ in (keywds) {: RESULT = token(ASSERT,lexeme); :};
-	terminal Token delegateKwd_t::= /delegate/ in (keywds) {: RESULT = token(DELEGATE,lexeme); :};
+	
+	// inserted while keyword
+	//terminal Token whileKwd_t 	::= /while/ in (keywds) {: RESULT = token(WHILE,lexeme); :};
+	
+	// inserted forward keyword
+	terminal Token forwardKwd_t::= /forward/ in (keywds) {: RESULT = token(FORWARD,lexeme); :};
+	
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
@@ -416,7 +422,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | defKwd_t:t {: RESULT = t; :}
 	       | varKwd_t:t {: RESULT = t; :}
 	       | assertKwd_t:t {: RESULT = t; :}
-	       | delegateKwd_t:t {: RESULT = t; :}
+	      // | whileKwd_t:t {: RESULT = t; :}
+	       | forwardKwd_t:t {: RESULT = t; :}
 	       | toKwd_t:t {: RESULT = t; :}
 //	       | fnKwd_t:t {: RESULT = t; :}
 	       | requireKwd_t:t {: RESULT = t; :}

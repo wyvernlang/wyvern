@@ -43,7 +43,7 @@ public class FloatConstant extends AbstractExpressionAST implements InvokableVal
 
     @Override
     public int hashCode() {
-        return (new java.lang.Double(value)).hashCode();
+        return ((Double) value).hashCode();
     }
 
     @Override
