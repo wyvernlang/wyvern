@@ -294,14 +294,14 @@ public class OIRTests {
     }
 
     @Test
-    public void testSimpleDelegation() throws ParseException {
+    public void testSimpleForward() throws ParseException {
         String input =
                 "type IntResult\n"
                       + "    def getResult() : system.Int\n"
                       + "val r : IntResult = new\n"
                       + "    def getResult() : system.Int = 26\n"
                       + "val r2 : IntResult = new\n"
-                      + "    delegate IntResult to r\n"
+                      + "    forward IntResult to r\n"
                       + "r2.getResult()\n";
         testPyFromInput(input, "26");
     }

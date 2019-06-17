@@ -344,13 +344,13 @@ public class ILTests {
     }
 
     @Test
-    public void testSimpleDelegation() throws ParseException {
+    public void testSimpleForward() throws ParseException {
         String input = "type IntResult\n"
                 + "    def getResult():system.Int\n\n"
                 + "val r : IntResult = new\n"
                 + "    def getResult():system.Int = 5\n\n"
                 + "val r2 : IntResult = new\n"
-                + "    delegate IntResult to r\n\n"
+                + "    forward IntResult to r\n\n"
                 + "r2.getResult()\n";
         TestUtil.doTestInt(input, 5);
     }

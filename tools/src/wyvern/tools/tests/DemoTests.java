@@ -55,7 +55,7 @@ public class DemoTests {
 
     @Test
     public void testSimpleDelegation() throws ParseException {
-        String program = TestUtil.readFile(PATH + "SimpleDelegation.wyv");
+        String program = TestUtil.readFile(PATH + "SimpleForwarding.wyv");
         TestUtil.getNewAST(program, "test input");
         // TODO: implement delegation in the new IL and run this test
     }
