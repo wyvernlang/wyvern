@@ -465,7 +465,8 @@ public class ModuleResolver {
         String typeName = null;
         if (loadingType) {
             List<DeclType> declTypes = moduleType.getStructuralType(ctx).getDeclTypes();
-            typeName = declTypes.get(declTypes.size()-1).getName();
+            // the type is the last thing declared; e.g. there might be type aliases earlier
+            typeName = declTypes.get(declTypes.size() - 1).getName();
         }
         // if not a top-level module, make sure the module type is well-formed
         // top-level modules are exempted from this check because the module returns the thing
