@@ -9,7 +9,7 @@ import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -23,22 +23,22 @@ import wyvern.tools.errors.ToolError;
 public class ObjectValue extends New implements Invokable {
     private static final ThreadLocal<List<String>> stack = ThreadLocal.withInitial(() -> new ArrayList<String>());
     private final EvalContext evalCtx; // captured eval context
-    private final boolean hasDelegate;
-    private ObjectValue delegateTarget;
+    private final boolean hasForward;
+    private ObjectValue forwardTarget;
 
     /** Precondition: the decls argument must be unique.
      * It is owned by this ObjectValue after the constructor call.
      */
-    public ObjectValue(List<Declaration> decls, BindingSite selfSite, ValueType exprType, DelegateDeclaration delegateDecl, FileLocation loc, EvalContext ctx) {
+    public ObjectValue(List<Declaration> decls, BindingSite selfSite, ValueType exprType, ForwardDeclaration forwardDecl, FileLocation loc, EvalContext ctx) {
         super(decls, selfSite, exprType, loc);
 
         if (selfSite == null) {
             throw new RuntimeException("selfName invariant violated");
         }
         evalCtx = ctx.extend(selfSite, this);
-        hasDelegate = (delegateDecl != null);
-        if (hasDelegate) {
-            delegateTarget = (ObjectValue) ctx.lookupValue(delegateDecl.getFieldName());
+        hasForward = (forwardDecl != null);
+        if (hasForward) {
+            forwardTarget = (ObjectValue) ctx.lookupValue(forwardDecl.getFieldName());
         }
         // assert that this ObjectValue is well-formed
         checkWellFormed();
@@ -78,8 +78,8 @@ public class ObjectValue extends New implements Invokable {
                     methodCtx = methodCtx.extend(dd.getFormalArgs().get(i).getSite(), args.get(i));
                 }
                 return dd.getBody().interpret(methodCtx);
-            } else if (hasDelegate) {
-                return delegateTarget.invoke(methodName, args);
+            } else if (hasForward) {
+                return forwardTarget.invoke(methodName, args);
             } else {
                 if (Util.isJavaNull(this)) {
                     ToolError.reportError(ErrorMessage.JAVA_NULL_EXCEPTION, loc, methodName);
@@ -104,8 +104,8 @@ public class ObjectValue extends New implements Invokable {
         DeclarationWithRHS decl = (DeclarationWithRHS) findDecl(fieldName, false);
         if (decl != null) {
             return (Value) decl.getDefinition();
-        } else if (delegateTarget != null && delegateTarget.findDecl(fieldName, false) != null) {
-            return delegateTarget.getField(fieldName);
+        } else if (forwardTarget != null && forwardTarget.findDecl(fieldName, false) != null) {
+            return forwardTarget.getField(fieldName);
         }
 
         throw new RuntimeException("can't find field: " + fieldName);
@@ -149,7 +149,7 @@ public class ObjectValue extends New implements Invokable {
 
     @Override
     public int hashCode() {
-        return evalCtx.hashCode() + delegateTarget.hashCode();
+        return evalCtx.hashCode() + forwardTarget.hashCode();
     }
 
     /** make sure all free variables are captured in the evalCtx */

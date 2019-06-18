@@ -8,7 +8,7 @@ import wyvern.target.corewyvernIL.astvisitor.DeclarationVisitor;
 import wyvern.target.corewyvernIL.astvisitor.TypeVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
@@ -487,7 +487,7 @@ public final class QuantificationLifter {
         }
 
         @Override
-        public NamedDeclaration visit(State state, DelegateDeclaration delegateDecl) {
+        public NamedDeclaration visit(State state, ForwardDeclaration forwardDecl) {
             throw new RuntimeException("DeclarationLifter not implemented for non-named declarations");
         }
 

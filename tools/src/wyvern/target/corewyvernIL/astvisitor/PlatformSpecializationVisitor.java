@@ -10,7 +10,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
@@ -307,8 +307,8 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
         return characterLiteral;
     }
 
-    public ASTNode visit(PSVState state, DelegateDeclaration delegateDecl) {
-        return delegateDecl;
+    public ASTNode visit(PSVState state, ForwardDeclaration forwardDecl) {
+        return forwardDecl;
     }
 
     @Override

@@ -11,7 +11,7 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
@@ -54,7 +54,7 @@ import wyvern.target.oir.OIRAST;
 import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.OIRProgram;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
-import wyvern.target.oir.declarations.OIRDelegate;
+import wyvern.target.oir.declarations.OIRForward;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
 import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
@@ -106,7 +106,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
         // Set up, initialise collections we'll be using.
         OIREnvironment classEnv = new OIREnvironment(state.getEnvironment());
         List<OIRMemberDeclaration> memberDecls = new Vector<OIRMemberDeclaration>();
-        List<OIRDelegate> delegates = new Vector<OIRDelegate>();
+        List<OIRForward> forwards = new Vector<OIRForward>();
         List<OIRFieldValueInitializePair> fieldValuePairs = new Vector<OIRFieldValueInitializePair>();
         List<OIRExpression> args = new Vector<OIRExpression>();
 
@@ -118,10 +118,10 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
         for (Declaration decl : newExpr.getDecls()) {
 
             // Special case: processing a delegate declaration.
-            if (decl instanceof DelegateDeclaration) {
-                OIRDelegate oirdelegate;
-                oirdelegate = (OIRDelegate) decl.acceptVisitor(this, new EmitOIRState(ctx, classEnv));
-                delegates.add(oirdelegate);
+            if (decl instanceof ForwardDeclaration) {
+                OIRForward oirforward;
+                oirforward = (OIRForward) decl.acceptVisitor(this, new EmitOIRState(ctx, classEnv));
+                forwards.add(oirforward);
                 continue;
             }
 
@@ -152,7 +152,7 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
 
         // Generate the OIR expression.
         String className = generateClassName();
-        OIRClassDeclaration classDecl = new OIRClassDeclaration(classEnv, className, newExpr.getSelfName(), delegates, memberDecls,
+        OIRClassDeclaration classDecl = new OIRClassDeclaration(classEnv, className, newExpr.getSelfName(), forwards, memberDecls,
                 fieldValuePairs, newExpr.getFreeVariables());
         state.getEnvironment().addType(className, classDecl);
         classEnv.addName(newExpr.getSelfName(), classDecl);
@@ -433,10 +433,10 @@ public class EmitOIRVisitor extends ASTVisitor<EmitOIRState, OIRAST> {
         return oircharacter;
     }
 
-    public OIRAST visit(EmitOIRState state, DelegateDeclaration delegateDecl) {
-        OIRDelegate oirdelegate = new OIRDelegate(null, delegateDecl.getFieldName());
-        oirdelegate.copyMetadata(delegateDecl);
-        return oirdelegate;
+    public OIRAST visit(EmitOIRState state, ForwardDeclaration forwardDecl) {
+        OIRForward oirforward = new OIRForward(null, forwardDecl.getFieldName());
+        oirforward.copyMetadata(forwardDecl);
+        return oirforward;
     }
 
     @Override

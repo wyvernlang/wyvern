@@ -103,7 +103,7 @@ TOKEN : /* Keywords */
 | < ASSERT: "assert" >
 | < DATATYPE: "datatype" >
 | < CLASS: "class" >
-| < DELEGATE: "delegate" >
+| < FORWARD: "forward" >
 | < TO: "to" >
 | < REQUIRE: "require" >
 | < METADATA: "metadata" >
@@ -116,6 +116,7 @@ TOKEN : /* Keywords */
 | < IMPORT: "import" >
 | < LIFTED: "lifted" >
 | < DEFLT: "default" >
+//| < WHILE: "while" >
 //| < : "" >
 // more here
 | < RESOURCE : "resource" >
@@ -332,11 +333,13 @@ AST Declaration(boolean inModule) :
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
 |
-  exp = DelegateDeclaration()  { return exp; }
+  exp = ForwardDeclaration()  { return exp; }
 |
   exp = ExpressionLine(inModule) { return exp; }
 |
-  exp = Instantiation() {return exp; }
+  exp = Instantiation() { return exp; }
+//|
+//  exp = WhileDeclaration() { return exp; }
 }
 
 AST DefDeclaration() :
@@ -394,13 +397,18 @@ AST EffectDeclaration() : // in module def, must be defined
    }
 }
 
-AST DelegateDeclaration() :
+AST ForwardDeclaration() :
 { Type type; Token t; AST exp; }
 {
-  t=<DELEGATE> type=Type() <TO> exp=ExpressionLine(false) {
-	return build.delegateDecl(type, exp, loc(t));
+  t=<FORWARD> type=Type() <TO> exp=ExpressionLine(false) {
+	return build.forwardDecl(type, exp, loc(t));
   }
 }
+
+// while declaration
+//AST WhileDeclaration() :
+//{}
+//{}
 
 AST TypeDeclaration() :
 { Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;

@@ -55,7 +55,7 @@ def parseGeneratedModule(input : String) : AST = ast.parseGeneratedModule(input)
 // Declarations
 def defDeclaration(name : String, formalArgs : list.List, returnType : Type, body : AST) : Decl = ast.defDeclaration(name, formalArgs, returnType, body)
 
-def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = ast.delegateDeclaration(delegateType, fieldName)
+def forwardDeclaration(forwardType : Type, fieldName : String) : Decl = ast.forwardDeclaration(forwardType, fieldName)
 
 def moduleDeclaration(name : String, formalArgs : list.List, moduleType : Type, body : AST, dependencies : list.List) : Decl = ast.moduleDeclaration(name, formalArgs, moduleType, body, dependencies)
 

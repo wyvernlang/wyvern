@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import wyvern.target.oir.declarations.OIRClassDeclaration;
-import wyvern.target.oir.declarations.OIRDelegate;
+import wyvern.target.oir.declarations.OIRForward;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
 import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
@@ -190,9 +190,9 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
         OIREnvironment env = oirClassDeclaration.getEnvironment();
         String name = oirClassDeclaration.getName();
         String selfName = oirClassDeclaration.getSelfName();
-        ArrayList<OIRDelegate> delegates = new ArrayList<>();
-        for (OIRDelegate del : oirClassDeclaration.getDelegates()) {
-            delegates.add(new OIRDelegate(del.getType(), mangle(del.getField())));
+        ArrayList<OIRForward> forwards = new ArrayList<>();
+        for (OIRForward del : oirClassDeclaration.getForwards()) {
+            forwards.add(new OIRForward(del.getType(), mangle(del.getField())));
         }
         ArrayList<OIRMemberDeclaration> members = new ArrayList<>();
         for (OIRMemberDeclaration decl : oirClassDeclaration.getMembers()) {
@@ -208,7 +208,7 @@ public class NameMangleVisitor extends ASTVisitor<NameMangleState, OIRAST> {
         for (String freeVar : oirClassDeclaration.getFreeVariables()) {
             freeVars.add(mangle(freeVar));
         }
-        OIRClassDeclaration classDecl = new OIRClassDeclaration(env, name, selfName, delegates, members, fieldValuePairs, freeVars);
+        OIRClassDeclaration classDecl = new OIRClassDeclaration(env, name, selfName, forwards, members, fieldValuePairs, freeVars);
         classDecl.copyMetadata(oirClassDeclaration);
         return classDecl;
     }

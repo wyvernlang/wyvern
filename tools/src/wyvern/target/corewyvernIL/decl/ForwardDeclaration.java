@@ -9,12 +9,12 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
-public class DelegateDeclaration extends Declaration {
+public class ForwardDeclaration extends Declaration {
 
     private ValueType valueType;
     private String fieldName;
 
-    public DelegateDeclaration(ValueType valueType, String fieldName, FileLocation loc) {
+    public ForwardDeclaration(ValueType valueType, String fieldName, FileLocation loc) {
         super(loc);
         this.valueType = valueType;
         this.fieldName = fieldName;

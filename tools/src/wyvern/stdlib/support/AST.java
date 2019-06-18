@@ -18,7 +18,7 @@ import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
@@ -192,8 +192,8 @@ public class AST {
         return new DefDeclaration(name, getFormalArgs(formalArgObjs), getType(returnType), getExpr(body), null);
     }
 
-    public DelegateDeclaration delegateDeclaration(ObjectValue valueType, String fieldName) {
-        return new DelegateDeclaration(getType(valueType), fieldName, null);
+    public ForwardDeclaration forwardDeclaration(ObjectValue valueType, String fieldName) {
+        return new ForwardDeclaration(getType(valueType), fieldName, null);
     }
 
     public ModuleDeclaration moduleDeclaration(String name, List<ObjectValue> formalArgObjs, ObjectValue returnType,

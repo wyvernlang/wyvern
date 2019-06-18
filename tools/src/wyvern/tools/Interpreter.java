@@ -24,25 +24,35 @@ public final class Interpreter {
      * an empty context. The resulting value is printed to the screen.
      */
     public static void main(String[] args) {
+        // check if 1 argument is supplied.
         if (args.length != 1) {
             System.err.println("usage: wyvern <filename>");
             System.exit(1);
         }
         String filename = args[0];
         Path filepath = Paths.get(filename);
+
+        // check if file is readable.
         if (!Files.isReadable(filepath)) {
             System.err.println("Cannot read file " + filename);
             System.exit(1);
         }
         try {
+            // obtain WYVERN_ROOT environment variable.
             String rootLoc = System.getenv("WYVERN_ROOT");
             if (wyvernRoot.get() != null) {
                 rootLoc = wyvernRoot.get();
             } else {
                 rootLoc = System.getProperty("user.dir");
             }
+
+            // create file object using root location.
             File rootDir = new File(rootLoc);
+
+            // obtain WYVERN_HOME environment variable.
             String wyvernPath = System.getenv("WYVERN_HOME");
+
+            // check and obtain the WYVERN_HOME environment variable.
             if (wyvernPath == null) {
                 if (wyvernHome.get() != null) {
                     wyvernPath = wyvernHome.get();
@@ -51,13 +61,20 @@ public final class Interpreter {
                     return;
                 }
             }
+
+            // go to WYVERN_ROOT/stdlib
             wyvernPath += "/stdlib/";
+
             // sanity check: is the wyvernPath a valid directory?
             if (!Files.isDirectory(Paths.get(wyvernPath))) {
                 System.err.println("Error: WYVERN_HOME is not set to a valid Wyvern project directory");
                 return;
             }
+
+            // create interpreter state using Java platform
             final InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, rootDir, new File(wyvernPath));
+            
+            // resolve modules and create Module object
             Module m = state.getResolver().load("unknown", filepath.toFile(), true);
             IExpr program = m.getExpression();
 

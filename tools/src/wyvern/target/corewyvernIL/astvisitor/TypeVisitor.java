@@ -3,7 +3,7 @@ package wyvern.target.corewyvernIL.astvisitor;
 import wyvern.target.corewyvernIL.Case;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
@@ -141,7 +141,7 @@ public abstract class TypeVisitor<S, T> extends ASTVisitor<S, T> {
     }
 
     @Override
-    public T visit(S state, DelegateDeclaration delegateDecl) {
+    public T visit(S state, ForwardDeclaration forwardDecl) {
         throw new RuntimeException(this.errorMessage());
     }
 

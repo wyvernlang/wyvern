@@ -59,12 +59,12 @@ public class PIC {
                 /* fieldPos is NULL would mean, we have found the last class */
                 return new MethodAddress(className, objectAddress);
             }
-            fieldAddress = DelegateNative.getFieldAddress(className, objectAddress, fieldPos);
-            fieldClassID = DelegateNative.getObjectClassID(fieldAddress);
+            fieldAddress = ForwardNative.getFieldAddress(className, objectAddress, fieldPos);
+            fieldClassID = ForwardNative.getObjectClassID(fieldAddress);
             fieldEntry = entry.getEntry(fieldClassID);
             if (fieldEntry == null) {
                 /* Couldn't find method, do HashTable search */
-                return OIRProgram.PROGRAM.delegateHashTableBuildPICEntry(objectAddress, classID, classDecl,
+                return OIRProgram.PROGRAM.forwardHashTableBuildPICEntry(objectAddress, classID, classDecl,
                         methodName, entry, fieldAddress, fieldPos, fieldClassID);
             } else {
                 entry = fieldEntry;
@@ -81,7 +81,7 @@ public class PIC {
             /* PICEntry for this class not present. Find the method. */
             OIRClassDeclaration classDecl = OIRProgram.PROGRAM.getClassDeclaration(classID);
             entry = new PICEntry(classID, classDecl);
-            return OIRProgram.PROGRAM.delegateHashTableBuildPICEntry(objectAddress, classID, classDecl,
+            return OIRProgram.PROGRAM.forwardHashTableBuildPICEntry(objectAddress, classID, classDecl,
                     methodName, entry, -1, -1, -1);
         } else {
             return searchMethod(classID, entry, objectAddress);
