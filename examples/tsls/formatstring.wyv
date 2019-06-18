@@ -1,6 +1,6 @@
 module formatstring
 
-import wyvern.internal.ast
+import wyvern.ast
 import wyvern.option
 import wyvern.util.matching.regex
 import metadata wyvern.collections.list
@@ -19,11 +19,11 @@ type FormatString = String
             val rest : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.after())
             
             (prefixString.isDefined).ifTrue(
-                () => ast.call(ast.string(prefixString.get()), "+", {parseExpr(rest.getOrElse(() => ""), ctx)}),
+                () => ast.call(ast.string(prefixString.get()), "+", {(parseExpr(rest.getOrElse(() => ""), ctx)}).getOrElse(() => ast.string(""))),
                 () => parseExpr(rest.getOrElse(() => ""), ctx)
             )
             
-            
+            //option.Some[AST](ast.string(input))
 
 
 
