@@ -46,7 +46,7 @@ public class EffectSet {
 
         if (e.contains(".")) { // effect from another object
             final String[] pathAndID = e.split("\\.");
-            return new Effect(new Variable(pathAndID[0]), pathAndID[1], fileLocation);
+            return new Effect(new Variable(pathAndID[0], fileLocation), pathAndID[1], fileLocation);
         } else { // effect defined in the same type or module def
             if (effectDecl && name.equals(e)) { // recursive definition (ex. "effect process = {send, process}")
                 ToolError.reportError(ErrorMessage.RECURSIVE_EFFECT, fileLocation, e);

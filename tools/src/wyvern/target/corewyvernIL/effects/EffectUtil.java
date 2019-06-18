@@ -5,6 +5,7 @@ import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 
 import java.util.HashSet;
@@ -75,19 +76,21 @@ public final class EffectUtil {
 
     public static EffectSet getHOEffects(ValueType type, GenContext ctx) {
         EffectSet effects = null;
-        List<DeclType> declTypes = type.getStructuralType(ctx).getDeclTypes();
+        StructuralType structuralType = type.getStructuralType(ctx);
+        List<DeclType> declTypes = structuralType.getDeclTypes();
+        GenContext thisCtx = ctx.extend(structuralType.getSelfSite(), structuralType);
         for (DeclType declType : declTypes) {
             if (declType instanceof DefDeclType) {
                 List<FormalArg> recursiveArgs = ((DefDeclType) declType).getFormalArgs();
                 for (FormalArg recursiveArg : recursiveArgs) {
                     ValueType argType = recursiveArg.getType();
-                    if (goodType(argType) && !argType.equalsInContext(type, ctx, new FailureReason())) {
-                        effects = addEffects(effects, argType, ctx);
+                    if (goodType(argType) && !argType.equalsInContext(type, thisCtx, new FailureReason())) {
+                        effects = addEffects(effects, argType, thisCtx);
                     }
                 }
                 ValueType resultType = ((DefDeclType) declType).getRawResultType();
-                if (goodType(resultType) && !type.equalsInContext(resultType, ctx, new FailureReason())) {
-                    effects = addHOEffects(effects, resultType, ctx);
+                if (goodType(resultType) && !type.equalsInContext(resultType, thisCtx, new FailureReason())) {
+                    effects = addHOEffects(effects, resultType, thisCtx);
                 }
             }
         }

@@ -1,0 +1,151 @@
+module def verifier(stdout:Stdout,support:Dyn)
+
+import from_protobuf
+import wyb_ast
+import wyvern.collections.list
+import wyvern.option
+import verifProtobuf
+
+val from_protobuf = from_protobuf.apply(support)
+
+type List = list.List
+type Option = option.Option
+
+// Verification accumulator
+resource type VerifAcc
+    var hasAssert:Boolean
+    val functions:List[String]
+    val program:verifProtobuf.Program
+
+// Constructor
+def verifAcc():VerifAcc = new
+    var hasAssert:Boolean = false
+    val functions:List[String] = list.make[String]()
+    val program:verifProtobuf.Program = verifProtobuf.Program(list.make[verifProtobuf.Statement]())
+
+// Analysis of statements, expressions, and declarations
+def visitStatement(s:wyb_ast.Statement, a:VerifAcc):Unit
+    match s:
+        d: wyb_ast.D => analyzeDecl(d.declaration,a)
+        e: wyb_ast.E => analyze(e.expression,a)
+
+def analyze(e:wyb_ast.Expression, a:VerifAcc):Option[verifProtobuf.Expression]
+    match e:
+        se: wyb_ast.SequenceExpression =>
+            stdout.print("  sequence {\n")
+            se.statements.do(x => visitStatement(x,a))
+            stdout.print("  }\n")
+            option.None[verifProtobuf.Expression]()
+        ce: wyb_ast.CallExpression =>
+            stdout.print("  call " + ce.method + "(")
+            if (ce.method.equals("assertion"))
+                a.hasAssert = true
+                val arg = ce.arguments.get(1)
+                val f = arg.flatMap[verifProtobuf.Expression](x => analyze(x,a))
+                f.map[Unit](x => a.program.stmts.append(verifProtobuf.Assert(x)))
+              else
+                ce.arguments.do(x => analyze(x,a))
+            stdout.print("  )\n")
+            option.None[verifProtobuf.Expression]()
+        ce: wyb_ast.StaticCallExpression =>
+            stdout.print("  static call " + ce.method + "(")
+            val args:List[Option[verifProtobuf.Expression]] = ce.arguments.map[Option[verifProtobuf.Expression]](x => analyze(x,a))
+            stdout.print("  )\n")
+            val none:Option[verifProtobuf.Expression] = option.None[verifProtobuf.Expression]()
+            if (ce.method.equals("+"))
+                val e1o:Option[verifProtobuf.Expression] = analyze(ce.receiver, a)
+                val e2o:Option[verifProtobuf.Expression] = args.get(0).get()
+                match e1o:
+                 e1:option.Some =>
+                  match e2o:
+                   e2:option.Some =>
+                    val some:Option[verifProtobuf.Expression] = option.Some[verifProtobuf.Expression](verifProtobuf.Binop(e1.content, "+", e2.content))
+                    some
+                   default => none
+                 default => none
+              else
+                if (ce.method.equals(">"))
+                    stdout.print("found >")
+                    val e1o:Option[verifProtobuf.Expression] = analyze(ce.receiver, verifAcc())
+                    val e2o:Option[verifProtobuf.Expression] = ce.arguments.get(0).flatMap[verifProtobuf.Expression](x:wyb_ast.Expression => analyze(x, verifAcc()))
+                    match e1o:
+                     e1:option.Some =>
+                      val e11:verifProtobuf.Expression = e1.content
+                      match e2o:
+                       e2:option.Some =>
+                        val some:Option[verifProtobuf.Expression] = option.Some[verifProtobuf.Expression](verifProtobuf.Binop(e11,">",e2.content))
+                        stdout.print("some formula")
+                        some
+                       default =>
+                        val none:Option[verifProtobuf.Expression] = option.None[verifProtobuf.Expression]()
+                        stdout.print("no formula arg")
+                        none
+                     default =>
+                      val none:Option[verifProtobuf.Expression] = option.None[verifProtobuf.Expression]()
+                      stdout.print("no formula")
+                      none
+                  else
+                    stdout.print("found nothing")
+                    option.None[verifProtobuf.Expression]()
+        ne: wyb_ast.NewExpression =>
+            stdout.print("  new {\n")
+            ne.declarations.do(x => analyzeDecl(x,a))
+            stdout.print("  }\n")
+            option.None[verifProtobuf.Expression]()
+        v: wyb_ast.Var =>
+            option.Some[verifProtobuf.Expression](verifProtobuf.Variable(v.v))
+        i: wyb_ast.IntegerLiteral =>
+            option.Some[verifProtobuf.Expression](verifProtobuf.Literal(i.i))
+        default =>
+            stdout.print("  other\n")
+            option.None[verifProtobuf.Expression]()
+
+def analyzeDecl(d:wyb_ast.Declaration, a:VerifAcc):Unit
+    match d:
+        md: wyb_ast.MethodDeclaration =>
+            stdout.print("  def " + md.methodName + " {")
+            val v = verifAcc()
+            analyze(md.body,v)
+            if (v.hasAssert)
+                a.functions.append(md.methodName)
+            stdout.print("  }\n")
+        vd: wyb_ast.VariableDeclaration =>
+            stdout.print("  val " + vd.variable + " = ")
+            a.program.stmts.append(verifProtobuf.Declare("Int",vd.variable))
+            val exprOpt = analyze(vd.initializer,a)
+            exprOpt.map[Unit](expr => a.program.stmts.append(verifProtobuf.Assign(vd.variable,expr)))
+        default =>
+            stdout.print("  other decl\n")
+
+// Analysis of bytecode
+def analyzeBytecode(wyb:Dyn):verifProtobuf.Program
+    val c: Int = wyb.getImportsCount()
+    def importLoop(i: Int, c: Int): Unit
+        if (i < c)
+            val imp = wyb.getImports(i)
+            val p: String = imp.getPath()
+            val n: String = imp.getName()
+            recur importLoop(i + 1, c)
+    importLoop(0, c)
+
+    val m: Int = wyb.getModulesCount()
+    def moduleLoop(i: Int): verifProtobuf.Program
+        val m = wyb.getModules(i)
+        val e = from_protobuf.expressionFromProtobuf(m.getValueModule().getExpression())
+        val p = m.getPath()
+        stdout.print(p)
+        stdout.println()
+        if (p.equals("toplevel"))
+            // we only analyze the top-level function, it's always last
+            stdout.print("analyzing...\n")
+            val v = verifAcc()
+            analyze(e,v)
+            stdout.print(verifProtobuf.showProgram(v.program))
+            stdout.print("methods with assert: ")
+            stdout.printInt(v.functions.length())
+            stdout.println()
+            v.program
+          else
+            recur moduleLoop(i - 1)
+    moduleLoop(m - 1)
+

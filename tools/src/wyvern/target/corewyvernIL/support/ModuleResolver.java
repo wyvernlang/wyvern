@@ -26,6 +26,7 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
+import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
@@ -463,7 +464,9 @@ public class ModuleResolver {
 
         String typeName = null;
         if (loadingType) {
-            typeName = moduleType.getStructuralType(ctx).getDeclTypes().get(0).getName();
+            List<DeclType> declTypes = moduleType.getStructuralType(ctx).getDeclTypes();
+            // the type is the last thing declared; e.g. there might be type aliases earlier
+            typeName = declTypes.get(declTypes.size() - 1).getName();
         }
         // if not a top-level module, make sure the module type is well-formed
         // top-level modules are exempted from this check because the module returns the thing

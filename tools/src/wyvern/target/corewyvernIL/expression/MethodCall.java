@@ -259,15 +259,18 @@ public class MethodCall extends Expression {
     }
 
     private static void checkUpperBound(TypeContext ctx,  List<ValueType> actualArgTypes) {
+        // see if this is a call with an effect parameter
         if (actualArgTypes.size() == 0) {
             return;
         }
 
+        // for effect parameters, the first formal parameter has a single decl type
         ValueType firstFormalArg = actualArgTypes.get(0);
-        if (firstFormalArg.getStructuralType(ctx).getDeclTypes().size() == 0) {
+        if (firstFormalArg.getStructuralType(ctx).getDeclTypes().size() != 1) {
             return;
         }
 
+        // which is an effect
         DeclType firstDeclType = firstFormalArg.getStructuralType(ctx).getDeclTypes().get(0);
         if (!(firstDeclType instanceof EffectDeclType)) {
             return;

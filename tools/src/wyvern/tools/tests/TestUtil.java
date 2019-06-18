@@ -44,13 +44,14 @@ import wyvern.tools.types.Type;
 import wyvern.tools.util.Pair;
 
 public final class TestUtil {
-    public static final String WYVERN_HOME = System.getenv("WYVERN_HOME");
-    public static final String BASE_PATH = WYVERN_HOME == null
-            ? "src/wyvern/tools/tests/" : WYVERN_HOME + "/tools/src/wyvern/tools/tests/";
+    public static final String WYVERN_HOME_FROM_ENV = System.getenv("WYVERN_HOME");
+    public static final String WYVERN_HOME = WYVERN_HOME_FROM_ENV == null ? "../" : WYVERN_HOME_FROM_ENV;
+    public static final String BASE_PATH = WYVERN_HOME_FROM_ENV == null
+            ? "src/wyvern/tools/tests/" : WYVERN_HOME_FROM_ENV + "/tools/src/wyvern/tools/tests/";
     public static final String STDLIB_PATH = BASE_PATH + "stdlib/";
-    public static final String LIB_PATH = WYVERN_HOME == null ? "../stdlib/" : WYVERN_HOME + "/stdlib/";
-    public static final String EXAMPLES_PATH = WYVERN_HOME == null ? "../examples/" : WYVERN_HOME + "/examples/";
-    public static final String BACKEND_PATH = WYVERN_HOME == null ? "../backend/src/" : WYVERN_HOME + "/backend/src/";
+    public static final String LIB_PATH = WYVERN_HOME + "/stdlib/";
+    public static final String EXAMPLES_PATH = WYVERN_HOME + "/examples/";
+    public static final String BACKEND_PATH = WYVERN_HOME + "/backend/src/";
     private static final String PLATFORM_PATH = BASE_PATH + "platform/java/stdlib/";
 
     private TestUtil() { }
