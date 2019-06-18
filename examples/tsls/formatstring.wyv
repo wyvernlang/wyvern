@@ -19,10 +19,11 @@ type FormatString = String
             val rest : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.after())
             
             (prefixString.isDefined).ifTrue(
-                () => ast.call(ast.string(prefixString.get()), "+", {(parseExpr(rest.getOrElse(() => ""), ctx)}).getOrElse(() => ast.string(""))),
+                () => option.Some[AST](ast.call(ast.string(prefixString.get()), "+", {(parseExpr(rest.getOrElse(() => ""), ctx)).getOrElse(() => ast.string(""))})),
                 () => parseExpr(rest.getOrElse(() => ""), ctx)
             )
             
+            //option.Some[AST](ast.call(ast.string("hello "), "+", {ast.string("world!")}))
             //option.Some[AST](ast.string(input))
 
 
