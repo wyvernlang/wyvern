@@ -8,8 +8,40 @@ import metadata wyvern.collections.list
 type AST = ast.AST
 
 val prefixRegex : regex.Regex = regex("[^%]+")
+
+// recursively determines position of the rbrace ending the expression, -1 if not found
+def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
+    (input.length() == pos).ifTrue(
+        () => -1,
+        () => (input.charAt(pos) == #"}").ifTrue(
+            () => (lbraceCt == 0).ifTrue(
+                () => pos,
+                () => getExprPos(input, lbraceCt - 1, pos+1)
+            ),
+            () => getExprPos(input, lbraceCt, pos+1)
+        )
+    )
+    
 def parseExpr(input : String, ctx: system.Context) : option.Option[AST]
-    option.Some[AST](ast.string(input)) //temporary placeholder
+    //if %{...}, we want to get the contents of the braces
+    val normal : option.Option[String] = regex("%\\{").findPrefixMatchOf(input).map[String]((m:regex.Match) => m.after())
+    //val end = getExprPos(normal.get(), 0, 0)
+    (normal.isDefined).ifTrue(
+        () => (getExprPos(normal.get(), 0, 0) == -1).ifTrue(
+            () => option.Some[AST](ast.string("parsing error")),//continue parsing or throw error
+            () => option.Some[AST](ast.parseExpression(normal.get().substring(0,getExprPos(normal.get(), 0, 0)), ctx))
+            ),
+        //if nothing found then default to whole string?
+        () => option.Some[AST](ast.string("the other one"))
+    )
+    
+    //regex("[^\\}]*(\\{.*\\})*[^\\}]*")
+    //if %/d./d, ensure formatted float
+    
+    // %/d
+    
+    // if none of the above, just append % and continue parsing
+    //option.Some[AST](ast.string(input))
 
 type FormatString = String
     metadata new

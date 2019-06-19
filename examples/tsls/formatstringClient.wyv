@@ -12,3 +12,6 @@ printf(~)
 
 //need to deal with leading whitespace for parsing; maybe use ` to indicate
 //beginning of format string or something?
+
+printf(~)
+ Hello %{"string!"}
