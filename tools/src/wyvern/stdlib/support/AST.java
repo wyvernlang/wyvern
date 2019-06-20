@@ -437,5 +437,10 @@ public class AST {
         }
         return count;
     }
+    
+    public ValueType getObjectType(ObjectValue o, GenContext ctx) {
+        IExpr expr = getExpr(o);
+        return expr.typeCheck(ctx, null);
+    }
 
 }

@@ -156,3 +156,7 @@ def genIdent() : String = utils.genIdent()
 
 def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = new
   val ast:Unit = utils.let(ident, bindingType, bindingValue, inExpr)
+
+def getType(e : AST, ctx : system.Context) : Type
+  val ctxDyn:Dyn = ctx
+  utils.getObjectType(e, ctxDyn)
