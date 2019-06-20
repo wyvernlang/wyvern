@@ -267,6 +267,10 @@ public final class TestUtil {
     }
 
     public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {
+        doTestScriptModularly(searchPath, qualifiedName, expectedType, expectedValue, true);
+    }
+    public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue, boolean doRun)
+            throws ParseException {
         InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(searchPath), new File(LIB_PATH));
         final Module module = state.getResolver().resolveModule(qualifiedName, true, false);
         IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
@@ -275,6 +279,9 @@ public final class TestUtil {
     }
 
     public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
+        doChecks(program, expectedType, expectedValue, true);
+    }
+    public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue, boolean doRun) {
         // resolveModule already typechecked, but we'll do it again to verify the type
         TypeContext ctx = Globals.getStandardTypeContext();
         ValueType t = null;
@@ -292,9 +299,11 @@ public final class TestUtil {
         }
 
         // check the result
-        Value v = program.interpret(Globals.getStandardEvalContext());
-        if (expectedValue != null) {
-            Assert.assertEquals(expectedValue, v);
+        if (doRun) {
+            Value v = program.interpret(Globals.getStandardEvalContext());
+            if (expectedValue != null) {
+                Assert.assertEquals(expectedValue, v);
+            }
         }
     }
 
