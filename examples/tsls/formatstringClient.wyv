@@ -14,4 +14,4 @@ printf(~)
 //beginning of format string or something?
 
 printf(~)
- Hello %{"string!"}
+ Hello %{"string!"}%{" mm"} and %{ "another string!" }

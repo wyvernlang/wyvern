@@ -7,6 +7,14 @@ import metadata wyvern.collections.list
 
 type AST = ast.AST
 
+type ParsedExpr
+    def expr():option.Option[AST]
+    def rest():String
+
+def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
+    def expr():option.Option[AST] = e
+    def rest():String = r
+
 val prefixRegex : regex.Regex = regex("[^%]+")
 
 // recursively determines position of the rbrace ending the expression, -1 if not found
@@ -22,20 +30,21 @@ def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
         )
     )
     
-def parseExpr(input : String, ctx: system.Context) : option.Option[AST]
+def parseExpr(input : String, ctx: system.Context) : ParsedExpr
     //if %{...}, we want to get the contents of the braces
     val normal : option.Option[String] = regex("%\\{").findPrefixMatchOf(input).map[String]((m:regex.Match) => m.after())
     //val end = getExprPos(normal.get(), 0, 0)
     (normal.isDefined).ifTrue(
         () => (getExprPos(normal.get(), 0, 0) == -1).ifTrue(
-            () => option.Some[AST](ast.string("parsing error")),//continue parsing or throw error
-            () => option.Some[AST](ast.parseExpression(normal.get().substring(0,getExprPos(normal.get(), 0, 0)), ctx))
+            () => makeParsedExpr(option.None[AST](), normal.get()), //error?
+            //option.Some[AST](ast.string("parsing error")),//continue parsing or throw error
+            () => makeParsedExpr(option.Some[AST](ast.parseExpression(normal.get().substring(0,getExprPos(normal.get(), 0, 0)), ctx)), normal.get().substring(getExprPos(normal.get(), 0, 0)+1, normal.get().length()))
+            //option.Some[AST](ast.parseExpression(normal.get().substring(0,getExprPos(normal.get(), 0, 0)), ctx))
             ),
         //if nothing found then default to whole string?
-        () => option.Some[AST](ast.string("the other one"))
+        () => makeParsedExpr(option.None[AST](), input) //WARNING probably loops //option.Some[AST](ast.string("nonstandard formatstring"))
     )
     
-    //regex("[^\\}]*(\\{.*\\})*[^\\}]*")
     //if %/d./d, ensure formatted float
     
     // %/d
@@ -49,12 +58,15 @@ type FormatString = String
             val regxMatch : option.Option[regex.Match] = prefixRegex.findPrefixMatchOf(input)
             val prefixString : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.matched())
             val rest : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.after())
-            
-            (prefixString.isDefined).ifTrue(
-                () => option.Some[AST](ast.call(ast.string(prefixString.get()), "+", {(parseExpr(rest.getOrElse(() => ""), ctx)).getOrElse(() => ast.string(""))})),
-                () => parseExpr(rest.getOrElse(() => ""), ctx)
+            (input == "").ifTrue(
+                () => option.Some[AST](ast.string("")),
+                () => (prefixString.isDefined).ifTrue(
+                    () => option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {(parseExpr(rest.getOrElse(() => ""), ctx)).expr().getOrElse(() => ast.string(""))}), "+", {this.parseTSL(parseExpr(rest.getOrElse(() => ""), ctx).rest(), ctx).getOrElse(() => ast.string(""))})),
+                    () => option.Some[AST](ast.call(parseExpr(rest.getOrElse(() => input), ctx).expr().getOrElse(() => ast.string("")), "+", {this.parseTSL(parseExpr(rest.getOrElse(() => input), ctx).rest(), ctx).getOrElse(() => ast.string(""))}))
+						//g = parseExpr(rest.getOrElse(() => ""), ctx)
+                        //option.Some[AST](ast.call(g.expr().getOrElse(() => ast.string("")), "+", {this.parseTSL(g.rest(), ctx).getOrElse(() => ast.string(""))}))
+                )
             )
-            
             //option.Some[AST](ast.call(ast.string("hello "), "+", {ast.string("world!")}))
             //option.Some[AST](ast.string(input))
 
@@ -99,37 +111,3 @@ def parseExpr(input:String):option.Option[AST]
 // shouldn't need to account for {} in primitive Wyvern expressions?? but maybe list methods...
 // ^maybe account for this later
 // still need to account for escape characters
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-/*
-EXAMPLES
-printf(~)
-    some sort of dollar amt $%{5} -> some sort of dollar amt $5
-    floating %.2{6.0} -> floating 6.00
-    
-    (val str = "bar")
-    foo%{str}
-    foo%{"bar"}
-
-not really much use for quotes
-use %__ identifiers to detail how to print the data
-formatting specs based on C
-
-
-*/
-
-
