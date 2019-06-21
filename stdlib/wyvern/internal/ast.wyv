@@ -159,4 +159,5 @@ def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : 
 
 def getType(e : AST, ctx : system.Context) : Type
   val ctxDyn:Dyn = ctx
-  utils.getObjectType(e, ctxDyn)
+  new
+    val typ:Unit = utils.getObjectType(e, ctxDyn)
