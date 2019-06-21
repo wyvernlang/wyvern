@@ -37,7 +37,7 @@ def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
 // takes in an expression as a string and returns a string wrapped in an AST
 def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
     val exp : AST = ast.parseExpression(input, ctx)
-    val ty = ast.getType(exp, ctx)
+    val ty : ast.Type = ast.getType(exp, ctx)
     //if (ty == ast.types.string())
     option.Some[AST](exp)
     //String.ofInt(x)
@@ -68,16 +68,15 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
                                 floatstring.substring(floatstringend+1, floatstring.length()))
             )
           else
-            // if nothing found then default to whole string
-            makeParsedExpr(option.None[AST](), input) //WARNING might loop
+            // if nothing found then 5 should've been escaped, so throw error
+            makeParsedExpr(option.None[AST](), input)
     
     
     //if %/d./d, ensure formatted float
     
     // %/d
     
-    // if none of the above, just append % and continue parsing
-    //option.Some[AST](ast.string(input))
+    // if none of the above, return option.None[AST]
 
 
 //TODO: if parseExpr.expr() == option.None[AST], then return option.None[AST]
@@ -92,11 +91,28 @@ type FormatString = String
                 option.Some[AST](ast.string(""))
               else
                 if (prefixString.isDefined)
-                    val g = parseExpr(rest.getOrElse(() => ""), ctx)
-                    option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().getOrElse(() => ast.string(""))}), "+", {this.parseTSL(g.rest(), ctx).getOrElse(() => ast.string(""))}))
+                    if (rest.get() == "")
+                        option.Some[AST](ast.string(prefixString.get()))
+                      else
+                        val g : ParsedExpr = parseExpr(rest.getOrElse(() => ""), ctx)
+                        if (g.expr().isDefined)
+                            val recursiveCall = this.parseTSL(g.rest(), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().get()}), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]() //recursive call gives None
+                          else
+                            option.None[AST]() //cannot parse expression
                   else
-                    val g = parseExpr(rest.getOrElse(() => input), ctx)
-                    option.Some[AST](ast.call(g.expr().getOrElse(() => ast.string("")), "+", {this.parseTSL(g.rest(), ctx).getOrElse(() => ast.string(""))}))
+                    val g : ParsedExpr = parseExpr(rest.getOrElse(() => input), ctx)
+                    if (g.expr().isDefined)
+                        val recursiveCall = this.parseTSL(g.rest(), ctx)
+                        if (recursiveCall.isDefined)
+                            option.Some[AST](ast.call(g.expr().get(), "+", {recursiveCall.get()}))
+                          else
+                            option.None[AST]() //recursive call gives None
+                      else
+                        option.None[AST]() //cannot parse expression
                 
             
 
