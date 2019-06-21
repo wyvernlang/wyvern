@@ -4,6 +4,8 @@ import wyvern.ast
 import wyvern.option
 import wyvern.util.matching.regex
 import metadata wyvern.collections.list
+import wyvern.Int
+import wyvern.String
 
 type AST = ast.AST
 
@@ -18,7 +20,8 @@ def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
 val prefixRegex : regex.Regex = regex("[^%]+")
 
 // recursively determines position of the rbrace ending the expression, -1 if not found
-// TODO: could also be part of a string
+// TODO: could also be part of a string, use inString : bool?
+// TODO: ignore escape characters (\{, \})
 def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
     (input.length() == pos).ifTrue(
         () => -1,
@@ -30,19 +33,43 @@ def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
             () => getExprPos(input, lbraceCt, pos+1)
         )
     )
+
+// takes in an expression as a string and returns a string wrapped in an AST
+def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
+    val exp : AST = ast.parseExpression(input, ctx)
+    val ty = ast.getType(exp, ctx)
+    //if (ty == ast.types.string())
+    option.Some[AST](exp)
+    //String.ofInt(x)
+    //String.ofFormattedFloat(format: String, f: Float) wait might need to work around this
+    //else
+    //option.None[AST]()
     
-def parseExpr(input : String, ctx: system.Context) : ParsedExpr
-    //if %{...}, we want to get the contents of the braces
+
+def parseExpr(input : String, ctx : system.Context) : ParsedExpr
+    // if %{...}, we want to get the contents of the braces
     val normal : option.Option[String] = regex("%\\{").findPrefixMatchOf(input).map[String]((m:regex.Match) => m.after())
     if (normal.isDefined)
-        val eoparse = getExprPos(normal.get(), 0, 0)
+        val eoparse : Int = getExprPos(normal.get(), 0, 0)
         (eoparse == -1).ifTrue(
-            () => makeParsedExpr(option.None[AST](), normal.get()),
-            () => makeParsedExpr(option.Some[AST](ast.parseExpression(normal.get().substring(0,eoparse), ctx)), normal.get().substring(eoparse+1, normal.get().length()))
+            () => makeParsedExpr(option.None[AST](), normal.get()), //technically don't need normal
+            () => makeParsedExpr(convStringAST(normal.get().substring(0,eoparse), ctx, -1), normal.get().substring(eoparse+1, normal.get().length()))
         )
       else
-        //if nothing found then default to whole string
-        makeParsedExpr(option.None[AST](), input) //WARNING probably loops
+        val floatspec : option.Option[regex.Match] = regex("%\\.\\d+\\{").findPrefixMatchOf(input)
+        val formatspec : option.Option[String] = floatspec.map[String]((m:regex.Match) => m.matched())
+        if (floatspec.isDefined)
+            val precision : Int = Int.from(formatspec.get().substring(2, formatspec.get().length()-1))
+            val floatstring : String = floatspec.get().after()
+            val floatstringend : Int = getExprPos(floatstring, 0, 0)
+            (floatstringend == -1).ifTrue(
+                () => makeParsedExpr(option.None[AST](), floatstring),
+                () => makeParsedExpr(convStringAST(floatstring.substring(0, floatstringend), ctx, precision),
+                                floatstring.substring(floatstringend+1, floatstring.length()))
+            )
+          else
+            // if nothing found then default to whole string
+            makeParsedExpr(option.None[AST](), input) //WARNING might loop
     
     
     //if %/d./d, ensure formatted float
@@ -52,6 +79,9 @@ def parseExpr(input : String, ctx: system.Context) : ParsedExpr
     // if none of the above, just append % and continue parsing
     //option.Some[AST](ast.string(input))
 
+
+//TODO: if parseExpr.expr() == option.None[AST], then return option.None[AST]
+//TODO: ignore escape character (\%)
 type FormatString = String
     metadata new
         def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
