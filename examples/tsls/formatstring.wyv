@@ -18,6 +18,7 @@ def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
 val prefixRegex : regex.Regex = regex("[^%]+")
 
 // recursively determines position of the rbrace ending the expression, -1 if not found
+// TODO: could also be part of a string
 def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
     (input.length() == pos).ifTrue(
         () => -1,
@@ -33,17 +34,16 @@ def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
 def parseExpr(input : String, ctx: system.Context) : ParsedExpr
     //if %{...}, we want to get the contents of the braces
     val normal : option.Option[String] = regex("%\\{").findPrefixMatchOf(input).map[String]((m:regex.Match) => m.after())
-    //val end = getExprPos(normal.get(), 0, 0)
-    (normal.isDefined).ifTrue(
-        () => (getExprPos(normal.get(), 0, 0) == -1).ifTrue(
-            () => makeParsedExpr(option.None[AST](), normal.get()), //error?
-            //option.Some[AST](ast.string("parsing error")),//continue parsing or throw error
-            () => makeParsedExpr(option.Some[AST](ast.parseExpression(normal.get().substring(0,getExprPos(normal.get(), 0, 0)), ctx)), normal.get().substring(getExprPos(normal.get(), 0, 0)+1, normal.get().length()))
-            //option.Some[AST](ast.parseExpression(normal.get().substring(0,getExprPos(normal.get(), 0, 0)), ctx))
-            ),
-        //if nothing found then default to whole string?
-        () => makeParsedExpr(option.None[AST](), input) //WARNING probably loops //option.Some[AST](ast.string("nonstandard formatstring"))
-    )
+    if (normal.isDefined)
+        val eoparse = getExprPos(normal.get(), 0, 0)
+        (eoparse == -1).ifTrue(
+            () => makeParsedExpr(option.None[AST](), normal.get()),
+            () => makeParsedExpr(option.Some[AST](ast.parseExpression(normal.get().substring(0,eoparse), ctx)), normal.get().substring(eoparse+1, normal.get().length()))
+        )
+      else
+        //if nothing found then default to whole string
+        makeParsedExpr(option.None[AST](), input) //WARNING probably loops
+    
     
     //if %/d./d, ensure formatted float
     
@@ -58,17 +58,17 @@ type FormatString = String
             val regxMatch : option.Option[regex.Match] = prefixRegex.findPrefixMatchOf(input)
             val prefixString : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.matched())
             val rest : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.after())
-            (input == "").ifTrue(
-                () => option.Some[AST](ast.string("")),
-                () => (prefixString.isDefined).ifTrue(
-                    () => option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {(parseExpr(rest.getOrElse(() => ""), ctx)).expr().getOrElse(() => ast.string(""))}), "+", {this.parseTSL(parseExpr(rest.getOrElse(() => ""), ctx).rest(), ctx).getOrElse(() => ast.string(""))})),
-                    () => option.Some[AST](ast.call(parseExpr(rest.getOrElse(() => input), ctx).expr().getOrElse(() => ast.string("")), "+", {this.parseTSL(parseExpr(rest.getOrElse(() => input), ctx).rest(), ctx).getOrElse(() => ast.string(""))}))
-						//g = parseExpr(rest.getOrElse(() => ""), ctx)
-                        //option.Some[AST](ast.call(g.expr().getOrElse(() => ast.string("")), "+", {this.parseTSL(g.rest(), ctx).getOrElse(() => ast.string(""))}))
-                )
-            )
-            //option.Some[AST](ast.call(ast.string("hello "), "+", {ast.string("world!")}))
-            //option.Some[AST](ast.string(input))
+            if (input == "")
+                option.Some[AST](ast.string(""))
+              else
+                if (prefixString.isDefined)
+                    val g = parseExpr(rest.getOrElse(() => ""), ctx)
+                    option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().getOrElse(() => ast.string(""))}), "+", {this.parseTSL(g.rest(), ctx).getOrElse(() => ast.string(""))}))
+                  else
+                    val g = parseExpr(rest.getOrElse(() => input), ctx)
+                    option.Some[AST](ast.call(g.expr().getOrElse(() => ast.string("")), "+", {this.parseTSL(g.rest(), ctx).getOrElse(() => ast.string(""))}))
+                
+            
 
 
 
