@@ -2,6 +2,9 @@ require stdout
 
 import metadata tsls.formatstring
 
+//need to deal with leading whitespace for parsing; maybe use ` to indicate
+//beginning of format string or something?
+
 def printf(str:formatstring.FormatString):Unit
     stdout.print(str)
     stdout.println()
@@ -10,8 +13,5 @@ def printf(str:formatstring.FormatString):Unit
 printf(~)
  Hello World!
 
-//need to deal with leading whitespace for parsing; maybe use ` to indicate
-//beginning of format string or something?
-
 printf(~)
- Hello %{"string!"}%{" mm"} and %{ "another string!" }
+ Hello %{"string!"}%{" {mm}"} and %{ "another string!" }

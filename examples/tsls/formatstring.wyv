@@ -17,20 +17,26 @@ def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
     def expr():option.Option[AST] = e
     def rest():String = r
 
-val prefixRegex : regex.Regex = regex("[^%]+")
-
 // recursively determines position of the rbrace ending the expression, -1 if not found
-// TODO: could also be part of a string, use inString : bool?
 // TODO: ignore escape characters (\{, \})
-def getExprPos(input : String, lbraceCt : Int, pos : Int) : Int
+def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : Int
     (input.length() == pos).ifTrue(
         () => -1,
         () => (input.charAt(pos) == #"}").ifTrue(
-            () => (lbraceCt == 0).ifTrue(
+            () => (lbraceCt == 0 && !inString).ifTrue(
                 () => pos,
-                () => getExprPos(input, lbraceCt - 1, pos+1)
+                () => inString.ifTrue(
+					() => getExprPos(input, lbraceCt, inString, pos+1),
+					() => getExprPos(input, lbraceCt - 1, inString, pos+1)
+				)
             ),
-            () => getExprPos(input, lbraceCt, pos+1)
+            () => (input.charAt(pos) == #"\"").ifTrue(
+				() => getExprPos(input, lbraceCt, !inString, pos+1),
+				() => (input.charAt(pos) == #"{" && !inString).ifTrue(
+					() => getExprPos(input, lbraceCt+1, inString, pos+1),
+					() => getExprPos(input, lbraceCt, inString, pos+1)
+				)
+			)
         )
     )
 
@@ -50,9 +56,9 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
     // if %{...}, we want to get the contents of the braces
     val normal : option.Option[String] = regex("%\\{").findPrefixMatchOf(input).map[String]((m:regex.Match) => m.after())
     if (normal.isDefined)
-        val eoparse : Int = getExprPos(normal.get(), 0, 0)
+        val eoparse : Int = getExprPos(normal.get(), 0, false, 0)
         (eoparse == -1).ifTrue(
-            () => makeParsedExpr(option.None[AST](), normal.get()), //technically don't need normal
+            () => makeParsedExpr(option.None[AST](), normal.get()),
             () => makeParsedExpr(convStringAST(normal.get().substring(0,eoparse), ctx, -1), normal.get().substring(eoparse+1, normal.get().length()))
         )
       else
@@ -61,7 +67,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
         if (floatspec.isDefined)
             val precision : Int = Int.from(formatspec.get().substring(2, formatspec.get().length()-1))
             val floatstring : String = floatspec.get().after()
-            val floatstringend : Int = getExprPos(floatstring, 0, 0)
+            val floatstringend : Int = getExprPos(floatstring, 0, false, 0)
             (floatstringend == -1).ifTrue(
                 () => makeParsedExpr(option.None[AST](), floatstring),
                 () => makeParsedExpr(convStringAST(floatstring.substring(0, floatstringend), ctx, precision),
@@ -78,8 +84,11 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
     
     // if none of the above, return option.None[AST]
 
+//val prefixRegex : regex.Regex = regex("((\\%)|[^%])+")
+//alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL
+val prefixRegex : regex.Regex = regex("[^%]+")
 
-//TODO: if parseExpr.expr() == option.None[AST], then return option.None[AST]
+//include \% + other characters, except pure %
 //TODO: ignore escape character (\%)
 type FormatString = String
     metadata new
