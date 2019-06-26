@@ -158,4 +158,14 @@ public class ExampleTests {
         Util.unitValue());
   }
 
+  @Test
+  public void testArrowModuleClient1() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "modules.arrowModuleClient1", Util.unitType(),
+        Util.unitValue());
+  }
+    @Test
+   public void testArrowModuleClient2() throws ParseException {
+     TestUtil.doTestScriptModularly(PATH, "modules.arrowModuleClient2", Util.unitType(),
+         Util.unitValue());
+   }
 }
