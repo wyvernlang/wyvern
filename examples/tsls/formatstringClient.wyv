@@ -15,3 +15,7 @@ printf(~)
 
 printf(~)
  Hello %{"string!"}%{" {mm}"} and %{ "another string!" }
+ 
+val x = "xvalue"
+printf(~)
+ %{x}

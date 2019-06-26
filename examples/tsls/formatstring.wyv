@@ -18,32 +18,40 @@ def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
     def rest():String = r
 
 // recursively determines position of the rbrace ending the expression, -1 if not found
-// TODO: ignore escape characters (\{, \})
+// TODO: ignore escape characters (\{, \}) (do we actually need this??)
 def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : Int
-    (input.length() == pos).ifTrue(
-        () => -1,
-        () => (input.charAt(pos) == #"}").ifTrue(
-            () => (lbraceCt == 0 && !inString).ifTrue(
-                () => pos,
-                () => inString.ifTrue(
-					() => getExprPos(input, lbraceCt, inString, pos+1),
-					() => getExprPos(input, lbraceCt - 1, inString, pos+1)
-				)
-            ),
-            () => (input.charAt(pos) == #"\"").ifTrue(
-				() => getExprPos(input, lbraceCt, !inString, pos+1),
-				() => (input.charAt(pos) == #"{" && !inString).ifTrue(
-					() => getExprPos(input, lbraceCt+1, inString, pos+1),
-					() => getExprPos(input, lbraceCt, inString, pos+1)
-				)
-			)
-        )
-    )
+    if (input.length() == pos)
+        -1
+      else
+        val c = input.charAt(pos)
+        if (c == #"}" || c == #"{" || c == #"\"")
+            (c == #"}").ifTrue(
+                () => (lbraceCt == 0 && !inString).ifTrue(
+                    () => pos,
+                    () => inString.ifTrue(
+                        () => getExprPos(input, lbraceCt, inString, pos+1),
+                        () => (input.charAt(pos-1) == #"\\").ifTrue(
+                            () => getExprPos(input, lbraceCt, inString, pos+1),
+                            () => getExprPos(input, lbraceCt - 1, inString, pos+1)
+                        )
+                    )
+                ),
+                () => (c == #"\"").ifTrue(
+                    () => getExprPos(input, lbraceCt, !inString, pos+1),
+                    () => (c == #"{" && !inString).ifTrue(
+                        () => getExprPos(input, lbraceCt+1, inString, pos+1),
+                        () => getExprPos(input, lbraceCt, inString, pos+1)
+                    )
+                )
+            )
+          else
+            getExprPos(input, lbraceCt, inString, pos+1)
 
 // takes in an expression as a string and returns a string wrapped in an AST
 def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
     val exp : AST = ast.parseExpression(input, ctx)
     val ty : ast.Type = ast.getType(exp, ctx)
+    //layout: if floatPrecision != -1, check type float and format, otws format as string
     //if (ty == ast.types.string())
     option.Some[AST](exp)
     //String.ofInt(x)
@@ -86,6 +94,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
 
 //val prefixRegex : regex.Regex = regex("((\\%)|[^%])+")
 //alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL
+//would need to replace \ in string even if using regex
 val prefixRegex : regex.Regex = regex("[^%]+")
 
 //include \% + other characters, except pure %
