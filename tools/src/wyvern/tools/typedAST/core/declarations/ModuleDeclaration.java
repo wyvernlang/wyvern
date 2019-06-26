@@ -47,7 +47,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     private final List<ImportDeclaration> imports;
     private boolean isAnnotated;
     private EffectSet effectSet;
-    //private final List<GenericParameter> generics;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
                              TypedAST inner, NamedType type, FileLocation location, boolean isResource,
@@ -226,20 +225,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     private Module resolveLoadedTypes(GenContext ctx, String typeName) {
       Module lt = ctx.getInterpreterState().getResolver().resolveType(typeName);
       return lt;
-    }
-    
-    private wyvern.target.corewyvernIL.type.ValueType getType(GenContext ctx,
-            List<Module> loadedTypes, FileLocation location, String name) {
-        wyvern.target.corewyvernIL.type.ValueType type = null;
-        if (ctx.isPresent(name, false)) {
-            type = ctx.lookupType(name, location);
-        } else {
-            Module lt = ctx.getInterpreterState().getResolver().resolveType(name);
-            type = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName());
-            //bindings.add(binding);
-            loadedTypes.add(lt);
-        }
-        return type;
     }
 
     public boolean isResource() {
