@@ -1,0 +1,6 @@
+module def arrowModuleImplementation2(methodToRun: String -> Int)
+import debug
+def run(): Unit
+  debug.printInt(methodToRun("Hello, World!"))
+  debug.println()
+  debug.print("arrowModuleImplementation2\n")

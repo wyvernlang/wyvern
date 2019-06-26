@@ -1,0 +1,4 @@
+require stdout
+import modules.arrowModuleImplementation2
+val method = arrowModuleImplementation2((x: String) => x.length())
+method.run()
