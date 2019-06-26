@@ -9,6 +9,9 @@ import wyvern.tools.generics.GenericArgument;
 import wyvern.tools.generics.GenericParameter;
 
 interface ASTBuilder<AST, Type> {
+    AST recDecl(AST body);
+    AST recConstructDecl(String name, Type type, AST body, FileLocation loc);
+    
     AST sequence(AST t1, AST t2, boolean inModule);
 
     AST script(List<AST> requires, List<AST> imports, AST body);

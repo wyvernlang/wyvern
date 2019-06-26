@@ -13,6 +13,8 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
+import wyvern.target.corewyvernIL.decl.RecConstructDeclaration;
+import wyvern.target.corewyvernIL.decl.RecDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
@@ -401,4 +403,16 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     public ASTNode visit(PSVState state, FloatLiteral flt)  {
       return flt;
     }
+
+  @Override
+  public ASTNode visit(PSVState state, RecDeclaration recDecl) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ASTNode visit(PSVState state, RecConstructDeclaration recConstructDecl) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

@@ -55,6 +55,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 		  case DEF:
 		  case NEW:
 		  case MATCH:
+		  case REC:
 		  case EQARROW:
 		  		return false;
 		  default:
@@ -196,14 +197,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
 	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
-	terminal Token assertKwd_t 	::= /assert/ in (keywds) {: RESULT = token(ASSERT,lexeme); :};
-	
-	// inserted while keyword
-	//terminal Token whileKwd_t 	::= /while/ in (keywds) {: RESULT = token(WHILE,lexeme); :};
-	
-	// inserted forward keyword
+	terminal Token assertKwd_t 	::= /assert/ in (keywds) {: RESULT = token(ASSERT,lexeme); :}; 
+	terminal Token recKwd_t::= /rec/ in (keywds) {: RESULT = token(REC,lexeme); flagTok = RESULT; :};
 	terminal Token forwardKwd_t::= /forward/ in (keywds) {: RESULT = token(FORWARD,lexeme); :};
-	
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
@@ -422,10 +418,9 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | defKwd_t:t {: RESULT = t; :}
 	       | varKwd_t:t {: RESULT = t; :}
 	       | assertKwd_t:t {: RESULT = t; :}
-	      // | whileKwd_t:t {: RESULT = t; :}
+	       | recKwd_t:t {: RESULT = t; :}
 	       | forwardKwd_t:t {: RESULT = t; :}
 	       | toKwd_t:t {: RESULT = t; :}
-//	       | fnKwd_t:t {: RESULT = t; :}
 	       | requireKwd_t:t {: RESULT = t; :}
 	       | metadataKwd_t:t {: RESULT = t; :}
 	       | newKwd_t:t {: RESULT = t; :}
@@ -443,7 +438,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | effectKwd_t:t {: RESULT = t; :}
 	       | recurKwd_t:t {: RESULT = t; :}
 	       ;
-//	       | :t {: RESULT = t; :}
 
 	literal ::= decimalInteger_t:t {: RESULT = t; :}
 	          | floatingPoint_t:t {: RESULT = t; :}

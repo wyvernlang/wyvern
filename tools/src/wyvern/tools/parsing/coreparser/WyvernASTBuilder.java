@@ -57,8 +57,20 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.TypeExtension;
+import wyvern.tools.typedAST.core.declarations.RecConstructDeclaration;
+import wyvern.tools.typedAST.core.declarations.RecDeclaration;
 
 public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
+
+    @Override
+    public TypedAST recDecl(TypedAST body) {
+      return new RecDeclaration(body);
+    }
+
+    @Override
+    public TypedAST recConstructDecl(String name, Type type, TypedAST body, FileLocation loc) {
+      return new RecConstructDeclaration(name, type, body, loc);
+    }
 
     /* Weirdness: DeclSequence typechecks everything simultaneously without
      * extending the environment, unless it's inside a module.  So if we're

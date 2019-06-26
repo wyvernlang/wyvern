@@ -33,8 +33,12 @@ import wyvern.tools.typedAST.core.values.FloatConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
 import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.core.declarations.RecConstructDeclaration;
+import wyvern.tools.typedAST.core.declarations.RecDeclaration;
 
 public abstract class TypedASTVisitor<S, T> {
+    public abstract T visit(S state, RecConstructDeclaration ast);
+    public abstract T visit(S state, RecDeclaration ast);
     public abstract T visit(S state, NameBindingImpl ast);
     public abstract T visit(S state, DeclSequence ast);
     public abstract T visit(S state, DefDeclaration ast);

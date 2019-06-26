@@ -9,6 +9,8 @@ import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
+import wyvern.target.corewyvernIL.decl.RecDeclaration;
+import wyvern.target.corewyvernIL.decl.RecConstructDeclaration;
 import wyvern.target.corewyvernIL.decltype.AbstractTypeMember;
 import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
@@ -41,6 +43,8 @@ import wyvern.tools.interop.FFI;
 import wyvern.tools.interop.FFIImport;
 
 public abstract class ASTVisitor<S, T> {
+    public abstract T visit(S state, RecDeclaration recDecl);
+    public abstract T visit(S state, RecConstructDeclaration recConstructDecl);
     public abstract T visit(S state, New newExpr);
     public abstract T visit(S state, Case c);
     public abstract T visit(S state, MethodCall methodCall);

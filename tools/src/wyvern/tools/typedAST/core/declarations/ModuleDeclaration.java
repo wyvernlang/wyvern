@@ -32,6 +32,8 @@ import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 import wyvern.tools.types.NamedType;
+import wyvern.tools.types.Type;
+import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.util.Pair;
 
 public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAST {
@@ -126,8 +128,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         // The real work is done by the sequence itself.
         return normalSeq.generateModuleIL(ctx, true);
     }
-
-
+    
     /**
      * Computes and returns the set of arguments this module requires.
      *
@@ -136,21 +137,97 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
      *
      * @param ctx
      * @param loadedTypes
-     * @return
+     * @return a list of formal arguments
      */
+    
     private List<FormalArg> getTypes(GenContext ctx, List<Module> loadedTypes) {
-        /* generate the formal arguments by requiring sequence */
-        List<FormalArg> types = new LinkedList<FormalArg>();
-        for (NameBindingImpl a : args) {
-            String typeName = ((NamedType) a.getType()).getFullName();
-            wyvern.target.corewyvernIL.type.ValueType type = getType(ctx,
-                    loadedTypes, null, typeName);
-            types.add(new FormalArg(a.getName(), type));
+      /* generate the formal arguments by requiring sequence */
+      List<FormalArg> types = new LinkedList<FormalArg>();
+      
+      for (NameBindingImpl arg : args) {
+        types.add(getType(ctx, loadedTypes, null, arg));
+      }
+      
+      return types;
+    }
+    
+    private FormalArg getType(GenContext ctx, List<Module> loadedTypes, FileLocation location, NameBindingImpl arg) {
+      // initialize resulting type to null.
+      FormalArg resultType = null;
+      
+      // get the type of the argument
+      Object argType = arg.getType();
+      
+      // initialize typeName
+      String typeName;
+      
+      if (argType instanceof Arrow) {
+        // case when argType is an Arrow type (a lambda expression).
+        
+        // obtain the value type from Arrow type.
+        ValueType intermediateLanguageType = ((Arrow) argType).getILType(ctx);
+        resultType = new FormalArg(arg.getName(), intermediateLanguageType);
+        
+        
+        // obtain the type of the formal arguments (of arrow type).
+        List<Type> list = ((Arrow) argType).getArguments();
+        
+        // obtain the result type (of arrow type).
+        Type arrowResultType = ((Arrow) argType).getResult();
+        
+        // loop through all the formal arguments and return arguments and add them to loadedTypes list.
+        for (Type argument : list) {
+          typeName = ((NamedType) argument).getFullName();
+          if (!ctx.isPresent(typeName, false)) {
+            // case when the context is not present.
+            Module lt = resolveLoadedTypes(ctx, typeName);
+            loadedTypes.add(lt);
+          }
         }
-        return types;
+        
+        // add result type of the arrow type to loadedTypes list.
+        typeName = ((NamedType) arrowResultType).getFullName();
+        if (!ctx.isPresent(typeName, false)) {
+          // case when the context is not present.
+          Module lt = resolveLoadedTypes(ctx, typeName);
+          loadedTypes.add(lt);
+        }
+        
+      } else {
+        // case when argType is not an Arrow type (a non-lambda expression).
+        
+        // initialize resulting value type to null;
+        ValueType valueType = null;
+        
+        // obtain the name of the type.
+        typeName = ((NamedType) argType).getFullName();
+        
+        if (ctx.isPresent(typeName, false)) {
+          // case when the context is present.
+          valueType = ctx.lookupType(typeName, location);
+        } else {
+          // case when the context is not present.
+          Module lt = resolveLoadedTypes(ctx, typeName);
+          valueType = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName()); // deprecated, replace with getwyvernILtype.
+          loadedTypes.add(lt);
+        }
+        resultType = new FormalArg(arg.getName(), valueType);
+      }
+      
+      return resultType;
     }
 
-
+    /**
+     * Resolve types from context
+     * @param ctx the context
+     * @param typeName the name of the type
+     * @return a Module object with resolved loaded types.
+     */
+    private Module resolveLoadedTypes(GenContext ctx, String typeName) {
+      Module lt = ctx.getInterpreterState().getResolver().resolveType(typeName);
+      return lt;
+    }
+    
     private wyvern.target.corewyvernIL.type.ValueType getType(GenContext ctx,
             List<Module> loadedTypes, FileLocation location, String name) {
         wyvern.target.corewyvernIL.type.ValueType type = null;
@@ -164,7 +241,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         }
         return type;
     }
-
 
     public boolean isResource() {
         return this.resourceFlag;

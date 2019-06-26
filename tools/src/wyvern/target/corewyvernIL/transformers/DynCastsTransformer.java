@@ -12,6 +12,8 @@ import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.EffectDeclaration;
 import wyvern.target.corewyvernIL.decl.ModuleDeclaration;
+import wyvern.target.corewyvernIL.decl.RecConstructDeclaration;
+import wyvern.target.corewyvernIL.decl.RecDeclaration;
 import wyvern.target.corewyvernIL.decl.TypeDeclaration;
 import wyvern.target.corewyvernIL.decl.ValDeclaration;
 import wyvern.target.corewyvernIL.decl.VarDeclaration;
@@ -378,5 +380,17 @@ public class DynCastsTransformer extends ASTVisitor<TypeContext, ASTNode> {
     public ASTNode visit(TypeContext state, RefinementType type) {
         return type;
     }
+
+  @Override
+  public ASTNode visit(TypeContext state, RecDeclaration recDecl) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ASTNode visit(TypeContext state, RecConstructDeclaration recConstructDecl) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

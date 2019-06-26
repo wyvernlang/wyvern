@@ -13,6 +13,8 @@ import wyvern.tools.typedAST.core.declarations.EffectDeclaration;
 import wyvern.tools.typedAST.core.declarations.ImportDeclaration;
 import wyvern.tools.typedAST.core.declarations.Instantiation;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
+import wyvern.tools.typedAST.core.declarations.RecConstructDeclaration;
+import wyvern.tools.typedAST.core.declarations.RecDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeAbbrevDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeDeclaration;
 import wyvern.tools.typedAST.core.declarations.TypeVarDecl;
@@ -240,4 +242,16 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
     public Void visit(GenContext state, DSLLit ast) {
         return null;
     }
+
+  @Override
+  public Void visit(GenContext state, RecConstructDeclaration ast) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Void visit(GenContext state, RecDeclaration ast) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }
