@@ -18,7 +18,7 @@ def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
     def rest():String = r
 
 // recursively determines position of the rbrace ending the expression, -1 if not found
-// TODO: ignore escape characters (\{, \}) (do we actually need this??)
+// TODO: ignore escape characters (\")
 def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : Int
     if (input.length() == pos)
         -1
@@ -30,14 +30,17 @@ def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : 
                     () => pos,
                     () => inString.ifTrue(
                         () => getExprPos(input, lbraceCt, inString, pos+1),
-                        () => (input.charAt(pos-1) == #"\\").ifTrue(
-                            () => getExprPos(input, lbraceCt, inString, pos+1),
-                            () => getExprPos(input, lbraceCt - 1, inString, pos+1)
-                        )
+                        () => getExprPos(input, lbraceCt - 1, inString, pos+1)
                     )
                 ),
                 () => (c == #"\"").ifTrue(
-                    () => getExprPos(input, lbraceCt, !inString, pos+1),
+                    () => (pos == 0).ifTrue(
+                        () => getExprPos(input, lbraceCt, !inString, pos+1),
+                        () => (input.charAt(pos-1) == #"\\").ifTrue(
+                            () => getExprPos(input, lbraceCt, inString, pos+1),
+                            () => getExprPos(input, lbraceCt, !inString, pos+1)
+                        )
+                    ),
                     () => (c == #"{" && !inString).ifTrue(
                         () => getExprPos(input, lbraceCt+1, inString, pos+1),
                         () => getExprPos(input, lbraceCt, inString, pos+1)
@@ -70,6 +73,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
             () => makeParsedExpr(convStringAST(normal.get().substring(0,eoparse), ctx, -1), normal.get().substring(eoparse+1, normal.get().length()))
         )
       else
+        // we check if %.x{...}, for float precision to x decimal places
         val floatspec : option.Option[regex.Match] = regex("%\\.\\d+\\{").findPrefixMatchOf(input)
         val formatspec : option.Option[String] = floatspec.map[String]((m:regex.Match) => m.matched())
         if (floatspec.isDefined)
@@ -82,7 +86,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
                                 floatstring.substring(floatstringend+1, floatstring.length()))
             )
           else
-            // if nothing found then 5 should've been escaped, so throw error
+            // if nothing found then % should've been escaped, so throw error
             makeParsedExpr(option.None[AST](), input)
     
     
@@ -99,6 +103,7 @@ val prefixRegex : regex.Regex = regex("[^%]+")
 
 //include \% + other characters, except pure %
 //TODO: ignore escape character (\%)
+//TODO: parse leading whitespace
 type FormatString = String
     metadata new
         def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
@@ -135,7 +140,12 @@ type FormatString = String
             
 
 
-
+/*
+parsing whitespace
+put parseTSL in a helper function
+do some preprocessing on the string
+find smallest indent and remove that much from each whitespace gap following \n
+*/
 
 
 

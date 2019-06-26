@@ -14,8 +14,8 @@ printf(~)
  Hello World!
 
 printf(~)
- Hello %{"string!"}%{" {mm}"} and %{ "another string!" }
- 
+ Hello %{"string!"}%{" \"}{mm}"} and %{ "another string!" }
+
 val x = "xvalue"
 printf(~)
  %{x}
