@@ -55,8 +55,11 @@ def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : 
     val exp : AST = ast.parseExpression(input, ctx)
     val ty : ast.Type = ast.getType(exp, ctx)
     //layout: if floatPrecision != -1, check type float and format, otws format as string
-    //if (ty == ast.types.string())
-    option.Some[AST](exp)
+    if (ast.types.equals(ty, ast.types.string(), ctx))
+        option.Some[AST](exp)
+      else
+        //if (ast.types.equals(ty, ast.types.int(), ctx))
+        option.None[AST]()
     //String.ofInt(x)
     //String.ofFormattedFloat(format: String, f: Float) wait might need to work around this
     //else
@@ -95,6 +98,18 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
     // %/d
     
     // if none of the above, return option.None[AST]
+
+/* TO DO LATER
+val whitespaceRX : regex.Regex = regex("[ \t]+")
+val lineRX : regex.Regex = regex("[^\n]*\n")
+def getLeastIndented(input : String, acc : Int) : Int
+    val leadingWS : option.Option[regex.Match] = whitespaceRX.findPrefixMatchOf(input)
+    val 
+
+// strips leading whitespace for each line up to least indented line
+def parseWhitespace(input : String) : String
+    
+*/
 
 //val prefixRegex : regex.Regex = regex("((\\%)|[^%])+")
 //alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL

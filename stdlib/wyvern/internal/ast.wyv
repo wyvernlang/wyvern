@@ -4,13 +4,13 @@ import wyvern.internal.list
 import java:wyvern.stdlib.support.AST.utils
 
 type AST
-	val ast:Unit
+    val ast:Unit
 
 type Decl
-	val decl:Unit
+    val decl:Unit
 
 type Type
-	val typ:Unit
+    val typ:Unit
 
 type DeclType
   val declType:Unit
@@ -37,10 +37,10 @@ def bind(bindings : list.List, inExpr : AST) : AST = new
   val ast:Unit = utils.bind(bindings, inExpr)
 
 def object(decls : list.List) : AST = new
-	val ast:Unit = utils.object(decls)
+    val ast:Unit = utils.object(decls)
 
 def defDeclaration(name : String, formalArgs : list.List[FormalArg], returnType : Type, body : AST):Decl = new
-	val decl:Unit = utils.defDeclaration(name, formalArgs, returnType, body)
+    val decl:Unit = utils.defDeclaration(name, formalArgs, returnType, body)
 
 def delegateDeclaration(delegateType : Type, fieldName : String) : Decl = new
   val decl:Unit = utils.delegateDeclaration(delegateType, fieldName)
@@ -58,19 +58,19 @@ def varDeclaration(fieldName : String, fieldType : Type, value : AST) : Decl = n
   val decl:Unit = utils.varDeclaration(fieldName, fieldType, value)
 
 def int(i:Int):AST = new
-	val ast:Unit = utils.intLiteral(i)
+    val ast:Unit = utils.intLiteral(i)
 
 def boolean(b:Boolean):AST = new
   val ast:Unit = utils.booleanLiteral(b)
 
 def string(s:String):AST = new
-	val ast:Unit = utils.stringLiteral(s)
+    val ast:Unit = utils.stringLiteral(s)
 
 def variable(s:String):AST = new
-	val ast:Unit = utils.variable(s)
+    val ast:Unit = utils.variable(s)
 
 def call(receiver:AST, methodName:String, arguments:list.List):AST = new
-	val ast:Unit = utils.methodCall(receiver,methodName, arguments)
+    val ast:Unit = utils.methodCall(receiver,methodName, arguments)
 
 def cast(toCastExpr : AST, exprType : Type) : AST = new
   val ast:Unit = utils.cast(toCastExpr, exprType)
@@ -149,6 +149,10 @@ val types = new
 
   def refinement(typeParams : list.List[Type], base : Type):Type = new
     val typ:Unit = utils.refinementType(typeParams, base)
+  
+  def equals(t1 : Type, t2 : Type, ctx : system.Context):Boolean
+    val ctxDyn:Dyn = ctx
+    utils.checkTypeEquality(t1, t2, ctxDyn)
 
 def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = utils.stripLeadingWhitespace(input, mustStrip)
 
