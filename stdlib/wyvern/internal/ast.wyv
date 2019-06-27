@@ -140,6 +140,9 @@ val types = new
 
   def string():Type = new
     val typ:Unit = utils.stringType()
+    
+  def float():Type = new
+    val typ:Unit = utils.floatType()
 
   def nominal(pathVariable : String, typeMember : String):Type = new
     val typ:Unit = utils.nominalType(pathVariable, typeMember)

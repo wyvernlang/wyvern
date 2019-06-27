@@ -99,6 +99,10 @@ public class AST {
     public ValueType stringType() {
         return Util.stringType();
     }
+    
+    public ValueType floatType() {
+        return Util.floatType();
+    }
 
     public ValueType nominalType(String pathVariable, String typeMember) {
         return new NominalType(pathVariable, typeMember);
