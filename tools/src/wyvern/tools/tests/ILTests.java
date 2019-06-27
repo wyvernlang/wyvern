@@ -522,7 +522,6 @@ public class ILTests {
     }
 
     @Test
-    @Category(CurrentlyBroken.class)
     public void testLambdaInferredInVarDeclaration() throws ParseException {
 
         String source = "type IntIntFn \n"
