@@ -92,11 +92,14 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
-
-        // Figure out expression being assigned and target it is being assigned to.
-        IExpr exprToAssign = value.generateIL(ctx, expectedType, dependencies);
-        ValueType exprType = exprToAssign.typeCheck(ctx, null);
+        // Figure out expression being assigned and target it is being assigned to
+        ValueType exprFieldExpectedType = null;
         IExpr exprFieldGet = generateFieldGet(ctx, dependencies);
+
+        // obtain the type of the express field and pass it to the generateIL function for exprToAssign
+        exprFieldExpectedType = exprFieldGet.typeCheck(ctx, null);
+        IExpr exprToAssign = value.generateIL(ctx, exprFieldExpectedType, dependencies);
+        ValueType exprType = exprToAssign.typeCheck(ctx, null);
 
         // Assigning to a top-level var.
         if (exprFieldGet instanceof MethodCall) {
