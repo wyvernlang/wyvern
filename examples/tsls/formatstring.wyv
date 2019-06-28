@@ -50,28 +50,25 @@ def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : 
             getExprPos(input, lbraceCt, inString, pos+1)
 
 // takes in a Wyvern expression as a string and returns a string wrapped in an AST
+// TODO: handle booleans
 def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
     val exp : AST = ast.parseExpression(input, ctx)
     val ty : ast.Type = ast.getType(exp, ctx)
     if (ast.types.equals(ty, ast.types.string(), ctx))
         option.Some[AST](exp)
       else
+        val str = ast.parseExpression("String", ctx) //wyvern.String
         if (ast.types.equals(ty, ast.types.int(), ctx))
-            option.Some[AST](ast.call(ast.parseExpression("String", ctx), "ofInt", {exp}))
+            option.Some[AST](ast.call(str, "ofInt", {exp}))
           else
-            option.None[AST]()
-        /*
-        if (ast.types.equals(ty, ast.types.float()))
-            if (floatPrecision == -1)
-            
+            if (ast.types.equals(ty, ast.types.float(), ctx))
+                if (floatPrecision == -1)
+                    option.Some[AST](ast.call(str, "ofFloat", {exp}))
+                  else
+                    val format : String = "%." + String.ofInt(floatPrecision) + "f"
+                    option.Some[AST](ast.call(str, "ofFormattedFloat", {ast.string(format), exp}))
               else
-                val format : String = "%." + String.ofInt(floatPrecision) + "f"
-                option.Some[AST](ast.call(, "", {ast.string(format), exp}))
-        */
-    //String.ofInt(x)
-    //String.ofFormattedFloat(format: String, f: Float) wait might need to work around this
-    //else
-    //option.None[AST]()
+                option.None[AST]()
     
 
 def parseExpr(input : String, ctx : system.Context) : ParsedExpr
@@ -100,13 +97,6 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
             // if nothing found then % should've been escaped, so throw error
             makeParsedExpr(option.None[AST](), input)
     
-    
-    //if %/d./d, ensure formatted float
-    
-    // %/d
-    
-    // if none of the above, return option.None[AST]
-
 
 //val prefixRegex : regex.Regex = regex("((\\%)|[^%])+")
 //alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL

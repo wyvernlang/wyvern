@@ -18,6 +18,6 @@ printf(~)
 
 val x = 3
 printf(~)
- %{x}
+ %{x} %{4} %.5{1.6} %{1.7}
  
 stdout.print(String.ofFormattedFloat("%.2f", 1.5))
