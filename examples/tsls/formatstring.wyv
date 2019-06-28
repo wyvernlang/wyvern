@@ -18,7 +18,6 @@ def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
     def rest():String = r
 
 // recursively determines position of the rbrace ending the expression, -1 if not found
-// TODO: ignore escape characters (\")
 def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : Int
     if (input.length() == pos)
         -1
@@ -50,16 +49,25 @@ def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : 
           else
             getExprPos(input, lbraceCt, inString, pos+1)
 
-// takes in an expression as a string and returns a string wrapped in an AST
+// takes in a Wyvern expression as a string and returns a string wrapped in an AST
 def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
     val exp : AST = ast.parseExpression(input, ctx)
     val ty : ast.Type = ast.getType(exp, ctx)
-    //layout: if floatPrecision != -1, check type float and format, otws format as string
     if (ast.types.equals(ty, ast.types.string(), ctx))
         option.Some[AST](exp)
       else
-        //if (ast.types.equals(ty, ast.types.int(), ctx))
-        option.None[AST]()
+        if (ast.types.equals(ty, ast.types.int(), ctx))
+            option.Some[AST](ast.call(ast.parseExpression("String", ctx), "ofInt", {exp}))
+          else
+            option.None[AST]()
+        /*
+        if (ast.types.equals(ty, ast.types.float()))
+            if (floatPrecision == -1)
+            
+              else
+                val format : String = "%." + String.ofInt(floatPrecision) + "f"
+                option.Some[AST](ast.call(, "", {ast.string(format), exp}))
+        */
     //String.ofInt(x)
     //String.ofFormattedFloat(format: String, f: Float) wait might need to work around this
     //else
@@ -99,17 +107,6 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
     
     // if none of the above, return option.None[AST]
 
-/* TO DO LATER
-val whitespaceRX : regex.Regex = regex("[ \t]+")
-val lineRX : regex.Regex = regex("[^\n]*\n")
-def getLeastIndented(input : String, acc : Int) : Int
-    val leadingWS : option.Option[regex.Match] = whitespaceRX.findPrefixMatchOf(input)
-    val 
-
-// strips leading whitespace for each line up to least indented line
-def parseWhitespace(input : String) : String
-    
-*/
 
 //val prefixRegex : regex.Regex = regex("((\\%)|[^%])+")
 //alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL
@@ -178,7 +175,7 @@ then look for either a number, ., or { (regexp matching)
 continue parsing and appending strings recursively
 
 
-*/    
+*/
     
 /*
 def parseString(input:String):option.Option[AST]

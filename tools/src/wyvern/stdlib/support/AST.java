@@ -46,6 +46,7 @@ import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.generics.GenericArgument;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ILFactory;
 import wyvern.target.corewyvernIL.support.InterpreterState;
@@ -448,7 +449,7 @@ public class AST {
     }
     
     public boolean checkTypeEquality(ObjectValue t1, ObjectValue t2, GenContext ctx) {
-        return getType(t1).equalsInContext(getType(t2), ctx, null);
+        return getType(t1).equalsInContext(getType(t2), ctx, new FailureReason());
     }
 
 }

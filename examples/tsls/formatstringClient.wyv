@@ -1,9 +1,9 @@
 require stdout
 
 import metadata tsls.formatstring
+import wyvern.String
 
-//need to deal with leading whitespace for parsing; maybe use ` to indicate
-//beginning of format string or something?
+//need to deal with leading whitespace for parsing
 
 def printf(str:formatstring.FormatString):Unit
     stdout.print(str)
@@ -16,6 +16,8 @@ printf(~)
 printf(~)
  Hello %{"string!"}%{" \"}{mm}"} and %{ "another string!" }
 
-val x = "xvalue"
+val x = 3
 printf(~)
  %{x}
+ 
+stdout.print(String.ofFormattedFloat("%.2f", 1.5))
