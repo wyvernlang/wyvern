@@ -13,7 +13,7 @@ import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decl.Declaration;
-import wyvern.target.corewyvernIL.decl.DelegateDeclaration;
+import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
 import wyvern.target.corewyvernIL.decl.NamedDeclaration;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
@@ -30,8 +30,8 @@ import wyvern.tools.errors.ToolError;
 public class New extends Expression {
     private List<? extends Declaration> decls;
     private BindingSite selfSite;
-    private boolean hasDelegate;
-    private DelegateDeclaration delegateDeclaration;
+    private boolean hasForward;
+    private ForwardDeclaration forwardDeclaration;
 
     /** convenience method for a single declaration */
     public New(NamedDeclaration decl, FileLocation loc) {
@@ -64,11 +64,11 @@ public class New extends Expression {
             }
         }
 
-        Optional<? extends Declaration> delegateOption = decls.stream().filter(d -> d instanceof DelegateDeclaration).findFirst();
+        Optional<? extends Declaration> forwardOption = decls.stream().filter(d -> d instanceof ForwardDeclaration).findFirst();
 
-        hasDelegate = delegateOption.isPresent();
-        if (hasDelegate) {
-            delegateDeclaration = (DelegateDeclaration) delegateOption.get();
+        hasForward = forwardOption.isPresent();
+        if (hasForward) {
+            forwardDeclaration = (ForwardDeclaration) forwardOption.get();
         }
     }
 
@@ -134,7 +134,7 @@ public class New extends Expression {
         TypeContext thisCtx = ctx.extend(selfSite, getType());
 
         boolean isResource = false;
-        for (Declaration d : declsExceptDelegate()) {
+        for (Declaration d : declsExceptForward()) {
             DeclType dt = d.typeCheck(ctx, thisCtx);
             dts.add(dt);
             if (d.containsResource(thisCtx) || dt.containsResource(thisCtx)) {
@@ -143,11 +143,11 @@ public class New extends Expression {
         }
 
         ValueType type = getType();
-        if (hasDelegate) {
-            ValueType delegateObjectType = ctx.lookupTypeOf(delegateDeclaration.getFieldName());
-            StructuralType delegateStructuralType = delegateObjectType.getStructuralType(thisCtx);
+        if (hasForward) {
+            ValueType forwardObjectType = ctx.lookupTypeOf(forwardDeclaration.getFieldName());
+            StructuralType forwardStructuralType = forwardObjectType.getStructuralType(thisCtx);
             // new defined declaration will override delegate object's method definition if they had subType relationship
-            for (DeclType declType : delegateStructuralType.getDeclTypes()) {
+            for (DeclType declType : forwardStructuralType.getDeclTypes()) {
                 if (!dts.stream().anyMatch(newDefDeclType -> newDefDeclType.isSubtypeOf(declType, thisCtx, new FailureReason()))) {
                     dts.add(declType);
                 }
@@ -184,24 +184,24 @@ public class New extends Expression {
 
         // evaluate all decls
         List<Declaration> ds = new LinkedList<Declaration>();
-        for (Declaration d : declsExceptDelegate()) {
+        for (Declaration d : declsExceptForward()) {
         Declaration newD = d.interpret(ctx);
         ds.add(newD);
         }
-        result = new ObjectValue(ds, selfSite, getType().interpret(ctx), delegateDeclaration, getLocation(), ctx);
+        result = new ObjectValue(ds, selfSite, getType().interpret(ctx), forwardDeclaration, getLocation(), ctx);
 
         return result;
     }
 
-    private List<Declaration> declsExceptDelegate() {
-        return decls.stream().filter(x -> x != delegateDeclaration).collect(Collectors.toList());
+    private List<Declaration> declsExceptForward() {
+        return decls.stream().filter(x -> x != forwardDeclaration).collect(Collectors.toList());
     }
 
     @Override
     public Set<String> getFreeVariables() {
         Set<String> freeVars = new HashSet<>();
-        if (hasDelegate) {
-            freeVars.addAll(delegateDeclaration.getFreeVariables());
+        if (hasForward) {
+            freeVars.addAll(forwardDeclaration.getFreeVariables());
         }
         for (Declaration decl : decls) {
             freeVars.addAll(decl.getFreeVariables());

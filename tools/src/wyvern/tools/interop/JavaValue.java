@@ -129,7 +129,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             if (hintClass != null && hintClass == Long.class) {
                 return ((IntegerLiteral) arg).getLongValue();
             }
-            return new Integer(((IntegerLiteral) arg).getValue());
+            return (Integer) (((IntegerLiteral) arg).getValue());
         } else if (arg instanceof FloatLiteral) {
             if (hintClass != null && hintClass == Double.class) {
                 return ((FloatLiteral) arg).getFullValue();
@@ -138,7 +138,7 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else if (arg instanceof StringLiteral) {
             return new String(((StringLiteral) arg).getValue());
         } else if (arg instanceof CharacterLiteral) {
-            return new Character(((CharacterLiteral) arg).getValue());
+            return (Character) (((CharacterLiteral) arg).getValue());
         } else if (arg instanceof ObjectValue) {
             // Check if arg looks like a list type
             ObjectValue wyvObj = (ObjectValue) arg;
@@ -161,7 +161,7 @@ public class JavaValue extends AbstractValue implements Invokable {
             }
             return arg;
         } else if (arg instanceof BooleanLiteral) {
-            return new Boolean(((BooleanLiteral) arg).getValue());
+            return (Boolean) (((BooleanLiteral) arg).getValue());
         } else if (arg instanceof JavaValue) {
             return ((JavaValue) arg).getWrappedValue();
         } else {

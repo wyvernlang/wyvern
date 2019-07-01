@@ -45,7 +45,7 @@ public enum ErrorMessage {
     SYNTAX_FOR_NO_ARG_LAMBDA("Use \"() => <expression>\" rather than \"x => <expression>\" for a zero-argument function expression", 0),
     CANNOT_AVOID_VARIABLE("Cannot avoid variable %ARG in type of this expression.  "
             + "If this is the last line in the program, try ending the program with a value of built-in type, e.g. the integer 0.", 1),
-    DELEGATE_MUST_BE_VARIABLE("Expected variable in delegate declaration, got %ARG", 1),
+    FORWARD_MUST_BE_VARIABLE("Expected variable in forward declaration, got %ARG", 1),
     QUALIFIED_TYPES_ONLY_FIELDS("Qualified types can only include val fields", 0),
     ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
     ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),

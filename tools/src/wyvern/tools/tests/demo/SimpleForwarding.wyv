@@ -12,6 +12,6 @@ val aFoo:Foo = new // TODO: allow specifying type here
 
 val aBar:FooBar = new
     def bar():Int = 3
-    delegate Foo to aFoo
+    forward Foo to aFoo
 
 aBar.foo()

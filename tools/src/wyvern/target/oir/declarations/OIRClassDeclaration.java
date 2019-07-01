@@ -10,7 +10,7 @@ import wyvern.target.oir.OIREnvironment;
 
 public class OIRClassDeclaration extends OIRType {
     private String name;
-    private List<OIRDelegate> delegates;
+    private List<OIRForward> forwards;
     private List<OIRMemberDeclaration> members;
     private String selfName;
     private List<OIRFieldValueInitializePair> fieldValuePairs;
@@ -19,12 +19,12 @@ public class OIRClassDeclaration extends OIRType {
     private HashMap<String, String> methodToFieldMap;
     private Set<String> freeVariables;
 
-    public OIRClassDeclaration(OIREnvironment environment, String name, String selfName, List<OIRDelegate> delegates,
+    public OIRClassDeclaration(OIREnvironment environment, String name, String selfName, List<OIRForward> forwards,
             List<OIRMemberDeclaration> members, List<OIRFieldValueInitializePair> fieldValuePairs,
             Set<String> freeVariables) {
         super(environment);
         this.name = name;
-        this.delegates = delegates;
+        this.forwards = forwards;
         this.members = members;
         this.freeVariables = freeVariables;
         methods = new HashSet<String>();
@@ -51,7 +51,7 @@ public class OIRClassDeclaration extends OIRType {
         //        }
     }
 
-    public int getDelegateMethodFieldHashMap(String method) {
+    public int getForwardMethodFieldHashMap(String method) {
         return getFieldPosition(methodToFieldMap.get(method));
     }
 
@@ -71,12 +71,12 @@ public class OIRClassDeclaration extends OIRType {
     }
 
     /* This method is for searching the method delegated to field sequentially */
-    public int getDelegateMethodFieldPosNaive(String method) {
-        for (OIRDelegate delegate : delegates) {
+    public int getForwardMethodFieldPosNaive(String method) {
+        for (OIRForward forward : forwards) {
             OIRInterface oirInterface;
-            oirInterface = (OIRInterface) delegate.getType();
+            oirInterface = (OIRInterface) forward.getType();
             if (oirInterface.isMethodInClass(method)) {
-                return getFieldPosition(delegate.getField());
+                return getFieldPosition(forward.getField());
             }
         }
         return -1;
@@ -106,10 +106,10 @@ public class OIRClassDeclaration extends OIRType {
 
         /* Not found here, search in the fields
          * that delegate this method */
-        for (OIRDelegate delegate : delegates) {
+        for (OIRForward forward : forwards) {
             OIRInterface type;
             OIRType methodType;
-            type = (OIRInterface) delegate.getType();
+            type = (OIRInterface) forward.getType();
             methodType = type.getTypeForMember(fieldName);
             if (methodType != null) {
                 return methodType;
@@ -140,12 +140,12 @@ public class OIRClassDeclaration extends OIRType {
         this.name = name;
     }
 
-    public List<OIRDelegate> getDelegates() {
-        return delegates;
+    public List<OIRForward> getForwards() {
+        return forwards;
     }
 
-    public void setDelegates(List<OIRDelegate> delegates) {
-        this.delegates = delegates;
+    public void setForwards(List<OIRForward> forwards) {
+        this.forwards = forwards;
     }
 
     public List<OIRMemberDeclaration> getMembers() {

@@ -245,10 +245,10 @@ public class DeclSequence extends Sequence {
         List<DeclType> declTypes = new LinkedList<DeclType>();
 
         // Look at each declaration.
-        wyvern.tools.typedAST.core.declarations.DelegateDeclaration delegateDecl = null;
+        wyvern.tools.typedAST.core.declarations.ForwardDeclaration forwardDecl = null;
         for (TypedAST d : this) {
-            if (d instanceof wyvern.tools.typedAST.core.declarations.DelegateDeclaration) {
-                delegateDecl = (wyvern.tools.typedAST.core.declarations.DelegateDeclaration) d;
+            if (d instanceof wyvern.tools.typedAST.core.declarations.ForwardDeclaration) {
+                forwardDecl = (wyvern.tools.typedAST.core.declarations.ForwardDeclaration) d;
             } else {
                 Declaration dd = (Declaration) d;
 
@@ -269,9 +269,9 @@ public class DeclSequence extends Sequence {
         final GenContext finalCtxTemp = ctxTemp; // for declTypes.stream() later, which requires this to be final
 
         // Add delegate object's declaration which has not been overridden to the structural type.
-        if (delegateDecl != null) {
-            StructuralType delegateStructuralType = delegateDecl.getType().getILType(ctxTemp).getStructuralType(ctxTemp);
-            for (DeclType declType : delegateStructuralType.getDeclTypes()) {
+        if (forwardDecl != null) {
+            StructuralType forwardStructuralType = forwardDecl.getType().getILType(ctxTemp).getStructuralType(ctxTemp);
+            for (DeclType declType : forwardStructuralType.getDeclTypes()) {
                 if (!declTypes.stream().anyMatch(newDefDecl -> newDefDecl.isSubtypeOf(declType, finalCtxTemp, new FailureReason()))) {
                     declTypes.add(declType);
                 }

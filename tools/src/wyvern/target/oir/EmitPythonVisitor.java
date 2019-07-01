@@ -11,7 +11,7 @@ import wyvern.target.corewyvernIL.metadata.Metadata;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.target.oir.declarations.OIRClassDeclaration;
-import wyvern.target.oir.declarations.OIRDelegate;
+import wyvern.target.oir.declarations.OIRForward;
 import wyvern.target.oir.declarations.OIRFieldDeclaration;
 import wyvern.target.oir.declarations.OIRFieldValueInitializePair;
 import wyvern.target.oir.declarations.OIRFormalArg;
@@ -571,9 +571,9 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
 
         String d = "";
 
-        if (!decl.getDelegates().isEmpty()) {
-            OIRDelegate delegate = decl.getDelegates().get(0);
-            d = ", delegate=" + delegate.getField();
+        if (!decl.getForwards().isEmpty()) {
+            OIRForward forward = decl.getForwards().get(0);
+            d = ", forward=" + forward.getField();
         }
 
         String thisName = "";
@@ -688,16 +688,16 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
             constructorArgs.append(", " + dec.getName());
         }
         members += "\n" + indent
-                + "def __init__(this" + constructorArgs.toString() + ", env={}, delegate=None, thisName=None):";
+                + "def __init__(this" + constructorArgs.toString() + ", env={}, forward=None, thisName=None):";
         members += "\n" + indent + indentIncrement + "this.env = env";
-        members += "\n" + indent + indentIncrement + "this.delegate = delegate";
+        members += "\n" + indent + indentIncrement + "this.forward = forward";
         members += "\n" + indent + indentIncrement + "if thisName is not None:";
         members += "\n" + indent + indentIncrement + indentIncrement + "this.env[thisName] = this";
         members += constructorBody.toString();
 
-        if (!oirClassDeclaration.getDelegates().isEmpty()) {
+        if (!oirClassDeclaration.getForwards().isEmpty()) {
             members += "\n\n" + indent + "def __getattr__(self, name):";
-            members += "\n" + indent + indentIncrement + "return getattr(self.delegate, name)";
+            members += "\n" + indent + indentIncrement + "return getattr(self.forward, name)";
         }
 
         for (OIRMemberDeclaration memberDec : oirClassDeclaration.getMembers()) {
