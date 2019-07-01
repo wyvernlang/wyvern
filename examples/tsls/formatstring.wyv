@@ -50,6 +50,7 @@ def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : 
             getExprPos(input, lbraceCt, inString, pos+1)
 
 // takes in a Wyvern expression as a string and returns a string wrapped in an AST
+// floatPrecision -1 indicates that no float precision was specified
 // TODO: handle booleans
 def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
     val exp : AST = ast.parseExpression(input, ctx)
@@ -98,7 +99,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
             makeParsedExpr(option.None[AST](), input)
     
 
-//val prefixRegex : regex.Regex = regex("((\\%)|[^%])+")
+//val prefixRegex : regex.Regex = regex("(\\\\|\\%|[^%])+")
 //alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL
 //would need to replace \ in string even if using regex
 val prefixRegex : regex.Regex = regex("[^%]+")
@@ -115,6 +116,11 @@ def parse(input : String, ctx : system.Context) : option.Option[AST]
             if (rest.get() == "")
                 option.Some[AST](ast.string(prefixString.get()))
               else
+                // check here for prefix length, if ending in \ sub for % and recall parse
+                // but also account for \\% == \%
+                /*
+                use regex [^\\]+, once you encounter an escape, if next is \ or % do the sub
+                */
                 val g : ParsedExpr = parseExpr(rest.getOrElse(() => ""), ctx)
                 if (g.expr().isDefined)
                     val recursiveCall = parse(g.rest(), ctx)
