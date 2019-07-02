@@ -3,15 +3,13 @@ require stdout
 import metadata tsls.formatstring
 import wyvern.String
 
-//need to deal with leading whitespace for parsing
-
 def printf(str:formatstring.FormatString):Unit
     stdout.print(str)
     stdout.println()
     
 //just a plain string
 printf(~)
- Hello World!
+ Hello \\ \%World!\\n
 
 printf(~)
  Hello %{"string!"}%{" \"}{mm}"} and %{ "another string!" }
