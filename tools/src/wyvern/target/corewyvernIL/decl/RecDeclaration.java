@@ -14,11 +14,6 @@ public class RecDeclaration extends NamedDeclaration {
 
   public RecDeclaration(TypedAST body) {
     super(null, null);
-    System.out.println();
-    System.out.println("target/corewyvernIL/decl/RecDeclaration");
-    System.out.println("RecDeclaration (decl) Called.");
-    System.out.println("  RecDeclaration Body: " + body); // debugger
-    System.out.println();
     this.body = (ExpressionAST) body;
   }
 

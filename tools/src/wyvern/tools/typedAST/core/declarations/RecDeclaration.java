@@ -14,16 +14,9 @@ import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class RecDeclaration extends Declaration implements CoreAST {
-
   private ExpressionAST body;
 
-  // constructor
   public RecDeclaration(TypedAST body) {
-    System.out.println();
-    System.out.println("tools/typedAST/core/declarations/RecDeclaration");
-    System.out.println("RecDeclaration Called.");
-    System.out.println("  RecDeclaration Body: " + body); // debugger
-    System.out.println();
     this.body = (ExpressionAST) body;
   }
 

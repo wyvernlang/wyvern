@@ -23,44 +23,23 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 
 public class RecConstructDeclaration extends Declaration implements CoreAST {
-  private String name;
-  private ExpressionAST body;
-  private NameBinding binding;
-  private Type declaredType;
-  private FileLocation location = FileLocation.UNKNOWN;
-  private ValueType cachedValueType;
+    private ExpressionAST definition;
+    private NameBinding binding;
+    private Type declaredType;
+    private String variableName;
+    private ValueType cachedValueType;
+    private FileLocation location = FileLocation.UNKNOWN;
 
-  // constructor
-  public RecConstructDeclaration(String name, Type type, TypedAST body, FileLocation location) {
-    // debugger
+    public RecConstructDeclaration(String name, Type type, TypedAST definition, FileLocation location) {
+        if (type instanceof UnresolvedType) {
+            this.variableName = name;
+            this.declaredType = type;
+        }
 
-    System.out.println();
-    System.out.println("tools/typedAST/core/declarations/RecConstructDeclaration");
-    System.out.println("RecConstructDeclaration Called");
-    System.out.println("  RecConstruct Name: " + name);
-    System.out.println("  RecConstruct Type: " + type);
-    System.out.println("  RecConstruct Body: " + body);
-    System.out.println("  RecConstruct Location: " + location);
-    System.out.println();
-
-    // create name binding
-    binding = new NameBindingImpl(name, type);
-
-    // set body
-    this.body = (ExpressionAST) body;
-
-    // set name and declared type
-    if (type instanceof UnresolvedType) {
-      this.name = name;
-      this.declaredType = type;
+        this.definition = (ExpressionAST) definition;
+        this.binding = new NameBindingImpl(name, type);
+        this.location = location;
     }
-
-    // set type of construct
-    this.declaredType = type;
-
-    // set location
-    this.location = location;
-  }
 
   @Override
   public Type getType() {
@@ -78,7 +57,7 @@ public class RecConstructDeclaration extends Declaration implements CoreAST {
   }
 
   public ExpressionAST getDefinition() {
-    return this.body;
+    return this.definition;
   }
 
   @Override
@@ -90,10 +69,9 @@ public class RecConstructDeclaration extends Declaration implements CoreAST {
   public void genTopLevel(TopLevelContext tlc) {
     ValueType declType = getILValueType(tlc.getContext());
     tlc.addLet(new BindingSite(getName()), getILValueType(tlc.getContext()),
-        this.body.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
+        this.definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()), false);
   }
 
-  // raises an error if the type is null
   @Override
   public void checkAnnotated(GenContext ctxWithoutThis) {
     if (binding.getType() == null) {
@@ -112,29 +90,20 @@ public class RecConstructDeclaration extends Declaration implements CoreAST {
   }
 
   private ValueType getILValueType(GenContext ctx) {
-    /*
-     * this method does not work properly if called when the variable being declared
-     * has already been added to ctx. We solve this problem by caching the value
-     * resulting from the first time this method is invoked on this object
-     */
     if (cachedValueType != null) {
       return cachedValueType;
     }
+
     ValueType vt;
     if (declaredType != null) {
-      // convert the declared type if there is one
       vt = declaredType.getILType(ctx);
     } else {
 
       final Type type = this.binding.getType();
       if (type != null) {
-
-        // then there is no proper R-value
-        // if(definition == null) {
         vt = type.getILType(ctx);
       } else {
-        // convert the declaration and typecheck it
-        vt = body.generateIL(ctx, null, null).typeCheck(ctx, null);
+        vt = definition.generateIL(ctx, null, null).typeCheck(ctx, null);
       }
     }
     cachedValueType = vt;
@@ -145,9 +114,8 @@ public class RecConstructDeclaration extends Declaration implements CoreAST {
   public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
 
     ValueType expectedType = getILValueType(thisContext);
-    /* uses ctx for generating the definition, as the selfName is not in scope */
     return new wyvern.target.corewyvernIL.decl.RecConstructDeclaration(getName(), expectedType,
-        body.generateIL(ctx, expectedType, null), location);
+        definition.generateIL(ctx, expectedType, null), location);
   }
 
   @Override
@@ -159,22 +127,20 @@ public class RecConstructDeclaration extends Declaration implements CoreAST {
   @Override
   public void addModuleDecl(TopLevelContext tlc) {
     wyvern.target.corewyvernIL.decl.Declaration decl =
-        // debugger
-        new wyvern.target.corewyvernIL.decl.ValDeclaration(getName(), getILValueType(tlc.getContext()),
+        new wyvern.target.corewyvernIL.decl.RecConstructDeclaration(getName(), getILValueType(tlc.getContext()),
             new wyvern.target.corewyvernIL.expression.Variable(getName()), location);
     DeclType dt = genILType(tlc.getContext());
     tlc.addModuleDecl(decl, dt);
   }
 
   public String toString() {
-    return name + ": " + declaredType.toString() + " = ...";
+    return variableName + ": " + declaredType.toString() + " = ...";
   }
 
   @Override
   public StringBuilder prettyPrint() {
     StringBuilder sb = new StringBuilder();
-    sb.append("val ");
-    sb.append(name);
+    sb.append(variableName);
     sb.append(" : ");
     if (declaredType != null) {
       sb.append(declaredType.toString());
@@ -182,8 +148,8 @@ public class RecConstructDeclaration extends Declaration implements CoreAST {
       sb.append("null");
     }
     sb.append(" = ");
-    if (body != null) {
-      sb.append(body.prettyPrint());
+    if (definition != null) {
+      sb.append(definition.prettyPrint());
     } else {
       sb.append("null");
     }

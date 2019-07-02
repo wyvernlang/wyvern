@@ -5,7 +5,7 @@ import java.util.Set;
 
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
-import wyvern.target.corewyvernIL.decltype.RecConstructDeclType;
+import wyvern.target.corewyvernIL.decltype.ValDeclType;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -20,14 +20,6 @@ public class RecConstructDeclaration extends DeclarationWithRHS {
   public RecConstructDeclaration(String fieldName, ValueType type, IExpr iExpr, FileLocation loc) {
     super(fieldName, iExpr, loc);
     this.type = type;
-    System.out.println();
-    System.out.println("target/corewyvernIL/decl/RecConstructDeclaration");
-    System.out.println("RecConstructDeclaration Called");
-    System.out.println("  RecConstruct Name: " + fieldName);
-    System.out.println("  RecConstruct Type: " + type);
-    System.out.println("  RecConstruct Body: " + iExpr);
-    System.out.println("  RecConstruct Location: " + loc);
-    System.out.println();
   }
 
   @Override
@@ -67,7 +59,7 @@ public class RecConstructDeclaration extends DeclarationWithRHS {
 
   @Override
   public DeclType getDeclType() {
-    return new RecConstructDeclType(getName(), type);
+    return new ValDeclType(getName(), type);
   }
 
   @Override
