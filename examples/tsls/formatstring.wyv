@@ -102,7 +102,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
 //val prefixRegex : regex.Regex = regex("(\\\\|\\%|[^%])+")
 //alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL
 //would need to replace \ in string even if using regex
-val prefixRegex : regex.Regex = regex("[^%]+(\\$)?")
+val prefixRegex : regex.Regex = regex("[^\\\\%]+")
 //val prefixRegex : regex.Regex = regex("[^%]+")
 
 // recursively parses the input, returning option.None[AST] if parsing error
@@ -117,39 +117,31 @@ def parse(input : String, ctx : system.Context) : option.Option[AST]
             if (rest.get() == "")
                 option.Some[AST](ast.string(prefixString.get()))
               else
-                // check here for prefix length, if ending in \ sub for % and recall parse
-                // but also account for \\% == \%
-                /*
-                use regex [^\\]+, once you encounter an escape, if next is \ or % do the sub
-                */
                 val prefix : String = prefixString.get()
                 val suffix : String = rest.get()
-                if (prefix != "")
+                if (suffix.length() >= 2)
                     // checking for escaped characters
-                    if (prefix.charAt(prefix.length()-1) == #"\\")
-                        if (suffix.charAt(0) == #"%")
-                            val recursiveCall : option.Option[AST] = parse(suffix.substring(1, suffix.length()), ctx)
+                    if (suffix.charAt(0) == #"\\")
+                        if (suffix.charAt(1) == #"%")
+                            val recursiveCall : option.Option[AST] = parse(suffix.substring(2, suffix.length()), ctx)
                             if (recursiveCall.isDefined)
-                                option.Some[AST](ast.call(ast.string(prefix.substring(0,prefix.length()-1) + "%"), "+", {recursiveCall.get()}))
+                                option.Some[AST](ast.call(ast.string(prefix + "%"), "+", {recursiveCall.get()}))
                               else
                                 option.None[AST]()
                           else
-                            if (suffix.charAt(0) == #"\\")
-                                val recursiveCall : option.Option[AST] = parse(suffix.substring(1, suffix.length()), ctx)
+                            if (suffix.charAt(1) == #"\\")
+                                val recursiveCall : option.Option[AST] = parse(suffix.substring(2, suffix.length()), ctx)
                                 if (recursiveCall.isDefined)
-                                    option.Some[AST](ast.call(ast.string(prefix.substring(0,prefix.length()-1) + "%"), "+", {recursiveCall.get()}))
+                                    option.Some[AST](ast.call(ast.string(prefix + "\\"), "+", {recursiveCall.get()}))
                                   else
                                     option.None[AST]()
                               else
-                                val g : ParsedExpr = parseExpr(suffix, ctx)
-                                if (g.expr().isDefined)
-                                    val recursiveCall : option.Option[AST] = parse(g.rest(), ctx)
-                                    if (recursiveCall.isDefined)
-                                        option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().get()}), "+", {recursiveCall.get()}))
-                                      else
-                                        option.None[AST]() //recursive call gives None
+                                //would throw error but this could also be part of an escaped string sequence
+                                val recursiveCall : option.Option[AST] = parse(suffix.substring(1, suffix.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string(prefix + "\\"), "+", {recursiveCall.get()}))
                                   else
-                                    option.None[AST]() //cannot parse expression
+                                    option.None[AST]()
                       else
                         val g : ParsedExpr = parseExpr(suffix, ctx)
                         if (g.expr().isDefined)
@@ -161,16 +153,18 @@ def parse(input : String, ctx : system.Context) : option.Option[AST]
                           else
                             option.None[AST]() //cannot parse expression
                   else
-                    // no need to append prefix
-                    val g : ParsedExpr = parseExpr(rest.getOrElse(() => ""), ctx)
-                    if (g.expr().isDefined)
-                        val recursiveCall = parse(g.rest(), ctx)
-                        if (recursiveCall.isDefined)
-                            option.Some[AST](ast.call(g.expr().get(), "+", {recursiveCall.get()}))
-                          else
-                            option.None[AST]() //recursive call gives None
+                    if (suffix == "")
+                        option.Some[AST](ast.string(prefix))
                       else
-                        option.None[AST]() //cannot parse expression
+                        val g : ParsedExpr = parseExpr(rest.getOrElse(() => ""), ctx)
+                        if (g.expr().isDefined)
+                            val recursiveCall = parse(g.rest(), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().get()}), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]() //recursive call gives None
+                          else
+                            option.None[AST]() //cannot parse expression
           else
             val g : ParsedExpr = parseExpr(rest.getOrElse(() => input), ctx)
             if (g.expr().isDefined)
