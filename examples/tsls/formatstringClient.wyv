@@ -17,3 +17,5 @@ printf(~)
 val x = 3
 printf(~)
  %{x} %{4} %.5{1.6} %{1.7}
+
+printf({%{1 == 2}%{true}})

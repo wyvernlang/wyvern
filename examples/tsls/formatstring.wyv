@@ -69,7 +69,10 @@ def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : 
                     val format : String = "%." + String.ofInt(floatPrecision) + "f"
                     option.Some[AST](ast.call(str, "ofFormattedFloat", {ast.string(format), exp}))
               else
-                option.None[AST]()
+                if (ast.types.equals(ty, ast.types.boolean(), ctx))
+                    option.Some[AST](ast.call(exp, "ifTrue", {ast.parseExpression("() => \"true\"", ctx), ast.parseExpression("() => \"false\"", ctx)}))
+                  else
+                    option.None[AST]()
     
 
 def parseExpr(input : String, ctx : system.Context) : ParsedExpr
