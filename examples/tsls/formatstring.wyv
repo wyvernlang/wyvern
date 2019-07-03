@@ -99,9 +99,7 @@ def parseExpr(input : String, ctx : system.Context) : ParsedExpr
             makeParsedExpr(option.None[AST](), input)
     
 
-//val prefixRegex : regex.Regex = regex("(\\\\|\\%|[^%])+")
-//alternative approach: if last char of prefixString is \ and next matches %, replace it with % and append to parseTSL
-//would need to replace \ in string even if using regex
+//val prefixRegex : regex.Regex = regex("(\\\\\\\\|\\\\%|[^%])+")
 val prefixRegex : regex.Regex = regex("[^\\\\%]+")
 //val prefixRegex : regex.Regex = regex("[^%]+")
 
@@ -174,10 +172,34 @@ def parse(input : String, ctx : system.Context) : option.Option[AST]
                   else
                     option.None[AST]() //recursive call gives None
               else
-                option.None[AST]() //cannot parse expression
+                // can only reach here if first character starts with \
+                if (input.charAt(0) == #"\\")
+                    if (input.length() >= 2)
+                        if (input.charAt(1) == #"%")
+                            val recursiveCall : option.Option[AST] = parse(input.substring(2,input.length()), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.string("%"), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]()
+                          else
+                            if (input.charAt(1) == #"\\")
+                                val recursiveCall : option.Option[AST] = parse(input.substring(2,input.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string("\\"), "+", {recursiveCall.get()}))
+                                  else
+                                    option.None[AST]()
+                              else
+                                val recursiveCall : option.Option[AST] = parse(input.substring(1,input.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string("\\"), "+", {recursiveCall.get()}))
+                                  else
+                                    option.None[AST]()
+                      else
+                        option.Some[AST](ast.string(input))
+                  else
+                    option.None[AST]() //cannot parse expression
 
-//include \% + other characters, except pure %
-//TODO: ignore escape character (\%)
+
 type FormatString = String
     metadata new
         def parseTSL(input : String, ctx : system.Context) : option.Option[AST]

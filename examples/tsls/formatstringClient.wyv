@@ -9,13 +9,11 @@ def printf(str:formatstring.FormatString):Unit
     
 //just a plain string
 printf(~)
- Hello \\ \%World!
- 
-/*
+ Hello \\\%World!\n
+
 printf(~)
  Hello %{"string!"}%{" \"}{mm}"} and %{ "another string!" }
 
 val x = 3
 printf(~)
  %{x} %{4} %.5{1.6} %{1.7}
-*/
