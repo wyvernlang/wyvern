@@ -51,7 +51,6 @@ def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : 
 
 // takes in a Wyvern expression as a string and returns a string wrapped in an AST
 // floatPrecision -1 indicates that no float precision was specified
-// TODO: handle booleans
 def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
     val exp : AST = ast.parseExpression(input, ctx)
     val ty : ast.Type = ast.getType(exp, ctx)
