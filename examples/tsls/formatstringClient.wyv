@@ -1,0 +1,21 @@
+require stdout
+
+import metadata tsls.formatstring
+import wyvern.String
+
+def printf(str:formatstring.FormatString):Unit
+    stdout.print(str)
+    stdout.println()
+    
+//just a plain string
+printf(~)
+ Hello \\\%World!\n
+
+printf(~)
+ Hello %{"string!"}%{" \"}{mm}"} and %{ "another string!" }
+
+val x = 3
+printf(~)
+ %{x} %{4} %.5{1.6} %{1.7}
+
+printf({%{1 == 2}%{true}})

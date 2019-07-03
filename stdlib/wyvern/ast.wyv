@@ -92,3 +92,6 @@ def formalArg(name : String, argType : Type) : FormalArg = ast.formalArg(name, a
 def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = ast.stripLeadingWhitespace(input, mustStrip)
 
 def genIdent() : String = ast.genIdent()
+
+def getType(e : AST, ctx : system.Context) : Type
+  ast.getType(e, ctx)

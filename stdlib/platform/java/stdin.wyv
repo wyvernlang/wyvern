@@ -13,10 +13,10 @@ effect Read = {fileEffects.Read}
 
 val sc = stdio.initStdin()
 
-def read() : {this.Read} Int
+def read() : {Read} Int
     stdio.read(sc)
 
-def readLine() : {this.Read} Option[String]
+def readLine() : {Read} Option[String]
     val line = stdio.readLine(sc)
     if (stdio.isNull(line))
         option.None[String]()

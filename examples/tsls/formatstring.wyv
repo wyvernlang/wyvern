@@ -1,0 +1,212 @@
+module formatstring
+
+import wyvern.ast
+import wyvern.option
+import wyvern.util.matching.regex
+import metadata wyvern.collections.list
+import wyvern.Int
+import wyvern.String
+
+type AST = ast.AST
+
+type ParsedExpr
+    def expr():option.Option[AST]
+    def rest():String
+
+def makeParsedExpr(e:option.Option[AST],r:String):ParsedExpr = new
+    def expr():option.Option[AST] = e
+    def rest():String = r
+
+// recursively determines position of the rbrace ending the expression, -1 if not found
+def getExprPos(input : String, lbraceCt : Int, inString : Boolean, pos : Int) : Int
+    if (input.length() == pos)
+        -1
+      else
+        val c = input.charAt(pos)
+        if (c == #"}" || c == #"{" || c == #"\"")
+            (c == #"}").ifTrue(
+                () => (lbraceCt == 0 && !inString).ifTrue(
+                    () => pos,
+                    () => inString.ifTrue(
+                        () => getExprPos(input, lbraceCt, inString, pos+1),
+                        () => getExprPos(input, lbraceCt - 1, inString, pos+1)
+                    )
+                ),
+                () => (c == #"\"").ifTrue(
+                    () => (pos == 0).ifTrue(
+                        () => getExprPos(input, lbraceCt, !inString, pos+1),
+                        () => (input.charAt(pos-1) == #"\\").ifTrue(
+                            () => getExprPos(input, lbraceCt, inString, pos+1),
+                            () => getExprPos(input, lbraceCt, !inString, pos+1)
+                        )
+                    ),
+                    () => (c == #"{" && !inString).ifTrue(
+                        () => getExprPos(input, lbraceCt+1, inString, pos+1),
+                        () => getExprPos(input, lbraceCt, inString, pos+1)
+                    )
+                )
+            )
+          else
+            getExprPos(input, lbraceCt, inString, pos+1)
+
+// takes in a Wyvern expression as a string and returns a string wrapped in an AST
+// floatPrecision -1 indicates that no float precision was specified
+def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : option.Option[AST]
+    val exp : AST = ast.parseExpression(input, ctx)
+    val ty : ast.Type = ast.getType(exp, ctx)
+    if (ast.types.equals(ty, ast.types.string(), ctx))
+        option.Some[AST](exp)
+      else
+        val str = ast.parseExpression("String", ctx) //wyvern.String
+        if (ast.types.equals(ty, ast.types.int(), ctx))
+            option.Some[AST](ast.call(str, "ofInt", {exp}))
+          else
+            if (ast.types.equals(ty, ast.types.float(), ctx))
+                if (floatPrecision == -1)
+                    option.Some[AST](ast.call(str, "ofFloat", {exp}))
+                  else
+                    val format : String = "%." + String.ofInt(floatPrecision) + "f"
+                    option.Some[AST](ast.call(str, "ofFormattedFloat", {ast.string(format), exp}))
+              else
+                if (ast.types.equals(ty, ast.types.boolean(), ctx))
+                    option.Some[AST](ast.call(exp, "ifTrue", {ast.parseExpression("() => \"true\"", ctx), ast.parseExpression("() => \"false\"", ctx)}))
+                  else
+                    option.None[AST]()
+    
+
+def parseExpr(input : String, ctx : system.Context) : ParsedExpr
+    // if %{...}, we want to get the contents of the braces
+    val normal : option.Option[String] = regex("%\\{").findPrefixMatchOf(input).map[String]((m:regex.Match) => m.after())
+    if (normal.isDefined)
+        val eoparse : Int = getExprPos(normal.get(), 0, false, 0)
+        (eoparse == -1).ifTrue(
+            () => makeParsedExpr(option.None[AST](), normal.get()),
+            () => makeParsedExpr(convStringAST(normal.get().substring(0,eoparse), ctx, -1), normal.get().substring(eoparse+1, normal.get().length()))
+        )
+      else
+        // we check if %.x{...}, for float precision to x decimal places
+        val floatspec : option.Option[regex.Match] = regex("%\\.\\d+\\{").findPrefixMatchOf(input)
+        val formatspec : option.Option[String] = floatspec.map[String]((m:regex.Match) => m.matched())
+        if (floatspec.isDefined)
+            val precision : Int = Int.from(formatspec.get().substring(2, formatspec.get().length()-1))
+            val floatstring : String = floatspec.get().after()
+            val floatstringend : Int = getExprPos(floatstring, 0, false, 0)
+            (floatstringend == -1).ifTrue(
+                () => makeParsedExpr(option.None[AST](), floatstring),
+                () => makeParsedExpr(convStringAST(floatstring.substring(0, floatstringend), ctx, precision),
+                                floatstring.substring(floatstringend+1, floatstring.length()))
+            )
+          else
+            // if nothing found then % should've been escaped, so throw error
+            makeParsedExpr(option.None[AST](), input)
+    
+
+//val prefixRegex : regex.Regex = regex("(\\\\\\\\|\\\\%|[^%])+")
+val prefixRegex : regex.Regex = regex("[^\\\\%]+")
+//val prefixRegex : regex.Regex = regex("[^%]+")
+
+// recursively parses the input, returning option.None[AST] if parsing error
+def parse(input : String, ctx : system.Context) : option.Option[AST]
+    val regxMatch : option.Option[regex.Match] = prefixRegex.findPrefixMatchOf(input)
+    val prefixString : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.matched())
+    val rest : option.Option[String] = regxMatch.map[String]((m:regex.Match) => m.after())
+    if (input == "")
+        option.Some[AST](ast.string(""))
+      else
+        if (prefixString.isDefined)
+            if (rest.get() == "")
+                option.Some[AST](ast.string(prefixString.get()))
+              else
+                val prefix : String = prefixString.get()
+                val suffix : String = rest.get()
+                if (suffix.length() >= 2)
+                    // checking for escaped characters
+                    if (suffix.charAt(0) == #"\\")
+                        if (suffix.charAt(1) == #"%")
+                            val recursiveCall : option.Option[AST] = parse(suffix.substring(2, suffix.length()), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.string(prefix + "%"), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]()
+                          else
+                            if (suffix.charAt(1) == #"\\")
+                                val recursiveCall : option.Option[AST] = parse(suffix.substring(2, suffix.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string(prefix + "\\"), "+", {recursiveCall.get()}))
+                                  else
+                                    option.None[AST]()
+                              else
+                                //would throw error but this could also be part of an escaped string sequence
+                                val recursiveCall : option.Option[AST] = parse(suffix.substring(1, suffix.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string(prefix + "\\"), "+", {recursiveCall.get()}))
+                                  else
+                                    option.None[AST]()
+                      else
+                        val g : ParsedExpr = parseExpr(suffix, ctx)
+                        if (g.expr().isDefined)
+                            val recursiveCall : option.Option[AST] = parse(g.rest(), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().get()}), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]() //recursive call gives None
+                          else
+                            option.None[AST]() //cannot parse expression
+                  else
+                    if (suffix == "")
+                        option.Some[AST](ast.string(prefix))
+                      else
+                        val g : ParsedExpr = parseExpr(rest.getOrElse(() => ""), ctx)
+                        if (g.expr().isDefined)
+                            val recursiveCall = parse(g.rest(), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.call(ast.string(prefixString.get()), "+", {g.expr().get()}), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]() //recursive call gives None
+                          else
+                            option.None[AST]() //cannot parse expression
+          else
+            val g : ParsedExpr = parseExpr(rest.getOrElse(() => input), ctx)
+            if (g.expr().isDefined)
+                val recursiveCall = parse(g.rest(), ctx)
+                if (recursiveCall.isDefined)
+                    option.Some[AST](ast.call(g.expr().get(), "+", {recursiveCall.get()}))
+                  else
+                    option.None[AST]() //recursive call gives None
+              else
+                // can only reach here if first character starts with \
+                if (input.charAt(0) == #"\\")
+                    if (input.length() >= 2)
+                        if (input.charAt(1) == #"%")
+                            val recursiveCall : option.Option[AST] = parse(input.substring(2,input.length()), ctx)
+                            if (recursiveCall.isDefined)
+                                option.Some[AST](ast.call(ast.string("%"), "+", {recursiveCall.get()}))
+                              else
+                                option.None[AST]()
+                          else
+                            if (input.charAt(1) == #"\\")
+                                val recursiveCall : option.Option[AST] = parse(input.substring(2,input.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string("\\"), "+", {recursiveCall.get()}))
+                                  else
+                                    option.None[AST]()
+                              else
+                                val recursiveCall : option.Option[AST] = parse(input.substring(1,input.length()), ctx)
+                                if (recursiveCall.isDefined)
+                                    option.Some[AST](ast.call(ast.string("\\"), "+", {recursiveCall.get()}))
+                                  else
+                                    option.None[AST]()
+                      else
+                        option.Some[AST](ast.string(input))
+                  else
+                    option.None[AST]() //cannot parse expression
+
+
+type FormatString = String
+    metadata new
+        def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
+            //TODO: only strip leading whitespace for ~ referencing, not {} TSL syntax
+            parse(ast.stripLeadingWhitespace(input, false), ctx)
+            
+
+

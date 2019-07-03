@@ -4,8 +4,21 @@ import stdout
 import stdin
 import wyvern.option
 type Option = option.Option
-val filesys = fileSystem(java)
+//val filesys = fileSystem(java)
 val out = stdout(java)
 val in = stdin(java)
 
-in.read()
+val prompt : Int = in.read()
+out.print("the int ")
+out.printInt(prompt)
+out.println()
+
+val promptStr : Option[String] = in.readLine()
+out.print("hello " + promptStr.getOrElse(() => "none"))
+out.println()
+
+in.close()
+
+//in.read() //this throws an error after closing stdin
+
+//just reads in int from stdin without waiting for \n
