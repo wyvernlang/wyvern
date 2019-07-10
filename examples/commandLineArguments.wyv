@@ -1,0 +1,19 @@
+// program to print all the command line arguments given by the user
+// delimited by comma
+
+require stdout
+require java
+import java:wyvern.stdlib.support.CommandLineUtils.utils
+
+val cmdLineArgs = utils.getArgs() // store the arguments in a dynamic array.
+
+def printCmdLineArgs(index: Int): Unit
+  if (index != utils.getLength() - 1)
+      stdout.print(cmdLineArgs.get(index))
+      stdout.print(", ")
+      printCmdLineArgs(index + 1)
+    else
+      stdout.print(cmdLineArgs.get(utils.getLength() - 1))
+      stdout.println()
+
+printCmdLineArgs(0)

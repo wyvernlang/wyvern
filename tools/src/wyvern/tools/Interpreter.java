@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import wyvern.stdlib.Globals;
+import wyvern.stdlib.support.CommandLineUtils;
 import wyvern.target.corewyvernIL.ASTNode;
 import wyvern.target.corewyvernIL.astvisitor.PlatformSpecializationVisitor;
 import wyvern.target.corewyvernIL.astvisitor.TailCallVisitor;
@@ -18,16 +19,26 @@ import wyvern.tools.errors.ToolError;
 public final class Interpreter {
     private Interpreter() { }
     /**
-     * The interpreter only supports 1 argument, which is the path to the Wyvern
-     * file. If more arguments are supplied, it will exit with an error. Then,
+     * The interpreter supports multiple arguments, the first argument (0th index)
+     * supplied will always be the path to the Wyvern file. The command line arguments
+     * will be stored in the dynamic array defined in stdlib/support/CommandLineArgumentsUtils.java
+     * and can be accessed by Wyvern program via the following import statement:
+     *
+     * require java
+     * import java:wyvern.stdlib.support.CommandLineUtils.utils
+     *
      * the file is read in to memory in it's entirety, before being executed in
      * an empty context. The resulting value is printed to the screen.
      */
     public static void main(String[] args) {
-        // check if 1 argument is supplied.
-        if (args.length != 1) {
-            System.err.println("usage: wyvern <filename>");
+        // check if at least one argument is supplied.
+        if (args.length < 1) {
+            // prompt usage message if the number of arguments is less than one.
+            System.err.println("usage: wyvern <filename> <arguments>");
             System.exit(1);
+        } else {
+            // create CommandLineUtils object to store the command line arguments.
+            CommandLineUtils commandLineUtilsObject = new CommandLineUtils(args);
         }
         String filename = args[0];
         Path filepath = Paths.get(filename);
