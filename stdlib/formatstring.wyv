@@ -1,4 +1,4 @@
-module def formatstring() : {}FormatStringModule
+module formatstring
 
 import wyvern.ast
 import wyvern.option
