@@ -1,6 +1,7 @@
 module def stdout(java : Java) : {} Stdout
 
 import java:wyvern.stdlib.support.Stdio.stdio
+import lifted formatstring
 
 // TODO: define me, probably using a stream abstraction for efficiency
 // actually this should probably go in a stream library
@@ -24,6 +25,10 @@ def printBoolean(b:Boolean): {print} Unit
 
 def printFloat(f:Float): {print} Unit
 	stdio.printFloat(f)
+
+def printf(str : formatstring.FormatString): {print} Unit
+    val s : String = str
+    stdio.print(s)
 
 def println(): {print} Unit
 	stdio.println()
