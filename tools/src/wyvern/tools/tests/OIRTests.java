@@ -373,6 +373,22 @@ public class OIRTests {
     }
 
     @Test
+    public void testTSLIfWithComments() throws ParseException {
+        String input = ""
+                     + "val x = 1\n"
+                     + "def getString(): String\n"
+                     + "  if (x == 1) // this is a comment\n"
+                     + "      \"Hello, World!\" // this is a body comment\n"
+                     + "    elif (x == 2) // this is another comment\n"
+                     + "      \"Hi, World!\" // this is a body comment\n"
+                     + "    else // this is another comment\n"
+                     + "      \"\" // this is the last body comment\n"
+                     + "getString()\n";
+        testPyFromInput(input, "Hello, World!");
+    }
+
+
+    @Test
     public void testArithmetic() throws ParseException {
         String input =
                 "val x = ((5 + 3) / 2) * 2 - 1\n"
