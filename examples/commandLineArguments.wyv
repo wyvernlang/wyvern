@@ -1,19 +1,17 @@
-// program to print all the command line arguments given by the user
-// delimited by comma
+// program to print the 0th command line argument and  all the
+// command line arguments given by the user delimited by comma
 
+require cmdArgs
 require stdout
-require java
-import java:wyvern.stdlib.support.CommandLineUtils.utils
 
-val cmdLineArgs = utils.getArgs() // store the arguments in a dynamic array.
+stdout.print("The 0th indexed command line argument is: ")
+stdout.print("\"" + cmdArgs.get(0) + "\"\n")
 
-def printCmdLineArgs(index: Int): Unit
-  if (index != utils.getLength() - 1)
-      stdout.print(cmdLineArgs.get(index))
-      stdout.print(", ")
-      printCmdLineArgs(index + 1)
-    else
-      stdout.print(cmdLineArgs.get(utils.getLength() - 1))
-      stdout.println()
+stdout.print("The last command line argument is: ")
+stdout.print("\"" + cmdArgs.get(cmdArgs.length() - 1) + "\"\n")
 
-printCmdLineArgs(0)
+stdout.print("All command line arguments are: ")
+stdout.print("\"")
+cmdArgs.print()
+stdout.print("\"\n")
+

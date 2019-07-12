@@ -13,8 +13,8 @@ public class CommandLineUtils {
         this.convertToDynArrayList();
     }
 
-    public DynArrayList getArgs() {
-        return argumentsArrayList;
+    public String get(int index) {
+        return (String) argumentsArrayList.get(index);
     }
 
     public int getLength() {
