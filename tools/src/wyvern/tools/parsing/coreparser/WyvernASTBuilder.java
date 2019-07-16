@@ -43,12 +43,7 @@ import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
-import wyvern.tools.typedAST.core.values.BooleanConstant;
-import wyvern.tools.typedAST.core.values.CharacterConstant;
-import wyvern.tools.typedAST.core.values.FloatConstant;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.typedAST.core.values.StringConstant;
-import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
@@ -351,6 +346,15 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST integerLit(BigInteger value, FileLocation loc) {
         return new IntegerConstant(value, loc);
+    }
+
+    @Override
+    public TypedAST rationalLit(String value, FileLocation loc) {
+        // parse the string into numerator and denominator
+        String[] parsedArray = value.split("/", 2);
+        BigInteger numerator = new BigInteger(parsedArray[0]);
+        BigInteger denominator = new BigInteger(parsedArray[1]);
+        return new RationalConstant(numerator, denominator, loc);
     }
 
     @Override

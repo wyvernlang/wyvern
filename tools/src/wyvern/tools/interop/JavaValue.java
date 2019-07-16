@@ -7,10 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import wyvern.stdlib.support.Rational;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.expression.AbstractValue;
 import wyvern.target.corewyvernIL.expression.BooleanLiteral;
+import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.CharacterLiteral;
 import wyvern.target.corewyvernIL.expression.FloatLiteral;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
@@ -111,6 +113,8 @@ public class JavaValue extends AbstractValue implements Invokable {
         } else if (result instanceof Value) {
             // Needed for returning arbitrary values from reflection's invoke.
             return (Value) result;
+        } else if (result instanceof Rational) {
+            return new RationalLiteral(((Rational) result).getNumerator(), ((Rational) result).getDenominator());
         } else {
             // return it as a unit; try to do better than this later
             return new JavaValue(JavaWrapper.wrapObject(result), Util.emptyType());
@@ -164,6 +168,8 @@ public class JavaValue extends AbstractValue implements Invokable {
             return (Boolean) (((BooleanLiteral) arg).getValue());
         } else if (arg instanceof JavaValue) {
             return ((JavaValue) arg).getWrappedValue();
+        } else if (arg instanceof RationalLiteral) {
+            return new Rational(((RationalLiteral) arg).getNumerator(), ((RationalLiteral) arg).getDenominator());
         } else {
             throw new RuntimeException("some Wyvern->Java cases not implemented");
         }

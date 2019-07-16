@@ -59,6 +59,7 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
         javaWhiteList.add("wyvern.stdlib.support.Int.utils");
         javaWhiteList.add("wyvern.stdlib.support.Float.utils");
+        //javaWhiteList.add("wyvern.stdlib.support.Rational.utils");
         javaWhiteList.add("wyvern.stdlib.support.AST.utils");
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
@@ -142,6 +143,7 @@ public final class Globals {
         }
         // Additional primitives should also be added to primitive list in MethodCall.java bytecode generation
         GenContext genCtx = new EmptyGenContext(state).extend(system, new Variable(system), Globals.getSystemType());
+        genCtx = new TypeOrEffectGenContext("Rational", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Int", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Float", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Unit", system, genCtx);
@@ -238,6 +240,10 @@ public final class Globals {
         ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
         declTypes.add(new ConcreteTypeMember("String", stringType));
 
+        List<DeclType> rationalDeclTypes = new LinkedList<>();
+        ValueType rationalType = new StructuralType("rational", rationalDeclTypes);
+        declTypes.add(new ConcreteTypeMember("Rational", rationalType));
+
         List<DeclType> charDeclTypes = new LinkedList<DeclType>();
         charDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
         charDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
@@ -304,6 +310,7 @@ public final class Globals {
     public static ObjectValue getSystemValue() {
         // construct a type for the system object
         List<Declaration> decls = new LinkedList<Declaration>();
+        decls.add(new TypeDeclaration("Rational", new NominalType("this", "Rational"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Float", new NominalType("this", "Float"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));

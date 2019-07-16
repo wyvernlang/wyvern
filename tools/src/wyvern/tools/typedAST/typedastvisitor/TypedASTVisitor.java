@@ -27,12 +27,7 @@ import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
-import wyvern.tools.typedAST.core.values.BooleanConstant;
-import wyvern.tools.typedAST.core.values.CharacterConstant;
-import wyvern.tools.typedAST.core.values.FloatConstant;
-import wyvern.tools.typedAST.core.values.IntegerConstant;
-import wyvern.tools.typedAST.core.values.StringConstant;
-import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.core.values.*;
 
 public abstract class TypedASTVisitor<S, T> {
     public abstract T visit(S state, NameBindingImpl ast);
@@ -59,6 +54,7 @@ public abstract class TypedASTVisitor<S, T> {
     public abstract T visit(S state, New ast);
     public abstract T visit(S state, TaggedInfo ast);
     public abstract T visit(S state, Variable ast);
+    public abstract T visit(S state, RationalConstant ast);
     public abstract T visit(S state, BooleanConstant ast);
     public abstract T visit(S state, CharacterConstant ast);
     public abstract T visit(S state, FloatConstant ast);
