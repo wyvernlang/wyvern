@@ -1,3 +1,8 @@
+/*
+ * program to support the interoperability between Java Rational types
+ * and Wyvern RationalLiteral types.
+ * @author Simon Chu
+ */
 package wyvern.stdlib.support;
 
 import java.math.BigInteger;
@@ -20,6 +25,12 @@ public class Rational {
     }
 
     public String toString() {
-        return numerator.toString() + "/" + denominator.toString();
+        if (this.denominator.equals(new BigInteger("1"))) {
+            // only print numerator if denominator is 1.
+            return this.numerator.toString();
+        } else {
+            // other cases, print the division bar in between numerator and denominator.
+            return numerator.toString() + "/" + denominator.toString();
+        }
     }
 }

@@ -43,7 +43,6 @@ import wyvern.tools.typedAST.core.expressions.Match;
 import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
-import wyvern.tools.typedAST.core.values.*;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.types.NamedType;
@@ -52,6 +51,13 @@ import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 import wyvern.tools.types.extensions.Arrow;
 import wyvern.tools.types.extensions.TypeExtension;
+import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.core.values.CharacterConstant;
+import wyvern.tools.typedAST.core.values.FloatConstant;
+import wyvern.tools.typedAST.core.values.IntegerConstant;
+import wyvern.tools.typedAST.core.values.StringConstant;
+import wyvern.tools.typedAST.core.values.UnitVal;
+import wyvern.tools.typedAST.core.values.RationalConstant;
 
 public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 

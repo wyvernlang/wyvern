@@ -696,7 +696,7 @@ public class OIRTests {
     }
     
     @Test
-    public void testComparisonOperator() throws ParseException {
+    public void testBooleanComparisonOperator() throws ParseException {
       String input =
         "require stdout\n"
             + "stdout.printBoolean(1 >= 2)\n"
@@ -714,5 +714,34 @@ public class OIRTests {
             + "stdout.println()\n"
             + "0";
       testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrue\n0");
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testRationalOperators() throws ParseException {
+        String input =
+                "require stdout\n"
+                        + "stdout.printRational(1/2 + 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/2 - 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/3 - 1/2)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/2 * 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/2 / 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(-1/2)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printBoolean(1/2 < 1/3)\n"
+                        + "stdout.printBoolean(1/2 > 1/3)\n"
+                        + "stdout.printBoolean(1/2 == 1/3)\n"
+                        + "stdout.printBoolean(1/2 <= 1/3)\n"
+                        + "stdout.printBoolean(1/2 >= 1/3)\n"
+                        + "stdout.printBoolean(1/2 != 1/3)\n"
+                        + "stdout.printBoolean(1/5 == 20/100)\n"
+                        + "stdout.println()\n"
+                        + "0";
+        testPyFromInput(input, "5/6 1/6 -1/6 1/6 3/2 -1/2 FalseTrueFalseFalseTrueTrueTrue\n0");
     }
 }

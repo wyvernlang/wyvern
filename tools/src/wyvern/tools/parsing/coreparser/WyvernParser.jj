@@ -930,13 +930,11 @@ AST Literal() :
 |
   lit = <BOOLEAN_LITERAL> { return build.booleanLit(Boolean.parseBoolean(lit.image), loc(lit)); }
 |
-
   lit = <DSL_LITERAL> {
     exp = build.dsl(loc(lit));
     build.setDSLBody(exp, lit.image);
     return exp;
   }
-
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :

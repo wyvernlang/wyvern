@@ -59,7 +59,6 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.StringHelper.utils");
         javaWhiteList.add("wyvern.stdlib.support.Int.utils");
         javaWhiteList.add("wyvern.stdlib.support.Float.utils");
-        //javaWhiteList.add("wyvern.stdlib.support.Rational.utils");
         javaWhiteList.add("wyvern.stdlib.support.AST.utils");
         javaWhiteList.add("wyvern.stdlib.support.Regex.utils");
         javaWhiteList.add("wyvern.stdlib.support.Stdio.debug");
@@ -241,6 +240,17 @@ public final class Globals {
         declTypes.add(new ConcreteTypeMember("String", stringType));
 
         List<DeclType> rationalDeclTypes = new LinkedList<>();
+        rationalDeclTypes.add(new DefDeclType("+", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("-", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("*", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("/", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("negate", Util.rationalType(), Arrays.asList()));
+        rationalDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
         ValueType rationalType = new StructuralType("rational", rationalDeclTypes);
         declTypes.add(new ConcreteTypeMember("Rational", rationalType));
 

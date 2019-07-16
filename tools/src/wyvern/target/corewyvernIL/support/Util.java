@@ -34,7 +34,9 @@ public final class Util {
     private static final ValueType theDynType = new DynamicType();
     private static final ValueType theBottomType = new BottomType();
 
-    public static ValueType rationalType() { return theRationalType; }
+    public static ValueType rationalType() {
+      return theRationalType;
+    }
     public static ValueType booleanType() {
         return theBooleanType;
     }

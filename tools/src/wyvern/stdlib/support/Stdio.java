@@ -1,7 +1,5 @@
 package wyvern.stdlib.support;
 
-import wyvern.stdlib.support.Rational;
-
 import java.math.BigInteger;
 import java.util.Scanner;
 
@@ -29,8 +27,10 @@ public class Stdio {
     public void printFloat(Double f) {
         java.lang.System.out.print(f);
     }
-    public void printRational(Rational r) { System.out.print(r); }
-    
+    public void printRational(Rational r) {
+      System.out.print(r);
+    }
+
     /** Stdin methods **/
     public Scanner initStdin() {
         return new Scanner(java.lang.System.in);
