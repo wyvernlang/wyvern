@@ -1,0 +1,53 @@
+module def asyncio(java : Java)
+
+import java:wyvern.stdlib.support.NIO.nio
+
+import future
+
+val future = future(java)
+
+type ByteBuffer
+    val size : Int
+    def get(index : Int) : Int
+    def set(index : Int, byte : Int) : Unit
+    // maybe writing strings? reading UTF? bytebuffer class with methods for creating from string, etc.
+
+// TCP
+type Socket
+    def read(buf : ByteBuffer) : future.Future[Int]
+    def write(buf : ByteBuffer) : future.Future[Int]
+    def close() : Unit
+
+// TCP
+type ServerSocket
+    def accept() : future.Future[Socket]
+
+
+def makeServerSocket(port : Int) : ServerSocket
+    val channel = nio.makeServerSocketChannel(port)
+    def makeSocketFromChannel(channel:Unit) : Socket = new
+        def read(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketRead(channel,buf))
+        def write(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketWrite(channel,buf))
+        def close():Unit = nio.socketClose(channel)
+    new
+        def accept() : future.Future[Socket]
+            future.Future[Unit](nio.serverAccept(channel)).andThen[Socket](
+                (channel:Unit) => makeSocketFromChannel(channel)
+            )
+
+def makeSocket(hostname : String, port : Int) : Socket = new
+    val channel = nio.makeSocketChannel(hostname, port)
+    def read(buf : ByteBuffer) : future.Future[Int]
+        future.Future[Int](nio.socketRead(this.channel, buf))
+    def write(buf : ByteBuffer) : future.Future[Int]
+        future.Future[Int](nio.socketWrite(this.channel, buf))
+    def close() : Unit
+        nio.socketClose(this.channel)
+
+def makeByteBuffer(allocSize : Int) : ByteBuffer = new
+    val buffer = nio.makeByteBuffer(allocSize)
+    val size = allocSize
+    def get(index : Int) : Int
+        nio.byteBufferGet(this.buffer, index)
+    def set(index : Int, byte : Int) : Unit
+        nio.byteBufferSet(this.buffer, index, byte)
