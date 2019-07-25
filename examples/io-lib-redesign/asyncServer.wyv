@@ -1,0 +1,21 @@
+require java
+require stdout
+
+import asyncio
+import future
+val async = asyncio(java)
+val futureobj = future(java)
+
+stdout.print("Making server socket...\n")
+
+val serverSocket = async.makeServerSocket(1254)
+
+stdout.print("Waiting for client connection...\n")
+
+val s1 : futureobj.Future[async.Socket] = serverSocket.accept()
+
+stdout.print("This should print before connecting\n")
+
+val connected : async.Socket = s1.get()
+
+stdout.print("Connected!\n")

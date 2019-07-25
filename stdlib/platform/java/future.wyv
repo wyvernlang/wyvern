@@ -2,7 +2,7 @@ module def future(java : Java) : {}
 
 import java:wyvern.stdlib.support.NIO.nio
 
-tagged resource type Future
+resource type Future
     type T
     def get() : this.T //blocking call
     def isCancelled() : Boolean
@@ -17,6 +17,7 @@ def Future[T](x:Unit):Future[T] = new
     def isCancelled() : Boolean = nio.futureIsCancelled(x)
     def isDone() : Boolean = nio.futureIsDone(x)
     def cancel() : Boolean = nio.futureCancel(x)
+    //def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.applyCallback(x, cb))
     def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.futureNew(cb(this.get()))) //this isn't supposed to block
     /*
     def andThen[U](cb : T -> U) : Future[U] = new
@@ -25,5 +26,5 @@ def Future[T](x:Unit):Future[T] = new
         def isCancelled() : Boolean = nio.futureIsCancelled(x)
         def isDone() : Boolean = nio.futureIsDone(x)
         def cancel() : Boolean = nio.futureCancel(x)
-        def andThen[V](cb : U -> V) : Future[V] = Future[V]()
+        def andThen[V](cb : U -> V) : Future[V] = andThen[U](cb)
     */

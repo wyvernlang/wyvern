@@ -1,0 +1,17 @@
+require java
+require stdout
+
+import asyncio
+import future
+val async = asyncio(java)
+val futureobj = future(java)
+
+stdout.print("Making socket...\n")
+
+val socket = async.makeSocket("localhost", 1254)
+
+stdout.print("Connected to server!\n")
+
+socket.close()
+
+stdout.print("Closed socket.\n")

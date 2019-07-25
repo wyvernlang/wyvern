@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 
 public class NIO {
@@ -21,11 +22,16 @@ public class NIO {
         return serverSocket;
     }
     
-    public AsynchronousSocketChannel makeSocketChannel(String hostname, int port) throws IOException {
+    public AsynchronousSocketChannel makeSocketChannel() throws IOException {
         AsynchronousSocketChannel socket = AsynchronousSocketChannel.open();
-        socket.bind(new InetSocketAddress(hostname, port));
+        //socket.connect(new InetSocketAddress(hostname, port));
         return socket;
     }
+	
+	public Future<Void> socketChannelConnect(Object sc, String hostname, int port) {
+		AsynchronousSocketChannel chan = (AsynchronousSocketChannel) sc;
+		return chan.connect(new InetSocketAddress(hostname, port));
+	}
     
     public Future<AsynchronousSocketChannel> serverAccept(Object server) {
         AsynchronousServerSocketChannel s = (AsynchronousServerSocketChannel) server;
@@ -87,6 +93,14 @@ public class NIO {
     public <T> Future<T> futureNew(T value) {
         return CompletableFuture.completedFuture(value);
     }
+    
+    
+    //doesn't work with casting
+    public <T,U> CompletableFuture<U> applyCallback(Object obj, Object fn) {
+        Function<T,U> fun = (Function<T,U>) fn;
+        CompletableFuture<T> f = (CompletableFuture<T>) obj;
+        return f.thenApply(fun);
+    }
 
     /** ByteBuffer abstraction **/
     public ByteBuffer makeByteBuffer(int allocSize) {
@@ -98,9 +112,10 @@ public class NIO {
         return b.get(index);
     }
     
-    public void byteBufferSet(Object buf, int index, byte value) {
+    //note that this puts an int
+    public void byteBufferSet(Object buf, int index, int value) {
         ByteBuffer b = (ByteBuffer) buf;
-        b.put(index, value);
+        b.putInt(index, value);
     }
     
 }

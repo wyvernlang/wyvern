@@ -9,7 +9,7 @@ val future = future(java)
 type ByteBuffer
     val size : Int
     def get(index : Int) : Int
-    def set(index : Int, byte : Int) : Unit
+    def set(index : Int, value : Int) : Unit
     // maybe writing strings? reading UTF? bytebuffer class with methods for creating from string, etc.
 
 // TCP
@@ -35,19 +35,36 @@ def makeServerSocket(port : Int) : ServerSocket
                 (channel:Unit) => makeSocketFromChannel(channel)
             )
 
-def makeSocket(hostname : String, port : Int) : Socket = new
-    val channel = nio.makeSocketChannel(hostname, port)
-    def read(buf : ByteBuffer) : future.Future[Int]
-        future.Future[Int](nio.socketRead(this.channel, buf))
-    def write(buf : ByteBuffer) : future.Future[Int]
-        future.Future[Int](nio.socketWrite(this.channel, buf))
-    def close() : Unit
-        nio.socketClose(this.channel)
+def makeSocket(hostname : String, port : Int) : future.Future[Socket]
+    val channel = nio.makeSocketChannel()
+    val connected : future.Future[Unit] = future.Future[Unit](nio.socketChannelConnect(channel, hostname, port))
+    val socket : Socket = new
+        def read(buf : ByteBuffer) : future.Future[Int]
+            future.Future[Int](nio.socketRead(channel, buf))
+        def write(buf : ByteBuffer) : future.Future[Int]
+            future.Future[Int](nio.socketWrite(channel, buf))
+        def close() : Unit
+            nio.socketClose(channel)
+    new
+        type T = Socket
+        def get() : Socket
+            val wait = connected.get() //blocks until done
+            socket
+        def isCancelled() : Boolean = connected.isCancelled()
+        def isDone() : Boolean = connected.isDone()
+        def cancel() : Boolean = connected.cancel()
+        def andThen[U](cb : this.T -> U) : future.Future[U]
+            val conv = (() => 
+                socket
+            )
+            val temp : future.Future[this.T] = connected.andThen[this.T](conv)
+            temp.andThen[U](cb)
 
-def makeByteBuffer(allocSize : Int) : ByteBuffer = new
+def makeByteBuffer(allocSize : Int) : ByteBuffer
     val buffer = nio.makeByteBuffer(allocSize)
-    val size = allocSize
-    def get(index : Int) : Int
-        nio.byteBufferGet(this.buffer, index)
-    def set(index : Int, byte : Int) : Unit
-        nio.byteBufferSet(this.buffer, index, byte)
+    new
+        val size = allocSize
+        def get(index : Int) : Int
+            nio.byteBufferGet(buffer, index)
+        def set(index : Int, value : Int) : Unit
+            nio.byteBufferSet(buffer, index, value)
