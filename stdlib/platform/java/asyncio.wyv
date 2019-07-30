@@ -22,6 +22,21 @@ type Socket
 type ServerSocket
     def accept() : future.Future[Socket]
 
+/*
+// can configure for async, but just returns null instead of blocking
+// UDP
+type DatagramChannel
+	//def bind(port : Int) : Unit
+	//maxSize? timeout?
+	def receive(buf : ByteBuffer) : Option[Packet]
+	def send(buf : ByteBuffer, hostname : String, port : Int) : Int
+	
+type DatagramPacket
+	val data : ByteBuffer
+	val hostaddr : String
+	val port : Int
+*/
+
 
 def makeServerSocket(port : Int) : ServerSocket
     val channel = nio.makeServerSocketChannel(port)
@@ -34,7 +49,7 @@ def makeServerSocket(port : Int) : ServerSocket
             future.Future[Unit](nio.serverAccept(channel)).andThen[Socket](
                 (channel:Unit) => makeSocketFromChannel(channel)
             )
-
+/*
 def makeSocket(hostname : String, port : Int) : future.Future[Socket]
     val channel = nio.makeSocketChannel()
     val connected : future.Future[Unit] = future.Future[Unit](nio.socketChannelConnect(channel, hostname, port))
@@ -59,7 +74,7 @@ def makeSocket(hostname : String, port : Int) : future.Future[Socket]
             )
             val temp : future.Future[this.T] = connected.andThen[this.T](conv)
             temp.andThen[U](cb)
-
+*/
 def makeByteBuffer(allocSize : Int) : ByteBuffer
     val buffer = nio.makeByteBuffer(allocSize)
     new
