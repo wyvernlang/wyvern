@@ -17,8 +17,8 @@ def Future[T](x:Unit):Future[T] = new
     def isCancelled() : Boolean = nio.futureIsCancelled(x)
     def isDone() : Boolean = nio.futureIsDone(x)
     def cancel() : Boolean = nio.futureCancel(x)
-    //def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.applyCallback(x, cb))
-    def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.futureNew(cb(this.get()))) //this isn't supposed to block
+    def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.applyCallback(x, cb))
+    //def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.futureNew(cb(this.get()))) //this isn't supposed to block
     /*
     def andThen[U](cb : T -> U) : Future[U] = new
         type T = U
