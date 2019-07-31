@@ -1,0 +1,33 @@
+module def bytebuffer(java : Java)
+
+import java:wyvern.stdlib.support.ByteBufferWrapper.bb
+
+type ByteBuffer
+    val size : Int
+    val buffer : Unit //java ByteBuffer
+    def get(index : Int) : Int
+    def set(index : Int, value : Int) : Unit
+    
+    // maybe writing strings? reading UTF? bytebuffer class with methods for creating from string, etc.
+    
+// makes an empty ByteBuffer
+def makeByteBuffer(allocSize : Int) : ByteBuffer
+    new
+        val size = allocSize
+        val buffer = bb.makeByteBuffer(allocSize)
+        def get(index : Int) : Int
+            bb.byteBufferGet(this.buffer, index)
+        def set(index : Int, value : Int) : Unit
+            bb.byteBufferSet(this.buffer, index, value)
+            
+// temporary design for String -> ByteBuffer
+def makeByteBufferFromString(s : String) : ByteBuffer
+    new
+        val size = s.length()
+        val buffer = bb.makeFromString(s)
+        // these modify with char values (2 bytes at a time)
+        def get(index : Int) : Int
+            bb.charGet(this.buffer, index)
+        def set(index : Int, value : Int) : Unit
+            bb.charSet(this.buffer, index, value)
+
