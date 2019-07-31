@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.channels.DatagramChannel;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
@@ -13,6 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.LinkedList;
+
+import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.Value;
 
 /* Future -> CompletableFuture conversion as described in 
 http://www.thedevpiece.com/converting-old-java-future-to-completablefuture/ */
@@ -106,6 +111,15 @@ public class NIO {
         socket.close();
     }
     
+    /** Async UDP channel methods **/
+    
+    public DatagramChannel makeDatagramChannel(int port) throws IOException {
+        DatagramChannel chan = DatagramChannel.open();
+        chan.bind(new InetSocketAddress(port));
+        chan.configureBlocking(false);
+        return chan;
+    }
+    
     /** Future wrapper **/
     public boolean futureIsCancelled(Object obj) {
         Future f = (Future) obj;
@@ -134,22 +148,22 @@ public class NIO {
     public <T> Future<T> futureNew(T value) {
         return CompletableFuture.completedFuture(value);
     }
-    /*
-    public <T,U> Function<T,U> wrapWyvernFunction(Object fn) {
-        return () -> fn;
-    }
-    */
-    //doesn't work with casting
-    public <T,U> CompletableFuture<U> applyCallback(Object obj, Object fn) {
+    
+	// applies wyvern function fn to wyvern value param
+	public <T> Value wyvernApplication(T param, ObjectValue fn) {
+		LinkedList<Value> params = new LinkedList<>();
+		params.add((Value) param);
+		return fn.invoke("apply", params).executeIfThunk();
+	}
+	
+	// supplies wyvern callback to future value
+    public <T> CompletableFuture<Value> applyCallback(Object obj, ObjectValue fn) {
         Future<T> f = (Future<T>) obj;
         CompletableFuture<T> completableFuture = new CompletablePromise<T>(f);
-        Function<T,U> fun = (Function<T,U>) fn; //need to wrap this
-        return completableFuture.thenApply(fun);
+        LinkedList<Value> params = new LinkedList<>();
+        return completableFuture.thenApply(res -> wyvernApplication(res, fn));
     }
-	/*
-	function from T to wyvern T, apply wyvern function, return
-	*/
-	
+    
 
     /** ByteBuffer abstraction **/
     public ByteBuffer makeByteBuffer(int allocSize) {
