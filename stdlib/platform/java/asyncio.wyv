@@ -3,14 +3,12 @@ module def asyncio(java : Java)
 import java:wyvern.stdlib.support.NIO.nio
 
 import future
+import bytebuffer
 
 val future = future(java)
+val bytebuffer = bytebuffer(java)
 
-type ByteBuffer
-    val size : Int
-    def get(index : Int) : Int
-    def set(index : Int, value : Int) : Unit
-    // maybe writing strings? reading UTF? bytebuffer class with methods for creating from string, etc.
+type ByteBuffer = bytebuffer.ByteBuffer
 
 // TCP
 type Socket
@@ -26,23 +24,26 @@ type ServerSocket
 // can configure for async, but just returns null instead of blocking
 // UDP
 type DatagramChannel
-	//def bind(port : Int) : Unit
-	//maxSize? timeout?
-	def receive(buf : ByteBuffer) : Option[Packet]
-	def send(buf : ByteBuffer, hostname : String, port : Int) : Int
-	
+    //def bind(port : Int) : Unit
+    //maxSize? timeout?
+    def receive(buf : ByteBuffer) : Option[Packet]
+    def send(buf : ByteBuffer, hostname : String, port : Int) : Int
+    
 type DatagramPacket
-	val data : ByteBuffer
-	val hostaddr : String
-	val port : Int
+    val data : ByteBuffer
+    val hostaddr : String
+    val port : Int
+
+def makeDatagramChannel(port : Int) : DatagramChannel = new
+    val chan = nio.makeDatagramChannel(port)
 */
 
 
 def makeServerSocket(port : Int) : ServerSocket
     val channel = nio.makeServerSocketChannel(port)
     def makeSocketFromChannel(channel:Unit) : Socket = new
-        def read(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketRead(channel,buf))
-        def write(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketWrite(channel,buf))
+        def read(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketRead(channel,buf.buffer))
+        def write(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketWrite(channel,buf.buffer))
         def close():Unit = nio.socketClose(channel)
     new
         def accept() : future.Future[Socket]
@@ -55,9 +56,9 @@ def makeSocket(hostname : String, port : Int) : future.Future[Socket]
     val connected : future.Future[Unit] = future.Future[Unit](nio.socketChannelConnect(channel, hostname, port))
     val socket : Socket = new
         def read(buf : ByteBuffer) : future.Future[Int]
-            future.Future[Int](nio.socketRead(channel, buf))
+            future.Future[Int](nio.socketRead(channel, buf.buffer))
         def write(buf : ByteBuffer) : future.Future[Int]
-            future.Future[Int](nio.socketWrite(channel, buf))
+            future.Future[Int](nio.socketWrite(channel, buf.buffer))
         def close() : Unit
             nio.socketClose(channel)
     new
@@ -75,11 +76,3 @@ def makeSocket(hostname : String, port : Int) : future.Future[Socket]
             val temp : future.Future[this.T] = connected.andThen[this.T](conv)
             temp.andThen[U](cb)
 */
-def makeByteBuffer(allocSize : Int) : ByteBuffer
-    val buffer = nio.makeByteBuffer(allocSize)
-    new
-        val size = allocSize
-        def get(index : Int) : Int
-            nio.byteBufferGet(buffer, index)
-        def set(index : Int, value : Int) : Unit
-            nio.byteBufferSet(buffer, index, value)

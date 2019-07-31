@@ -164,21 +164,5 @@ public class NIO {
         return completableFuture.thenApply(res -> wyvernApplication(res, fn));
     }
     
-
-    /** ByteBuffer abstraction **/
-    public ByteBuffer makeByteBuffer(int allocSize) {
-        return ByteBuffer.allocate(allocSize);
-    }
-    
-    public int byteBufferGet(Object buf, int index) {
-        ByteBuffer b = (ByteBuffer) buf;
-        return b.get(index);
-    }
-    
-    //note that this puts an int
-    public void byteBufferSet(Object buf, int index, int value) {
-        ByteBuffer b = (ByteBuffer) buf;
-        b.putInt(index, value);
-    }
     
 }
