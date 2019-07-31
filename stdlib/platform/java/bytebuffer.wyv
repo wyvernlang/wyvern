@@ -1,4 +1,4 @@
-module def bytebuffer(java : Java)
+module def bytebuffer(java:Java)
 
 import java:wyvern.stdlib.support.ByteBufferWrapper.bb
 
