@@ -3,17 +3,18 @@ package wyvern.stdlib.support;
 /* Imports */
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.Channel;
 import java.nio.channels.DatagramChannel;
 import java.net.InetSocketAddress;
-import java.util.concurrent.Future;
+import java.net.SocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.LinkedList;
 
 import wyvern.target.corewyvernIL.expression.ObjectValue;
@@ -106,9 +107,10 @@ public class NIO {
         return status;
     }
     
-    public void socketClose(Object chan) throws IOException {
-        AsynchronousSocketChannel socket = (AsynchronousSocketChannel) chan;
-        socket.close();
+	// works for any of the socket channels
+    public void closeChannel(Object chan) throws IOException {
+        Channel channel = (Channel) chan;
+        channel.close();
     }
     
     /** Async UDP channel methods **/
@@ -118,6 +120,27 @@ public class NIO {
         chan.bind(new InetSocketAddress(port));
         chan.configureBlocking(false);
         return chan;
+    }
+    
+    public SocketAddress receiveUDP(Object chan, Object buf) throws IOException {
+        DatagramChannel channel = (DatagramChannel) chan;
+        ByteBuffer buffer = (ByteBuffer) buf;
+        return channel.receive(buffer);
+    }
+    
+    public int sendUDP(Object chan, Object buf, Object addr) throws IOException {
+        DatagramChannel channel = (DatagramChannel) chan;
+        SocketAddress target = (SocketAddress) addr;
+        ByteBuffer src = (ByteBuffer) buf;
+        return channel.send(src, target);
+    }
+    
+    public boolean isNull(Object obj) {
+        return obj == null;
+    }
+    
+    public SocketAddress makeSocketAddress(String hostname, int port) {
+        return new InetSocketAddress(hostname, port);
     }
     
     /** Future wrapper **/
@@ -149,14 +172,14 @@ public class NIO {
         return CompletableFuture.completedFuture(value);
     }
     
-	// applies wyvern function fn to wyvern value param
-	public <T> Value wyvernApplication(T param, ObjectValue fn) {
-		LinkedList<Value> params = new LinkedList<>();
-		params.add((Value) param);
-		return fn.invoke("apply", params).executeIfThunk();
-	}
-	
-	// supplies wyvern callback to future value
+    // applies wyvern function fn to wyvern value param
+    public <T> Value wyvernApplication(T param, ObjectValue fn) {
+        LinkedList<Value> params = new LinkedList<>();
+        params.add((Value) param);
+        return fn.invoke("apply", params).executeIfThunk();
+    }
+    
+    // supplies wyvern callback to future value
     public <T> CompletableFuture<Value> applyCallback(Object obj, ObjectValue fn) {
         Future<T> f = (Future<T>) obj;
         CompletableFuture<T> completableFuture = new CompletablePromise<T>(f);
