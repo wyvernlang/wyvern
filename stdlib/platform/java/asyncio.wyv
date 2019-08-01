@@ -4,11 +4,13 @@ import java:wyvern.stdlib.support.NIO.nio
 
 import future
 import bytebuffer
+import wyvern.option
 
 val future = future(java)
 val bytebuffer = bytebuffer(java)
 
 type ByteBuffer = bytebuffer.ByteBuffer
+type Option = option.Option
 
 // TCP
 type Socket
@@ -19,37 +21,59 @@ type Socket
 // TCP
 type ServerSocket
     def accept() : future.Future[Socket]
+    def close() : Unit
 
-/*
-// can configure for async, but just returns null instead of blocking
 // UDP
 type DatagramChannel
-    //def bind(port : Int) : Unit
-    //maxSize? timeout?
-    def receive(buf : ByteBuffer) : Option[Packet]
-    def send(buf : ByteBuffer, hostname : String, port : Int) : Int
-    
-type DatagramPacket
+    // returns None if no packet ready, Some(Packet) if there was
+    def receive(maxSize : Int) : Option[Packet]
+    // returns number of bytes sent
+    def send(packet: Packet) : Int
+    def close() : Unit
+
+// UDP
+type Packet
     val data : ByteBuffer
-    val hostaddr : String
-    val port : Int
+    val address : Unit // java SocketAddress
 
-def makeDatagramChannel(port : Int) : DatagramChannel = new
+def makeDatagramPacket(buf : ByteBuffer, hostname : String, port : Int) : Packet = new
+    val data = buf
+    val address = makeSocketAddress(hostname, port)
+
+def makeSocketAddress(hostname : String, port : Int) : Unit
+    nio.makeSocketAddress(hostname, port)
+
+def makeDatagramChannel(port : Int) : DatagramChannel
     val chan = nio.makeDatagramChannel(port)
-*/
-
+    new
+        def receive(maxSize : Int) : Option[Packet]
+            val buf : ByteBuffer = bytebuffer.makeByteBuffer(maxSize) //allocates every time; can make more efficient?
+            val maybeAddr = nio.receiveUDP(chan, buf.buffer)
+            if (nio.isNull(maybeAddr))
+                option.None[Packet]()
+              else
+                val packet = new
+                    val data = buf
+                    val address = maybeAddr
+                option.Some[Packet](packet)
+        def send(packet : Packet) : Int
+            nio.sendUDP(chan, packet.data.buffer, packet.address)
+        def close() : Unit
+            nio.closeChannel(chan)
 
 def makeServerSocket(port : Int) : ServerSocket
-    val channel = nio.makeServerSocketChannel(port)
+    val serverChannel = nio.makeServerSocketChannel(port)
     def makeSocketFromChannel(channel:Unit) : Socket = new
         def read(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketRead(channel,buf.buffer))
         def write(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketWrite(channel,buf.buffer))
-        def close():Unit = nio.socketClose(channel)
+        def close():Unit = nio.closeChannel(channel)
     new
         def accept() : future.Future[Socket]
-            future.Future[Unit](nio.serverAccept(channel)).andThen[Socket](
+            future.Future[Unit](nio.serverAccept(serverChannel)).andThen[Socket](
                 (channel:Unit) => makeSocketFromChannel(channel)
             )
+        def close() : Unit
+            nio.closeChannel(serverChannel)
 /*
 def makeSocket(hostname : String, port : Int) : future.Future[Socket]
     val channel = nio.makeSocketChannel()
@@ -60,7 +84,7 @@ def makeSocket(hostname : String, port : Int) : future.Future[Socket]
         def write(buf : ByteBuffer) : future.Future[Int]
             future.Future[Int](nio.socketWrite(channel, buf.buffer))
         def close() : Unit
-            nio.socketClose(channel)
+            nio.closeChannel(channel)
     new
         type T = Socket
         def get() : Socket
