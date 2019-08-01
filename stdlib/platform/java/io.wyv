@@ -1,6 +1,10 @@
 module def io(java:Java)
 import java:wyvern.stdlib.support.IO.io
 
+import bytebuffer
+val bytebuffer = bytebuffer(java)
+type ByteBuffer = bytebuffer.ByteBuffer
+
 // === Library Types ===
 type InputStream
     def close():Unit
@@ -26,12 +30,39 @@ type Socket
 type ServerSocket
     def accept():Socket
 
+type DatagramSocket
+	def send(p:Packet):Unit
+	def receive(p:Packet):Unit
+	def close():Unit
+
+type Packet
+	val data : ByteBuffer // can change directly to byte array if necessary
+	val length : Int
+	val hostname : String
+	val port : Int
+
 // === Creator Functions ===
 def makeServerSocket(port:Int):ServerSocket
     io.makeServerSocket(port)
 
 def makeSocket(hostname:String, port:Int):Socket
     io.makeSocket(hostname, port)
+
+def makeDatagramSocket(port:Int):DatagramSocket
+	val socket = io.makeDatagramSocket(port)
+	new
+		def send(p:Packet):Unit
+			io.sendDatagram(socket, io.makePacket(p.data.buffer, p.length, p.hostname, p.port))
+		def receive(p:Packet):Unit
+			io.receiveDatagram(socket, io.makePacket(p.data.buffer, p.length, p.hostname, p.port))
+		def close():Unit
+			io.closeSocket(socket)
+
+def makePacket(data:ByteBuffer, length:Int, hostname:String, port:Int):Packet = new
+	val data = data
+	val length = length
+	val hostname = hostname
+	val port = port
 
 /**
 * TODO: Hide functions that take arg:Dyn from the user
