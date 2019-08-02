@@ -41,4 +41,8 @@ public class ByteBufferWrapper {
         b.putChar(i, (char) c);
     }
     
+    public String stringFromByteBuffer(Object buf) {
+        ByteBuffer buffer = (ByteBuffer) buf;
+        return new String(buffer.array());
+    }
 }

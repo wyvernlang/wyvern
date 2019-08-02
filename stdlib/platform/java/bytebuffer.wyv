@@ -31,3 +31,5 @@ def makeByteBufferFromString(s : String) : ByteBuffer
         def set(index : Int, value : Int) : Unit
             bb.charSet(this.buffer, index, value)
 
+def toString(buf : ByteBuffer) : String
+	bb.stringFromByteBuffer(buf.buffer)

@@ -1,0 +1,27 @@
+require java
+require stdout
+
+import asyncio
+import io
+import bytebuffer
+import wyvern.option
+val async = asyncio(java)
+val ioobj = io(java)
+val bytebuffer = bytebuffer(java)
+
+def loop(chan : async.DatagramChannel) : async.Packet
+    chan.receive(256).getOrElse(() => loop(chan))
+
+stdout.print("Making async UDP channel...\n")
+
+val asyncUDP = async.makeDatagramChannel(1234)
+
+stdout.print("Waiting for packet...\n")
+
+val p = loop(asyncUDP)
+
+stdout.print("Packet received!\n")
+
+stdout.print(bytebuffer.toString(p.data) + "\n")
+
+asyncUDP.close()

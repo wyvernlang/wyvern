@@ -1,0 +1,28 @@
+require java
+require stdout
+
+import asyncio
+import io
+import bytebuffer
+import wyvern.option
+val async = asyncio(java)
+val ioobj = io(java)
+val bytebuffer = bytebuffer(java)
+
+
+stdout.print("Making async UDP channel...\n")
+
+val asyncUDP = async.makeDatagramChannel(1235)
+
+stdout.print("Making datagram packet...\n")
+
+val b = bytebuffer.makeByteBufferFromString("hello world!")
+val p : async.Packet = async.makeDatagramPacket(b, "localhost", 1234)
+
+stdout.print("Sending packet on UDP channel...\n")
+
+asyncUDP.send(p)
+
+stdout.print("Sent!")
+
+asyncUDP.close()
