@@ -10,7 +10,8 @@ resource type Future
     def cancel() : Boolean
     def andThen[U](cb : this.T -> U) : Future[U]
     // also can add timeout for get as an Option later
-    
+
+// takes in x of Java type Future<T>
 def Future[T](x:Unit):Future[T] = new
     type T = T
     def get() : T = nio.futureGet(x)
