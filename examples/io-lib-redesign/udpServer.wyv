@@ -17,6 +17,7 @@ val asyncUDP = async.makeDatagramChannel(1235)
 stdout.print("Making datagram packet...\n")
 
 val b = bytebuffer.makeByteBufferFromString("hello world!")
+stdout.print(bytebuffer.toString(b) + "\n")
 val p : async.Packet = async.makeDatagramPacket(b, "localhost", 1234)
 
 stdout.print("Sending packet on UDP channel...\n")

@@ -2,9 +2,9 @@ module def bytebuffer(java:Java)
 
 import java:wyvern.stdlib.support.ByteBufferWrapper.bb
 
-type ByteBuffer
+resource type ByteBuffer
     val size : Int
-    val buffer : Unit //java ByteBuffer
+    def getBuffer() : Unit //java ByteBuffer
     def get(index : Int) : Int
     def set(index : Int, value : Int) : Unit
     
@@ -14,7 +14,9 @@ type ByteBuffer
 def makeByteBuffer(allocSize : Int) : ByteBuffer
     new
         val size = allocSize
-        val buffer = bb.makeByteBuffer(allocSize)
+        var buffer : Unit = bb.makeByteBuffer(allocSize)
+        def getBuffer() : Unit
+            this.buffer
         def get(index : Int) : Int
             bb.byteBufferGet(this.buffer, index)
         def set(index : Int, value : Int) : Unit
@@ -24,12 +26,16 @@ def makeByteBuffer(allocSize : Int) : ByteBuffer
 def makeByteBufferFromString(s : String) : ByteBuffer
     new
         val size = s.length()
-        val buffer = bb.makeFromString(s)
+        var buffer : Unit = bb.makeFromString(s)
+        def getBuffer() : Unit
+            this.buffer
         // these modify with char values (2 bytes at a time)
         def get(index : Int) : Int
-            bb.charGet(this.buffer, index)
+            //bb.charGet(this.buffer, index)
+            bb.byteBufferGet(this.buffer, index)
         def set(index : Int, value : Int) : Unit
-            bb.charSet(this.buffer, index, value)
+            //bb.charSet(this.buffer, index, value)
+            bb.byteBufferSet(this.buffer, index, value)
 
 def toString(buf : ByteBuffer) : String
-	bb.stringFromByteBuffer(buf.buffer)
+    bb.stringFromByteBuffer(buf.getBuffer())

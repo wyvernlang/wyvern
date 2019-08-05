@@ -35,7 +35,7 @@ type DatagramSocket
 	def receive(p:Packet):Unit
 	def close():Unit
 
-type Packet
+resource type Packet
 	val data : ByteBuffer // can change directly to byte array if necessary
 	val length : Int
 	val hostname : String
@@ -52,9 +52,9 @@ def makeDatagramSocket(port:Int):DatagramSocket
 	val socket = io.makeDatagramSocket(port)
 	new
 		def send(p:Packet):Unit
-			io.sendDatagram(socket, io.makePacket(p.data.buffer, p.length, p.hostname, p.port))
+			io.sendDatagram(socket, io.makePacket(p.data.getBuffer(), p.length, p.hostname, p.port))
 		def receive(p:Packet):Unit
-			io.receiveDatagram(socket, io.makePacket(p.data.buffer, p.length, p.hostname, p.port))
+			io.receiveDatagram(socket, io.makePacket(p.data.getBuffer(), p.length, p.hostname, p.port))
 		def close():Unit
 			io.closeSocket(socket)
 

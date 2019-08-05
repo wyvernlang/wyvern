@@ -107,7 +107,7 @@ public class NIO {
         return status;
     }
     
-	// works for any of the socket channels
+    // works for any of the socket channels
     public void closeChannel(Object chan) throws IOException {
         Channel channel = (Channel) chan;
         channel.close();
@@ -141,6 +141,10 @@ public class NIO {
     
     public SocketAddress makeSocketAddress(String hostname, int port) {
         return new InetSocketAddress(hostname, port);
+    }
+    
+    public String addressToString(Object obj) {
+        return ((SocketAddress) obj).toString();
     }
     
     /** Future wrapper **/
