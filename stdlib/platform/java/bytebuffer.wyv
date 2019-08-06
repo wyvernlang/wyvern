@@ -2,9 +2,9 @@ module def bytebuffer(java:Java)
 
 import java:wyvern.stdlib.support.ByteBufferWrapper.bb
 
-resource type ByteBuffer
+type ByteBuffer
     val size : Int
-    def getBuffer() : Unit //java ByteBuffer
+    val buffer : Unit //java ByteBuffer
     def get(index : Int) : Int
     def set(index : Int, value : Int) : Unit
     
@@ -14,9 +14,7 @@ resource type ByteBuffer
 def makeByteBuffer(allocSize : Int) : ByteBuffer
     new
         val size = allocSize
-        var buffer : Unit = bb.makeByteBuffer(allocSize)
-        def getBuffer() : Unit
-            this.buffer
+        val buffer = bb.makeByteBuffer(allocSize)
         def get(index : Int) : Int
             bb.byteBufferGet(this.buffer, index)
         def set(index : Int, value : Int) : Unit
@@ -26,9 +24,7 @@ def makeByteBuffer(allocSize : Int) : ByteBuffer
 def makeByteBufferFromString(s : String) : ByteBuffer
     new
         val size = s.length()
-        var buffer : Unit = bb.makeFromString(s)
-        def getBuffer() : Unit
-            this.buffer
+        val buffer = bb.makeFromString(s)
         // these modify with char values (2 bytes at a time)
         def get(index : Int) : Int
             //bb.charGet(this.buffer, index)
@@ -38,4 +34,4 @@ def makeByteBufferFromString(s : String) : ByteBuffer
             bb.byteBufferSet(this.buffer, index, value)
 
 def toString(buf : ByteBuffer) : String
-    bb.stringFromByteBuffer(buf.getBuffer())
+    bb.stringFromByteBuffer(buf.buffer)

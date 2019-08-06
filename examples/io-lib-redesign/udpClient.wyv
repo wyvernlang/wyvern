@@ -10,7 +10,7 @@ val ioobj = io(java)
 val bytebuffer = bytebuffer(java)
 
 def loop(chan : async.DatagramChannel) : async.Packet
-    chan.receive(8).getOrElse(() => loop(chan))
+    chan.receive(256).getOrElse(() => loop(chan))
 
 stdout.print("Making async UDP channel...\n")
 
@@ -22,7 +22,7 @@ val p = loop(asyncUDP)
 
 stdout.print("Packet received!\n")
 
-stdout.print(bytebuffer.toString(p.getData()) + "\n")
+stdout.print(bytebuffer.toString(p.data) + "\n")
 
 stdout.print(async.socketAddressToString(p.address) + "\n")
 
