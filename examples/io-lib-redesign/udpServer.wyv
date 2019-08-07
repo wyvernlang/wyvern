@@ -22,7 +22,7 @@ val p : async.Packet = async.makeDatagramPacket(b, "localhost", 1234)
 
 stdout.print("Sending packet on UDP channel...\n")
 
-asyncUDP.send(p)
+stdout.printInt(asyncUDP.send(p))
 
 stdout.print("Sent!")
 
