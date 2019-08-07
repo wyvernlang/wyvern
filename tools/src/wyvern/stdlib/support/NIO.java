@@ -132,6 +132,7 @@ public class NIO {
         DatagramChannel channel = (DatagramChannel) chan;
         SocketAddress target = (SocketAddress) addr;
         ByteBuffer src = (ByteBuffer) buf;
+        src.rewind();
         return channel.send(src, target);
     }
     

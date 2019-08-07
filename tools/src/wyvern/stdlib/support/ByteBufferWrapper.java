@@ -25,9 +25,7 @@ public class ByteBufferWrapper {
     
     public ByteBuffer makeFromString(String s) {
         ByteBuffer buf = ByteBuffer.allocate(s.length() * 2);
-        for (int i = 0; i < s.length(); i++) {
-            buf.putChar(s.charAt(i));
-        }
+        buf.put(s.getBytes());
         return buf;
     }
     
