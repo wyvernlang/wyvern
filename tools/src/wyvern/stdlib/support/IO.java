@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
+import java.nio.channels.DatagramChannel;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -51,24 +51,30 @@ public class IO {
      * Methods for synchronous UDP operations
      * Created by jennyafish 7/31/19.
      */
-    public DatagramPacket makePacket(Object buf, int length, String hostname, int port) {
-		ByteBuffer buffer = (ByteBuffer) buf;
-        return new DatagramPacket(buffer.array(), length, new InetSocketAddress(hostname, port));
+    public DatagramChannel makeDatagramChannel(int port) throws IOException {
+        DatagramChannel chan = DatagramChannel.open();
+        chan.bind(new InetSocketAddress(port));
+        return chan;
     }
     
-    public DatagramSocket makeDatagramSocket(int port) throws IOException {
-        return new DatagramSocket(port);
+    public int sendDatagram(DatagramChannel chan, Object buf, Object addr) throws IOException {
+        SocketAddress address = (SocketAddress) addr;
+        ByteBuffer buffer = (ByteBuffer) buf;
+        buffer.rewind();
+        return chan.send(buffer, address);
     }
     
-    public void sendDatagram(DatagramSocket socket, DatagramPacket packet) throws IOException {
-        socket.send(packet);
+    public SocketAddress receiveDatagram(DatagramChannel chan, Object buf) throws IOException {
+        ByteBuffer buffer = (ByteBuffer) buf;
+        buffer.rewind();
+        return chan.receive(buffer);
     }
     
-    public void receiveDatagram(DatagramSocket socket, DatagramPacket packet) throws IOException {
-        socket.receive(packet);
-    }
-    
-    public void closeSocket(DatagramSocket s) throws IOException {
+    public void closeChannel(DatagramChannel s) throws IOException {
         s.close();
+    }
+    
+    public SocketAddress makeSocketAddress(String hostname, int port) {
+        return new InetSocketAddress(hostname, port);
     }
 }

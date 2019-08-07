@@ -9,8 +9,8 @@ val async = asyncio(java)
 val ioobj = io(java)
 val bytebuffer = bytebuffer(java)
 
-def loop(chan : async.DatagramChannel) : async.Packet
-    chan.receive(256).getOrElse(() => loop(chan))
+def loop(chan : async.DatagramChannel, buf : bytebuffer.ByteBuffer) : async.Packet
+    chan.receive(buf).getOrElse(() => loop(chan, buf))
 
 stdout.print("Making async UDP channel...\n")
 
@@ -18,7 +18,9 @@ val asyncUDP = async.makeDatagramChannel(1234)
 
 stdout.print("Waiting for packet...\n")
 
-val p = loop(asyncUDP)
+val buf = bytebuffer.makeByteBuffer(256)
+
+val p = loop(asyncUDP, buf)
 
 stdout.print("Packet received!\n")
 

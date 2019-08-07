@@ -26,7 +26,8 @@ type ServerSocket
 // UDP
 type DatagramChannel
     // returns None if no packet ready, Some(Packet) if there was
-    def receive(maxSize : Int) : Option[Packet]
+	// user must initialize the byte buffer size
+    def receive(buf : ByteBuffer) : Option[Packet]
     // returns number of bytes sent
     def send(packet: Packet) : Int
     def close() : Unit
@@ -50,8 +51,7 @@ def socketAddressToString(addr : Unit) : String
 def makeDatagramChannel(port : Int) : DatagramChannel
     val chan = nio.makeDatagramChannel(port)
     new
-        def receive(maxSize : Int) : Option[Packet]
-            val buf : ByteBuffer = bytebuffer.makeByteBuffer(maxSize) //allocates every time; can make more efficient?
+        def receive(buf : ByteBuffer) : Option[Packet] // fills buffer and returns packet if ready
             val maybeAddr = nio.receiveUDP(chan, buf.buffer)
             if (nio.isNull(maybeAddr))
                 option.None[Packet]()

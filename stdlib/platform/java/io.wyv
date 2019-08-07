@@ -30,16 +30,14 @@ type Socket
 type ServerSocket
     def accept():Socket
 
-type DatagramSocket
-    def send(p:Packet):Unit
-    def receive(p:Packet):Unit
+type DatagramChannel
+    def send(p:Packet):Int
+    def receive(buf:ByteBuffer):Packet
     def close():Unit
 
 resource type Packet
-    val data : ByteBuffer // can change directly to byte array if necessary
-    val length : Int
-    val hostname : String
-    val port : Int
+    val data : ByteBuffer
+    val address : Unit // java SocketAddress
 
 // === Creator Functions ===
 def makeServerSocket(port:Int):ServerSocket
@@ -48,21 +46,23 @@ def makeServerSocket(port:Int):ServerSocket
 def makeSocket(hostname:String, port:Int):Socket
     io.makeSocket(hostname, port)
 
-def makeDatagramSocket(port:Int):DatagramSocket
-    val socket = io.makeDatagramSocket(port)
-    new
-        def send(p:Packet):Unit
-            io.sendDatagram(socket, io.makePacket(p.data.buffer, p.length, p.hostname, p.port))
-        def receive(p:Packet):Unit
-            io.receiveDatagram(socket, io.makePacket(p.data.buffer, p.length, p.hostname, p.port))
-        def close():Unit
-            io.closeSocket(socket)
+def makeSocketAddress(hostname : String, port : Int) : Unit
+    io.makeSocketAddress(hostname, port)
 
-def makePacket(data:ByteBuffer, length:Int, hostname:String, port:Int):Packet = new
+def makeDatagramChannel(port:Int):DatagramChannel
+    val chan = io.makeDatagramChannel(port)
+    new
+        def send(p:Packet):Int
+            io.sendDatagram(chan, p.data.buffer, p.address)
+        def receive(buf:ByteBuffer):Packet = new
+            val data = buf
+            val address = io.receiveDatagram(chan, buf.buffer)
+        def close():Unit
+            io.closeChannel(chan)
+
+def makePacket(data:ByteBuffer, hostname:String, port:Int):Packet = new
     val data = data
-    val length = length
-    val hostname = hostname
-    val port = port
+    val address = io.makeSocketAddress(hostname, port)
 
 /**
 * TODO: Hide functions that take arg:Dyn from the user
