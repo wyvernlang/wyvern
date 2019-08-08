@@ -62,6 +62,7 @@ public abstract class ValueType extends Type implements IASTNode {
      */
     public abstract void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException;
 
+    @Override
     public final void doPrettyPrint(Appendable dest, String indent) throws IOException {
         doPrettyPrint(dest, indent, null);
     }
@@ -121,7 +122,7 @@ public abstract class ValueType extends Type implements IASTNode {
         }
         return st.findMatchingDecl(name, exclusionFilter, ctx);
     }
-    
+
     /** Find the declaration type with the specified name, or return null if it is not present */
     public DeclType findDecl(String declName, TypeContext ctx) {
         StructuralType st = getStructuralType(ctx);
@@ -136,7 +137,7 @@ public abstract class ValueType extends Type implements IASTNode {
     public List<DeclType> findDecls(String declName, TypeContext ctx) {
         StructuralType st = getStructuralType(ctx);
         if (st == null) {
-            return (List<DeclType>) Collections.EMPTY_LIST;
+            return Collections.EMPTY_LIST;
         }
         return st.findDecls(declName, ctx);
     }
@@ -148,7 +149,7 @@ public abstract class ValueType extends Type implements IASTNode {
     public abstract ValueType doAvoid(String varName, TypeContext ctx, int depth);
 
     public boolean equalsInContext(ValueType otherType, TypeContext ctx, FailureReason reason) {
-        return this.isSubtypeOf(otherType, ctx, reason) && otherType.isSubtypeOf(this, ctx, reason);
+        return isSubtypeOf(otherType, ctx, reason) && otherType.isSubtypeOf(this, ctx, reason);
     }
 
     /**
@@ -191,7 +192,7 @@ public abstract class ValueType extends Type implements IASTNode {
      * Some types that are effect-annotated and not effect-unannotated:
      *
      *   type T
-     *     def foo() : {system.FFI} Unit
+     *     def foo() : {system.FFIRead} Unit
      *
      *   type U
      *     effect E [ = ... ]
@@ -209,7 +210,7 @@ public abstract class ValueType extends Type implements IASTNode {
      * Some types that are neither effect-annotated nor effect-unannotated
      *
      *   type T
-     *     def foo() : {system.FFI} Unit
+     *     def foo() : {system.FFIRead} Unit
      *     def bar() : Unit
      *
      *   type U
