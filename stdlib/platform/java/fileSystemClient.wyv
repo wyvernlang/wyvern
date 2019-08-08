@@ -1,4 +1,4 @@
-module def fileSystemClient(fileSys : fileSystem.FileSystem) : {system.FFI}
+module def fileSystemClient(fileSys : fileSystem.FileSystem) : {}
 import annotatedFileSystem
 
 def make() : Unit
