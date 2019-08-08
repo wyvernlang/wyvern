@@ -2,6 +2,11 @@ module def bytebuffer(java:Java)
 
 import java:wyvern.stdlib.support.ByteBufferWrapper.bb
 
+import filesystem.fileEffects
+import filesystem.BinaryWriter
+import filesystem.BinaryReader
+
+
 type ByteBuffer
     val size : Int
     val buffer : Unit //java ByteBuffer
@@ -25,7 +30,6 @@ def makeByteBufferFromString(s : String) : ByteBuffer
     new
         val size = s.length()
         val buffer = bb.makeFromString(s)
-        // these modify with char values (2 bytes at a time)
         def get(index : Int) : Int
             //bb.charGet(this.buffer, index)
             bb.byteBufferGet(this.buffer, index)
@@ -35,3 +39,26 @@ def makeByteBufferFromString(s : String) : ByteBuffer
 
 def toString(buf : ByteBuffer) : String
     bb.stringFromByteBuffer(buf.buffer)
+
+def makeBinaryReaderFor(buf : ByteBuffer) : BinaryReader
+    bb.initializeForRead(buf.buffer)
+    new
+        effect Read = {fileEffects.Read}
+        def read() : {this.Read} Int
+            bb.getNext(buf.buffer)
+        def readUTF() : {this.Read} String
+            bb.readUTF(buf.buffer)
+        def close() : Unit
+            bb.close() //temporary
+
+def makeBinaryWriterFor(buf : ByteBuffer) : BinaryWriter
+    bb.initializeForWrite(buf.buffer)
+    new
+        effect Write = {fileEffects.Write}
+        //write byte
+        def write(b : Int) : {this.Write} Unit
+            bb.writeNext(buf.buffer, b)
+        def writeUTF(s : String) : {this.Write} Unit
+            bb.writeUTF(buf.buffer, s)
+        def close() : Unit
+            bb.close() //temporary
