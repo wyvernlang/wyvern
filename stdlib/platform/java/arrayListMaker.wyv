@@ -3,10 +3,10 @@ import java:wyvern.stdlib.support.ArrayListWrapper.arraylist
 import fileSystem.File
 import ArrayList
 
-effect makelist = {system.FFI}
+effect makelist = {system.FFIWrite}
 def make() : {makelist} ArrayList = new
-    effect read = {system.FFI}
-    effect write = {system.FFI}
+    effect read = {system.FFIRead}
+    effect write = {system.FFIWrite}
     val l = arraylist.makeArrayList()
     def isEmpty() : {} Boolean
         this.l.isEmpty()
