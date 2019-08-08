@@ -15,7 +15,7 @@ import fileSystem.ByteArray
 import wyvern.option
 type Option = option.Option
 
-effect createNewFile = {system.FFI}
+effect createNewFile = {system.FFIWrite}
 effect Read = {fileEffects.Read}
 effect Write = {fileEffects.Write}
 effect Append = {fileEffects.Append}
@@ -25,15 +25,15 @@ def fileFor(path: String) : {} File = new
     effect Read = {fileEffects.Read}
     effect Write = {fileEffects.Write}
     effect Append = {fileEffects.Append}
-    effect openForRead = {system.FFI}
-    effect openForWrite = {system.FFI}
-    effect openForAppend = {system.FFI}
-    effect openForRandomAccess = {system.FFI}
+    effect openForRead = {system.FFIRead}
+    effect openForWrite = {system.FFIWrite}
+    effect openForAppend = {system.FFIWrite}
+    effect openForRandomAccess = {system.FFIWrite}
 
     def makeReader() : {} BoundedReader
         val br = file.openBRForRead(this.f)
         new (self) =>
-            effect Read = {system.FFI}
+            effect Read = {system.FFIRead}
             def read() : {self.Read} Int
                 file.readCharFromFile(br)
             def readLine() : {self.Read}  Option[String]
@@ -50,7 +50,7 @@ def fileFor(path: String) : {} File = new
     def makeWriter() : {} Writer
         val bw = file.openBWForWrite(this.f)
         new (self) =>
-            effect Write = {system.FFI}
+            effect Write = {system.FFIWrite}
             def write(s : String) : {self.Write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
             def close() : {} Unit
@@ -65,7 +65,7 @@ def fileFor(path: String) : {} File = new
     def makeAppender() : {} Writer
         val bw = file.openBWForAppend(this.f)
         new (self) =>
-            effect Write = {system.FFI}
+            effect Write = {system.FFIWrite}
             def write(s : String) : {self.Write} Unit
                 file.writeString(bw, s)        //again temporary limits on write format
             def close() : {} Unit
@@ -103,8 +103,8 @@ def fileFor(path: String) : {} File = new
     def makeRandomAccessFile(mode : String) : {} RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new (self) =>
-            effect Read  = {system.FFI}
-            effect Write = {system.FFI}
+            effect Read  = {system.FFIRead}
+            effect Write = {system.FFIWrite}
             def close() : {} Unit
                 file.closeRandomAccessFile(rf)
             def getPosition() : {} Int
