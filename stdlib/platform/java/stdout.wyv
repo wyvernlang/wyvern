@@ -11,8 +11,10 @@ type Printable = Unit
 either add a '\n' to the string you want to print, to use println()
 instead, or call flush() right after print(). */
 
-effect print = {system.FFI}
-effect flush = {system.FFI}
+/* Note: both effects are "write" because we are writing to the console. */
+effect print = {system.FFIWrite}
+effect flush = {system.FFIWrite}
+
 def print(text:String): {print} Unit
 	stdio.print(text)
 
