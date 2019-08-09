@@ -1,4 +1,4 @@
 // Pure module, but with a non-empty effect annotation
-module file5 : {system.FFI}
+module file5 : {system.FFIRead}
 def x() : Unit
     unit
