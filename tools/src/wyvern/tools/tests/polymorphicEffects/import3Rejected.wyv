@@ -6,13 +6,13 @@ import lifted polymorphicEffects.import3Lib
 type UnitFnWithoutEffect
     def app() : {} Unit
 
-val g : Go [{system.FFI}] = new
+val g : Go [{system.FFIWrite}] = new
     // x should be a function without effect
     def go (x : Unit -> {} Unit) : {} Unit
         x()
 
-val file1 : File[{system.FFI}] = new
-    effect write = {system.FFI}
+val file1 : File[{system.FFIWrite}] = new
+    effect write = {system.FFIWrite}
     def writeToFile() : {this.write} Unit
         unit
 

@@ -8,7 +8,7 @@ val myLogger : Logger = new
     s
 
 val u = new
-  effect E = {system.FFI}
+  effect E = {system.FFIRead, system.FFIWrite}
 
 // Cannot refine abstract type
 type S = myLogger.T[{u.E}]

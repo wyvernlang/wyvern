@@ -5,7 +5,7 @@ def id[effect F, T](x : T) : {F} T
 // Related to the "avoidance problem"
 def run() : {} String
   val v = new
-    effect hiddenEffect = {system.FFI}
+    effect hiddenEffect = {system.FFIRead, system.FFIWrite}
   id[{v.hiddenEffect}, String]("abc")
 
 run()

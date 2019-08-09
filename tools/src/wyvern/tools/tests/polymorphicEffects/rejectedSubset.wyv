@@ -1,13 +1,13 @@
 type Generic
   effect E
 
-val u : Generic[{system.FFI}] = new
-  effect E = {system.FFI}
+val u : Generic[{system.FFIRead, system.FFIWrite}] = new
+  effect E = {system.FFIRead, system.FFIWrite}
 
 def id(g : Generic, x : String) : {g.E} String
   x
 
-// {u.E} = {system.FFI} is not a subset of {}
+// {u.E} = {system.FFIRead, system.FFIWrite} is not a subset of {}
 def run() : {} String
   id(u, "abc")
 

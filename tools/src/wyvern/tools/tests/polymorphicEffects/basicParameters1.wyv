@@ -1,8 +1,8 @@
 type Generic
   effect E
 
-val u : Generic[{system.FFI}] = new
-  effect E = {system.FFI}
+val u : Generic[{system.FFIRead, system.FFIWrite}] = new
+  effect E = {system.FFIRead, system.FFIWrite}
 
 def id[T, effect F](x : T) : {F} T
   x

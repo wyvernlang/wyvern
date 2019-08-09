@@ -6,6 +6,6 @@ val u : Generic = new
   effect E = {}
 
 val v : Generic = new
-  effect E = {system.FFI}
+  effect E = {system.FFIRead, system.FFIWrite}
 
 "abc"

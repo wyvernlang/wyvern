@@ -2,7 +2,7 @@ type Generic
   effect E
 
 val u : Generic = new
-  effect E = {system.FFI}
+  effect E = {system.FFIRead, system.FFIWrite}
 
 type Function
   effect E

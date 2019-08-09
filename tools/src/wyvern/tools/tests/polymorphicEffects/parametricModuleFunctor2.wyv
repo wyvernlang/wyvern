@@ -1,7 +1,7 @@
 import polymorphicEffects.parametricLib
 
 val u = new
-  effect E = {system.FFI}
+  effect E = {system.FFIRead, system.FFIWrite}
 
 val lib = parametricLib[String, {u.E}]()
 
