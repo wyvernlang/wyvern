@@ -24,9 +24,9 @@ def createFile(path : String) : {filesys.createNewFile, filelist.write} File
     filelist.add(file)
     file
 
-val filelist2 : ArrayList[{system.FFI}, {system.FFI}] = new
-    effect read = {system.FFI}
-    effect write = {system.FFI}
+val filelist2 : ArrayList[{system.FFIRead}, {system.FFIWrite}] = new
+    effect read = {system.FFIRead}
+    effect write = {system.FFIWrite}
     def isEmpty() : {} Boolean
         filelist.isEmpty()
     def add(f : File) : {filelist.write} Boolean
