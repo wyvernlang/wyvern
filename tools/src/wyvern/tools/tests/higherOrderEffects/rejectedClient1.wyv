@@ -12,7 +12,7 @@ val ubFile : RejectedFile1[{}] = new
     def go() : {} ((Unit -> {} Unit) -> {} Unit)
         y : (Unit -> {} Unit) => unit
 
-// This causes an error since FFI is not in the upper bound
-val ublib = rejectedLib1[{system.FFI}](ubFile)
+// This causes an error since FFIWrite is not in the upper bound
+val ublib = rejectedLib1[{system.FFIWrite}](ubFile)
 
 "abc"

@@ -2,8 +2,8 @@
 import higherOrderEffects.RejectedFile4
 import lifted higherOrderEffects.rejectedLib4
 
-val file : RejectedFile4[{system.FFI}] = new
-    effect write = {system.FFI}
+val file : RejectedFile4[{system.FFIWrite}] = new
+    effect write = {system.FFIWrite}
     def go(f : (Unit -> {this.write} Unit) -> {} Unit) : {} Unit
         unit
 
