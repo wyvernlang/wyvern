@@ -1,9 +1,13 @@
 package wyvern.stdlib.support;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.net.InetSocketAddress;
@@ -38,13 +42,26 @@ public class IO {
     public Socket makeSocket(String hostname, int port) throws IOException {
         return new Socket(hostname, port);
     }
-
+    /*
     public DataOutputStream getDataOutputStream(OutputStream out) {
         return new DataOutputStream(out);
     }
 
     public DataInputStream getDataInputStream(InputStream in) {
         return new DataInputStream(in);
+    }
+    */
+    
+    public BufferedReader makeReader(Socket s) throws IOException {
+        return new BufferedReader(new InputStreamReader(s.getInputStream()));
+    }
+    
+    public BufferedWriter makeWriter(Socket s) throws IOException {
+        return new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+    }
+    
+    public boolean isNull(Object obj) {
+        return obj == null;
     }
     
     /**
