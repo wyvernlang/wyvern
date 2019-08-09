@@ -1,5 +1,5 @@
 module nested
 
 val x = new
-  effect e = {system.FFI}
+  effect e = {system.FFIRead}
   def id(x: Int): {this.e} Int = x

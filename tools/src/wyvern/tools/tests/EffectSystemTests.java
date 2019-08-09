@@ -112,7 +112,7 @@ public class EffectSystemTests {
 
     @Test
     public void testFileIO() throws ParseException {
-        /* Globally available effects (system.FFI) are used in effect definitions in module (only). */
+        /* Globally available effects (system.FFIRead and system.FFIWrite) are used in effect definitions in module (only). */
         TestUtil.doTestScriptModularly(PATH, "effects.testFileIO", Util.intType(), new IntegerLiteral(3));
     }
 
@@ -143,8 +143,7 @@ public class EffectSystemTests {
 
     @Test
     public void testLogger() throws ParseException {
-        /* A method has an effect annotation involving a globally available effect (system.FFI)
-         * in module but not in type. */
+        /* A method has an effect annotation in module but not in type. */
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Method body's type resource type"));
         expectedException.expectMessage(StringContains.containsString("is not a subtype of declared type "
@@ -155,10 +154,10 @@ public class EffectSystemTests {
 
     @Test
     public void testLogger1() throws ParseException {
-        /* Globally available effect (system.FFI) is attempted to be used to annotate a method directly
+        /* A globally available effect (system.FFIWrite) is used to annotate a method directly
          * without having exposed the effect definition in the type. */
         expectedException.expect(ToolError.class);
-        expectedException.expectMessage(StringContains.containsString("Effect annotation {system.FFI} "
+        expectedException.expectMessage(StringContains.containsString("Effect annotation {system.FFIWrite} "
                 + "on method updateLog is not a subtype of effects that method produces, which are [fio.writeF];  at location file "
                 + Paths.get(PATH, "effects", "logger1.wyv").toAbsolutePath().toString()));
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger1", Util.intType(), new IntegerLiteral(5));
@@ -183,7 +182,7 @@ public class EffectSystemTests {
 
     @Test
     public void testLogger4() throws ParseException {
-        /* Globally available effect (system.FFI) is used to annotate a method directly
+        /* Globally available effect (system.FFIWrite) is used to annotate a method directly
          * without defining any local effects. */
         TestUtil.doTestScriptModularly(PATH, "effects.testLogger4", Util.intType(), new IntegerLiteral(5));
     }
