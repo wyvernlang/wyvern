@@ -1,2 +1,2 @@
 resource type Logger1
-    def updateLog(x: Int): {system.FFI} Int
+    def updateLog(x: Int): {system.FFIWrite} Int
