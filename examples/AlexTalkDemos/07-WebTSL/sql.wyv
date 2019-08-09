@@ -1,3 +1,5 @@
+// module parser
+
 import metadata wyvern.collections.list
 import wyvern.util.matching.regex
 import tsls.glexer
@@ -57,6 +59,7 @@ val lexer = glexer(tokens)
 // local bindings to make things easier
 type AST = ast.AST
 type Option = option.Option
+type None = option.None
 
 def createScanner(input:String):lexer.Scanner
     // Create a scanner configuration, setting up the whitespace operator
@@ -109,85 +112,71 @@ def lex(input:String):Unit
     
     // print the tokens, one at a time
     val t = scanner.nextToken()
-    debugOut(t)
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    debugOut(scanner.nextToken())
-    
-/*  
-lex("UPDATE Students SET GPA=3.0 WHERE Name='John'")
-lex("SELECT AVG(GPA) FROM Students")
-lex("INSERT INTO Students VALUES ('John',4.0)")
-lex("CREATE TABLE Students (Name varchar(255), GPA float)")
-*/
+    printTokens(scanner, t)
+
+def printTokens(scanner : lexer.Scanner, token : lexer.Token) : Unit
+    debugOut(token)
+    val next = scanner.nextToken()
+    (next.kind() == tokens.EOF).ifTrue(
+       () => unit,
+       () => printTokens(scanner, next))
+
+// lex("UPDATE blah")
+// lex("UPDATE Students SET GPA=3.0 WHERE Name='John'")
+// lex("SELECT AVG(GPA) FROM Students")
+// lex("INSERT INTO Students VALUES ('John',4.0)")
+// lex("CREATE TABLE Students (Name varchar(255), GPA float)")
+
+////////////////////////////////////////////////////////////////////////////
 
 // A parse function for SQL queries
+// SQLStatement ::= SQLInsert | SQLUpdate
 def parse(input:String):Option[String]
     val scanner = createScanner(input)
-    val t = scanner.nextToken()
-    match t:
-//        t:tokens.UPDATE => parseUpdate(scanner)
-//        t:tokens.SELECT => parseSelect(scanner)
-        t:tokens.INSERT => parseInsert(scanner)
-//        t:tokens.CREATE => parseCreate(scanner)
-        default => None[String]()
 
+    val token = scanner.nextToken()
+    debugOut(token)
+
+    (token.kind() == tokens.INSERT).ifTrue(
+        () => parseInsert(scanner),
+        () => (token.kind() == tokens.UPDATE).ifTrue(
+            () => parseUpdate(scanner),
+            () => option.None[String]())) // default is PARSE ERROR
+
+// SQLInsert ::= "INSERT" "IDENTIFIER"
 def parseInsert(scanner:lexer.Scanner):Option[String]
-    val t = scanner.nextToken()
-    match t:
-        t:tokens.INTO => unit
-        default => error
+    debug.print("Called parseInsert.")
+    debug.println()
+    
+    val token = scanner.nextToken()
+    debugOut(token)
 
-/*
-    // A parse function for reverse Polish notation
-def parse(input:String):option.Option[AST] // Option of AST
-	// create a scanner and scan the input
-	val scanner = lexer.makeScanner(config, input)
-	debug.print(input)
-	doParse(scanner)
+    (token.kind() == tokens.EOF).ifTrue(
+        () => option.None[String](), // need to have IDENTIFIER
+        () => (token.kind() == tokens.IDENTIFIER).ifTrue(
+            () => option.Some[String]("Successfully parsed insert and identifier!"),
+            () => option.None[String]())) // need to have IDENTIFIER
 
-// The starting point for recursive-descent parsing	
-def doParse(scanner:lexer.Scanner):option.Option[AST]
-	val t = scanner.nextToken()
-	(t.kind() == tokens.NUMBER).ifTrue(
-	  () => parseWithOneExpr(scanner, ast.int(Int.from(t.print()))),
-	  () => option.None[AST]()
-	)
+// SQLUpdate ::= "UPDATE" "IDENTIFIER"
+def parseUpdate(scanner:lexer.Scanner):Option[String]
+    debug.print("Called parseUpdate.")
+    debug.println()
+    
+    val token = scanner.nextToken()
+    debugOut(token)
 
-// We've got exactly one expression on the stack
-def parseWithOneExpr(scanner:lexer.Scanner, exp:AST):option.Option[AST]
-	val t = scanner.nextToken()
-	(t.kind() == tokens.EOF).ifTrue(
-		() => option.Some[AST](exp),
-		() => (t.kind() == tokens.NUMBER).ifTrue(
-			() => parseWithTwoExprs(scanner, exp, ast.int(Int.from(t.print())), false),
-			() => option.None[AST]()
-		)
-	)
+    (token.kind() == tokens.EOF).ifTrue(
+        () => option.None[String](), // need to have IDENTIFIER
+        () => (token.kind() == tokens.IDENTIFIER).ifTrue(
+            () => option.Some[String]("Successfully parsed update and identifier!"),
+            () => option.None[String]())) // need to have IDENTIFIER
 
-// We've got two (ore more, if moreOnStack is true) expressions on the stack
-def parseWithTwoExprs(scanner:lexer.Scanner, exp1:AST, exp2:AST,
-                      moreOnStack:Boolean):option.Option[AST]
-	def compose(exp3:AST):option.Option[AST]
-		val expOption : option.Option[AST] = parseWithTwoExprs(scanner, exp2, exp3, true)
-		expOption.flatMap[AST]((expResult) => parseWithTwoExprs(scanner, exp1,expResult, moreOnStack))
-	val t = scanner.nextToken()
-	(t.kind() == tokens.OPERATOR).ifTrue(
-		() => moreOnStack.ifTrue(
-			() => option.Some[AST](ast.call(exp1,t.print(),{exp2})),
-		    () => parseWithOneExpr(scanner, ast.call(exp1,t.print(),{exp2}))
-		),
-		() => (t.kind() == tokens.NUMBER).ifTrue(
-			() => compose(ast.int(Int.from(t.print()))),
-			() => option.None[AST]()
-		)
-	)
-*/
+////////////////////////////////////////////////////////////////////////////
+
+var testString:String = "UPDATE blah"
+
+debug.print("Trying to parse ")
+debug.print(testString)
+debug.println()
+debug.print(parse(testString).getOrElse(() => "PARSE ERROR"))
+debug.println()

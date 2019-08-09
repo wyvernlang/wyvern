@@ -62,7 +62,8 @@ def makeScannerConfig(wsRX:regex.Regex):ScannerConfig = new (self)=>
 		// compute the resulting token
 		val resultOption : option.Option[ScanResult] = tokMatch.flatMap[ScanResult]((rkp:RegexpKindPair) =>
 			rkp.regex.findPrefixMatchOf(sWithoutWS).map[ScanResult]((m:regex.Match) =>
-				makeScanResult(m.matched(), rkp.kind, m.after()))
+				makeScanResult(m.matched(), rkp.kind, m.after())
+            )
 		)
 		
 		// return the result, or error
