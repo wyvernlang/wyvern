@@ -1,4 +1,5 @@
 # need to use sudo-enabled containers for additional RAM
+dist: trusty
 sudo: required
 language: java
 jdk: oraclejdk12
