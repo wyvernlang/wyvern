@@ -1,7 +1,12 @@
 package wyvern.stdlib.support;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+/**
+ * TODO: handle unsupported encoding exceptions
+ */
 
 public class ByteBufferWrapper {
 
@@ -24,9 +29,10 @@ public class ByteBufferWrapper {
         b.putInt(index, value);
     }
     
-    public ByteBuffer makeFromString(String s) {
-        ByteBuffer buf = ByteBuffer.allocate(s.length() * 2);
-        buf.put(s.getBytes());
+    public ByteBuffer makeFromString(String s) throws UnsupportedEncodingException {
+        byte[] ins = s.getBytes("UTF-16LE");
+        ByteBuffer buf = ByteBuffer.allocate(ins.length);
+        buf.put(ins);
         return buf;
     }
     
@@ -40,9 +46,9 @@ public class ByteBufferWrapper {
         b.putChar(i, (char) c);
     }
     
-    public String stringFromByteBuffer(Object buf) {
+    public String stringFromByteBuffer(Object buf) throws UnsupportedEncodingException {
         ByteBuffer buffer = (ByteBuffer) buf;
-        return new String(buffer.array(), StandardCharsets.UTF_8);
+        return new String(buffer.array(), "UTF-16LE");
     }
     
     /**
@@ -73,44 +79,38 @@ public class ByteBufferWrapper {
     }
     
     //check defaults for this method
-    public String readUTF(Object b) {
+    //consistent with encoding for filesystem readUTF
+    public String readUTF(Object b) throws IOException {
         ByteBuffer buf = (ByteBuffer) b;
-        //assumes UTF-8 encoding
-        //num bytes to extract based on https://en.wikipedia.org/wiki/UTF-8
+        //assumes UTF-16 encoding
+        //based on http://www.herongyang.com/Unicode/UTF-16-UTF-16LE-Encoding.html
         byte first = buf.get();
-        if ((first & 0x80) == 0) {
-            //one byte encoding
-            byte[] res = new byte[1];
-            res[0] = first;
-            return new String(res, StandardCharsets.UTF_8);
-        } else if ((first & 0xE0) == 0xC0) {
-            //two byte encoding
-            byte[] res = new byte[2];
-            res[0] = first;
-            res[1] = buf.get();
-            return new String(res, StandardCharsets.UTF_8);
-        } else if ((first & 0xF0) == 0xE0) {
-            //three byte encoding
-            byte[] res = new byte[3];
-            res[0] = first;
-            res[1] = buf.get();
-            res[2] = buf.get();
-            return new String(res, StandardCharsets.UTF_8);
-        } else if ((first & 0xF8) == 0xF0) {
-            //four byte encoding
-            byte[] res = new byte[4];
-            res[0] = first;
-            res[1] = buf.get();
-            res[2] = buf.get();
-            res[3] = buf.get();
-            return new String(res, StandardCharsets.UTF_8);
+        byte second = buf.get();
+        int block = (first << 8) + second;
+        try {
+            if ((block < 0xD800) || (block > 0xDFFF)) {
+                //this indicates code point of decode character
+                byte[] res = new byte[2];
+                res[0] = first;
+                res[1] = second;
+                return new String(res, "UTF-16LE");
+            } else {
+                //first surrogate of surrogate pair, so read more
+                byte[] res = new byte[4];
+                res[0] = first;
+                res[1] = second;
+                res[2] = buf.get();
+                res[3] = buf.get();
+                return new String(res, "UTF-16LE");
+            }
+        } catch (UnsupportedEncodingException e) {
+            return ""; //temporary
         }
-        return ""; //default
     }
     
-    public void writeUTF(Object buf, String s) {
+    public void writeUTF(Object buf, String s) throws UnsupportedEncodingException {
         ByteBuffer buffer = (ByteBuffer) buf;
-        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = s.getBytes("UTF-16LE");
         buffer.put(bytes);
     }
     
