@@ -67,7 +67,52 @@ def makeServerSocket(port:Int):ServerSocket
     new
         def accept():Socket
             val socket = serverSocket.accept()
-            // try to pass into makeSocket by extracting hostname/port
+            //copied from makeSocket
+            new
+                def makeReader():Reader
+                    val reader = io.makeReader(socket)
+                    new
+                        effect Read = {networkEffects.Read}
+                        def read():{this.Read}Int
+                            reader.read()
+                        def readLine():{this.Read}option.Option[String]
+                            val s : String = reader.readLine()
+                            if(io.isNull(s))
+                                option.None[String]()
+                              else
+                                option.Some[String](s)
+                        def close():{}Unit
+                            reader.close()
+                def makeWriter():Writer
+                    val writer = io.makeWriter(socket)
+                    new
+                        effect Write = {networkEffects.Write}
+                        def write(s:String):{this.Write}Unit
+                            writer.write(s)
+                        def close():{}Unit
+                            writer.close()
+                def makeBinaryReader():BinaryReader
+                    val reader = io.makeReader(socket)
+                    new
+                        effect Read = {networkEffects.Read}
+                        def read():{this.Read}Int
+                            reader.read()
+                        def readUTF():{this.Read}String
+                            io.readUTF(reader)
+                        def close():Unit
+                            reader.close()
+                def makeBinaryWriter():BinaryWriter
+                    val writer = io.makeWriter(socket)
+                    new
+                        effect Write = {networkEffects.Write}
+                        def write(b:Int):{this.Write}Unit
+                            writer.write(b)
+                        def writeUTF(s:String):{this.Write}Unit
+                            io.writeUTF(writer, s)
+                        def close():Unit
+                            writer.close()
+                def close():Unit
+                    socket.close()
         def close():Unit
             serverSocket.close()
 
@@ -96,19 +141,29 @@ def makeSocket(hostname:String, port:Int):Socket
                     writer.write(s)
                 def close():{}Unit
                     writer.close()
-        /*
-        def makeBinaryReader():BinaryReader = new
-            effect Read
-            def read():{this.Read}Int
-            def readUTF():{this.Read}String
-            def close():Unit
-        def makeBinaryWriter():BinaryWriter = new
-            effect Write
-            def write(b:Int):{this.Write}Unit
-            def writeUTF(s:String):{this.Write}Unit
-            def close():Unit
+        def makeBinaryReader():BinaryReader
+            val reader = io.makeReader(socket)
+            new
+                effect Read = {networkEffects.Read}
+                def read():{this.Read}Int
+                    reader.read()
+                def readUTF():{this.Read}String
+                    io.readUTF(reader)
+                def close():Unit
+                    reader.close()
+        def makeBinaryWriter():BinaryWriter
+            val writer = io.makeWriter(socket)
+            new
+                effect Write = {networkEffects.Write}
+                def write(b:Int):{this.Write}Unit
+                    writer.write(b)
+                def writeUTF(s:String):{this.Write}Unit
+                    io.writeUTF(writer, s)
+                def close():Unit
+                    writer.close()
         def close():Unit
-        */
+            socket.close()
+            
 
 def makeSocketAddress(hostname : String, port : Int) : Unit
     io.makeSocketAddress(hostname, port)
