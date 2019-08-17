@@ -1,7 +1,8 @@
 # need to use sudo-enabled containers for additional RAM
+dist: trusty
 sudo: required
 language: java
-jdk: oraclejdk8
+jdk: oraclejdk12
 python:
   - "3.6"
 cache:
