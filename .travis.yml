@@ -14,7 +14,7 @@ install:
   - cd ..
 before_script:
   - export WYVERN_HOME="$(pwd)"
-  - export _JAVA_OPTIONS="-Xmx6144m -Xms512m -XX:UseParallelGC"
+  - export _JAVA_OPTIONS="-Xmx6144m -Xms512m -XX:+UseParallelGC"
 script:
   - cd tools
   - ant test
