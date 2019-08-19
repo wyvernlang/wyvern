@@ -6,7 +6,7 @@ import io
 import bytebuffer
 import wyvern.option
 val async = asyncio(java)
-val ioobj = io(java)
+val io = io(java)
 val bytebuffer = bytebuffer(java)
 
 
@@ -27,3 +27,26 @@ stdout.printInt(asyncUDP.send(p))
 stdout.print("Sent!")
 
 asyncUDP.close()
+
+stdout.print("\n-----------\nNow beginning tests for synchronous UDP...\n")
+
+val udp = io.makeDatagramChannel(1235)
+
+//val b = bytebuffer.makeByteBufferFromString("Hello World?")
+val b = bytebuffer.makeByteBufferFromString("hi")
+stdout.print(bytebuffer.toString(b) + "\n")
+val p = io.makePacket(b, "localhost", 1234)
+
+def stall(x : Int) : Int
+    (x == 0).ifTrue(
+        () => x,
+        () => stall(x-1)
+    )
+
+stall(50000)
+
+udp.send(p)
+
+stdout.print("Sent successfully!\n")
+
+udp.close()

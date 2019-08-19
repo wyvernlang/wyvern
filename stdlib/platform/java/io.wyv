@@ -144,24 +144,23 @@ def makeSocket(hostname:String, port:Int):Socket
                 def close():{}Unit
                     writer.close()
         def makeBinaryReader():BinaryReader
-            val reader = io.makeReader(socket)
+            val reader = io.makeBinaryReader(socket)
             new
                 effect Read = {networkEffects.Read}
                 def read():{this.Read}Int
                     reader.read()
                 def readUTF():{this.Read}String
-                    //io.readUTF(reader)
-                    reader.readLine()
+                    reader.readUTF()
                 def close():Unit
                     reader.close()
         def makeBinaryWriter():BinaryWriter
-            val writer = io.makeWriter(socket)
+            val writer = io.makeBinaryWriter(socket)
             new
                 effect Write = {networkEffects.Write}
                 def write(b:Int):{this.Write}Unit
                     writer.write(b)
                 def writeUTF(s:String):{this.Write}Unit
-                    io.writeUTF(writer, s)
+                    writer.writeUTF(s)
                 def close():Unit
                     writer.close()
         def close():Unit

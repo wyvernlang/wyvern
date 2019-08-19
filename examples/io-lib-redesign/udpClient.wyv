@@ -6,7 +6,7 @@ import io
 import bytebuffer
 import wyvern.option
 val async = asyncio(java)
-val ioobj = io(java)
+val io = io(java)
 val bytebuffer = bytebuffer(java)
 
 def loop(chan : async.DatagramChannel, buf : bytebuffer.ByteBuffer) : async.Packet
@@ -31,3 +31,21 @@ stdout.print(async.socketAddressToString(p.address) + "\n")
 stdout.print("End of result.\n")
 
 asyncUDP.close()
+
+stdout.print("---------\nNow making synchronous UDP channel...\n")
+
+val udp = io.makeDatagramChannel(1234)
+
+stdout.print("Waiting for packet...\n")
+
+val buf = bytebuffer.makeByteBuffer(256)
+
+val p = udp.receive(buf) //blocking call
+
+stdout.print("packet received!\n")
+
+stdout.print(bytebuffer.toString(p.data) + "\n")
+
+stdout.print("End of result.\n")
+
+udp.close()
