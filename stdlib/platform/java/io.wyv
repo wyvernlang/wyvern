@@ -17,29 +17,9 @@ import wyvern.option
 val bytebuffer = bytebuffer(java)
 type ByteBuffer = bytebuffer.ByteBuffer
 
+effect Connect = {networkEffects.Connect}
+
 // === Library Types ===
-/*
-type InputStream
-    def close():Unit
-
-type OutputStream
-    def close():Unit
-
-type DataInputStream
-    def readUTF():String
-    def readLine(): String
-    def close():Unit
-
-type DataOutputStream
-    def writeUTF(str:String):Unit
-    def writeBytes(str:String):Unit
-    def close():Unit
-
-type Socket
-    def getOutputStream():OutputStream
-    def getInputStream():InputStream
-    def close():Unit
-*/
 
 type Socket
     def makeReader():Reader
@@ -49,7 +29,7 @@ type Socket
     def close():Unit
 
 type ServerSocket
-    def accept():Socket
+    def accept():{Connect}Socket
     def close():Unit
 
 type DatagramChannel
@@ -65,7 +45,7 @@ resource type Packet
 def makeServerSocket(port:Int):ServerSocket
     val serverSocket = io.makeServerSocket(port)
     new
-        def accept():Socket
+        def accept():{Connect}Socket
             val socket = serverSocket.accept()
             //copied from makeSocket
             new
@@ -118,7 +98,7 @@ def makeServerSocket(port:Int):ServerSocket
         def close():Unit
             serverSocket.close()
 
-def makeSocket(hostname:String, port:Int):Socket
+def makeSocket(hostname:String, port:Int):{Connect}Socket
     val socket = io.makeSocket(hostname, port)
     new
         def makeReader():Reader
@@ -184,20 +164,3 @@ def makeDatagramChannel(port:Int):DatagramChannel
 def makePacket(data:ByteBuffer, hostname:String, port:Int):Packet = new
     val data = data
     val address = io.makeSocketAddress(hostname, port)
-
-/**
-* TODO: Hide functions that take arg:Dyn from the user
-*/
-/*
-def getDataOutputStream(out:Dyn):DataOutputStream // This will be the hidden function
-    io.getDataOutputStream(out)
-
-def makeDataOutputStream(out:OutputStream):DataOutputStream
-    getDataOutputStream(out)
-
-def getDataInputStream(in:Dyn):DataInputStream // This will be the hidden function
-    io.getDataInputStream(in)
-
-def makeDataInputStream(in:InputStream):DataInputStream
-    getDataInputStream(in)
-*/

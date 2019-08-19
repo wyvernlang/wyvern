@@ -2,9 +2,5 @@ module networkEffects : {}
 effect Read = {system.FFI}
 effect Write = {system.FFI}
 
-// for opening/closing socket connections
-effect Open = {system.FFI}
-effect Close = {system.FFI}
-
-// indicating asynchronous operation in progress, using another thread
-//effect Async = {system.FFI}
+// for opening socket connections
+effect Connect = {Read}
