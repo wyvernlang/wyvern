@@ -53,6 +53,9 @@ public class IO {
     }
     */
     
+    /**
+     * Added for Reader/Writer types in Wyvern
+     */
     public BufferedReader makeReader(Socket s) throws IOException {
         return new BufferedReader(new InputStreamReader(s.getInputStream()));
     }
@@ -65,38 +68,14 @@ public class IO {
         return obj == null;
     }
     
-    /**
-     * Reads a UTF-16 character using the given reader
-     * TODO: handle unsupported encoding exceptions gracefully
-     */
-    public String readUTF(Object r) throws IOException, UnsupportedEncodingException {
-        BufferedReader reader = (BufferedReader) r;
-        //assumes UTF-16 encoding
-        //based on http://www.herongyang.com/Unicode/UTF-16-UTF-16LE-Encoding.html
-        int first = reader.read();
-        int second = reader.read();
-        int block = (first << 8) + second;
-        if ((block < 0xD800) || (block > 0xDFFF)) {
-            //this indicates code point of decode character
-            byte[] res = new byte[2];
-            res[0] = (byte)first;
-            res[1] = (byte)second;
-            return new String(res, "UTF-16LE");
-        } else {
-            //first surrogate of surrogate pair, so read more
-            byte[] res = new byte[4];
-            res[0] = (byte)first;
-            res[1] = (byte)second;
-            res[2] = (byte)reader.read();
-            res[3] = (byte)reader.read();
-            return new String(res, "UTF-16LE");
-        }
+    public DataInputStream makeBinaryReader(Socket s) throws IOException {
+        return new DataInputStream(s.getInputStream());
     }
     
-    public void writeUTF(Object w, String s) throws IOException {
-        BufferedWriter writer = (BufferedWriter) w;
-        //since java chars support unicode characters, just straight to char[]
-        writer.write(s.toCharArray());
+    public DataOutputStream makeBinaryWriter(Socket s) throws IOException {
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        dos.flush();
+        return dos;
     }
     
     /**
