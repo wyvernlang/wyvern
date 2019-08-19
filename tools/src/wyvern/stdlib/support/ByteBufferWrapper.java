@@ -30,10 +30,13 @@ public class ByteBufferWrapper {
     }
     
     public ByteBuffer makeFromString(String s) throws UnsupportedEncodingException {
+        /*
         byte[] ins = s.getBytes("UTF-16LE");
         ByteBuffer buf = ByteBuffer.allocate(ins.length);
         buf.put(ins);
         return buf;
+        */
+        return ByteBuffer.wrap(s.getBytes("UTF-16LE"));
     }
     
     public int charGet(Object buf, int i) {
@@ -48,7 +51,13 @@ public class ByteBufferWrapper {
     
     public String stringFromByteBuffer(Object buf) throws UnsupportedEncodingException {
         ByteBuffer buffer = (ByteBuffer) buf;
-        return new String(buffer.array(), "UTF-16LE");
+        if(buffer.hasArray()) {
+            return new String(buffer.array(), "UTF-16LE");
+        } else {
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+            return new String(bytes, "UTF-16LE");
+        }
     }
     
     /**

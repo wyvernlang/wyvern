@@ -6,14 +6,12 @@ import filesystem.fileEffects
 import filesystem.BinaryWriter
 import filesystem.BinaryReader
 
-
+// TODO: can add more functionality, dealing with marks, clearing, relative operations, resetting the pointer
 type ByteBuffer
     val size : Int
     val buffer : Unit //java ByteBuffer
     def get(index : Int) : Int
     def set(index : Int, value : Int) : Unit
-    
-    // maybe writing strings? reading UTF? bytebuffer class with methods for creating from string, etc.
     
 // makes an empty ByteBuffer
 def makeByteBuffer(allocSize : Int) : ByteBuffer
