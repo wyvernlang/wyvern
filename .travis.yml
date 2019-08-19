@@ -1,7 +1,8 @@
 # need to use sudo-enabled containers for additional RAM
+dist: trusty
 sudo: required
 language: java
-jdk: oraclejdk8
+jdk: oraclejdk9
 python:
   - "3.6"
 cache:
@@ -13,7 +14,7 @@ install:
   - cd ..
 before_script:
   - export WYVERN_HOME="$(pwd)"
-  - export _JAVA_OPTIONS="-Xmx6144m -Xms512m"
+  - export _JAVA_OPTIONS="-Xmx6144m -Xms512m -XX:+UseParallelGC"
 script:
   - cd tools
   - ant test
