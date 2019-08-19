@@ -219,7 +219,7 @@ public final class TestUtil {
         InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(TestUtil.BASE_PATH), null);
         GenContext genCtx = Globals.getGenContext(state);
         IExpr program = ast.generateIL(genCtx, null, new LinkedList<TypedModuleSpec>());
-        TestUtil.doChecks(program, expectedType, expectedValue);
+        TestUtil.doChecks(program, expectedType, expectedValue, true);
     }
 
     public static void doTestInt(String input, int expectedIntResult) throws ParseException {
@@ -233,7 +233,7 @@ public final class TestUtil {
         final LinkedList<TypedModuleSpec> dependencies = new LinkedList<TypedModuleSpec>();
         IExpr program = ast.generateIL(genCtx, null, dependencies);
         program = genCtx.getInterpreterState().getResolver().wrap(program, dependencies);
-        TestUtil.doChecks(program, expectedType, expectedResult);
+        TestUtil.doChecks(program, expectedType, expectedResult, true);
     }
 
     private static InterpreterState getInterpreterState() {
@@ -275,12 +275,9 @@ public final class TestUtil {
         final Module module = state.getResolver().resolveModule(qualifiedName, true, false);
         IExpr program = state.getResolver().wrap(module.getExpression(), module.getDependencies());
         program = (IExpr) PlatformSpecializationVisitor.specializeAST((ASTNode) program, "java", Globals.getGenContext(state));
-        TestUtil.doChecks(program, expectedType, expectedValue);
+        TestUtil.doChecks(program, expectedType, expectedValue, doRun);
     }
 
-    public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue) {
-        doChecks(program, expectedType, expectedValue, true);
-    }
     public static void doChecks(IExpr program, ValueType expectedType, Value expectedValue, boolean doRun) {
         // resolveModule already typechecked, but we'll do it again to verify the type
         TypeContext ctx = Globals.getStandardTypeContext();
@@ -336,7 +333,7 @@ public final class TestUtil {
         wyvern.target.corewyvernIL.decl.Declaration decl = ((Declaration) ast).topLevelGen(genCtx, new LinkedList<TypedModuleSpec>());
         IExpr mainProgram = ((DefDeclaration) decl).getBody();
         IExpr program = new FieldGet(mainProgram, fieldName, null); // slightly hacky
-        doChecks(program, expectedType, expectedValue);
+        doChecks(program, expectedType, expectedValue, true);
     }
 
     public static void doTestTypeFail(String input) throws ParseException {
