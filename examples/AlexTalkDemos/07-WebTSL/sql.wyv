@@ -1,4 +1,4 @@
-// module parser
+module sql
 
 import metadata wyvern.collections.list
 import wyvern.util.matching.regex
@@ -7,6 +7,7 @@ import wyvern.ast
 import wyvern.Int
 import wyvern.option
 import debug
+import metadata wyvern.collections.list
 
 /* some SQL examples
 
@@ -129,54 +130,83 @@ def printTokens(scanner : lexer.Scanner, token : lexer.Token) : Unit
 
 ////////////////////////////////////////////////////////////////////////////
 
-// A parse function for SQL queries
-// SQLStatement ::= SQLInsert | SQLUpdate
-def parse(input:String):Option[String]
-    val scanner = createScanner(input)
-
-    val token = scanner.nextToken()
-    debugOut(token)
-
-    (token.kind() == tokens.INSERT).ifTrue(
-        () => parseInsert(scanner),
-        () => (token.kind() == tokens.UPDATE).ifTrue(
-            () => parseUpdate(scanner),
-            () => option.None[String]())) // default is PARSE ERROR
-
 // SQLInsert ::= "INSERT" "IDENTIFIER"
-def parseInsert(scanner:lexer.Scanner):Option[String]
-    debug.print("Called parseInsert.")
-    debug.println()
-    
-    val token = scanner.nextToken()
-    debugOut(token)
+def parseInsert(scanner : lexer.Scanner):Option[AST]
+  debug.print("Called parseInsert.")
+  debug.println()
+  val token = scanner.nextToken()
+  // debugOut(token)
+  
+  if (token.kind() == tokens.EOF)
+      option.None[AST]() // need to have IDENTIFIER
+    else
+      if (token.kind() == tokens.IDENTIFIER)
+          val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
+            ast.string("Successfully parsed insert and identifier (" + token.print() + ")!"))
+          val declList : list.List[ast.Decl] = list.make[ast.Decl]()
+          declList.append(defEval)
+          option.Some(ast.object(declList))
+        else
+          option.None[AST]() // need to have IDENTIFIER
 
-    (token.kind() == tokens.EOF).ifTrue(
-        () => option.None[String](), // need to have IDENTIFIER
-        () => (token.kind() == tokens.IDENTIFIER).ifTrue(
-            () => option.Some[String]("Successfully parsed insert and identifier!"),
-            () => option.None[String]())) // need to have IDENTIFIER
+// SQLInsert ::= "UPDATE" "IDENTIFIER"
+def parseUpdate(scanner : lexer.Scanner):Option[AST]
+  debug.print("Called parseUpdate.")
+  debug.println()
+  val token = scanner.nextToken()
+  // debugOut(token)
+  
+  if (token.kind() == tokens.EOF)
+      option.None[AST]() // need to have IDENTIFIER
+    else
+      if (token.kind() == tokens.IDENTIFIER)
+          val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
+            ast.string("Successfully parsed update and identifier (" + token.print() + ")!"))
+          val declList : list.List[ast.Decl] = list.make[ast.Decl]()
+          declList.append(defEval)
+          option.Some(ast.object(declList))
+        else
+          option.None[AST]() // need to have IDENTIFIER
 
-// SQLUpdate ::= "UPDATE" "IDENTIFIER"
-def parseUpdate(scanner:lexer.Scanner):Option[String]
-    debug.print("Called parseUpdate.")
-    debug.println()
-    
-    val token = scanner.nextToken()
-    debugOut(token)
+// Parse until EOF.
+def parseAllSQLStatements(scanner : lexer.Scanner) : list.List[AST]
+  var list : list.List[AST] = list.make[AST]()
+  parseAllSQLStatementsHelper(scanner, list)
 
-    (token.kind() == tokens.EOF).ifTrue(
-        () => option.None[String](), // need to have IDENTIFIER
-        () => (token.kind() == tokens.IDENTIFIER).ifTrue(
-            () => option.Some[String]("Successfully parsed update and identifier!"),
-            () => option.None[String]())) // need to have IDENTIFIER
+def parseAllSQLStatementsHelper(scanner : lexer.Scanner, list : list.List[AST]) : list.List[AST]
+  val token = scanner.nextToken()
+  // debugOut(token)
+  var ast : option.Option[AST] = option.None[AST]()
+
+  if (token.kind() != tokens.EOF)
+    if (token.kind() == tokens.INSERT)
+        ast = parseInsert(scanner)
+      else
+        if (token.kind() == tokens.UPDATE)
+          ast = parseUpdate(scanner)
+    if (ast.isDefined)
+      list.append(ast.get())
+
+  list
 
 ////////////////////////////////////////////////////////////////////////////
 
-var testString:String = "UPDATE blah"
+type SQLExpr
+  def eval() : String
 
-debug.print("Trying to parse ")
-debug.print(testString)
-debug.println()
-debug.print(parse(testString).getOrElse(() => "PARSE ERROR"))
-debug.println()
+  metadata new
+    // A parse function for SQL queries
+    // SQLStatement ::= SQLInsert | SQLUpdate
+    def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
+      val scanner = createScanner(input)
+
+      val sqlStatements : list.List[AST] = parseAllSQLStatements(scanner)
+      debug.print("Found ")
+      debug.printInt(sqlStatements.length())
+      debug.print(" SQL statements.\n")
+
+      val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
+        ast.string("Successfully parsed some SQL statements!"))
+      val declList : list.List[ast.Decl] = list.make[ast.Decl]()
+      declList.append(defEval)
+      option.Some(ast.object(declList))

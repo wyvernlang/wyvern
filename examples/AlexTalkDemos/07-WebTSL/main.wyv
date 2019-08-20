@@ -2,16 +2,38 @@ require stdout
 
 import metadata html
 import metadata xml
+import metadata sql
 
-val h:html.HTMLExpr = ~
+val h : html.HTMLExpr = ~
   <html>
 
 stdout.print(h.eval() + "\n")
 
-val x:xml.XMLExpr = ~
+val x : xml.XMLExpr = ~
   <xml>
 
 stdout.print(x.eval() + "\n")
 
-// val hError:html.HTMLExpr = ~
+// val hError : html.HTMLExpr = ~
 //   <xml>
+
+val s1 : sql.SQLExpr = ~
+  UPDATE blah
+
+stdout.print("s1 " + s1.eval() + "\n")
+
+val s2 : sql.SQLExpr = ~
+  INSERT blah
+
+stdout.print("s2 " + s2.eval() + "\n")
+
+val s3 : sql.SQLExpr = ~
+  INSERT Something
+  UPDATE Anything
+
+stdout.print("s3 " + s3.eval() + "\n")
+
+val s4 : sql.SQLExpr = ~
+  UPDATE Students SET GPA=3.0
+
+stdout.print("s4 " + s4.eval() + "\n")
