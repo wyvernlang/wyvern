@@ -98,3 +98,4 @@ out.js
 */examples/*.js
 boot.js
 *.js.old
+out.gradver
