@@ -7,7 +7,6 @@ import wyvern.ast
 import wyvern.Int
 import wyvern.option
 import debug
-import metadata wyvern.collections.list
 
 /* some SQL examples
 
@@ -173,7 +172,7 @@ def parseAllSQLStatements(scanner : lexer.Scanner) : list.List[AST]
   var list : list.List[AST] = list.make[AST]()
   parseAllSQLStatementsHelper(scanner, list)
 
-def parseAllSQLStatementsHelper(scanner : lexer.Scanner, list : list.List[AST]) : list.List[AST]
+def parseAllSQLStatementsHelper(scanner : lexer.Scanner, l : list.List[AST]) : list.List[AST]
   val token = scanner.nextToken()
   // debugOut(token)
   var ast : option.Option[AST] = option.None[AST]()
@@ -185,9 +184,9 @@ def parseAllSQLStatementsHelper(scanner : lexer.Scanner, list : list.List[AST]) 
         if (token.kind() == tokens.UPDATE)
           ast = parseUpdate(scanner)
     if (ast.isDefined)
-      list.append(ast.get())
+      l.append(ast.get())
 
-  list
+  l
 
 ////////////////////////////////////////////////////////////////////////////
 
