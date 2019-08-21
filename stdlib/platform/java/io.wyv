@@ -33,8 +33,8 @@ type ServerSocket
     def close():Unit
 
 type DatagramChannel
-    def send(p:Packet):Int
-    def receive(buf:ByteBuffer):Packet
+    def send(p:Packet):{networkEffects.Write}Int
+    def receive(buf:ByteBuffer):{networkEffects.Read}Packet
     def close():Unit
 
 resource type Packet
@@ -153,9 +153,9 @@ def makeSocketAddress(hostname : String, port : Int) : Unit
 def makeDatagramChannel(port:Int):DatagramChannel
     val chan = io.makeDatagramChannel(port)
     new
-        def send(p:Packet):Int
+        def send(p:Packet):{networkEffects.Write}Int
             io.sendDatagram(chan, p.data.buffer, p.address)
-        def receive(buf:ByteBuffer):Packet = new
+        def receive(buf:ByteBuffer):{networkEffects.Read}Packet = new
             val data = buf
             val address = io.receiveDatagram(chan, buf.buffer)
         def close():Unit
