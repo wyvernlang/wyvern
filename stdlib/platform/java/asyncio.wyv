@@ -2,6 +2,10 @@ module def asyncio(java : Java)
 
 import java:wyvern.stdlib.support.NIO.nio
 
+//Import effects
+import io.networkEffects
+
+//Import modules
 import future
 import bytebuffer
 import wyvern.option
@@ -14,22 +18,22 @@ type Option = option.Option
 
 // TCP
 type Socket
-    def read(buf : ByteBuffer) : future.Future[Int]
-    def write(buf : ByteBuffer) : future.Future[Int]
+    def read(buf : ByteBuffer) : {networkEffects.Read} future.Future[Int]
+    def write(buf : ByteBuffer) : {networkEffects.Write} future.Future[Int]
     def close() : Unit
 
 // TCP
 type ServerSocket
-    def accept() : future.Future[Socket]
+    def accept() : {networkEffects.Connect} future.Future[Socket]
     def close() : Unit
 
 // UDP
 type DatagramChannel
     // returns None if no packet ready, Some(Packet) if there was
 	// user must initialize the byte buffer size
-    def receive(buf : ByteBuffer) : Option[Packet]
+    def receive(buf : ByteBuffer) : {networkEffects.Read} Option[Packet]
     // returns number of bytes sent
-    def send(packet: Packet) : Int
+    def send(packet: Packet) : {networkEffects.Write} Int
     def close() : Unit
 
 // UDP
@@ -51,7 +55,7 @@ def socketAddressToString(addr : Unit) : String
 def makeDatagramChannel(port : Int) : DatagramChannel
     val chan = nio.makeDatagramChannel(port)
     new
-        def receive(buf : ByteBuffer) : Option[Packet] // fills buffer and returns packet if ready
+        def receive(buf : ByteBuffer) : {networkEffects.Read} Option[Packet] // fills buffer and returns packet if ready
             val maybeAddr = nio.receiveUDP(chan, buf.buffer)
             if (nio.isNull(maybeAddr))
                 option.None[Packet]()
@@ -60,7 +64,7 @@ def makeDatagramChannel(port : Int) : DatagramChannel
                     val data = buf
                     val address = maybeAddr
                 option.Some[Packet](packet)
-        def send(packet : Packet) : Int
+        def send(packet : Packet) : {networkEffects.Write} Int
             nio.sendUDP(chan, packet.data.buffer, packet.address)
         def close() : Unit
             nio.closeChannel(chan)
@@ -68,24 +72,24 @@ def makeDatagramChannel(port : Int) : DatagramChannel
 def makeServerSocket(port : Int) : ServerSocket
     val serverChannel = nio.makeServerSocketChannel(port)
     def makeSocketFromChannel(channel:Unit) : Socket = new
-        def read(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketRead(channel,buf.buffer))
-        def write(buf:ByteBuffer):future.Future[Int] = future.Future[Int](nio.socketWrite(channel,buf.buffer))
+        def read(buf:ByteBuffer):{networkEffects.Read}future.Future[Int] = future.Future[Int](nio.socketRead(channel,buf.buffer))
+        def write(buf:ByteBuffer):{networkEffects.Write}future.Future[Int] = future.Future[Int](nio.socketWrite(channel,buf.buffer))
         def close():Unit = nio.closeChannel(channel)
     new
-        def accept() : future.Future[Socket]
+        def accept() : {networkEffects.Connect} future.Future[Socket]
             future.Future[Unit](nio.serverAccept(serverChannel)).andThen[Socket](
                 (channel:Unit) => makeSocketFromChannel(channel)
             )
         def close() : Unit
             nio.closeChannel(serverChannel)
 /*
-def makeSocket(hostname : String, port : Int) : future.Future[Socket]
+def makeSocket(hostname : String, port : Int) : {networkEffects.Connect} future.Future[Socket]
     val channel = nio.makeSocketChannel()
     val connected : future.Future[Unit] = future.Future[Unit](nio.socketChannelConnect(channel, hostname, port))
     val socket : Socket = new
-        def read(buf : ByteBuffer) : future.Future[Int]
+        def read(buf : ByteBuffer) : {networkEffects.Read} future.Future[Int]
             future.Future[Int](nio.socketRead(channel, buf.buffer))
-        def write(buf : ByteBuffer) : future.Future[Int]
+        def write(buf : ByteBuffer) : {networkEffects.Write} future.Future[Int]
             future.Future[Int](nio.socketWrite(channel, buf.buffer))
         def close() : Unit
             nio.closeChannel(channel)
