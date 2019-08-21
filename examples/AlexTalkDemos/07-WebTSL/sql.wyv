@@ -130,68 +130,77 @@ def printTokens(scanner : lexer.Scanner, token : lexer.Token) : Unit
 ////////////////////////////////////////////////////////////////////////////
 
 // SQLInsert ::= "INSERT" "IDENTIFIER"
-def parseInsert(scanner : lexer.Scanner):Option[AST]
-  debug.print("Called parseInsert.")
-  debug.println()
+def parseInsert(scanner : lexer.Scanner, ctx : system.Context):Option[AST]
   val token = scanner.nextToken()
-  // debugOut(token)
   
   if (token.kind() == tokens.EOF)
       option.None[AST]() // need to have IDENTIFIER
     else
       if (token.kind() == tokens.IDENTIFIER)
-          val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
-            ast.string("Successfully parsed insert and identifier (" + token.print() + ")!"))
-          val declList : list.List[ast.Decl] = list.make[ast.Decl]()
-          declList.append(defEval)
-          option.Some(ast.object(declList))
+          val insert : AST = ast.parseExpression("sql.sql.insert(\"" + token.print() + "\")\n", ctx)
+          option.Some(insert)
         else
           option.None[AST]() // need to have IDENTIFIER
 
 // SQLInsert ::= "UPDATE" "IDENTIFIER"
-def parseUpdate(scanner : lexer.Scanner):Option[AST]
-  debug.print("Called parseUpdate.")
-  debug.println()
+def parseUpdate(scanner : lexer.Scanner, ctx : system.Context):Option[AST]
   val token = scanner.nextToken()
-  // debugOut(token)
   
   if (token.kind() == tokens.EOF)
       option.None[AST]() // need to have IDENTIFIER
     else
       if (token.kind() == tokens.IDENTIFIER)
-          val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
-            ast.string("Successfully parsed update and identifier (" + token.print() + ")!"))
-          val declList : list.List[ast.Decl] = list.make[ast.Decl]()
-          declList.append(defEval)
-          option.Some(ast.object(declList))
+          val update : AST = ast.parseExpression("sql.sql.update(\"" + token.print() + "\")\n", ctx)
+          option.Some(update)
         else
           option.None[AST]() // need to have IDENTIFIER
 
 // Parse until EOF.
-def parseAllSQLStatements(scanner : lexer.Scanner) : list.List[AST]
-  var list : list.List[AST] = list.make[AST]()
-  parseAllSQLStatementsHelper(scanner, list)
-
-def parseAllSQLStatementsHelper(scanner : lexer.Scanner, l : list.List[AST]) : list.List[AST]
+def parseAllSQLStatements(scanner : lexer.Scanner, ctx : system.Context, l : list.List[AST]) : list.List[AST]
   val token = scanner.nextToken()
   // debugOut(token)
   var ast : option.Option[AST] = option.None[AST]()
 
   if (token.kind() != tokens.EOF)
-    if (token.kind() == tokens.INSERT)
-        ast = parseInsert(scanner)
-      else
-        if (token.kind() == tokens.UPDATE)
-          ast = parseUpdate(scanner)
-    if (ast.isDefined)
-      l.append(ast.get())
+      if (token.kind() == tokens.INSERT)
+          ast = parseInsert(scanner, ctx)
+        else
+          if (token.kind() == tokens.UPDATE)
+              ast = parseUpdate(scanner, ctx)
+            else
+              debug.print("SQL TSL ERROR: Undefined token encountered: " + token.print() + "\n")
+      if (ast.isDefined)
+        l.append(ast.get())
+      parseAllSQLStatements(scanner, ctx, l)
+    else
+      l
 
-  l
+// Convert expressions sequence to nested lets for lack of sequence.
+def astListToLet(l : list.List[AST]) : AST
+  if (l.length() == 0)
+      ast.parseExpressionNoContext("unit")
+    else
+      if (l.get(0).isDefined)
+          val e : AST = l.get(0).get()
+          l.remove(0)
+          ast.let("sequence", ast.types.unit(), e, astListToLet(l))
+        else
+          ast.parseExpressionNoContext("unit")
 
 ////////////////////////////////////////////////////////////////////////////
 
+type SQL
+  def insert(id : String) : Unit
+  def update(id : String) : Unit
+
+val sql : SQL = new
+  def insert(id : String) : Unit
+    debug.print("Running INSERT with argument: " + id + "\n")
+  def update(id : String) : Unit
+    debug.print("Running UPDATE with argument: " + id + "\n")
+
 type SQLExpr
-  def eval() : String
+  def eval() : Unit
 
   metadata new
     // A parse function for SQL queries
@@ -199,13 +208,14 @@ type SQLExpr
     def parseTSL(input : String, ctx : system.Context) : option.Option[AST]
       val scanner = createScanner(input)
 
-      val sqlStatements : list.List[AST] = parseAllSQLStatements(scanner)
-      debug.print("Found ")
-      debug.printInt(sqlStatements.length())
-      debug.print(" SQL statements.\n")
+      var sqlStatements : list.List[AST] = list.make[AST]()
+      sqlStatements = parseAllSQLStatements(scanner, ctx, sqlStatements)
 
-      val defEval = ast.defDeclaration("eval", list.make[ast.FormalArg](), ast.types.string(),
-        ast.string("Successfully parsed some SQL statements!"))
+      val defEval = ast.defDeclaration(
+        "eval",
+        list.make[ast.FormalArg](),
+        ast.types.unit(),
+        astListToLet(sqlStatements))
       val declList : list.List[ast.Decl] = list.make[ast.Decl]()
       declList.append(defEval)
       option.Some(ast.object(declList))
