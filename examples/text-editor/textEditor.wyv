@@ -16,6 +16,7 @@ import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
 import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
+import NativeUIManager
 import Plugin
 
 /******* Step 1: Import plugins *********************************************/
@@ -40,6 +41,21 @@ val edit = nativeJMenu.create("Edit")
 val plugins = nativeJMenu.create("Plugins")
 val fs = fileSystem(java)
 val save = nativeActionCreator.create("Save")
+
+def getAttenuatedNativeUIManager(): NativeUIManager
+  new
+    def paintUIAttributeBlack(element: String, attribute: String): Unit
+      nativeUIManager.paintUIAttributeBlack(element, attribute)
+    def paintUIAttributeDarkGray(element: String, attribute: String): Unit
+      nativeUIManager.paintUIAttributeDarkGray(element, attribute)
+    def paintUIAttributeGray(element: String, attribute: String): Unit
+      nativeUIManager.paintUIAttributeGray(element, attribute)
+    def paintUIAttributeLightGray(element: String, attribute: String): Unit
+      nativeUIManager.paintUIAttributeLightGray(element, attribute)
+    def paintUIAttributeWhite(element: String, attribute: String): Unit
+      nativeUIManager.paintUIAttributeWhite(element, attribute)
+    def updateLookAndFeel(): Unit
+      nativeUIManager.updateLookAndFeel(jFrame)
 
 def registerPlugin(plugin: Plugin): Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
@@ -146,8 +162,8 @@ def run(): Unit
 
 /******* Step 2: Instantiate plugins passing in appropriate resources *******/
 
-  val darkTheme = darkTheme(logger, nativeUIManager, jFrame)
-  val lightTheme = lightTheme(logger, nativeUIManager, jFrame)
+  val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
+  val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
   val wordCount = wordCount(logger, textArea, nativeJOptionPane) // Must pass in JTextArea and not just String because need to get the latest version of the text
   val questionnaireCreator = questionnaireCreator(logger, textArea, fs) // Must pass in JTextArea and not just String because need to get the latest version of the text
 
