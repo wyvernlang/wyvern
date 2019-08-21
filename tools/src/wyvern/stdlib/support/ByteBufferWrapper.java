@@ -51,7 +51,7 @@ public class ByteBufferWrapper {
     
     public String stringFromByteBuffer(Object buf) throws UnsupportedEncodingException {
         ByteBuffer buffer = (ByteBuffer) buf;
-        if(buffer.hasArray()) {
+        if (buffer.hasArray()) {
             return new String(buffer.array(), "UTF-16LE");
         } else {
             byte[] bytes = new byte[buffer.remaining()];
@@ -81,7 +81,7 @@ public class ByteBufferWrapper {
     //gets a byte
     public int getNext(Object b) {
         ByteBuffer buf = (ByteBuffer) b;
-        if(buf.position() == buf.limit()) {
+        if (buf.position() == buf.limit()) {
             return -1;
         }
         return buf.get();

@@ -22,8 +22,12 @@ import wyvern.target.corewyvernIL.expression.Value;
 
 /* Future -> CompletableFuture conversion as described in 
 http://www.thedevpiece.com/converting-old-java-future-to-completablefuture/ */
-class CompletablePromiseContext {
+final class CompletablePromiseContext {
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
+    
+    private CompletablePromiseContext() {
+        //not called
+    }
     
     public static void schedule(Runnable r) {
         SERVICE.schedule(r, 1, TimeUnit.MILLISECONDS);
@@ -33,7 +37,7 @@ class CompletablePromiseContext {
 class CompletablePromise<V> extends CompletableFuture<V> {
     private Future<V> future;
     
-    public CompletablePromise(Future<V> future) {
+    CompletablePromise(Future<V> future) {
         this.future = future;
         CompletablePromiseContext.schedule(this::tryToComplete);
     }
