@@ -42,6 +42,10 @@ public class Effect {
         return name;
     }
 
+    public boolean hasFreeVariable(String name) {
+        return path.hasFreeVariable(name);
+    }
+    
     public FileLocation getLocation() {
         return loc;
     }
@@ -121,6 +125,11 @@ public class Effect {
         }
         return (EffectDeclType) eDT;
     }
+    
+    public static final Set<Effect> unscopedEffect = new HashSet<Effect>();
+    static {
+        unscopedEffect.add(new Effect(new Variable("system"), "EffectNotInScope", null));
+    }
 
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
         if (path != null && path.getFreeVariables().contains(varName)) {
@@ -130,9 +139,10 @@ public class Effect {
                         && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
                     // avoid infinite loops, just in case
                     // TODO: make this more principled
-                    final Set<Effect> s = new HashSet<Effect>();
+                    /*final Set<Effect> s = new HashSet<Effect>();
                     s.add(this);
-                    return s;
+                    return s;*/
+                    return unscopedEffect;
                 }
                 // different effects, so call recursively
                 final Set<Effect> s = new HashSet<Effect>();
@@ -140,6 +150,8 @@ public class Effect {
                     s.addAll(e.doAvoid(varName, ctx, count + 1));
                 }
                 return s;
+            } else {
+                return unscopedEffect;
             }
         }
 

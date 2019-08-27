@@ -16,4 +16,5 @@ public interface Path extends IASTNode, IExpr {
     Path adapt(View v);
     void doPrettyPrint(Appendable dest, String indent) throws IOException;
     Path adaptVariables(GenContext ctx);
+    boolean hasFreeVariable(String name);
 }

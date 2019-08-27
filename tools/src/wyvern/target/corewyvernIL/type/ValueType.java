@@ -176,8 +176,9 @@ public abstract class ValueType extends Type implements IASTNode {
      * @param count TODO
      */
     public final ValueType avoid(String varName, TypeContext ctx) {
-        return doAvoid(varName, ctx, 0);
+        return doAvoid(varName, ctx, INIT_RECURSION_DEPTH);
     }
+    public static final int INIT_RECURSION_DEPTH = 0;
     public static final int MAX_RECURSION_DEPTH = 10;
     public Tag getTag(EvalContext ctx) {
         throw new RuntimeError("internal error: getTag not implemented for things other than nominal types");
