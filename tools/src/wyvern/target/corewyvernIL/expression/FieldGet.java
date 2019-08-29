@@ -169,4 +169,11 @@ public class FieldGet extends Expression implements Path {
             return objectExpr.getFreeVariables().contains(name);
         }
     }
+
+    @Override
+    public void canonicalize(TypeContext ctx) {
+        if (objectExpr instanceof Path) {
+            ((Path) objectExpr).canonicalize(ctx);
+        }
+    }
 }

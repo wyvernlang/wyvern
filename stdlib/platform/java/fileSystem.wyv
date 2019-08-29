@@ -58,7 +58,7 @@ def fileFor(path: String) : File = new
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender() : Writer
+    def makeAppender() : Writer[{fileEffects.Append}]
         val bw = file.openBWForAppend(this.f)
         new
             effect Write = {fileEffects.Append}

@@ -100,5 +100,14 @@ public class VarGenContext extends GenContext {
             return getNext().getCallableExprRec(varName, origCtx);
         }
     }
+    
+    @Override
+    public BindingSite find(String name) {
+        if (name.equals(this.name)) {
+            return site;
+        } else {
+            return super.find(name); 
+        }
+    }
 
 }

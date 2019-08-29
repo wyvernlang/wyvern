@@ -171,4 +171,8 @@ public class Effect {
         }
         path = path.adaptVariables(ctx);
     }
+
+    public void canonicalize(TypeContext ctx) {
+        path.canonicalize(ctx);
+    }
 }

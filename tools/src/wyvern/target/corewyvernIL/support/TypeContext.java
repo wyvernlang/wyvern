@@ -48,4 +48,12 @@ public abstract class TypeContext {
 
     protected abstract TypeContext getNext();
     protected abstract String endToString();
+
+    public BindingSite find(String name) {
+        if (getNext() == null) {
+            return null;
+        } else {
+            return getNext().find(name); 
+        }
+    }
 }

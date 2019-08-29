@@ -121,9 +121,18 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
     @Override
     public void checkWellFormed(TypeContext ctx) {
-        // TODO Auto-generated method stub
+        if (effectSet != null) {
+            effectSet.effectsCheck(ctx);
+        }
     }
 
+    @Override
+    public void canonicalize(TypeContext ctx) {
+        if (effectSet != null) {
+            effectSet.canonicalize(ctx);
+        }
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
