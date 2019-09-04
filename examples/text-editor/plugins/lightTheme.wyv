@@ -1,19 +1,19 @@
-module def lightTheme(logger: Logger, uiManager: UIManager): {} Plugin
+module def lightTheme(logger: Logger, nativeUIManager: NativeUIManager): {} Plugin
 // N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
 import uiEffects
 
-effect Run = {logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}
+effect Run = {logger.Update}
 
 def getName(): {} String
   "Light Theme"
 
 def run(): {Run} Unit
-  uiManager.paintUIAttributeWhite("MenuBar", "background")
-  uiManager.paintUIAttributeWhite("MenuItem", "background")
-  uiManager.paintUIAttributeBlack("MenuItem", "foreground")
-  uiManager.paintUIAttributeWhite("TextArea", "background")
-  uiManager.paintUIAttributeBlack("TextArea", "foreground")
-  uiManager.paintUIAttributeWhite("ScrollPane", "background")
-  uiManager.paintUIAttributeWhite("ScrollBar", "background")
-  uiManager.updateLookAndFeel()
+  nativeUIManager.paintUIAttributeWhite("MenuBar", "background")
+  nativeUIManager.paintUIAttributeWhite("MenuItem", "background")
+  nativeUIManager.paintUIAttributeBlack("MenuItem", "foreground")
+  nativeUIManager.paintUIAttributeWhite("TextArea", "background")
+  nativeUIManager.paintUIAttributeBlack("TextArea", "foreground")
+  nativeUIManager.paintUIAttributeWhite("ScrollPane", "background")
+  nativeUIManager.paintUIAttributeWhite("ScrollBar", "background")
+  nativeUIManager.updateLookAndFeel()
   logger.updateLog("Set text editor theme to light.\n")
