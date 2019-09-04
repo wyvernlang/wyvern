@@ -1,0 +1,5 @@
+module effects : {}
+
+effect Read = {system.FFI}
+effect Write = {system.FFI}
+effect Any = {system.FFI}

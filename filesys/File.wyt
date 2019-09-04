@@ -1,0 +1,7 @@
+import filesys.fileEffects
+resource type File
+	effect Any <: fileEffects.Any
+	effect Read <: fileEffects.Read, this.Any
+	effect Write <: fileEffects.Write, this.Any
+	def read() : {this.Read} String
+	def write(s : String) : {this.Write} Unit

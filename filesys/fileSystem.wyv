@@ -1,0 +1,37 @@
+module fileSystem : {}
+
+import filesys.File
+import filesys.fileEffects
+import wyvern.option
+import wyvern.collections.List
+
+def makeFile() : {} File = new
+	effect Write = {system.FFI}
+	effect Read = {system.FFI}
+	effect Any = {system.FFI}
+
+	def read() : {this.Read} String
+		"content"
+
+	def write(s : String) : {this.Write} Unit
+		unit
+
+// Create file within function
+def makeFileAndWrite() : {fileEffects.Write} File 
+	val f : File = makeFile()
+	f.write("content")
+	f
+
+// Receive option type as argument
+def readFromFileOption(x : Option[File]) : {fileEffects.Read} Option[String]
+	if (x.isDefined)
+		Some[String](x.get().read())
+	else 
+		None
+
+// Write content to files in a list
+def writeFileList(l : List[File]) : {fileEffects.Write} Unit
+	def write(f : File) : {f.Write} Unit
+		f.write("content")
+	l.map[Unit](write)
+	unit

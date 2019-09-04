@@ -1,0 +1,10 @@
+module fileUser : {fileSystem.Any}
+
+import filesys.fileSystem
+import filesys.File
+
+val f : File = fileSystem.makeFile()
+
+val content = f.read()
+
+unit
