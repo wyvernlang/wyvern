@@ -1,3 +1,4 @@
 resource type Plugin // this type is a resource because plugins 1) may have fields and 2) may need some resources to be passed in
-  def getName(): String
-  def run(): Unit
+  effect Run
+  def getName(): {} String
+  def run(): {this.Run} Unit
