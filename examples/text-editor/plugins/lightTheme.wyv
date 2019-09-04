@@ -1,10 +1,12 @@
-module def lightTheme(logger: Logger, nativeUIManager: NativeUIManager): Plugin
+module def lightTheme(logger: Logger, nativeUIManager: NativeUIManager): {} Plugin
 // N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
 
-def getName(): String
+effect Run = {logger.Update}
+
+def getName(): {} String
   "Light Theme"
 
-def run(): Unit
+def run(): {Run} Unit
   nativeUIManager.paintUIAttributeWhite("MenuBar", "background")
   nativeUIManager.paintUIAttributeWhite("MenuItem", "background")
   nativeUIManager.paintUIAttributeBlack("MenuItem", "foreground")
