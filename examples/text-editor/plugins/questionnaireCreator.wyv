@@ -1,10 +1,12 @@
-module def questionnaireCreator(logger: Logger, textArea: JTextArea, fs: fileSystem.FileSystem): Plugin
+module def questionnaireCreator(logger: Logger, textArea: JTextArea, fs: fileSystem.FileSystem): {} Plugin
 // N.B.: Must pass in JTextArea and not just String because need to get the latest version of the text.
 
-def getName(): String
+effect Run = {logger.Update, fs.Write, fs.Append}
+
+def getName(): {} String
   "Questionnaire Creator"
 
-def run(): Unit
+def run(): {Run} Unit
   logger.updateLog("Running the " + getName() + " plugin...\n")
   val text = textArea.getText()
   val length = text.length()
@@ -19,7 +21,7 @@ def run(): Unit
   logger.updateLog("Result: The created questionnaire is:\n" + questionnaire)
 
 
-def extractQuestions(text: String, result: String): String
+def extractQuestions(text: String, result: String): {} String
   val length = text.length()
   if (length < 1)
       result
@@ -47,7 +49,7 @@ def extractQuestions(text: String, result: String): String
                     else
                       extractQuestions(text.substring(smallerPosition + 1, length), result)
 
-def trimSpaces(text: String): String
+def trimSpaces(text: String): {} String
   var changed: Boolean = false
   var firstIndex: Int = 0
   if (text.charAt(0) == #" " || text.charAt(0) == #"\n" || text.charAt(0) == #"\t")
