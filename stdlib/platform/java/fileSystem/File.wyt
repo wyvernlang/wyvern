@@ -7,9 +7,9 @@ resource type File
     effect Read
     effect Write
     effect Append
-    def makeReader():{}BoundedReader
-    def makeWriter():{}Writer
-    def makeAppender():{}Writer[{this.Append}]
-    def makeBinaryReader():{}BinaryReader
-    def makeBinaryWriter():{}BinaryWriter
-    def makeRandomAccessFile(mode : String):{}RandomAccessFile
+    def makeReader(): {} BoundedReader
+    def makeWriter(): {} Writer[{this.Write, this.Append}]
+    def makeAppender(): {} Writer[{this.Append}]
+    def makeBinaryReader(): {} BinaryReader
+    def makeBinaryWriter(): {} BinaryWriter
+    def makeRandomAccessFile(mode : String): {} RandomAccessFile
