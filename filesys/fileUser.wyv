@@ -1,4 +1,4 @@
-module fileUser : {fileSystem.Any}
+module fileUser : {fileEffects.Any}
 
 import filesys.fileSystem
 import filesys.File
