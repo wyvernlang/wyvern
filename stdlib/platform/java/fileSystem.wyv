@@ -20,7 +20,7 @@ effect Read = {fileEffects.Read}
 effect Write = {fileEffects.Write}
 effect Append = {fileEffects.Append}
 
-def fileFor(path: String) : File = new
+def fileFor(path: String) : File[{fileEffects.Read}, {fileEffects.Write}, {fileEffects.Append}] = new
     effect Read = {fileEffects.Read}
     effect Write = {fileEffects.Write}
     effect Append = {fileEffects.Append}
@@ -43,7 +43,7 @@ def fileFor(path: String) : File = new
             def close() : Unit
                 file.closeReader(br)
             
-    def makeWriter() : Writer
+    def makeWriter() : Writer[{fileEffects.Write, fileEffects.Append}]
         val bw = file.openBWForWrite(this.f)
         new
             effect Write = {fileEffects.Write, fileEffects.Append}
