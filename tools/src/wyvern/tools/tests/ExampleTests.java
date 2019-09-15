@@ -158,4 +158,9 @@ public class ExampleTests {
         Util.unitValue());
   }
 
+  @Test
+  public void testCommandLineArguments() throws ParseException {
+    TestUtil.doTestScriptModularly(PATH, "commandLineArguments", Util.unitType(),
+        Util.unitValue());
+  }
 }
