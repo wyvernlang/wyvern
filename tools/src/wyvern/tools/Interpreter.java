@@ -38,7 +38,6 @@ public final class Interpreter {
             System.exit(1);
         } else {
             // create CommandLineUtils object to store the command line arguments.
-            CommandLineUtils commandLineUtilsObject = new CommandLineUtils(args);
             CommandLineUtils commandLineUtilsObject = new CommandLineUtils();
             commandLineUtilsObject.setArgumentList(args);
         }
