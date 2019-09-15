@@ -292,6 +292,10 @@ public class NominalType extends ValueType {
     @Override
     public Value getMetadata(TypeContext ctx) {
         DeclType t = getSourceDeclType(ctx);
+        
+        // If one requests invalid or undefined member, then t would be null here, hence this check:
+        this.checkWellFormed(ctx);
+                
         return t.getMetadataValue();
     }
 

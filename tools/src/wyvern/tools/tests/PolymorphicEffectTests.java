@@ -104,6 +104,11 @@ public class PolymorphicEffectTests {
     }
 
     @Test
+    public void testAvoidEffects() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.avoidEffects", Util.stringType(), new StringLiteral("abc"));
+    }
+
+    @Test
     public void testSubtype3() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.subtype3", Util.stringType(), new StringLiteral("abc"));
     }
@@ -210,7 +215,7 @@ public class PolymorphicEffectTests {
     public void testRejectedHiddenEffects() throws ParseException {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString(
-                "Effect \"v.hiddenEffect\" not found in scope"
+                "EffectNotInScope"
                 ));
         TestUtil.doTestScriptModularly(PATH, "polymorphicEffects.rejectedHiddenEffects", Util.stringType(), new StringLiteral("abc"));
     }

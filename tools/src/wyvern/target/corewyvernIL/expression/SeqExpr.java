@@ -106,19 +106,27 @@ public class SeqExpr extends Expression {
                 ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getType().toString(),
                         r.getReason());
             }
-            return getType();
         }
-        for (int i = elements.size() - 1; i >= 0; --i) {
-            HasLocation elem = elements.get(i);
-            if (elem instanceof VarBinding) {
-                String varName = ((VarBinding) elem).getVarName();
-                // TODO (hack): avoid only variables not present outside
-                if (!ctx.isPresent(varName, true)) {
-                    result = result.avoid(varName, extendedCtx);
+        if (getType() == null || effectAccumulator != null) {
+            for (int i = elements.size() - 1; i >= 0; --i) {
+                HasLocation elem = elements.get(i);
+                if (elem instanceof VarBinding) {
+                    String varName = ((VarBinding) elem).getVarName();
+                    // TODO (hack): avoid only variables not present outside
+                    if (!ctx.isPresent(varName, true)) {
+                        if (getType() == null) {
+                            result = result.avoid(varName, extendedCtx);
+                        }
+                        if (effectAccumulator != null) {
+                            effectAccumulator.avoidVar(varName, extendedCtx);
+                        }
+                    }
                 }
             }
         }
-        setExprType(result);
+        if (getType() == null) {
+            setExprType(result);
+        }
         return getType();
     }
 

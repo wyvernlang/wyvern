@@ -180,6 +180,7 @@ public class RefinementType extends ValueType {
         base.checkWellFormed(ctx);
         final TypeContext selfCtx = selfSite == null ? ctx : ctx.extend(selfSite, this);
         for (DeclType dt : getDeclTypes(ctx)) {
+            dt.canonicalize(ctx);
             dt.checkWellFormed(selfCtx);
         }
     }
@@ -199,13 +200,15 @@ public class RefinementType extends ValueType {
 
     @Override
     public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
+        checkWellFormed(ctx);
         StructuralType baseST = base.getStructuralType(ctx, theDefault);
         List<DeclType> newDTs = new LinkedList<DeclType>();
         int current = 0;
         int max = getDeclTypes(ctx).size();
         for (DeclType t : baseST.getDeclTypes()) {
-            if (current < max && t.getName().equals(getDeclTypes(ctx).get(current).getName())) {
-                newDTs.add(getDeclTypes(ctx).get(current));
+            List<DeclType> rdts = getDeclTypes(ctx);
+            if (current < max && t.getName().equals(rdts.get(current).getName())) {
+                newDTs.add(rdts.get(current));
                 current++;
             } else {
                 newDTs.add(t);

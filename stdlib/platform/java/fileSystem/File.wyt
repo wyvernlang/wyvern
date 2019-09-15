@@ -9,7 +9,7 @@ resource type File
     effect Append
     def makeReader():{}BoundedReader
     def makeWriter():{}Writer
-    def makeAppender():{}Writer
+    def makeAppender():{}Writer[{this.Append}]
     def makeBinaryReader():{}BinaryReader
     def makeBinaryWriter():{}BinaryWriter
     def makeRandomAccessFile(mode : String):{}RandomAccessFile

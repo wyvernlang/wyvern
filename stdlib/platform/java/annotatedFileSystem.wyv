@@ -62,7 +62,7 @@ def fileFor(path: String) : {} File = new
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender() : {} Writer
+    def makeAppender() : {} Writer[{this.Append}]
         val bw = file.openBWForAppend(this.f)
         new (self) =>
             effect Write = {system.FFI}

@@ -150,4 +150,14 @@ public class Variable extends Expression implements Path {
             return (Path) expr;
         }
     }
+    @Override
+    public boolean hasFreeVariable(String name) {
+        return this.name.equals(name);
+    }
+    @Override
+    public void canonicalize(TypeContext ctx) {
+        if (site == null) {
+            site = ctx.find(name);
+        }
+    }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.support.GenContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.View;
 
 public interface Path extends IASTNode, IExpr {
@@ -16,4 +17,7 @@ public interface Path extends IASTNode, IExpr {
     Path adapt(View v);
     void doPrettyPrint(Appendable dest, String indent) throws IOException;
     Path adaptVariables(GenContext ctx);
+    boolean hasFreeVariable(String name);
+    /** converts variables without a binding to ones with a binding, if possible */
+    void canonicalize(TypeContext ctx);
 }
