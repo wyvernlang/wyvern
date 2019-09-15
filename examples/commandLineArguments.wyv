@@ -8,7 +8,7 @@ stdout.print("The 0th indexed command line argument is: ")
 stdout.print("\"" + cmdArgs.get(0) + "\"\n")
 
 stdout.print("The last command line argument is: ")
-stdout.print("\"" + cmdArgs.get(cmdArgs.length() - 1) + "\"\n")
+stdout.print("\"" + cmdArgs.get(cmdArgs.size() - 1) + "\"\n")
 
 stdout.print("All command line arguments are: ")
 stdout.print("\"")

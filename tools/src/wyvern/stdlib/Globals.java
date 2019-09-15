@@ -65,7 +65,6 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.Sys.utils");
         javaWhiteList.add("wyvern.stdlib.support.HashMapWrapper.hashmapwrapper");
         javaWhiteList.add("wyvern.stdlib.support.ArrayWrapper.arr");
-        javaWhiteList.add("wyvern.stdlib.support.CommandLineUtils.utils");
     }
 
     static {

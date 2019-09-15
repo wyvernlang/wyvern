@@ -3,18 +3,18 @@ import java:wyvern.stdlib.support.CommandLineUtils.utils
 import java:wyvern.stdlib.support.Stdio.stdio
 
 def printCmdLineArgs(index: Int): Unit
-  if (index != utils.getLength() - 1)
+  if (index != size() - 1)
       stdio.print(utils.get(index))
       stdio.print(", ")
       printCmdLineArgs(index + 1)
     else
-      stdio.print(utils.get(utils.getLength() - 1))
+      stdio.print(utils.get(size() - 1))
 
 def print(): Unit
   printCmdLineArgs(0)
 
-def length(): Int
-  utils.getLength()
+def size(): Int
+  utils.size()
 
 def get(index: Int): String
   utils.get(index)
