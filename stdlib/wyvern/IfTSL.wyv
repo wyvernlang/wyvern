@@ -30,7 +30,7 @@ def indentAndMakeIf(x : String, cond : String): String
   "if" + cond + "\n" + ind + indent(x, ind)
 
 def elifAST(input : String, ctx : system.Context): String
-  val elifRegex = regex("^elif\\s*\\(.*\\)\\s*\n")
+  val elifRegex = regex("^elif\\s*\\(.*\\)\\s*(\\/\\/[^\n]*)?\n")
   val mOpt = elifRegex.findPrefixMatchOf(input)
   val isElif = mOpt.isDefined
   val em = mOpt.getOrElse( () => regex.makeMatch("", input)).after()
@@ -38,7 +38,7 @@ def elifAST(input : String, ctx : system.Context): String
   isElif.ifTrue(() => indentAndMakeIf(em, cond), () => em)
 
 def elifOrElseAST(input : String, ctx : system.Context) : AST
-  val elseRegex = regex("^else\\s*\n")
+  val elseRegex = regex("^else\\s*(\\/\\/[^\n]*)?\n")
   val mOpt = elseRegex.findPrefixMatchOf(input)
   val body = mOpt.map[String](x: regex.Match => x.after()).getOrElse(() => elifAST(input, ctx))
   toUnitOrAST(body, ctx)
