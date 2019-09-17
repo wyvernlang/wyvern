@@ -918,6 +918,8 @@ AST PrimaryPrefix(ExpFlags flags) :
 AST Literal() :
 { AST exp; Token lit; }
 {
+ lit = <RATIONAL_LITERAL> { return build.rationalLit(lit.image, loc(lit)); }
+|
   lit = <FLOATING_POINT_LITERAL> { return build.floatLit(Float.parseFloat(lit.image), loc(lit)); }
 |
   lit = <STRING_LITERAL>  { return build.stringLit(lit.image, loc(lit)); }
@@ -933,8 +935,6 @@ AST Literal() :
     build.setDSLBody(exp, lit.image);
     return exp;
   }
-|
-  <RATIONAL_LITERAL>
 }
 
 AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :

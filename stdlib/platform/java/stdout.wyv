@@ -25,6 +25,9 @@ def printBoolean(b:Boolean): {print} Unit
 def printFloat(f:Float): {print} Unit
 	stdio.printFloat(f)
 
+def printRational(r:Rational): Unit
+  stdio.printRational(r)
+
 def println(): {print} Unit
 	stdio.println()
 

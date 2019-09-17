@@ -234,6 +234,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token booleanLit_t ::= /true|false/ in (keywds) {: RESULT = token(BOOLEAN_LITERAL,lexeme); :};
 	terminal Token floatingPoint_t ::= /([0]\.[0-9]*)|([1-9][0-9]*\.[0-9]+)|(\.[0-9]+)|([1-9][0-9]*\.)/ {: RESULT = token(FLOATING_POINT_LITERAL, lexeme); :};
  	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
+ 	terminal Token rationalLit_t ::= /([1-9][0-9]*|0)\/([1-9][0-9]*|0)/  {: RESULT = token(RATIONAL_LITERAL,lexeme); :};
 
 	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); flagTok = RESULT; :};
 	terminal Token plus_t ::= /\+/ {: RESULT = token(PLUS,lexeme); :};
@@ -450,6 +451,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	          | booleanLit_t:t {: RESULT = t; :}
 	          | shortString_t:t {: RESULT = t; :}
 	          | character_t:t {: RESULT = t; :}
+	          | rationalLit_t:t {: RESULT = t; :}
 	          | inlinelit:lit {: RESULT = token(DSL_LITERAL,(String)lit); :};
 	
 	operator ::= tilde_t:t {: foundTilde = true; RESULT = t; :}

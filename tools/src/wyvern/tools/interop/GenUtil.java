@@ -67,6 +67,9 @@ public final class GenUtil {
             return Util.booleanType();
         }
 
+        if (javaClass.getName().equals("wyvern.stdlib.support.Rational")) {
+            return Util.rationalType();
+        }
         // TODO: might be unnecessary
         if (javaClass.getName().equals("wyvern.target.corewyvernIL.expression.ObjectValue")) {
             return Util.dynType();

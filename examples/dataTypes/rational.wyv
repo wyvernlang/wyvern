@@ -1,0 +1,58 @@
+require stdout
+
+val oneHalf: Rational = 1/2
+val oneThird: Rational = 1/3
+
+val result = oneHalf + oneThird
+
+stdout.print("1/2 + 1/3 = ")
+stdout.printRational(result)
+stdout.println()
+
+stdout.print("1/2 - 1/3 = ")
+stdout.printRational(1/2 - 1/3)
+stdout.println()
+
+stdout.print("1/3 - 1/2 == ")
+stdout.printRational(1/3 - 1/2)
+stdout.println()
+
+stdout.print("1/2 * 1/3 == ")
+stdout.printRational(1/2 * 1/3)
+stdout.println()
+
+stdout.print("1/2 / 1/3 == ")
+stdout.printRational(1/2 / 1/3)
+stdout.println()
+
+stdout.print("negate 1/2: ")
+stdout.printRational(-1/2)
+stdout.println()
+
+stdout.print("1/2 < 1/3 ? ")
+stdout.printBoolean(1/2 < 1/3)
+stdout.println()
+
+stdout.print("1/2 > 1/3 ? ")
+stdout.printBoolean(1/2 > 1/3)
+stdout.println()
+
+stdout.print("1/2 == 1/3 ? ")
+stdout.printBoolean(1/2 == 1/3)
+stdout.println()
+
+stdout.print("1/2 <= 1/3 ? ")
+stdout.printBoolean(1/2 <= 1/3)
+stdout.println()
+
+stdout.print("1/2 >= 1/3 ? ")
+stdout.printBoolean(1/2 >= 1/3)
+stdout.println()
+
+stdout.print("1/2 != 1/3 ? ")
+stdout.printBoolean(1/2 != 1/3)
+stdout.println()
+
+stdout.print("1/5 == 20/100 ? ")
+stdout.printBoolean(1/5 == 20/100)
+stdout.println()
