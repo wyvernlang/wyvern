@@ -175,6 +175,8 @@ public final class Globals {
         boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("!", Util.booleanType(), Arrays.asList()));
+        boolDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
+        boolDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
 
         // construct a type for the system object
         // N.B.: Operations here are built-in and performed on an instance of a type.

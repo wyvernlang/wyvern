@@ -710,7 +710,7 @@ public class OIRTests {
                       + "\"typechecked!\"";
         testPyFromInput(input, "typechecked!");
     }
-    
+
     @Test
     public void testComparisonOperator() throws ParseException {
       String input =
@@ -727,8 +727,13 @@ public class OIRTests {
             + "stdout.printBoolean(\"a\" > \"b\")\n"
             + "stdout.printBoolean(\"a\" < \"b\")\n"
             + "stdout.printBoolean(\"a\" != \"b\")\n"
+            + "stdout.printBoolean(true == true)\n"
+            + "stdout.printBoolean(false == true)\n"
+            + "stdout.printBoolean(false != true)\n"
+            + "stdout.printBoolean((1 > 2) == (2 > 3))\n"
             + "stdout.println()\n"
             + "0";
-      testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrue\n0");
+      testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrueTrueFalseTrueTrue\n0");
     }
 }
+
