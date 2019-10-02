@@ -82,4 +82,9 @@ public abstract class DeclType extends ASTNode implements IASTNode {
      * @return True if the type is effect-unannotated, false otherwise.
      */
     public abstract boolean isEffectUnannotated(TypeContext ctx);
+
+    /** for effect declarations, makes sure the variables are bound */
+    public void canonicalize(TypeContext ctx) {
+        // default implementation does nothing
+    }
 }

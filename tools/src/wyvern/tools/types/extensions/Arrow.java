@@ -37,6 +37,10 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
         return result;
     }
 
+    public boolean isResource() {
+        return isResource;
+    }
+
     public List<Type> getArguments() {
         return arguments;
     }
@@ -61,7 +65,7 @@ public class Arrow extends AbstractTypeImpl implements ApplyableType {
         return arguments.hashCode() + result.hashCode();
     }
 
-    static final ValueType NOMINAL_UNIT = new NominalType("system", "Unit");
+    public static final ValueType NOMINAL_UNIT = new NominalType("system", "Unit");
 
     @Override
     public ValueType getILType(GenContext ctx) {

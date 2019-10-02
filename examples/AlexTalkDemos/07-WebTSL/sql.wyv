@@ -45,6 +45,7 @@ val tokens = new
 	val SET     :this.Kind = 37
 	val TABLE   :this.Kind = 38
 	val UPDATE  :this.Kind = 39
+
 	val VALUES  :this.Kind = 40
 	val WHERE   :this.Kind = 41
     
@@ -101,7 +102,7 @@ def createScanner(input:String):lexer.Scanner
 
 ////////////////////////////////////////////////////////////////////////////
 
-def debugOut(t:lexer.Token):Unit
+def debugOut(t : lexer.Token):Unit
     debug.printInt(t.kind())
     debug.print(": ")
     debug.print(t.print())
@@ -150,8 +151,30 @@ def parseUpdate(scanner : lexer.Scanner, ctx : system.Context):Option[AST]
       option.None[AST]() // need to have IDENTIFIER
     else
       if (token.kind() == tokens.IDENTIFIER)
-          val update : AST = ast.parseExpression("sql.sql.update(\"" + token.print() + "\")\n", ctx)
-          option.Some(update)
+          var next : lexer.Token = scanner.peekToken()
+          var updateWhat : String = token.print()
+          if (next.kind() == tokens.SET)
+              next = scanner.nextToken() // SET
+              next = scanner.nextToken()
+              if (next.kind() == tokens.IDENTIFIER)
+                  var setWhat : String = next.print()
+                  next = scanner.nextToken()
+                  if (next.kind() == tokens.EQUALS)
+                      next = scanner.nextToken()
+                      if (next.kind() == tokens.FLOAT_CONST)
+                          var value : String = next.print()
+                          val update : AST = ast.parseExpression("sql.sql.updateAndSet(\"" + updateWhat +
+                            "\", \"" + setWhat + "\", \"" + value + "\")\n", ctx)
+                          option.Some(update)
+                        else
+                          option.None[AST]() // need to have FLOAT after =
+                    else
+                      option.None[AST]() // need to have = after IDENTIFIER
+                else
+                  option.None[AST]() // need to have IDENTIFIER after SET
+            else
+              val update : AST = ast.parseExpression("sql.sql.update(\"" + token.print() + "\")\n", ctx)
+              option.Some(update)
         else
           option.None[AST]() // need to have IDENTIFIER
 
@@ -192,12 +215,15 @@ def astListToLet(l : list.List[AST]) : AST
 type SQL
   def insert(id : String) : Unit
   def update(id : String) : Unit
+  def updateAndSet(id : String, set : String, v : String) : Unit
 
 val sql : SQL = new
   def insert(id : String) : Unit
     debug.print("Running INSERT with argument: " + id + "\n")
   def update(id : String) : Unit
     debug.print("Running UPDATE with argument: " + id + "\n")
+  def updateAndSet(id : String, set : String, v : String) : Unit
+    debug.print("Running UPDATE with argument: " + id + " and setting " + set + " to value: " + v + "\n")
 
 type SQLExpr
   def eval() : Unit

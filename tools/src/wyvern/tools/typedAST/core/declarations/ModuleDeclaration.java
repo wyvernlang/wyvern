@@ -2,6 +2,7 @@ package wyvern.tools.typedAST.core.declarations;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -10,6 +11,7 @@ import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.decltype.DefDeclType;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
@@ -20,7 +22,9 @@ import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -28,6 +32,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.generics.GenericParameter;
 import wyvern.tools.typedAST.core.Sequence;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
+import wyvern.tools.typedAST.core.expressions.Fn;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
@@ -40,7 +45,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     private final String name;
     private final TypedAST inner;
     private FileLocation location;
-    private NamedType ascribedType;
+    private Type ascribedType;
     private boolean resourceFlag;
     private final List<NameBindingImpl> args;
 
@@ -50,7 +55,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     //private final List<GenericParameter> generics;
 
     public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
-                             TypedAST inner, NamedType type, FileLocation location, boolean isResource,
+                             TypedAST inner, Type type, FileLocation location, boolean isResource,
                              boolean isAnnotated, String effects) {
         this.name = name;
         this.inner = inner;
@@ -145,75 +150,64 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         List<FormalArg> types = new LinkedList<FormalArg>();
 
         for (NameBindingImpl arg : args) {
-            types.add(getType(ctx, loadedTypes, null, arg));
+            types.add(getArgType(ctx, loadedTypes, null, arg));
         }
 
         return types;
     }
 
+    /** Implements the case of toInternalType for arrows
+     */
+    private ValueType getArrowType(Arrow arrowType, GenContext ctx, List<Module> loadedTypes, FileLocation location2) {
+        List<FormalArg> formals = new LinkedList<FormalArg>();
+        for (int i = 0; i < arrowType.getArguments().size(); ++i) {
+            Type type = arrowType.getArguments().get(i);
+            ValueType argType = toInternalType(ctx, loadedTypes, location2, type);
+            if (!Util.unitType().equals(argType) && !Arrow.NOMINAL_UNIT.equals(argType)) {
+                // it's a real argument, add it to the list
+                formals.add(new FormalArg("arg" + i, argType));
+            }
+        }
+        ValueType resultType = toInternalType(ctx, loadedTypes, location2, arrowType.getResult());
+        
+        return new StructuralType(Fn.LAMBDA_STRUCTUAL_DECL,
+                                  Arrays.asList(new DefDeclType(Util.APPLY_NAME, resultType, formals, effectSet)), arrowType.isResource());
+    }
+
+    
     /**
-     * Obtain the type of the module.
+     * Responsibility: Use other methods to determine the type of the
+     * NameBinding for a module argument, then package up that type in a
+     * FormalArg.
      *
      * @param ctx         context of the method
      * @param loadedTypes a list of Modules objects that has loaded types
      * @param location    file location
      * @param arg         the name binding argument
-     * @return a FormalArg object that contains the type of the module.
+     * @return a FormalArg object that contains an argument of the module.
      */
-    private FormalArg getType(GenContext ctx, List<Module> loadedTypes, FileLocation location, NameBindingImpl arg) {
-        // initialize resulting type to null.
-        FormalArg resultType = null;
-
-        // get the type of the argument
-        Object argType = arg.getType();
-
-        // initialize typeName
-        String typeName;
-
-        if (argType instanceof Arrow) {
-            // case when argType is an Arrow type (a lambda expression).
-
-            // obtain the value type from Arrow type.
-            ValueType intermediateLanguageType = ((Arrow) argType).getILType(ctx);
-            resultType = new FormalArg(arg.getName(), intermediateLanguageType);
-
-            // obtain the type of the formal arguments (of arrow type).
-            List<Type> list = ((Arrow) argType).getArguments();
-
-            // obtain the result type (of arrow type).
-            Type arrowResultType = ((Arrow) argType).getResult();
-
-            // loop through all the formal arguments and return arguments and add them to
-            // loadedTypes list.
-            for (Type argument : list) {
-                typeName = ((NamedType) argument).getFullName();
-                if (!ctx.isPresent(typeName, false)) {
-                    // case when the context is not present.
-                    Module lt = resolveLoadedTypes(ctx, typeName);
-                    loadedTypes.add(lt);
-                }
-            }
-
-            // add result type of the arrow type to loadedTypes list.
-            typeName = ((NamedType) arrowResultType).getFullName();
-            if (!ctx.isPresent(typeName, false)) {
-                // case when the context is not present.
-                Module lt = resolveLoadedTypes(ctx, typeName);
-                loadedTypes.add(lt);
-            }
-
-        } else {
-            // obtain the name of the type.
-            typeName = ((NamedType) argType).getFullName();
-            ValueType valueType = this.getType(ctx, loadedTypes, location, typeName);
-            resultType = new FormalArg(arg.getName(), valueType);
-        }
-
-        return resultType;
+    private FormalArg getArgType(GenContext ctx, List<Module> loadedTypes, FileLocation location, NameBindingImpl arg) {
+        ValueType valueType = toInternalType(ctx, loadedTypes, location, arg.getType());
+        return new FormalArg(arg.getName(), valueType);
     }
+    
+    /** Responsibility: convert a external Type to an internal ValueType,
+     * side-effecting loadedTypes as needed.
+     */
+    private ValueType toInternalType(GenContext ctx, List<Module> loadedTypes, FileLocation location, Type type) {
+        if (type instanceof Arrow) {
+            // case when argType is an Arrow type (a lambda expression).
+            return getArrowType((Arrow) type, ctx, loadedTypes, location);
+        } else {
+            // case of fully qualified named types
+            String typeName = ((NamedType) type).getFullName();
+            return getType(ctx, loadedTypes, location, typeName);
+        }
+    }
+    
 
     /**
-     * Obtain the type of the module.
+     * Converts a fully-qualified type name to a ValueType
      *
      * @param ctx         context of the method
      * @param loadedTypes a list of Modules objects that has loaded types
@@ -334,7 +328,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         List<Module> loadedTypes = new LinkedList<Module>();
         formalArgs.addAll(getTypes(methodContext, loadedTypes)); // get the types of the module parameters
         wyvern.target.corewyvernIL.type.ValueType ascribedValueType
-            = ascribedType == null ? null : this.getType(methodContext, loadedTypes, ascribedType.getLocation(), ascribedType.getFullName());
+            = ascribedType == null ? null : toInternalType(methodContext, loadedTypes, ascribedType.getLocation(), ascribedType);
         for (Module lt : loadedTypes) {
             // include the declaration itself
             final BindingSite internalSite = lt.getSpec().getSite();

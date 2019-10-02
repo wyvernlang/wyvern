@@ -30,6 +30,9 @@ def printf(str : formatstring.FormatString): {print} Unit
     val s : String = str
     stdio.print(s)
 
+def printRational(r:Rational): Unit
+  stdio.printRational(r)
+
 def println(): {print} Unit
 	stdio.println()
 

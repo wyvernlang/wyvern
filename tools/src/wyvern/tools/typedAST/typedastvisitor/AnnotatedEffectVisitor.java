@@ -30,6 +30,7 @@ import wyvern.tools.typedAST.core.expressions.New;
 import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.core.values.BooleanConstant;
+import wyvern.tools.typedAST.core.values.RationalConstant;
 import wyvern.tools.typedAST.core.values.CharacterConstant;
 import wyvern.tools.typedAST.core.values.FloatConstant;
 import wyvern.tools.typedAST.core.values.IntegerConstant;
@@ -195,6 +196,11 @@ public class AnnotatedEffectVisitor extends TypedASTVisitor<GenContext, Void> {
 
     @Override
     public Void visit(GenContext state, BooleanConstant ast) {
+        return null;
+    }
+
+    @Override
+    public Void visit(GenContext state, RationalConstant ast) {
         return null;
     }
 

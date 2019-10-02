@@ -57,7 +57,7 @@ public abstract class ASTVisitor<S, T> {
     public abstract T visit(S state, ModuleDeclaration moduleDecl);
     public abstract T visit(S state, IntegerLiteral integerLiteral);
     public abstract T visit(S state, BooleanLiteral booleanLiteral);
-    public abstract T visit(S state, RationalLiteral rational);
+    public abstract T visit(S state, RationalLiteral rationalLiteral);
     public abstract T visit(S state, FormalArg formalArg);
     public abstract T visit(S state, VarDeclType varDeclType);
     public abstract T visit(S state, ValDeclType valDeclType);

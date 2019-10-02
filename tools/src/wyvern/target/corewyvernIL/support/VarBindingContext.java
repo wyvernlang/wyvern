@@ -65,4 +65,13 @@ public class VarBindingContext extends TypeContext {
     protected String endToString() {
         return binding.toString() + " : " + type + ", " + getNext().endToString();
     }
+    
+    @Override
+    public BindingSite find(String name) {
+        if (name.equals(this.binding.getName())) {
+            return binding;
+        } else {
+            return super.find(name); 
+        }
+    }
 }

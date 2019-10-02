@@ -126,4 +126,10 @@ public class EffectSet {
             e.adaptVariables(ctx);
         }
     }
+
+    public void canonicalize(TypeContext ctx) {
+        for (final Effect e:effectSet) {
+            e.canonicalize(ctx);
+        }
+    }
 }

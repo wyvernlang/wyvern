@@ -373,6 +373,22 @@ public class OIRTests {
     }
 
     @Test
+    public void testTSLIfWithComments() throws ParseException {
+        String input = ""
+                     + "val x = 1\n"
+                     + "def getString(): String\n"
+                     + "  if (x == 1) // this is a comment\n"
+                     + "      \"Hello, World!\" // this is a body comment\n"
+                     + "    elif (x == 2) // this is another comment\n"
+                     + "      \"Hi, World!\" // this is a body comment\n"
+                     + "    else // this is another comment\n"
+                     + "      \"\" // this is the last body comment\n"
+                     + "getString()\n";
+        testPyFromInput(input, "Hello, World!");
+    }
+
+
+    @Test
     public void testArithmetic() throws ParseException {
         String input =
                 "val x = ((5 + 3) / 2) * 2 - 1\n"
@@ -694,9 +710,9 @@ public class OIRTests {
                       + "\"typechecked!\"";
         testPyFromInput(input, "typechecked!");
     }
-    
+
     @Test
-    public void testComparisonOperator() throws ParseException {
+    public void testBooleanComparisonOperator() throws ParseException {
       String input =
         "require stdout\n"
             + "stdout.printBoolean(1 >= 2)\n"
@@ -711,8 +727,42 @@ public class OIRTests {
             + "stdout.printBoolean(\"a\" > \"b\")\n"
             + "stdout.printBoolean(\"a\" < \"b\")\n"
             + "stdout.printBoolean(\"a\" != \"b\")\n"
+            + "stdout.printBoolean(true == true)\n"
+            + "stdout.printBoolean(false == true)\n"
+            + "stdout.printBoolean(false != true)\n"
+            + "stdout.printBoolean((1 > 2) == (2 > 3))\n"
             + "stdout.println()\n"
             + "0";
-      testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrue\n0");
+      testPyFromInput(input, "FalseTrueFalseFalseTrueTrueFalseTrueFalseFalseTrueTrueTrueFalseTrueTrue\n0");
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
+    public void testRationalOperators() throws ParseException {
+        String input =
+                "require stdout\n"
+                        + "stdout.printRational(1/2 + 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/2 - 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/3 - 1/2)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/2 * 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(1/2 / 1/3)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printRational(-1/2)\n"
+                        + "stdout.print(\" \")\n"
+                        + "stdout.printBoolean(1/2 < 1/3)\n"
+                        + "stdout.printBoolean(1/2 > 1/3)\n"
+                        + "stdout.printBoolean(1/2 == 1/3)\n"
+                        + "stdout.printBoolean(1/2 <= 1/3)\n"
+                        + "stdout.printBoolean(1/2 >= 1/3)\n"
+                        + "stdout.printBoolean(1/2 != 1/3)\n"
+                        + "stdout.printBoolean(1/5 == 20/100)\n"
+                        + "stdout.println()\n"
+                        + "0";
+        testPyFromInput(input, "5/6 1/6 -1/6 1/6 3/2 -1/2 FalseTrueFalseFalseTrueTrueTrue\n0");
     }
 }
+

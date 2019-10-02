@@ -160,4 +160,20 @@ public class FieldGet extends Expression implements Path {
             return new FieldGet(newPath, fieldName, getLocation());
         }
     }
+
+    @Override
+    public boolean hasFreeVariable(String name) {
+        if (objectExpr instanceof Path) {
+            return ((Path) objectExpr).hasFreeVariable(name);
+        } else {
+            return objectExpr.getFreeVariables().contains(name);
+        }
+    }
+
+    @Override
+    public void canonicalize(TypeContext ctx) {
+        if (objectExpr instanceof Path) {
+            ((Path) objectExpr).canonicalize(ctx);
+        }
+    }
 }
