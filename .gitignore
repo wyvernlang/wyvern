@@ -11,6 +11,7 @@ tools/wyvern-tools.iml
 `.metadata/
 tools/.checkstyle
 tools/bin
+tools/src/wyvern/tools/InterpreterTest.java
 tools/src/wyvern/tools/parsing/Wyvern.java
 tools/src/wyvern/tools/parsing/quotelang/WyvernQuote.java
 tools/src/wyvern/tools/tests/utils/TestSuiteParser.java
