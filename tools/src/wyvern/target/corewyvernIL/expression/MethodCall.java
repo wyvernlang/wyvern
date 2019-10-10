@@ -142,16 +142,16 @@ public class MethodCall extends Expression {
         // boolean type and method "||" or "&&" is invoked
         if ((Util.isBooleanType(getReceiverType(ctx)) && this.getMethodName() == "||")
           || (Util.isBooleanType(getReceiverType(ctx)) && this.getMethodName() == "&&")) {
-            return Util.booleanType();
-        }
-
-        if (Util.isDynamicType(getReceiverType(ctx))) {
+            // set short circuit flag
+            typeMethodDeclaration(ctx, effectAccumulator, true);
+        } else if (Util.isDynamicType(getReceiverType(ctx))) {
             for (IExpr arg : args) {
                 arg.typeCheck(ctx, effectAccumulator);
             }
             return Util.dynType();
+        } else {
+            typeMethodDeclaration(ctx, effectAccumulator);
         }
-        typeMethodDeclaration(ctx, effectAccumulator);
         return getType();
     }
 
@@ -426,11 +426,23 @@ public class MethodCall extends Expression {
     }
     
     /**
-     * Type the declaration for the method being invoked.
-     * @param ctx: ctx in which invocation happens.
+     * Type the declaration for the method being invoked, with the short circuit flag set to false
+     * @param ctx: the type context in which invocation happens.
+     * @param effectAccumulator: the list of effects
      * @return the declaration of the method.
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        return this.typeMethodDeclaration(ctx, effectAccumulator, false);
+    }
+
+    /**
+     * Type the declaration for the method being invoked.
+     * @param ctx: the type context in which invocation happens.
+     * @param effectAccumulator: the list of effects
+     * @param isShortCircuit: short circuit flag. Indicates if the current operation requires short circuit
+     * @return the declaration of the method.
+     */
+    public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator, boolean isShortCircuit) {
         boolean isTarget = false;
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
@@ -441,7 +453,18 @@ public class MethodCall extends Expression {
             ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName, receiver.desugar(ctx));
         }
         // Go through all declarations, typechecking against the actual types passed in...
-        List<ValueType> actualArgTypes = getArgTypes(ctx, args);
+        List<ValueType> actualArgTypes;
+
+        // if short circuit flag is set, avoid checking the actual argument types
+        if (isShortCircuit) {
+           // initialize actual arg types to an empty array
+           actualArgTypes = new ArrayList<>() {{
+             add(Util.booleanType());
+           }};
+        } else {
+            actualArgTypes = getArgTypes(ctx, args);
+        }
+
         List<ValueType> formalArgTypes = null;
 
         // ...use this context to do that.
@@ -449,8 +472,16 @@ public class MethodCall extends Expression {
         TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
-
-            MatchResult mr = matches(ctx, receiver, declType, args, objectExpr);
+            MatchResult mr;
+            if (isShortCircuit) {
+                ArrayList booleanArgList = new ArrayList<>() {{
+                  add(new BooleanLiteral(true));
+                }};
+                mr = matches(ctx, receiver, declType, booleanArgList, objectExpr);
+            } else {
+                mr = matches(ctx, receiver, declType, args, objectExpr);
+            }
+            
             newCtx = mr.newCtx;
             calleeCtx = mr.calleeCtx;
             formalArgTypes = mr.formalArgTypes;
