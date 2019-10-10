@@ -163,18 +163,24 @@ public class MethodCall extends Expression {
     @Override
     public Value interpret(EvalContext ctx) {
         Invokable receiver = (Invokable) objectExpr.interpret(ctx);
-
+        List<Value> argValues;
         // Perform short-circuit evaluation on the evaluation
         if ((receiver instanceof BooleanLiteral)
           && (this.getMethodName() == "||")
           && (((BooleanLiteral) receiver).getValue())) {
-            return (Value) new BooleanLiteral(true);
+            // since the argument list will not be evaluated in this case
+            // we declare an empty arguments list. BooleanLiteral class will
+            // handle the short circuit case and return the value of the receiver
+            argValues = new ArrayList<Value>();
         } else if ((receiver instanceof BooleanLiteral)
             && (this.getMethodName() == "&&")
             && !(((BooleanLiteral) receiver).getValue())) {
-            return (Value) new BooleanLiteral(false);
+            // since the argument list will not be evaluated in this case
+            // we declare an empty argument list. Boolean Literal class will
+            // handle the short circuit case and return the value of the receiver
+            argValues = new ArrayList<Value>();
         } else {
-            List<Value> argValues = new ArrayList<Value>(args.size());
+            argValues = new ArrayList<Value>(args.size());
             for (int i = 0; i < args.size(); ++i) {
                 IExpr e = args.get(i);
                 argValues.add(e.interpret(ctx));
@@ -195,8 +201,8 @@ public class MethodCall extends Expression {
   
                 };
             }
-            return trampoline(receiver.invoke(methodName, argValues, getLocation()));
         }
+        return trampoline(receiver.invoke(methodName, argValues, getLocation()));
     }
 
     public static Value trampoline(Value v) {
@@ -474,6 +480,9 @@ public class MethodCall extends Expression {
         for (DeclType declType : declarationTypes) {
             MatchResult mr;
             if (isShortCircuit) {
+                // since the argument list will not be evaluated in this case
+                // we declare an arguments list with a BooleanLiteral for the 
+                // type checking
                 ArrayList booleanArgList = new ArrayList<>() {{
                   add(new BooleanLiteral(true));
                 }};
