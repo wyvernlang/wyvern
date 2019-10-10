@@ -34,6 +34,7 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
+import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
@@ -136,6 +137,15 @@ public class MethodCall extends Expression {
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         // If calling on a dynamic receiver, it types to Dyn (provided the args typecheck)
+
+        // perform short-circuit evaluation on the type check of booleans
+        // prevent type checking the actual arguments when the receiver is of
+        // boolean type and method "||" or "&&" is invoked
+        if ((Util.isBooleanType(getReceiverType(ctx)) && this.getMethodName() == "||")
+          || (Util.isBooleanType(getReceiverType(ctx)) && this.getMethodName() == "&&")) {
+            return Util.booleanType();
+        }
+
         if (Util.isDynamicType(getReceiverType(ctx))) {
             for (IExpr arg : args) {
                 arg.typeCheck(ctx, effectAccumulator);
@@ -154,28 +164,42 @@ public class MethodCall extends Expression {
     @Override
     public Value interpret(EvalContext ctx) {
         Invokable receiver = (Invokable) objectExpr.interpret(ctx);
-        List<Value> argValues = new ArrayList<Value>(args.size());
-        for (int i = 0; i < args.size(); ++i) {
-            IExpr e = args.get(i);
-            argValues.add(e.interpret(ctx));
+
+        // Perform short-circuit evaluation on the evaluation
+        if ((receiver instanceof BooleanLiteral) &&
+           (this.getMethodName() == "||") &&
+           (((BooleanLiteral) receiver).getValue() == true)) {
+            return new BooleanLiteral(true);
         }
-        if (isTailCall()) {
-            return new SuspendedTailCall(this.getType(), this.getLocation()) {
-
-                @Override
-                public Value interpret(EvalContext ignored) {
-                    return receiver.invoke(methodName, argValues, getLocation());
-                }
-
-                @Override
-                public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-                    // TODO Auto-generated method stub
-                    return null;
-                }
-
-            };
+        else if ((receiver instanceof BooleanLiteral) &&
+                (this.getMethodName() == "&&") &&
+                (((BooleanLiteral) receiver).getValue() == false)) {
+            return new BooleanLiteral(false);
         }
-        return trampoline(receiver.invoke(methodName, argValues, getLocation()));
+        else {
+            List<Value> argValues = new ArrayList<Value>(args.size());
+            for (int i = 0; i < args.size(); ++i) {
+                IExpr e = args.get(i);
+                argValues.add(e.interpret(ctx));
+            }
+            if (isTailCall()) {
+                return new SuspendedTailCall(this.getType(), this.getLocation()) {
+  
+                    @Override
+                    public Value interpret(EvalContext ignored) {
+                        return receiver.invoke(methodName, argValues, getLocation());
+                    }
+  
+                    @Override
+                    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
+  
+                };
+            }
+            return trampoline(receiver.invoke(methodName, argValues, getLocation()));
+        }
     }
 
     public static Value trampoline(Value v) {
