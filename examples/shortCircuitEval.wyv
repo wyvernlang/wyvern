@@ -1,0 +1,22 @@
+require stdout
+
+def testAnd(): Unit
+    val s = ""
+    if (s.length() > 0 && s.substring(0, 1) == " ")
+            stdout.print("string starts with space")
+            stdout.println()
+        else
+            stdout.print("string is empty")
+            stdout.println()
+
+def testOr(): Unit
+    val s = ""
+    if (s.length() == 0 || s.substring(0, 1) == " ")
+            stdout.print("string is empty")
+            stdout.println()
+        else
+            stdout.print("string is not empty or starts with space")
+            stdout.println()
+
+testAnd()
+testOr()

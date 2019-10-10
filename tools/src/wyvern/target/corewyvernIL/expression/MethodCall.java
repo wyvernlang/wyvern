@@ -34,7 +34,6 @@ import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
@@ -166,17 +165,15 @@ public class MethodCall extends Expression {
         Invokable receiver = (Invokable) objectExpr.interpret(ctx);
 
         // Perform short-circuit evaluation on the evaluation
-        if ((receiver instanceof BooleanLiteral) &&
-           (this.getMethodName() == "||") &&
-           (((BooleanLiteral) receiver).getValue() == true)) {
-            return new BooleanLiteral(true);
-        }
-        else if ((receiver instanceof BooleanLiteral) &&
-                (this.getMethodName() == "&&") &&
-                (((BooleanLiteral) receiver).getValue() == false)) {
-            return new BooleanLiteral(false);
-        }
-        else {
+        if ((receiver instanceof BooleanLiteral)
+          && (this.getMethodName() == "||")
+          && (((BooleanLiteral) receiver).getValue())) {
+            return (Value) new BooleanLiteral(true);
+        } else if ((receiver instanceof BooleanLiteral)
+            && (this.getMethodName() == "&&")
+            && !(((BooleanLiteral) receiver).getValue())) {
+            return (Value) new BooleanLiteral(false);
+        } else {
             List<Value> argValues = new ArrayList<Value>(args.size());
             for (int i = 0; i < args.size(); ++i) {
                 IExpr e = args.get(i);

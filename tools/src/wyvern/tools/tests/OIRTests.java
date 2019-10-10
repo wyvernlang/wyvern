@@ -558,6 +558,21 @@ public class OIRTests {
 
     @Test
     @Category(CurrentlyBroken.class)
+    public void testBooleanAndShortCircuit() throws ParseException {
+      String input =
+      "require stdout\n"
+        + "val s = \"\"\n"
+        + "stdout.printBoolean(s.length() > 0 && s.substring(0, 1) == \" \")\n"
+        + "stdout.printBoolean(s.length() == 0 || s.substring(0, 1) == \" \")\n"
+        + "stdout.printBoolean(false && (1 / 0))\n"
+        + "stdout.printBoolean(true || (1 / 0))\n"
+        + "stdout.println()\n"
+        + "0";
+      testPyFromInput(input, "FalseTrueFalseTrue\n0");
+    }
+
+    @Test
+    @Category(CurrentlyBroken.class)
     public void testNestedLambda() throws ParseException {
         String input =
                 "val obj = new\n"
