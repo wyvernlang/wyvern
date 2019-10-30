@@ -22,6 +22,7 @@ public final class Util {
     public static final String NULL_SELF = "nullSelf";
 
     private Util() { }
+    private static final ValueType theRationalType = new NominalType("system", "Rational");
     private static final ValueType theBooleanType = new NominalType("system", "Boolean");
     private static final ValueType theEmptyType = new StructuralType("empty", new LinkedList<>());
     private static final ValueType theIntType = new NominalType("system", "Int");
@@ -33,6 +34,9 @@ public final class Util {
     private static final ValueType theDynType = new DynamicType();
     private static final ValueType theBottomType = new BottomType();
 
+    public static ValueType rationalType() {
+      return theRationalType;
+    }
     public static ValueType booleanType() {
         return theBooleanType;
     }

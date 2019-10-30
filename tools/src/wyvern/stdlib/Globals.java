@@ -142,6 +142,7 @@ public final class Globals {
         }
         // Additional primitives should also be added to primitive list in MethodCall.java bytecode generation
         GenContext genCtx = new EmptyGenContext(state).extend(system, new Variable(system), Globals.getSystemType());
+        genCtx = new TypeOrEffectGenContext("Rational", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Int", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Float", system, genCtx);
         genCtx = new TypeOrEffectGenContext("Unit", system, genCtx);
@@ -175,6 +176,8 @@ public final class Globals {
         boolDeclTypes.add(new DefDeclType("&&", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("||", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
         boolDeclTypes.add(new DefDeclType("!", Util.booleanType(), Arrays.asList()));
+        boolDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
+        boolDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.booleanType()))));
 
         // construct a type for the system object
         // N.B.: Operations here are built-in and performed on an instance of a type.
@@ -237,6 +240,21 @@ public final class Globals {
         stringDeclTypes.add(new DefDeclType("indexOf", Util.intType(), Arrays.asList(new FormalArg("ch", Util.intType()))));
         ValueType stringType = new StructuralType("stringSelf", stringDeclTypes);
         declTypes.add(new ConcreteTypeMember("String", stringType));
+
+        List<DeclType> rationalDeclTypes = new LinkedList<>();
+        rationalDeclTypes.add(new DefDeclType("+", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("-", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("*", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("/", Util.rationalType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("<", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType(">", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("negate", Util.rationalType(), Arrays.asList()));
+        rationalDeclTypes.add(new DefDeclType("<=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType(">=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        rationalDeclTypes.add(new DefDeclType("!=", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.rationalType()))));
+        ValueType rationalType = new StructuralType("rational", rationalDeclTypes);
+        declTypes.add(new ConcreteTypeMember("Rational", rationalType));
 
         List<DeclType> charDeclTypes = new LinkedList<DeclType>();
         charDeclTypes.add(new DefDeclType("==", Util.booleanType(), Arrays.asList(new FormalArg("other", Util.charType()))));
@@ -305,6 +323,7 @@ public final class Globals {
     public static ObjectValue getSystemValue() {
         // construct a type for the system object
         List<Declaration> decls = new LinkedList<Declaration>();
+        decls.add(new TypeDeclaration("Rational", new NominalType("this", "Rational"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Int", new NominalType("this", "Int"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Float", new NominalType("this", "Float"), FileLocation.UNKNOWN));
         decls.add(new TypeDeclaration("Unit", Util.unitType(), FileLocation.UNKNOWN));

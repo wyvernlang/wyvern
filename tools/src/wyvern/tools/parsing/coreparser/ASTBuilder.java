@@ -45,6 +45,7 @@ interface ASTBuilder<AST, Type> {
     AST characterLit(char value, FileLocation loc);
     AST integerLit(BigInteger value, FileLocation loc);
     AST booleanLit(boolean value, FileLocation loc);
+    AST rationalLit(String value, FileLocation loc);
     AST invocation(AST receiver, String name, AST argument, FileLocation loc);
     AST application(AST function, List<AST> arguments, FileLocation loc, List<GenericArgument> genericArguments, boolean recur);
     AST addArguments(AST application, List<String> names, List<AST> arguments) throws ParseException;

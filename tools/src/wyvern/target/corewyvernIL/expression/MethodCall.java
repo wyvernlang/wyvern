@@ -87,7 +87,7 @@ public class MethodCall extends Expression {
     @Override
     public BytecodeOuterClass.Expression emitBytecode() {
         // Should match primitives in Globals.java
-        String[] primitives = {"Int", "Float", "String", "Character", "Boolean"};
+        String[] primitives = {"Int", "Float", "String", "Character", "Boolean", "Rational"};
         if (receiverType instanceof NominalType && Arrays.asList(primitives).contains(((NominalType) receiverType).getTypeMember())) {
             BytecodeOuterClass.Expression.StaticCallExpression.Builder pce = BytecodeOuterClass.Expression.StaticCallExpression.newBuilder()
                     .setMethod(methodName)

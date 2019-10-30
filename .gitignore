@@ -91,6 +91,7 @@ tools/src/wyvern/target/llvm/aclocal.m4
 tools/src/wyvern/target/llvm/configure
 tools/jacoco.exec
 tools/report
+tools/out.gradver
 
 node_modules
 *.wyb

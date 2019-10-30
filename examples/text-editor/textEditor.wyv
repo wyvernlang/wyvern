@@ -1,5 +1,4 @@
-module def textEditor(java: Java, logger: Logger, createTextEditorInstance: Unit -> Dyn): TextEditor
-// FIX: Use the TextEditor type instead of Dyn. Currently gives the error saying that type TextEditor isn't defined
+module def textEditor(java: Java, logger: Logger, createTextEditorInstance: Unit -> TextEditor): TextEditor
 
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJTextArea
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJFileChooser

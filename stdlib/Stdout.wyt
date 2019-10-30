@@ -8,3 +8,4 @@ resource type Stdout
     def println() : {this.print} Unit
     def flush() : {this.flush} Unit
     def printFloat(f : Float) : {this.print} Unit
+    def printRational(r : Rational) : {this.print} Unit

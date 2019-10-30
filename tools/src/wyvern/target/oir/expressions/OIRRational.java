@@ -5,27 +5,29 @@ import wyvern.target.oir.OIREnvironment;
 import wyvern.target.oir.declarations.OIRRationalType;
 import wyvern.target.oir.declarations.OIRType;
 
-public class OIRRational extends OIRLiteral implements OIRValue {
-    private int numerator;
-    private int denominator;
+import java.math.BigInteger;
 
-    public int getNumerator() {
+public class OIRRational extends OIRLiteral implements OIRValue {
+    private BigInteger numerator;
+    private BigInteger denominator;
+
+    public BigInteger getNumerator() {
         return numerator;
     }
 
-    public void setNumerator(int numerator) {
+    public void setNumerator(BigInteger numerator) {
         this.numerator = numerator;
     }
 
-    public int getDenominator() {
+    public BigInteger getDenominator() {
         return denominator;
     }
 
-    public void setDenominator(int denominator) {
+    public void setDenominator(BigInteger denominator) {
         this.denominator = denominator;
     }
 
-    public OIRRational(int numerator, int denominator) {
+    public OIRRational(BigInteger numerator, BigInteger denominator) {
         super();
         this.numerator = numerator;
         this.denominator = denominator;

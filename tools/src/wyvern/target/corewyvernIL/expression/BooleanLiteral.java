@@ -16,7 +16,7 @@ import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.FileLocation;
 
 public class BooleanLiteral extends Literal implements Invokable {
-    private boolean value;
+    private Boolean value;
 
     @Override
     public int hashCode() {
@@ -118,7 +118,12 @@ public class BooleanLiteral extends Literal implements Invokable {
             return new BooleanLiteral(this.value || ((BooleanLiteral) args.get(0)).value);
         case "!":
             return new BooleanLiteral(!this.value);
-        default: throw new RuntimeException();
+        case "==":
+            return new BooleanLiteral(this.value.compareTo(((BooleanLiteral) args.get(0)).getValue()) == 0);
+        case "!=":
+            return new BooleanLiteral(this.value.compareTo(((BooleanLiteral) args.get(0)).getValue()) != 0);
+        default:
+            throw new RuntimeException();
         }
     }
 

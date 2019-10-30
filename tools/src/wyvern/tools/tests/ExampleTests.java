@@ -134,6 +134,7 @@ public class ExampleTests {
         PythonCompiler.main(args);
     }
 
+
     @Test
     public void testBinarySearchTree() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "dataStructures.bsttest",
@@ -161,5 +162,11 @@ public class ExampleTests {
     @Test
     public void testTextEditorApplication() throws ParseException {
         TestUtil.doTestScriptModularly(PATH + "text-editor", "main", Util.unitType(), Util.unitValue(), false);
+    }
+
+    @Test
+    public void testCommandLineArguments() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "commandLineArguments", Util.unitType(),
+        Util.unitValue());
     }
 }
