@@ -1,0 +1,5 @@
+module friend
+
+import modules.outer.inner.mod
+
+val x : mod.T = 5

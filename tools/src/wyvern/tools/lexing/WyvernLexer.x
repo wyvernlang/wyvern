@@ -212,6 +212,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token importKwd_t   ::= /import/ in (keywds) {: RESULT = token(IMPORT,lexeme); :};
  	terminal Token liftedKwd_t   ::= /lifted/ in (keywds) {: RESULT = token(LIFTED,lexeme); :};
  	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
+ 	terminal Token abstractKwd_t   ::= /abstract/ in (keywds) {: RESULT = token(ABSTRACT,lexeme); :};
  	terminal Token comprisesKwd_t   ::= /comprises/ in (keywds) {: RESULT = token(COMPRISES,lexeme); :};
  	terminal Token extendsKwd_t   ::= /extends/ in (keywds) {: RESULT = token(EXTENDS,lexeme); :};
 	//terminal Token ifKwd_t 	::= /if/ in (keywds);
@@ -430,6 +431,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | metadataKwd_t:t {: RESULT = t; :}
 	       | newKwd_t:t {: RESULT = t; :}
 	       | moduleKwd_t:t {: RESULT = t; :}
+	       | abstractKwd_t:t {: RESULT = t; :}
 	       | comprisesKwd_t:t {: RESULT = t; :}
 	       | extendsKwd_t:t {: RESULT = t; :}
 	       | matchKwd_t:t {: RESULT = t; :}
