@@ -136,22 +136,13 @@ public class MethodCall extends Expression {
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         // If calling on a dynamic receiver, it types to Dyn (provided the args typecheck)
-
-        // perform short-circuit evaluation on the type check of booleans
-        // prevent type checking the actual arguments when the receiver is of
-        // boolean type and method "||" or "&&" is invoked
-        if ((Util.isBooleanType(getReceiverType(ctx)) && this.getMethodName() == "||")
-          || (Util.isBooleanType(getReceiverType(ctx)) && this.getMethodName() == "&&")) {
-            // set short circuit flag
-            typeMethodDeclaration(ctx, effectAccumulator, true);
-        } else if (Util.isDynamicType(getReceiverType(ctx))) {
+        if (Util.isDynamicType(getReceiverType(ctx))) {
             for (IExpr arg : args) {
                 arg.typeCheck(ctx, effectAccumulator);
             }
             return Util.dynType();
-        } else {
-            typeMethodDeclaration(ctx, effectAccumulator);
         }
+        typeMethodDeclaration(ctx, effectAccumulator);
         return getType();
     }
 
@@ -167,18 +158,19 @@ public class MethodCall extends Expression {
         // Perform short-circuit evaluation on the evaluation
         if ((receiver instanceof BooleanLiteral)
           && (this.getMethodName() == "||")
+          // check whether receiver is true
           && (((BooleanLiteral) receiver).getValue())) {
-            // since the argument list will not be evaluated in this case
-            // we declare an empty arguments list. BooleanLiteral class will
-            // handle the short circuit case and return the value of the receiver
-            argValues = new ArrayList<Value>();
+            // the expression will be evaluated to "true" if
+            // the receiver is "true" and method name is "or"
+            return new BooleanLiteral(true);
+
         } else if ((receiver instanceof BooleanLiteral)
             && (this.getMethodName() == "&&")
             && !(((BooleanLiteral) receiver).getValue())) {
-            // since the argument list will not be evaluated in this case
-            // we declare an empty argument list. Boolean Literal class will
-            // handle the short circuit case and return the value of the receiver
-            argValues = new ArrayList<Value>();
+            // the expression will be evaluated to "false" if
+            // the receiver is "false" and method name is "and"
+            return new BooleanLiteral(false); 
+
         } else {
             argValues = new ArrayList<Value>(args.size());
             for (int i = 0; i < args.size(); ++i) {
@@ -204,7 +196,6 @@ public class MethodCall extends Expression {
         }
         return trampoline(receiver.invoke(methodName, argValues, getLocation()));
     }
-
     public static Value trampoline(Value v) {
         while (v instanceof SuspendedTailCall) {
             v = v.interpret(null);
@@ -432,23 +423,11 @@ public class MethodCall extends Expression {
     }
     
     /**
-     * Type the declaration for the method being invoked, with the short circuit flag set to false
-     * @param ctx: the type context in which invocation happens.
-     * @param effectAccumulator: the list of effects
+     * Type the declaration for the method being invoked.
+     * @param ctx: ctx in which invocation happens.
      * @return the declaration of the method.
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
-        return this.typeMethodDeclaration(ctx, effectAccumulator, false);
-    }
-
-    /**
-     * Type the declaration for the method being invoked.
-     * @param ctx: the type context in which invocation happens.
-     * @param effectAccumulator: the list of effects
-     * @param isShortCircuit: short circuit flag. Indicates if the current operation requires short circuit
-     * @return the declaration of the method.
-     */
-    public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator, boolean isShortCircuit) {
         boolean isTarget = false;
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
@@ -459,18 +438,7 @@ public class MethodCall extends Expression {
             ToolError.reportError(ErrorMessage.NO_SUCH_METHOD, this, methodName, receiver.desugar(ctx));
         }
         // Go through all declarations, typechecking against the actual types passed in...
-        List<ValueType> actualArgTypes;
-
-        // if short circuit flag is set, avoid checking the actual argument types
-        if (isShortCircuit) {
-           // initialize actual arg types to an empty array
-           actualArgTypes = new ArrayList<>() {{
-             add(Util.booleanType());
-           }};
-        } else {
-            actualArgTypes = getArgTypes(ctx, args);
-        }
-
+        List<ValueType> actualArgTypes = getArgTypes(ctx, args);
         List<ValueType> formalArgTypes = null;
 
         // ...use this context to do that.
@@ -478,19 +446,8 @@ public class MethodCall extends Expression {
         TypeContext calleeCtx = null;
         String failureReason = null;
         for (DeclType declType : declarationTypes) {
-            MatchResult mr;
-            if (isShortCircuit) {
-                // since the argument list will not be evaluated in this case
-                // we declare an arguments list with a BooleanLiteral for the 
-                // type checking
-                ArrayList booleanArgList = new ArrayList<>() {{
-                  add(new BooleanLiteral(true));
-                }};
-                mr = matches(ctx, receiver, declType, booleanArgList, objectExpr);
-            } else {
-                mr = matches(ctx, receiver, declType, args, objectExpr);
-            }
-            
+
+            MatchResult mr = matches(ctx, receiver, declType, args, objectExpr);
             newCtx = mr.newCtx;
             calleeCtx = mr.calleeCtx;
             formalArgTypes = mr.formalArgTypes;
@@ -619,3 +576,4 @@ public class MethodCall extends Expression {
         return errMsg.toString();
     }
 }
+

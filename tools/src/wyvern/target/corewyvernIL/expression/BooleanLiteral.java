@@ -113,19 +113,9 @@ public class BooleanLiteral extends Literal implements Invokable {
                 }
             };
         case "&&":
-            // case when && is short circuits
-            if (args.isEmpty()) {
-              return new BooleanLiteral(this.value);
-            } else {
               return new BooleanLiteral(this.value && ((BooleanLiteral) args.get(0)).value);
-            }
         case "||":
-            // case when || short circuits
-            if (args.isEmpty()) {
-              return new BooleanLiteral(this.value);
-            } else {
               return new BooleanLiteral(this.value || ((BooleanLiteral) args.get(0)).value);
-            }
         case "!":
             return new BooleanLiteral(!this.value);
         case "==":

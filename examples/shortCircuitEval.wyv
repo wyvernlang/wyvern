@@ -2,6 +2,9 @@ require stdout
 
 def testAnd(): Unit
     val s = ""
+
+    // note that since s is an empty string s.substring(0, 1) will throw an exception
+    // if short circuit evaluation is not supported.
     if (s.length() > 0 && s.substring(0, 1) == " ")
             stdout.print("string starts with space")
             stdout.println()
@@ -9,14 +12,28 @@ def testAnd(): Unit
             stdout.print("string is empty")
             stdout.println()
 
+    // note that a DivisionByZero exception will be thrown if short circuit>
+    // is not supported.
+    stdout.printBoolean(false && ((1 / 0) == 0))
+    stdout.println()
+
+
 def testOr(): Unit
     val s = ""
+
+    // note that since s is an empty string s.substring(0, 1) will throw an exception
+    // if short circuit evaluation is not supported.
     if (s.length() == 0 || s.substring(0, 1) == " ")
             stdout.print("string is empty")
             stdout.println()
         else
             stdout.print("string is not empty or starts with space")
             stdout.println()
+
+    // note that a DivisionByZero exception will be thrown if short circuit>
+    // is not supported.
+    stdout.printBoolean(true || ((1 / 0) == 0))
+    stdout.println()
 
 testAnd()
 testOr()
