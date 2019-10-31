@@ -1,0 +1,3 @@
+module mod
+
+abstract[outer] type T = Int

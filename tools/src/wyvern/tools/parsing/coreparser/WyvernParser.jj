@@ -109,6 +109,7 @@ TOKEN : /* Keywords */
 | < METADATA: "metadata" >
 | < NEW: "new" >
 | < MODULE: "module" >
+| < ABSTRACT: "abstract" >
 | < COMPRISES: "comprises" >
 | < EXTENDS: "extends" >
 | < TAGGED: "tagged" >
@@ -312,9 +313,17 @@ AST DeclSequence(boolean inModule) :
     { return decl1; }
 }
 
-AST Declaration(boolean inModule) :
-{ AST exp; }
+String AbstractionDeclaration() :
+{ String abstractionLevel; }
 {
+  <ABSTRACT> <LBRACK> abstractionLevel = Segment() <RBRACK> { return abstractionLevel; }
+}
+
+AST Declaration(boolean inModule) :
+{ String abstractionLevel=null; AST exp; }
+{
+  (abstractionLevel = AbstractionDeclaration()) ?
+(
   exp = DefDeclaration()  { return exp; }
 |
   exp = ValDeclaration()  { return exp; }
@@ -338,6 +347,7 @@ AST Declaration(boolean inModule) :
   exp = ExpressionLine(inModule) { return exp; }
 |
   exp = Instantiation() { return exp; }
+)
 //|
 //  exp = WhileDeclaration() { return exp; }
 }

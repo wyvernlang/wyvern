@@ -73,7 +73,8 @@ public class TopLevelContext {
         StructuralType vt = new StructuralType(newName, moduleDeclTypes, isModule);
         vt = (StructuralType) adapt(vt, newName);
 
-        IExpr exp = new New(moduleDecls, vt.getSelfSite(), vt, null);
+        New exp = new New(moduleDecls, vt.getSelfSite(), vt, null);
+        exp.setModuleFlag();
         addExpression(exp, vt);
 
         return getExpression();
