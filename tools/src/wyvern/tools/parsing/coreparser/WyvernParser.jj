@@ -104,6 +104,7 @@ TOKEN : /* Keywords */
 | < DATATYPE: "datatype" >
 | < CLASS: "class" >
 | < FORWARD: "forward" >
+| < NONE: "None" >
 | < TO: "to" >
 | < REQUIRE: "require" >
 | < METADATA: "metadata" >
@@ -773,7 +774,61 @@ Type Type() :
 }
 
 Type NonArrowType() :
-{ Token id = null; Token id2 = null; AST exp = null; List<GenericArgument> generics = null; Type t; }
+{ Type regularType; Type optionType; }
+{
+    LOOKAHEAD(50)
+    optionType = OptionType() {
+        return optionType;
+    }
+|
+    regularType = RegularType() {
+    return regularType;
+    }
+}
+
+Type OptionType() :
+{ Token questionMark; AST exp; List<GenericArgument> generics; Type t; GenericArgument genArg = null; }
+{
+    // syntactic sugar for option types
+    // T? as sugar for option.Option[T] (T stands for a type)
+    genArg=GenericArgumentRegularType() questionMark = <QUESTION> {
+        exp = build.var("option", loc(questionMark));
+        t = build.qualifiedType(exp, "Option");
+
+        // add the generic argument to the generics linked list
+        generics = new LinkedList<GenericArgument>();
+        generics.add(genArg);
+
+        Object o = build.parameterizedType(t, generics, loc(questionMark));
+        t = (Type) o;
+
+        return t;
+    }
+}
+
+/*
+Type OptionNoneType() :
+{ Token none; }
+{
+    // built-in None value that works for all T. None[Dyn] <: None[T] for all T
+    none = <NONE> {
+        exp = build.var("option", loc(none));
+        t = build.qualifiedType(exp, "Option");
+
+        // add the generic argument to the generics linked list
+        generics = new LinkedList<GenericArgument>();
+        generics.add(genArg);
+
+        Object o = build.parameterizedType(t, generics, loc(questionMark));
+        t = (Type) o;
+
+        return t;
+    }
+}
+*/
+
+Type RegularType() :
+{ Token id = null; Token id2 = null; AST exp = null; List<GenericArgument> generics = null; Type t = null; }
 {
   <LPAREN> t=Type() <RPAREN> {
       return t;
@@ -904,7 +959,13 @@ AST PrimaryPrefix(ExpFlags flags) :
 {
   exp = Literal() { return exp; }
 |
-  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
+  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { 
+    System.out.println("Prefix: " + t.image); // debugger
+    return build.var(t.image, loc(t)); }
+|
+  "None" {
+    System.out.println("None"); // debugger
+  }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |
@@ -940,7 +1001,9 @@ AST Literal() :
 AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :
 { List<AST> rhs; Token t; List<GenericArgument> generics = null;}
 {
-  <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
+  <DOT> t = <IDENTIFIER> { 
+    System.out.println("Suffix" + t.image); // debugger
+    return build.invocation(lhs, t.image, null, loc(t)); }
 |
   [generics = Generics()] rhs = Arguments(flags) {
     return build.application(lhs, rhs, null, generics, recur);
@@ -1029,6 +1092,10 @@ GenericArgument GenericArgument() :
 | effect = <DSL_LITERAL> { return new GenericArgument(effect.image); }
 }
 
+GenericArgument GenericArgumentRegularType() :
+{ Type type; Token effect; }
+{ type = RegularType() { return new GenericArgument(GenericKind.TYPE, type); }
+}
 
 List GenericsDecl() :
 { List gens = null; }
