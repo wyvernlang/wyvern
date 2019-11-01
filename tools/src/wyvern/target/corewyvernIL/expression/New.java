@@ -31,6 +31,7 @@ public class New extends Expression {
     private List<? extends Declaration> decls;
     private BindingSite selfSite;
     private boolean hasForward;
+    private boolean moduleFlag = false;
     private ForwardDeclaration forwardDeclaration;
 
     /** convenience method for a single declaration */
@@ -160,7 +161,13 @@ public class New extends Expression {
         actualT.checkForDuplicates();
         FailureReason r = new FailureReason();
         if (!actualT.isSubtypeOf(requiredT, ctx, r)) {
-            ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
+            // we disable warnings when there is a failure inside a SeqExpr
+            // the issue is that Wyvern's type theory doesn't have singleton types,
+            // and sometimes fails to reason about an object in a field of this new being the
+            // same as a let-bound object in an earlier part of the module.
+            if (!moduleFlag) {
+                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
+            }
         }
 
         if (isResource && !requiredT.isResource(GenContext.empty())) {
@@ -208,6 +215,10 @@ public class New extends Expression {
         }
         freeVars.remove(getSelfName());
         return freeVars;
+    }
+    
+    public void setModuleFlag() {
+        moduleFlag = true;
     }
 
     private static ValueType typeOf(List<NamedDeclaration> decls2) {

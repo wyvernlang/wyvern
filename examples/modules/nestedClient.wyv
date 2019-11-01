@@ -1,0 +1,6 @@
+import modules.outer.inner.mod
+import modules.outer.friend
+
+val y : mod.T = friend.x // OK
+
+y + 1 // error
