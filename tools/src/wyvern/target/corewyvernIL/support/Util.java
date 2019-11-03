@@ -87,6 +87,11 @@ public final class Util {
         return type.equals(new NominalType("system", "Dyn"))
                 || type instanceof DynamicType;
     }
+
+    public static boolean isBooleanType(ValueType type) {
+      return type.equals(new NominalType("system", "Boolean"));
+    }
+
     public static Value intValue(int i) {
         return new IntegerLiteral(i);
     }

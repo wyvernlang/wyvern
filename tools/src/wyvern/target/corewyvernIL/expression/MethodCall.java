@@ -154,30 +154,48 @@ public class MethodCall extends Expression {
     @Override
     public Value interpret(EvalContext ctx) {
         Invokable receiver = (Invokable) objectExpr.interpret(ctx);
-        List<Value> argValues = new ArrayList<Value>(args.size());
-        for (int i = 0; i < args.size(); ++i) {
-            IExpr e = args.get(i);
-            argValues.add(e.interpret(ctx));
-        }
-        if (isTailCall()) {
-            return new SuspendedTailCall(this.getType(), this.getLocation()) {
+        List<Value> argValues;
+        // Perform short-circuit evaluation on the evaluation
+        if ((receiver instanceof BooleanLiteral)
+          && (this.getMethodName() == "||")
+          // check whether receiver is true
+          && (((BooleanLiteral) receiver).getValue())) {
+            // the expression will be evaluated to "true" if
+            // the receiver is "true" and method name is "or"
+            return new BooleanLiteral(true);
 
-                @Override
-                public Value interpret(EvalContext ignored) {
-                    return receiver.invoke(methodName, argValues, getLocation());
-                }
+        } else if ((receiver instanceof BooleanLiteral)
+            && (this.getMethodName() == "&&")
+            && !(((BooleanLiteral) receiver).getValue())) {
+            // the expression will be evaluated to "false" if
+            // the receiver is "false" and method name is "and"
+            return new BooleanLiteral(false); 
 
-                @Override
-                public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-                    // TODO Auto-generated method stub
-                    return null;
-                }
-
-            };
+        } else {
+            argValues = new ArrayList<Value>(args.size());
+            for (int i = 0; i < args.size(); ++i) {
+                IExpr e = args.get(i);
+                argValues.add(e.interpret(ctx));
+            }
+            if (isTailCall()) {
+                return new SuspendedTailCall(this.getType(), this.getLocation()) {
+  
+                    @Override
+                    public Value interpret(EvalContext ignored) {
+                        return receiver.invoke(methodName, argValues, getLocation());
+                    }
+  
+                    @Override
+                    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
+  
+                };
+            }
         }
         return trampoline(receiver.invoke(methodName, argValues, getLocation()));
     }
-
     public static Value trampoline(Value v) {
         while (v instanceof SuspendedTailCall) {
             v = v.interpret(null);
@@ -558,3 +576,4 @@ public class MethodCall extends Expression {
         return errMsg.toString();
     }
 }
+

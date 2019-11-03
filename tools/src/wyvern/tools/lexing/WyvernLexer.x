@@ -117,6 +117,12 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
                         c = '\t'; ++i;
                         break;
 
+                    case 'O':
+                        int char_code = Integer.parseInt(Character.toString(s.charAt(i + 2)));
+                        c = Character.toChars(char_code)[0];
+                        i += 2;
+                        break;
+
                     default:
                         ToolError.reportError(ErrorMessage.ILLEGAL_ESCAPE_SEQUENCE,
                                               new FileLocation(virtualLocation.getFileName(),
