@@ -175,4 +175,10 @@ public class ExampleTests {
       TestUtil.doTestScriptModularly(PATH, "shortCircuitEval", Util.unitType(),
       Util.unitValue());
     }
+
+    @Test
+    public void testShortCircuitEvaluation() throws ParseException {
+      TestUtil.doTestScriptModularly(PATH, "optionType", Util.unitType(),
+      Util.unitValue());
+    }
 }
