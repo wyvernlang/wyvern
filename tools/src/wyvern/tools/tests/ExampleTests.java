@@ -177,7 +177,7 @@ public class ExampleTests {
     }
 
     @Test
-    public void testShortCircuitEvaluation() throws ParseException {
+    public void testOptionTypeSugar() throws ParseException {
       TestUtil.doTestScriptModularly(PATH, "optionType", Util.unitType(),
       Util.unitValue());
     }
