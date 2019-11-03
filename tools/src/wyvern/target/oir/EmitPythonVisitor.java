@@ -435,6 +435,7 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
 
         ValueType objType = oirMethodCall.getObjectType();
         boolean isBool = objType.equals(new NominalType("system", "Boolean"));
+        boolean isFloat = objType.equals(new NominalType("system", "Float"));
         boolean isInt = objType.equals(new NominalType("system", "Int"));
 
         if (isBool && methodName.equals("||")) {
@@ -443,6 +444,8 @@ public class EmitPythonVisitor extends ASTVisitor<EmitPythonState, String> {
             return "(" + objExpr + " and " + args + ")";
         } else if (isBool && methodName.equals("!")) {
             return "(not " + objExpr + ")";
+        } else if (isFloat && methodName.equals("negate")) {
+            return "-(" + objExpr + ")";
         } else if (isInt && methodName.equals("/")) {
             // Make int division result in an int on Python 3
             return "int(" + objExpr + " " + methodName + " " + args + ")";
