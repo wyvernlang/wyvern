@@ -1,9 +1,9 @@
-module def wordCount(logger: Logger, textArea: TextArea, nativeJOptionPane: NativeJOptionPane): {} Plugin
+module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane): {} Plugin
 // N.B.: Must pass in TextArea and not just String because need to get the latest version of the text.
 
 import wyvern.String
 
-effect Run = {logger.Update, textArea.Read, nativeJOptionPane.ShowDialog}
+effect Run = {logger.Update, textArea.Read, optionPane.ShowDialog}
 
 def getName(): {} String
   "Word Count"
