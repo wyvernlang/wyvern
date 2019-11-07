@@ -1,3 +1,0 @@
-type NativeJTextArea
-  effect Read
-  def getText(): {this.Read} String
