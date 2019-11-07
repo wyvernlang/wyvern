@@ -15,7 +15,7 @@ import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
 import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
-import NativeJOptionPane
+import OptionPane
 import TextArea
 import UIManager
 import Plugin
@@ -71,7 +71,7 @@ def getAttenuatedNativeJTextArea(): TextArea
     def getText(): {this.Read} String
       textArea.getText()
 
-def getAttenuatedNativeJOptionPane(): NativeJOptionPane
+def getAttenuatedNativeJOptionPane(): OptionPane
   new
     effect ShowDialog = {system.FFI}
     def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
