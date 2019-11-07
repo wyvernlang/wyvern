@@ -15,8 +15,9 @@ import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
 import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
-import NativeUIManager
+import NativeJOptionPane
 import NativeJTextArea
+import NativeUIManager
 import Plugin
 
 /******* Step 1: Import plugins *********************************************/
@@ -65,6 +66,14 @@ def getAttenuatedNativeJTextArea(): NativeJTextArea
     effect Read = {system.FFI}
     def getText(): {this.Read} String
       textArea.getText()
+
+def getAttenuatedNativeJOptionPane(): NativeJOptionPane
+  new
+    effect ShowDialog = {system.FFI}
+    def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
+      nativeJOptionPane.showMessageDialog(message, title, messageType)
+    def getPlainMessageValue(): {} Int
+      nativeJOptionPane.getPlainMessageValue()
 
 def registerPlugin(plugin: Plugin): Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
@@ -173,7 +182,7 @@ def run(): Unit
 
   val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
   val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), nativeJOptionPane) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
   val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
 
 /****************************************************************************/
