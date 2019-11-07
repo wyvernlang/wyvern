@@ -53,8 +53,8 @@ val save = nativeActionCreator.create("Save")
 
 def getAttenuatedNativeUIManager(): {} UIManager
   new
-    effect PaintUI = {uiEffects.PaintUI}
-    effect SetLookAndFeel = {uiEffects.SetUILookAndFeel}
+    effect PaintUI = {system.FFI}
+    effect SetLookAndFeel = {system.FFI}
     def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeBlack(element, attribute)
     def paintUIAttributeDarkGray(element: String, attribute: String): {this.PaintUI} Unit
