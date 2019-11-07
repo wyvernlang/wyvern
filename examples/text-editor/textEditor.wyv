@@ -43,17 +43,19 @@ val save = nativeActionCreator.create("Save")
 
 def getAttenuatedNativeUIManager(): NativeUIManager
   new
-    def paintUIAttributeBlack(element: String, attribute: String): Unit
+    effect PaintUI = {system.FFI}
+    effect SetLookAndFeel = {system.FFI}
+    def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeBlack(element, attribute)
-    def paintUIAttributeDarkGray(element: String, attribute: String): Unit
+    def paintUIAttributeDarkGray(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeDarkGray(element, attribute)
-    def paintUIAttributeGray(element: String, attribute: String): Unit
+    def paintUIAttributeGray(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeGray(element, attribute)
-    def paintUIAttributeLightGray(element: String, attribute: String): Unit
+    def paintUIAttributeLightGray(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeLightGray(element, attribute)
-    def paintUIAttributeWhite(element: String, attribute: String): Unit
+    def paintUIAttributeWhite(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeWhite(element, attribute)
-    def updateLookAndFeel(): Unit
+    def updateLookAndFeel(): {this.SetLookAndFeel} Unit
       nativeUIManager.updateLookAndFeel(jFrame)
 
 def registerPlugin(plugin: Plugin): Unit
