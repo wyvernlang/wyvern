@@ -29,6 +29,9 @@ import plugins.questionnaireCreator
 
 /****************************************************************************/
 
+
+// Field initialization (most of the fields)
+
 nativeUIManager.enableSettingLookAndFeel() // This must happen before jFrame is created.
 val jFrame = nativeJFrame.create()
 val textArea = nativeJTextArea.create(20, 60)
@@ -42,6 +45,9 @@ val edit = nativeJMenu.create("Edit")
 val plugins = nativeJMenu.create("Plugins")
 val fs = fileSystem(java)
 val save = nativeActionCreator.create("Save")
+
+
+// Attenuators
 
 def getAttenuatedNativeUIManager(): UIManager
   new
@@ -73,6 +79,9 @@ def getAttenuatedNativeJOptionPane(): OptionPane
       nativeJOptionPane.showMessageDialog(message, title, messageType)
     def getPlainMessageValue(): {} Int
       nativeJOptionPane.getPlainMessageValue()
+
+
+// Other methods and remaining field initialization
 
 def registerPlugin(plugin: Plugin): Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
@@ -147,6 +156,9 @@ def performKeyPressedAction(): Unit
 
 val kl = nativeKeyListenerCreator.create(() => performKeyPressedAction())
 val m = textArea.getActionMap()
+
+
+// Main method
 
 def run(): Unit
   logger.updateLog("New text-editor window is starting...\n")
