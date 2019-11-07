@@ -16,7 +16,7 @@ import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
 import NativeJOptionPane
-import NativeJTextArea
+import TextArea
 import UIManager
 import Plugin
 
@@ -65,7 +65,7 @@ def getAttenuatedNativeUIManager(): UIManager
     def updateLookAndFeel(): {this.SetLookAndFeel} Unit
       nativeUIManager.updateLookAndFeel(jFrame)
 
-def getAttenuatedNativeJTextArea(): NativeJTextArea
+def getAttenuatedNativeJTextArea(): TextArea
   new
     effect Read = {system.FFI}
     def getText(): {this.Read} String
@@ -193,8 +193,8 @@ def run(): {Run} Unit
 /*
   val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
   val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
-  val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
+  val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
 
 /****************************************************************************/
 
