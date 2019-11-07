@@ -16,6 +16,7 @@ import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
 import NativeUIManager
+import NativeJTextArea
 import Plugin
 
 /******* Step 1: Import plugins *********************************************/
@@ -58,6 +59,12 @@ def getAttenuatedNativeUIManager(): NativeUIManager
       nativeUIManager.paintUIAttributeWhite(element, attribute)
     def updateLookAndFeel(): {this.SetLookAndFeel} Unit
       nativeUIManager.updateLookAndFeel(jFrame)
+
+def getAttenuatedNativeJTextArea(): NativeJTextArea
+  new
+    effect Read = {system.FFI}
+    def getText(): {this.Read} String
+      textArea.getText()
 
 def registerPlugin(plugin: Plugin): Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
@@ -166,8 +173,8 @@ def run(): Unit
 
   val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
   val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, textArea, nativeJOptionPane) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
-  val questionnaireCreator = questionnaireCreator(logger, textArea, fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), nativeJOptionPane) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
 
 /****************************************************************************/
 
