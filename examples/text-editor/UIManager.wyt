@@ -1,4 +1,4 @@
-type UIManager
+type NativeUIManager
   effect PaintUI
   effect SetLookAndFeel
   def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit
