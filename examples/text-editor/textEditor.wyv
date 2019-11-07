@@ -15,9 +15,8 @@ import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
 import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
-import OptionPane
-import TextArea
-import UIManager
+import NativeUIManager
+import NativeJTextArea
 import Plugin
 
 import uiEffects
@@ -68,39 +67,13 @@ def getAttenuatedNativeUIManager(): {} UIManager
     def updateLookAndFeel(): {this.SetLookAndFeel} Unit
       nativeUIManager.updateLookAndFeel(jFrame)
 
-def getAttenuatedNativeJTextArea(): {} TextArea
+def getAttenuatedNativeJTextArea(): NativeJTextArea
   new
-    effect Read = {uiEffects.ReadTextArea}
+    effect Read = {system.FFI}
     def getText(): {this.Read} String
       textArea.getText()
 
-def getAttenuatedNativeJOptionPane(): {} OptionPane
-  new
-    effect ShowDialog = {uiEffects.ShowDialog}
-    def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
-      nativeJOptionPane.showMessageDialog(message, title, messageType)
-    def getPlainMessageValue(): {} Int
-      nativeJOptionPane.getPlainMessageValue()
-
-
-val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
-val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
-val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
-
-effect PluginRun = {darkTheme.Run, lightTheme.Run, wordCount.Run, questionnaireCreator.Run}
-
-effect SaveFile = {logger.Update, system.FFI, fs.Write, fs.Append}
-effect Quit = {SaveFile}
-effect PressKey = {system.FFI}
-effect Open = {SaveFile}
-effect RegisterPlugin = {logger.Update, system.FFI}
-effect RunPluginExtra = {logger.Update}
-
-
-// Other methods and remaining field initialization
-
-def registerPlugin(plugin: Plugin): {RegisterPlugin, plugin.Run} Unit
+def registerPlugin(plugin: Plugin): Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
   logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
 
@@ -214,8 +187,8 @@ def run(): {Run} Unit
 /*
   val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
   val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, textArea, nativeJOptionPane) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
-  val questionnaireCreator = questionnaireCreator(logger, textArea, fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), nativeJOptionPane) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
 
 /****************************************************************************/
 
