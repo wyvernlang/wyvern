@@ -201,8 +201,8 @@ def run(): Unit
 
   val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
   val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
-  val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
+  val wordCount = wordCount(logger, textArea, nativeJOptionPane) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
+  val questionnaireCreator = questionnaireCreator(logger, textArea, fs) // Must pass in NativeJTextArea and not just String because need to get the latest version of the text
 
 /****************************************************************************/
 
