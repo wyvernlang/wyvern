@@ -1,3 +1,0 @@
-type NativeActionCreator
-  def create(s: String): Unit
-  def createWithAction(s: String, f: Unit -> Unit): Unit
