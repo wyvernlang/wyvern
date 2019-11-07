@@ -17,7 +17,7 @@ import fileSystem.Reader
 import fileSystem.Writer
 import NativeJOptionPane
 import NativeJTextArea
-import NativeUIManager
+import UIManager
 import Plugin
 
 /******* Step 1: Import plugins *********************************************/
@@ -44,7 +44,7 @@ val fs = fileSystem(java)
 effect Test = {fs.Read}
 val save = nativeActionCreator.create("Save")
 
-def getAttenuatedNativeUIManager(): NativeUIManager
+def getAttenuatedNativeUIManager(): UIManager
   new
     effect PaintUI = {system.FFI}
     effect SetLookAndFeel = {system.FFI}
