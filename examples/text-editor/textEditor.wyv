@@ -48,6 +48,9 @@ val plugins = nativeJMenu.create("Plugins")
 val fs = fileSystem(java)
 val save = nativeActionCreator.create("Save")
 
+
+// Attenuators
+
 def getAttenuatedNativeUIManager(): UIManager
   new
     effect PaintUI = {system.FFI}
@@ -78,6 +81,9 @@ def getAttenuatedNativeJOptionPane(): OptionPane
       nativeJOptionPane.showMessageDialog(message, title, messageType)
     def getPlainMessageValue(): {} Int
       nativeJOptionPane.getPlainMessageValue()
+
+
+// Other methods and remaining field initialization
 
 def registerPlugin(plugin: Plugin): Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
@@ -160,7 +166,7 @@ val m = textArea.getActionMap()
 
 // Main method
 
-def run(): {Run} Unit
+def run(): Unit
   logger.updateLog("New text-editor window is starting...\n")
   jFrame.add(scroll, "Center") // "Center" = BorderLayout.CENTER
   jFrame.setJMenuBar(jmb)
