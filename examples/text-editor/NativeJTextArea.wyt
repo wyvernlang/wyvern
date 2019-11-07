@@ -1,2 +1,2 @@
-type JTextArea
+type NativeJTextArea
   def getText(): String
