@@ -4,7 +4,7 @@ module def wordCount(logger: Logger, nativeTextArea: NativeJTextArea, nativeJOpt
 import wyvern.String
 import uiEffects
 
-effect Run = {logger.Update, nativeTextArea.Read}
+effect Run = {logger.Update, nativeTextArea.Read, nativeJOptionPane.ShowDialog}
 
 def getName(): {} String
   "Word Count"
