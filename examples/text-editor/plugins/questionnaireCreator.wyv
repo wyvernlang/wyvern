@@ -1,7 +1,7 @@
 module def questionnaireCreator(logger: Logger, nativeTextArea: NativeJTextArea, fs: fileSystem.FileSystem): {} Plugin
 // N.B.: Must pass in NativeJTextArea and not just String because need to get the latest version of the text.
 
-effect Run = {logger.Update, fs.Write, fs.Append}
+effect Run = {logger.Update, fs.Write, fs.Append, nativeTextArea.Read}
 
 def getName(): {} String
   "Questionnaire Creator"
