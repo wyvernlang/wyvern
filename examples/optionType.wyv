@@ -1,0 +1,13 @@
+require stdout
+
+def print(str: String?): Unit
+  if (str.isDefined)
+        stdout.print(str.get() + "\n")
+    else
+        stdout.print("None\n")
+
+var str: String? = option.Some[String]("Life is Good!")
+print(str)
+
+str = NONE
+print(str)

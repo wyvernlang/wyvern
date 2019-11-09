@@ -1,5 +1,6 @@
 import metadata wyvern.IfTSL
 import wyvern.runtime
+import wyvern.option
 
 val ifelseARG = (cond:Boolean, tt:IfTSL.FnExpr, ff:IfTSL.FnExpr) => IfTSL.doif(cond, tt, ff)
 val if = (cond:Boolean, blocks:IfTSL.Blocks) => IfTSL.doifblk(cond, blocks)
