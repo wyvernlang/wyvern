@@ -47,9 +47,17 @@ val fs = fileSystem(java)
 val save = nativeActionCreator.create("Save")
 
 
+effect SaveFile = {logger.Update, system.FFI, fs.Write, fs.Append}
+effect Quit = {SaveFile}
+effect PressKey = {system.FFI}
+effect Open = {SaveFile}
+effect RegisterPlugin = {logger.Update, system.FFI}
+effect RunPluginExtra = {logger.Update}
+
+
 // Attenuators
 
-def getAttenuatedNativeUIManager(): UIManager
+def getAttenuatedNativeUIManager(): {} UIManager
   new
     effect PaintUI = {system.FFI}
     effect SetLookAndFeel = {system.FFI}
@@ -66,13 +74,13 @@ def getAttenuatedNativeUIManager(): UIManager
     def updateLookAndFeel(): {this.SetLookAndFeel} Unit
       nativeUIManager.updateLookAndFeel(jFrame)
 
-def getAttenuatedNativeJTextArea(): TextArea
+def getAttenuatedNativeJTextArea(): {} TextArea
   new
     effect Read = {system.FFI}
     def getText(): {this.Read} String
       textArea.getText()
 
-def getAttenuatedNativeJOptionPane(): OptionPane
+def getAttenuatedNativeJOptionPane(): {} OptionPane
   new
     effect ShowDialog = {system.FFI}
     def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
@@ -83,7 +91,7 @@ def getAttenuatedNativeJOptionPane(): OptionPane
 
 // Other methods and remaining field initialization
 
-def registerPlugin(plugin: Plugin): Unit
+def registerPlugin(plugin: Plugin): {RegisterPlugin} Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
   logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
 
