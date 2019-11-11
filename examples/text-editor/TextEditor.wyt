@@ -1,14 +1,25 @@
 import Plugin
 resource type TextEditor
+  effect SaveFile
+  effect Quit
+  effect PressKey
+  effect Open
+  effect RegisterPlugin
+  effect RunPluginExtra
   def run(): Unit
-  def saveFile(fileName: String): Unit // N.B.: File exceptions aren't handled.
-  def saveFileAs(): Unit
-  def saveOld(): Unit
+  def saveFile(fileName: String): {this.SaveFile} Unit // N.B.: File exceptions aren't handled.
+  def saveFileAs(): {this.SaveFile} Unit
+  def saveOld(): {this.SaveFile} Unit
   def performNewAction(): Unit
-  def performSaveAction(): Unit
-  def performSaveAsAction(): Unit
-  def performOpenAction(): Unit // N.B.: File exceptions aren't handled.
-  def performQuitAction(): Unit
-  def performKeyPressedAction(): Unit
-  def registerPlugin(plugin: Plugin): Unit
-  def runPluginOnSetup(plugin: Plugin): Unit
+  def performSaveAction(): {this.SaveFile} Unit
+  def performSaveAsAction(): {this.SaveFile} Unit
+  def performOpenAction(): {this.Open} Unit // N.B.: File exceptions aren't handled.
+  def performQuitAction(): {this.Quit} Unit
+  def performKeyPressedAction(): {this.PressKey} Unit
+  def registerPlugin(plugin: Plugin): {this.RegisterPlugin} Unit
+  def runPluginOnSetup(plugin: Plugin): {plugin.Run, this.RunPluginExtra} Unit
+
+/*
+  def run(): Unit
+  def performNewAction(): Unit
+*/
