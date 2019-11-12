@@ -1,11 +1,11 @@
 require java
 import editor.editor
 import arrayListMaker
-import annotatedFileSystem
+import fileSystem
 import stdout
 
 val arraylistmaker = arrayListMaker(java)
-val filesys = annotatedFileSystem(java)
+val filesys = fileSystem(java)
 val out = stdout(java)
 
 val editor = editor(filesys, arraylistmaker, out)
