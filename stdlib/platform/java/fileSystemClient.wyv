@@ -1,8 +1,5 @@
-module def fileSystemClient(fileSys : fileSystem.FileSystem) : {system.FFI}
-import annotatedFileSystem
+module def fileSystemClient(fileSys: fileSystem.FileSystem): {system.FFI}
 
-def make() : Unit
+def make(): String
     fileSys.fileFor("~/file")
-    unit
-
-
+    "abc"
