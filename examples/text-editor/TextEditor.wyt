@@ -6,7 +6,9 @@ resource type TextEditor
   effect Open
   effect RegisterPlugin
   effect RunPluginExtra
-  def run(): Unit
+  effect Run
+  effect PluginRun
+  def run(): {this.Run} Unit
   def saveFile(fileName: String): {this.SaveFile} Unit // N.B.: File exceptions aren't handled.
   def saveFileAs(): {this.SaveFile} Unit
   def saveOld(): {this.SaveFile} Unit

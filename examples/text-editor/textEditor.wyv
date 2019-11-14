@@ -91,7 +91,7 @@ def getAttenuatedNativeJOptionPane(): {} OptionPane
 
 // Other methods and remaining field initialization
 
-def registerPlugin(plugin: Plugin): {RegisterPlugin} Unit
+def registerPlugin(plugin: Plugin): {RegisterPlugin, plugin.Run} Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
   logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
 
@@ -165,10 +165,18 @@ def performKeyPressedAction(): {PressKey} Unit
 val kl = nativeKeyListenerCreator.create(() => performKeyPressedAction())
 val m = textArea.getActionMap()
 
+val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
+val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
+val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
+val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
+
+effect PluginRun = {darkTheme.Run, lightTheme.Run, wordCount.Run, questionnaireCreator.Run}
+
+effect Run = {logger.Update, system.FFI, RunPluginExtra, RegisterPlugin, PluginRun}
 
 // Main method
 
-def run(): Unit
+def run(): {Run} Unit
   logger.updateLog("New text-editor window is starting...\n")
   jFrame.add(scroll, "Center") // "Center" = BorderLayout.CENTER
   jFrame.setJMenuBar(jmb)
@@ -198,12 +206,12 @@ def run(): Unit
   saveAs.setEnabled(false)
 
 /******* Step 2: Instantiate plugins passing in appropriate resources *******/
-
+/*
   val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
   val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
   val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
   val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
-
+*/
 /****************************************************************************/
 
 //******* Step 3: Register plugins with menu or run them on setup ***********/
