@@ -1,7 +1,9 @@
 module def darkTheme(logger: Logger, uiManager: UIManager): {} Plugin
 // N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
 
-effect Run = {logger.Update, uiManager.PaintUI, uiManager.SetLookAndFeel}
+import uiManagerEffects
+
+effect Run = {logger.Update, uiManagerEffects.PaintUI, uiManagerEffects.SetLookAndFeel}
 
 def getName(): {} String
   "Dark Theme"
