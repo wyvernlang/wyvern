@@ -70,13 +70,13 @@ def getAttenuatedNativeUIManager(): {} UIManager
 
 def getAttenuatedNativeJTextArea(): {} TextArea
   new
-    effect Read = {system.FFI}
+    effect Read = {uiEffects.ReadTextArea}
     def getText(): {this.Read} String
       textArea.getText()
 
 def getAttenuatedNativeJOptionPane(): {} OptionPane
   new
-    effect ShowDialog = {system.FFI}
+    effect ShowDialog = {uiEffects.ShowDialog}
     def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
       nativeJOptionPane.showMessageDialog(message, title, messageType)
     def getPlainMessageValue(): {} Int

@@ -1,7 +1,8 @@
 module def questionnaireCreator(logger: Logger, textArea: TextArea, fs: fileSystem.FileSystem): {} Plugin
 // N.B.: Must pass in TextArea and not just String because need to get the latest version of the text.
+import uiEffects
 
-effect Run = {logger.Update, fs.Write, fs.Append, textArea.Read}
+effect Run = {logger.Update, fs.Write, fs.Append, uiEffects.ReadTextArea}
 
 def getName(): {} String
   "Questionnaire Creator"
