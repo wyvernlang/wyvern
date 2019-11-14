@@ -20,7 +20,7 @@ import TextArea
 import UIManager
 import Plugin
 
-import uiManagerEffects
+import uiEffects
 
 /******* Step 1: Import plugins *********************************************/
 
@@ -53,8 +53,8 @@ val save = nativeActionCreator.create("Save")
 
 def getAttenuatedNativeUIManager(): {} UIManager
   new
-    effect PaintUI = {uiManagerEffects.PaintUI}
-    effect SetLookAndFeel = {uiManagerEffects.SetLookAndFeel}
+    effect PaintUI = {uiEffects.PaintUI}
+    effect SetLookAndFeel = {uiEffects.SetUILookAndFeel}
     def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeBlack(element, attribute)
     def paintUIAttributeDarkGray(element: String, attribute: String): {this.PaintUI} Unit
