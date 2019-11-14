@@ -20,8 +20,3 @@ resource type TextEditor
   def performKeyPressedAction(): {this.PressKey} Unit
   def registerPlugin(plugin: Plugin): {this.RegisterPlugin} Unit
   def runPluginOnSetup(plugin: Plugin): {plugin.Run, this.RunPluginExtra} Unit
-
-/*
-  def run(): Unit
-  def performNewAction(): Unit
-*/
