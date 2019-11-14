@@ -1,3 +1,0 @@
-module uiManagerEffects: {}
-effect PaintUI = {system.FFI}
-effect SetLookAndFeel = {system.FFI}
