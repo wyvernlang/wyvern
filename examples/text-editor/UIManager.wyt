@@ -1,7 +1,7 @@
-import uiManagerEffects
+import uiEffects
 type UIManager
-  effect PaintUI = {uiManagerEffects.PaintUI}
-  effect SetLookAndFeel = {uiManagerEffects.SetLookAndFeel}
+  effect PaintUI = {uiEffects.PaintUI}
+  effect SetLookAndFeel = {uiEffects.SetUILookAndFeel}
   def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit
   def paintUIAttributeDarkGray(element: String, attribute: String): {this.PaintUI} Unit
   def paintUIAttributeGray(element: String, attribute: String): {this.PaintUI} Unit
