@@ -1,7 +1,8 @@
 module def lightTheme(logger: Logger, uiManager: UIManager): {} Plugin
 // N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
+import uiEffects
 
-effect Run = {logger.Update, uiManager.PaintUI, uiManager.SetLookAndFeel}
+effect Run = {logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}
 
 def getName(): {} String
   "Light Theme"

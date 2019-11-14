@@ -2,8 +2,9 @@ module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane)
 // N.B.: Must pass in TextArea and not just String because need to get the latest version of the text.
 
 import wyvern.String
+import uiEffects
 
-effect Run = {logger.Update, textArea.Read, optionPane.ShowDialog}
+effect Run = {logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}
 
 def getName(): {} String
   "Word Count"
