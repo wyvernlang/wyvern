@@ -59,7 +59,7 @@ public class ASTConnectorTypeDecl extends SimpleNode {
     public boolean checkModule(InterpreterState state) {
         Module mod = null;
         try {
-            mod = state.getResolver().resolveType(typeName + "Properties");
+            mod = state.getResolver().resolveType(typeName + "Properties", null);
             for (HasLocation i : ((SeqExpr) mod.getExpression()).getElements()) {
                 IExpr expr = ((VarBinding) i).getExpression();
                 if (expr instanceof New) {

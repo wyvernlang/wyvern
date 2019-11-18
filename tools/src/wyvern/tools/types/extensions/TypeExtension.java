@@ -21,6 +21,14 @@ public class TypeExtension extends AbstractTypeImpl implements Type {
         this.genericArguments = genericArguments;
     }
 
+    public Type getBase() {
+        return base;
+    }
+    
+    public List<GenericArgument> getGenericArguments() {
+        return genericArguments;
+    }
+    
     @Override
     public ValueType getILType(GenContext ctx) {
         final ValueType baseType = base.getILType(ctx);

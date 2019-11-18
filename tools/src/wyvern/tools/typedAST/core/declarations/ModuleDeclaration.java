@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.FormalArg;
@@ -24,6 +25,7 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.TypeOrEffectGenContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
+import wyvern.target.corewyvernIL.type.RefinementType;
 import wyvern.target.corewyvernIL.type.StructuralType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
@@ -40,6 +42,7 @@ import wyvern.tools.types.NamedType;
 import wyvern.tools.util.Pair;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.extensions.Arrow;
+import wyvern.tools.types.extensions.TypeExtension;
 
 public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAST {
     private final String name;
@@ -150,7 +153,9 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         List<FormalArg> types = new LinkedList<FormalArg>();
 
         for (NameBindingImpl arg : args) {
-            types.add(getArgType(ctx, loadedTypes, null, arg));
+            FormalArg formalArg = getArgType(ctx, loadedTypes, arg.getType().getLocation(), arg);
+            types.add(formalArg);
+            ctx = ctx.extend(arg.getName(), new Variable(arg.getName()), formalArg.getType());
         }
 
         return types;
@@ -198,10 +203,20 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         if (type instanceof Arrow) {
             // case when argType is an Arrow type (a lambda expression).
             return getArrowType((Arrow) type, ctx, loadedTypes, location);
-        } else {
+        } else if (type instanceof NamedType) {
             // case of fully qualified named types
-            String typeName = ((NamedType) type).getFullName();
-            return getType(ctx, loadedTypes, location, typeName);
+            return getType(ctx, loadedTypes, location, (NamedType) type);
+        } else {
+            // must be a TypeExtension
+            TypeExtension te = (TypeExtension) type;
+            final ValueType baseType = toInternalType(ctx, loadedTypes, location, te.getBase());
+            return new RefinementType(
+                    te.getGenericArguments().stream()
+                            .map(arg -> wyvern.target.corewyvernIL.generics.GenericArgument.fromHighLevel(ctx, location, arg))
+                            .collect(Collectors.toList()),
+                    baseType,
+                    this
+            );
         }
     }
     
@@ -215,20 +230,20 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
      * @param typeName    the name of the type
      * @return a FormalArg object that contains the type of the module.
      */
-    private ValueType getType(GenContext ctx, List<Module> loadedTypes, FileLocation location, String typeName) {
+    private ValueType getType(GenContext ctx, List<Module> loadedTypes, FileLocation location, NamedType type) {
         // initialize resulting value type to null;
         ValueType valueType = null;
-
-        if (ctx.isPresent(typeName, false)) {
-            // case when the context is present.
-            valueType = ctx.lookupType(typeName, location);
-        } else {
+        
+        try {
+            // attempt to find the type
+            return type.getILType(ctx);
+        } catch (RuntimeException e) {
             // case when the context is not present.
-            Module lt = resolveLoadedTypes(ctx, typeName);
+            Module lt = resolveLoadedTypes(ctx, type.getFullName(), location);
             valueType = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName());
             loadedTypes.add(lt);
+            return valueType;
         }
-        return valueType;
     }
 
     /**
@@ -238,8 +253,8 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
      * @param typeName the name of the type
      * @return a Module object with resolved loaded types.
      */
-    private Module resolveLoadedTypes(GenContext ctx, String typeName) {
-        Module lt = ctx.getInterpreterState().getResolver().resolveType(typeName);
+    private Module resolveLoadedTypes(GenContext ctx, String typeName, FileLocation location) {
+        Module lt = ctx.getInterpreterState().getResolver().resolveType(typeName, location);
         return lt;
     }
 
@@ -327,6 +342,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
 
         List<Module> loadedTypes = new LinkedList<Module>();
         formalArgs.addAll(getTypes(methodContext, loadedTypes)); // get the types of the module parameters
+        /* adding parameters to environments */
+        for (FormalArg arg : formalArgs) {
+            methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
+        }
         wyvern.target.corewyvernIL.type.ValueType ascribedValueType
             = ascribedType == null ? null : toInternalType(methodContext, loadedTypes, ascribedType.getLocation(), ascribedType);
         for (Module lt : loadedTypes) {
@@ -340,11 +359,6 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
                 dependencies.add(lt.getSpec());
                 dependencies.addAll(lt.getDependencies());
             }
-        }
-
-        /* adding parameters to environments */
-        for (FormalArg arg : formalArgs) {
-            methodContext = methodContext.extend(arg.getName(), new Variable(arg.getName()), arg.getType());
         }
 
         /* importing modules and instantiations are translated into a SeqExpr */

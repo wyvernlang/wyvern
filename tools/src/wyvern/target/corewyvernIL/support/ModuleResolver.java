@@ -112,16 +112,16 @@ public class ModuleResolver {
      * @param qualifiedName
      * @return
      */
-    public Module resolveType(String qualifiedName) {
-        return resolveType(qualifiedName, false);
+    public Module resolveType(String qualifiedName, FileLocation location) {
+        return resolveType(qualifiedName, false, location);
     }
 
-    private Module resolveType(String qualifiedName, boolean toplevel) {
+    private Module resolveType(String qualifiedName, boolean toplevel, FileLocation location) {
         Module typeDefiningModule;
         if (!unliftedModuleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, true);
             if (f == null || !f.exists()) {
-                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, FileLocation.UNKNOWN, "type", qualifiedName);
+                ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, location, "type", qualifiedName);
             }
             typeDefiningModule = load(qualifiedName, f, toplevel);
             unliftedModuleCache.put(qualifiedName, typeDefiningModule);
@@ -129,7 +129,7 @@ public class ModuleResolver {
             final String fileName = f.getName();
             final String typeName1 = typeDefiningModule.getSpec().getDefinedTypeName();
             if (!fileName.startsWith(typeName1)) {
-                ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, FileLocation.UNKNOWN, typeName1);
+                ToolError.reportError(ErrorMessage.MODULE_NAME_ERROR, location, typeName1);
             }
         } else {
             typeDefiningModule = unliftedModuleCache.get(qualifiedName);

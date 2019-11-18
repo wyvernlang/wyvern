@@ -263,7 +263,7 @@ public final class TestUtil {
 
     public static void doParseTypeModularly(String searchPath, String qualifiedName) throws ParseException {
         InterpreterState state = new InterpreterState(InterpreterState.PLATFORM_JAVA, new File(searchPath), new File(LIB_PATH));
-        state.getResolver().resolveType(qualifiedName);
+        state.getResolver().resolveType(qualifiedName, null);
     }
 
     public static void doTestScriptModularly(String searchPath, String qualifiedName, ValueType expectedType, Value expectedValue) throws ParseException {

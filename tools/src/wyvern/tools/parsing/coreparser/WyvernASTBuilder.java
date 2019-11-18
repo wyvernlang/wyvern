@@ -45,7 +45,6 @@ import wyvern.tools.typedAST.core.expressions.TaggedInfo;
 import wyvern.tools.typedAST.core.expressions.Variable;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
-import wyvern.tools.types.NamedType;
 import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
@@ -78,7 +77,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST moduleDecl(String name, List<TypedAST> imports, List<GenericParameter> generics, List args,
                                TypedAST ast, Type type, FileLocation loc, boolean isResource, boolean isAnnotated, String effects) {
-        return new ModuleDeclaration(name, imports, generics, args, ast, (NamedType) type, loc, isResource, isAnnotated, effects);
+        return new ModuleDeclaration(name, imports, generics, args, ast, type, loc, isResource, isAnnotated, effects);
     }
 
     @Override
