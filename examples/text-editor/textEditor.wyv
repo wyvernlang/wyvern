@@ -39,7 +39,6 @@ val file = nativeJMenu.create("File")
 val edit = nativeJMenu.create("Edit")
 val plugins = nativeJMenu.create("Plugins")
 val fs = fileSystem(java)
-effect Test = {fs.Read}
 val save = nativeActionCreator.create("Save")
 
 def getAttenuatedNativeUIManager(): NativeUIManager
