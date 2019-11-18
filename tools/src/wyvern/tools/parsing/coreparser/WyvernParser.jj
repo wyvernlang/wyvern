@@ -192,11 +192,13 @@ TOKEN : /* Literals */
 AST CompilationUnit() :
 { LinkedList<AST> imports= new LinkedList<AST>(); AST exp; LinkedList<AST> requires = new LinkedList<AST>(); }
 {
-  /*ImportDecls(imports)*/ exp=ModuleDecl(imports) { return exp; }
-|
-  exp = Script(imports, requires)  { return exp; }
-|
-  /* nothing */ { return build.unitValue(null); }
+  ImportDecls(imports)
+  ( exp=ModuleDecl(imports) { return exp; }
+  |
+    exp = Script(imports, requires)  { return exp; }
+  |
+    /* nothing */ { return build.unitValue(null); }
+  )
 }
 
 /** Root production. */
@@ -209,33 +211,44 @@ void ImportDecls(LinkedList<AST> decls) :
   /* nothing */ {}
 }
 
-AST ModuleDecl(LinkedList<AST> imports) :
-{ AST exp; Token id; Type type = null; List<GenericParameter> generics = null; List moduleArgs = new LinkedList(); boolean isResource = false; Token effects = null; }
+AST ModuleDecl(LinkedList<AST> preImports) :
+{ LinkedList<AST> postImports= new LinkedList<AST>(); AST exp; Token id; Type type = null; List<GenericParameter> generics = null; List moduleArgs = new LinkedList(); boolean isResource = false; Token effects = null; }
 {
   LOOKAHEAD(50)
-  <MODULE> <DEF> id = <IDENTIFIER> [ generics = GenericsDecl() ] moduleArgs = Formals() <COLON> effects = <DSL_LITERAL> [ type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
+  <MODULE> <DEF> id = <IDENTIFIER> [ generics = GenericsDecl() ] moduleArgs = Formals() <COLON> effects = <DSL_LITERAL> [ type=Type() ] <NEWLINE> exp = ModuleBody(postImports) {
     if (effects == null) {
-	   return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), true, true, null);
+	   return build.moduleDecl(id.image, preImports, generics, moduleArgs, postImports, exp, type, loc(id), true, true, null);
 	}
-	return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), true, true, effects.image);
+	return build.moduleDecl(id.image, preImports, generics, moduleArgs, postImports, exp, type, loc(id), true, true, effects.image);
   }
 |
   LOOKAHEAD(2)
-  <MODULE> <DEF> id = <IDENTIFIER> [ generics = GenericsDecl() ] moduleArgs = Formals() [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	   return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), true, false, null);
+  <MODULE> <DEF> id = <IDENTIFIER> [ generics = GenericsDecl() ] moduleArgs = Formals() [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(postImports) {
+	   return build.moduleDecl(id.image, preImports, generics, moduleArgs, postImports, exp, type, loc(id), true, false, null);
   }
 |
   LOOKAHEAD(5)
-  <MODULE> id = <IDENTIFIER> <COLON> effects = <DSL_LITERAL> [ type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), isResource, true, effects.image);
+  <MODULE> id = <IDENTIFIER> <COLON> effects = <DSL_LITERAL> [ type=Type() ] <NEWLINE> exp = ModuleBody(postImports) {
+	return build.moduleDecl(id.image, preImports, generics, moduleArgs, postImports, exp, type, loc(id), isResource, true, effects.image);
   }
 |
-  <MODULE> id = <IDENTIFIER> [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(imports) {
-	return build.moduleDecl(id.image, imports, generics, moduleArgs, exp, type, loc(id), isResource, false, null);
+  <MODULE> id = <IDENTIFIER> [ <COLON> type=Type() ] <NEWLINE> exp = ModuleBody(postImports) {
+	return build.moduleDecl(id.image, preImports, generics, moduleArgs, postImports, exp, type, loc(id), isResource, false, null);
   }
 }
 
 AST Script(LinkedList<AST> imports, LinkedList<AST> requires) :
+{ AST ast; AST decl; }
+{
+  ast = DeclSequence(false)  { return build.script(requires, imports, ast); }
+|
+  decl = RequireDecl() {
+      requires.addLast(decl);
+  }
+  ast = PostRequireScript(imports, requires) { return ast; }
+}
+
+AST PostRequireScript(LinkedList<AST> imports, LinkedList<AST> requires) :
 { AST ast; AST decl; }
 {
   ImportDecls(imports) ast = DeclSequence(false)  { return build.script(requires, imports, ast); }
@@ -243,7 +256,7 @@ AST Script(LinkedList<AST> imports, LinkedList<AST> requires) :
   decl = RequireDecl() {
       requires.addLast(decl);
   }
-  ast = Script(imports, requires) { return ast; }
+  ast = PostRequireScript(imports, requires) { return ast; }
 }
 
 AST ModuleBody(LinkedList<AST> imports) :

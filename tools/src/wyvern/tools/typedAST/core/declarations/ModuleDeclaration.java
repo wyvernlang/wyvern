@@ -52,13 +52,15 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     private boolean resourceFlag;
     private final List<NameBindingImpl> args;
 
-    private final List<ImportDeclaration> imports;
+    private final List<ImportDeclaration> preImports;
+    private final List<ImportDeclaration> postImports;
+    private List<ImportDeclaration> allImports;
     private boolean isAnnotated;
     private EffectSet effectSet;
     //private final List<GenericParameter> generics;
 
-    public ModuleDeclaration(String name, List imports, List<GenericParameter> generics, List<NameBindingImpl> args,
-                             TypedAST inner, Type type, FileLocation location, boolean isResource,
+    public ModuleDeclaration(String name, List preImports, List<GenericParameter> generics, List<NameBindingImpl> args,
+                             List postImports, TypedAST inner, Type type, FileLocation location, boolean isResource,
                              boolean isAnnotated, String effects) {
         this.name = name;
         this.inner = inner;
@@ -66,11 +68,12 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         this.resourceFlag = isResource;
         ascribedType = type;
         this.args = args;
-        this.imports = imports;
+        this.preImports = preImports;
+        this.postImports = postImports;
         this.generics = generics;
         this.isAnnotated = isAnnotated;
         this.effectSet = EffectSet.parseEffects(name, effects, false, location);
-        if (args.isEmpty() && imports.isEmpty() && this.effectSet != null
+        if (args.isEmpty() && preImports.isEmpty() && postImports.isEmpty() && this.effectSet != null
                 && !this.effectSet.getEffects().isEmpty()) {
             ToolError.reportError(ErrorMessage.PURE_MODULE_ANNOTATION, location);
         }
@@ -276,7 +279,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     }
 
     private void separatePlatformDependencies(LinkedList<ImportDeclaration> platformDependent, LinkedList<ImportDeclaration> platformIndependent) {
-        for (ImportDeclaration d : imports) {
+        for (ImportDeclaration d : postImports) {
             URI uri = d.getUri();
             /*if (d instanceof ImportDeclaration) {
                 ImportDeclaration decl = (ImportDeclaration)d;
@@ -300,7 +303,7 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     }
 
     /** Translates imports, adding them to the passed-in SeqExpr.  Updates the list of dependencies.  Returns an extended context */
-    public GenContext translateImports(LinkedList<ImportDeclaration> imports, GenContext ctx, SeqExpr seq, List<TypedModuleSpec> dependencies) {
+    public GenContext translateImports(List<ImportDeclaration> imports, GenContext ctx, SeqExpr seq, List<TypedModuleSpec> dependencies) {
         GenContext current = ctx;
         for (ImportDeclaration imp : imports) {
             Pair<VarBinding, GenContext> bindingAndCtx = imp.genBinding(current, dependencies);
@@ -330,6 +333,11 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         separatePlatformDependencies(platformDependentImports, platformIndependentImports);
         Sequence normalSeq = (inner instanceof Sequence) ? ((DeclSequence) inner).filterNormal() : new Sequence(inner);
 
+        /* Process imports that come before the module is declared */
+        SeqExpr seqExpr = new SeqExpr();
+        methodContext = translateImports(preImports, methodContext, seqExpr, dependencies);
+        
+        /* Process module arguments */
         List<FormalArg> formalArgs = new LinkedList<>();
 
         // Add the generic parameters to the list of formal arguments, if they exist
@@ -362,9 +370,8 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         }
 
         /* importing modules and instantiations are translated into a SeqExpr */
-        SeqExpr seqExpr = new SeqExpr();
-        GenContext extended = translateImports(platformDependentImports, methodContext, seqExpr, dependencies);
-        seqExpr = new SeqExpr(); // throw away the bindings for platform dependencies, they will be added back later
+        SeqExpr tempSeqExpr = new SeqExpr(); // throw away expr for platform dependencies, they will be added back later
+        GenContext extended = translateImports(platformDependentImports, methodContext, tempSeqExpr, dependencies);
         extended = translateImports(platformIndependentImports, extended, seqExpr, dependencies);
         wyvern.target.corewyvernIL.expression.IExpr body = innerTranslate(normalSeq, extended);
         TypeContext tempContext = methodContext.getInterpreterState().getResolver().extendContext(/*ctxWithPlatDeps*/methodContext, dependencies);
@@ -400,6 +407,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
     }
 
     public List<ImportDeclaration> getImports() {
-        return imports;
+        if (allImports == null) {
+            allImports = new LinkedList<ImportDeclaration>(preImports);
+            allImports.addAll(postImports);
+        }
+        return allImports;
     }
 }
