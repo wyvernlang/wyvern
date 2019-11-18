@@ -117,6 +117,12 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
                         c = '\t'; ++i;
                         break;
 
+                    case 'O':
+                        int char_code = Integer.parseInt(Character.toString(s.charAt(i + 2)));
+                        c = Character.toChars(char_code)[0];
+                        i += 2;
+                        break;
+
                     default:
                         ToolError.reportError(ErrorMessage.ILLEGAL_ESCAPE_SEQUENCE,
                                               new FileLocation(virtualLocation.getFileName(),
@@ -204,6 +210,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	// inserted forward keyword
 	terminal Token forwardKwd_t::= /forward/ in (keywds) {: RESULT = token(FORWARD,lexeme); :};
 	
+  terminal Token noneKwd_t  ::= /NONE/ in (keywds) {: RESULT = token(NONE,lexeme); :};
 	terminal Token toKwd_t		::= /to/ in (keywds) {: RESULT = token(TO,lexeme); :};
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
@@ -426,6 +433,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	       | assertKwd_t:t {: RESULT = t; :}
 	      // | whileKwd_t:t {: RESULT = t; :}
 	       | forwardKwd_t:t {: RESULT = t; :}
+         | noneKwd_t:t {: RESULT = t; :}
 	       | toKwd_t:t {: RESULT = t; :}
 //	       | fnKwd_t:t {: RESULT = t; :}
 	       | requireKwd_t:t {: RESULT = t; :}

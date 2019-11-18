@@ -169,4 +169,16 @@ public class ExampleTests {
         TestUtil.doTestScriptModularly(PATH, "commandLineArguments", Util.unitType(),
         Util.unitValue());
     }
+
+    @Test
+    public void testShortCircuitEvaluation() throws ParseException {
+      TestUtil.doTestScriptModularly(PATH, "shortCircuitEval", Util.unitType(),
+      Util.unitValue());
+    }
+
+    @Test
+    public void testOptionTypeSugar() throws ParseException {
+      TestUtil.doTestScriptModularly(PATH, "optionType", Util.unitType(),
+      Util.unitValue());
+    }
 }

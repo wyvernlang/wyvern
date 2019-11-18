@@ -104,6 +104,7 @@ TOKEN : /* Keywords */
 | < DATATYPE: "datatype" >
 | < CLASS: "class" >
 | < FORWARD: "forward" >
+| < NONE: "NONE" >
 | < TO: "to" >
 | < REQUIRE: "require" >
 | < METADATA: "metadata" >
@@ -783,7 +784,63 @@ Type Type() :
 }
 
 Type NonArrowType() :
-{ Token id = null; Token id2 = null; AST exp = null; List<GenericArgument> generics = null; Type t; }
+{ Type regularType; Type optionType; }
+{
+    LOOKAHEAD(50)
+    optionType = OptionType() {
+        return optionType;
+    }
+|
+    regularType = RegularType() {
+    return regularType;
+    }
+}
+
+Type OptionType() :
+{ Token questionMark; AST exp; List<GenericArgument> generics; Type t; GenericArgument genArg = null; }
+{
+    // syntactic sugar for option types
+    // T? as sugar for option.Option[T] (T stands for a type)
+    genArg=GenericArgumentRegularType() questionMark = <QUESTION> {
+        exp = build.var("option", loc(questionMark));
+        t = build.qualifiedType(exp, "Option");
+
+        // add the generic argument to the generics linked list
+        generics = new LinkedList<GenericArgument>();
+        generics.add(genArg);
+
+        Object o = build.parameterizedType(t, generics, loc(questionMark));
+        t = (Type) o;
+
+        return t;
+    }
+}
+
+AST OptionNoneValue() :
+{ Token none; AST exp; AST lhs; List<AST> rhs; List<GenericArgument> generics; GenericArgument genArg = null; Type type; }
+{
+    // built-in None value that works for all T. NONE = option.None[Dyn] <: option.None[T] for all T
+    // NONE is equivalent to option.None[Dyn]
+    none = <NONE> {
+        lhs = build.var("option", loc(none));
+        exp = build.invocation(lhs, "None", null, loc(none));
+
+        // generate generics
+        generics = new LinkedList<GenericArgument>();
+        type = build.nominalType("Dyn", loc(none)); // create Dynamic type
+        genArg = new GenericArgument(GenericKind.TYPE, type);
+        generics.add(genArg);
+
+        // generate rhs (Arguments)
+        rhs = new LinkedList<AST>(); // initialize empty AST list for rhs
+        exp = build.application(exp, rhs, null, generics, /*recur*/false);
+        
+        return exp;
+    }
+}
+
+Type RegularType() :
+{ Token id = null; Token id2 = null; AST exp = null; List<GenericArgument> generics = null; Type t = null; }
 {
   <LPAREN> t=Type() <RPAREN> {
       return t;
@@ -883,6 +940,8 @@ AST PrimaryExpression(ExpFlags flags) :
     return exp;
   }
 |
+  exp = OptionNoneValue() { return exp; }
+|
   t = <NEW> [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW>] {
     String self = (selfName == null) ? null : selfName.image;
     exp = build.newObj(loc(t), self);
@@ -914,7 +973,7 @@ AST PrimaryPrefix(ExpFlags flags) :
 {
   exp = Literal() { return exp; }
 |
-  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { return build.var(t.image, loc(t)); }
+  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { return build.var(t.image, loc(t));  }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |
@@ -950,7 +1009,8 @@ AST Literal() :
 AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :
 { List<AST> rhs; Token t; List<GenericArgument> generics = null;}
 {
-  <DOT> t = <IDENTIFIER> { return build.invocation(lhs, t.image, null, loc(t)); }
+  <DOT> t = <IDENTIFIER> { 
+    return build.invocation(lhs, t.image, null, loc(t)); }
 |
   [generics = Generics()] rhs = Arguments(flags) {
     return build.application(lhs, rhs, null, generics, recur);
@@ -1039,6 +1099,10 @@ GenericArgument GenericArgument() :
 | effect = <DSL_LITERAL> { return new GenericArgument(effect.image); }
 }
 
+GenericArgument GenericArgumentRegularType() :
+{ Type type; Token effect; }
+{ type = RegularType() { return new GenericArgument(GenericKind.TYPE, type); }
+}
 
 List GenericsDecl() :
 { List gens = null; }
