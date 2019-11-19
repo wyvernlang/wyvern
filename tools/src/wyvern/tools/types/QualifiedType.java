@@ -94,4 +94,14 @@ public class QualifiedType extends AbstractTypeImpl implements NamedType {
         }
         throw new RuntimeException("can't get here");
     }
+
+    @Override
+    public boolean isPresent(GenContext ctx) {
+        ExpressionAST a = base;
+        while (a instanceof Invocation) {
+            Invocation i = (Invocation) a;
+            a = i.getReceiver();
+        }
+        return ctx.isPresent(((Variable) a).getName(), true);
+    }
 }

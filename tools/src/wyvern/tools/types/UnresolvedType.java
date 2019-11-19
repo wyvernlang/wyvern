@@ -36,4 +36,9 @@ public class UnresolvedType extends AbstractTypeImpl implements NamedType {
     public ValueType getILType(GenContext ctx) {
         return ctx.lookupType(typeName, this.getLocation());
     }
+
+    @Override
+    public boolean isPresent(GenContext ctx) {
+        return ctx.isPresent(typeName, false);
+    }
 }

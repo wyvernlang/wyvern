@@ -39,6 +39,7 @@ public class GenericArgument {
                         }
                     } catch (ToolError toolError) { }
                 }
+                effectSet.contextualize(ctx);
                 return new GenericArgument(effectSet);
             default:
                 throw new RuntimeException("Unhandled generic argument kind: " + ga.getKind());

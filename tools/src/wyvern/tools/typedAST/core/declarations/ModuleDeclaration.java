@@ -237,10 +237,9 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         // initialize resulting value type to null;
         ValueType valueType = null;
         
-        try {
-            // attempt to find the type
+        if (type.isPresent(ctx)) {
             return type.getILType(ctx);
-        } catch (RuntimeException e) {
+        } else {
             // case when the context is not present.
             Module lt = resolveLoadedTypes(ctx, type.getFullName(), location);
             valueType = new NominalType(lt.getSpec().getInternalName(), lt.getSpec().getDefinedTypeName());
@@ -356,6 +355,9 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
         }
         wyvern.target.corewyvernIL.type.ValueType ascribedValueType
             = ascribedType == null ? null : toInternalType(methodContext, loadedTypes, ascribedType.getLocation(), ascribedType);
+        if (effectSet != null) {
+            effectSet.contextualize(methodContext);
+        }
         for (Module lt : loadedTypes) {
             // include the declaration itself
             final BindingSite internalSite = lt.getSpec().getSite();

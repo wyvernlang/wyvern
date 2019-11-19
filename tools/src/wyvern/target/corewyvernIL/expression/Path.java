@@ -16,8 +16,9 @@ public interface Path extends IASTNode, IExpr {
      */
     Path adapt(View v);
     void doPrettyPrint(Appendable dest, String indent) throws IOException;
+    /** replaces the underlying variable with the gen expression, if one exists */
     Path adaptVariables(GenContext ctx);
     boolean hasFreeVariable(String name);
-    /** converts variables without a binding to ones with a binding, if possible */
+    /** converts variables without a binding site to ones with a binding site, if possible */
     void canonicalize(TypeContext ctx);
 }

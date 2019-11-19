@@ -118,6 +118,7 @@ public class EffectSet {
         return new EffectSet(newSet);
     }
 
+    /** replaces variables in the effects with the corresponding gen expressions, where they exist */
     public void contextualize(GenContext ctx) {
         if (effectSet.isEmpty()) {
             return;
@@ -127,6 +128,7 @@ public class EffectSet {
         }
     }
 
+    /** converts variables in the effects without a binding site to ones with a binding site, if possible */
     public void canonicalize(TypeContext ctx) {
         for (final Effect e:effectSet) {
             e.canonicalize(ctx);

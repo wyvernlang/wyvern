@@ -162,6 +162,7 @@ public class Effect {
         return s;
     }
 
+    /** replaces variables in the Effect with the corresponding gen expressions, where they exist */
     public void adaptVariables(GenContext ctx) {
         if (path == null) {
             path = ctx.getContainerForTypeAbbrev(name);
@@ -172,6 +173,7 @@ public class Effect {
         path = path.adaptVariables(ctx);
     }
 
+    /** converts variables in the Effect without a binding site to ones with a binding site, if possible */
     public void canonicalize(TypeContext ctx) {
         path.canonicalize(ctx);
     }

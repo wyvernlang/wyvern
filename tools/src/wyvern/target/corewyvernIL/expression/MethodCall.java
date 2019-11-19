@@ -508,8 +508,13 @@ public class MethodCall extends Expression {
                     // adaptation for the receiver couldn't have worked, so try avoiding "this"
                     resultType = resultType.avoid(receiverType.getSelfName(), calleeCtx);
                 }
+                Set<String> actualNames = args.stream().filter(arg -> arg instanceof Variable).
+                        map(arg -> ((Variable) arg).getName()).collect(Collectors.toSet());
                 for (int i = args.size() - 1; i >= 0; --i) {
-                    resultType = resultType.avoid(formalArgs.get(i).getName(), calleeCtx);
+                    String name = formalArgs.get(i).getName();
+                    if (!actualNames.contains(name)) {
+                        resultType = resultType.avoid(name, calleeCtx);
+                    }
                 }
                 setExprType(resultType);
                 return defDeclType;
