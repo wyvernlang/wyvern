@@ -1,8 +1,8 @@
-module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane): {} Plugin
+import uiEffects
+module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane): {} Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}]
 // N.B.: Must pass in TextArea and not just String because need to get the latest version of the text.
 
 import wyvern.String
-import uiEffects
 
 effect Run = {logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}
 
