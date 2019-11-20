@@ -10,7 +10,7 @@ val logFile = fs.fileFor("log.txt") // We create the log file, but not an append
 val logger = logger(logFile)
 
 def createTextEditorInstance(): {system.FFI} TextEditor
-  textEditor(java, logger, () => createTextEditorInstance())
+  textEditor(java, fs, logger, () => createTextEditorInstance())
 
 val te = createTextEditorInstance()
 te.run()
