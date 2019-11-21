@@ -91,10 +91,16 @@ def getAttenuatedNativeJOptionPane(): {} OptionPane
       nativeJOptionPane.getPlainMessageValue()
 
 
+// Plugins
+
+/******* Step 2: Instantiate plugins passing in appropriate resources *******/
+
 val darkTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = darkTheme(logger, getAttenuatedNativeUIManager())
 val lightTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = lightTheme(logger, getAttenuatedNativeUIManager())
 val wordCount: Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}] = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
 val questionnaireCreator: Plugin[{logger.Update, fs.Write, fs.Append, uiEffects.ReadTextArea}] = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
+
+/****************************************************************************/
 
 
 // Other methods and remaining field initialization
@@ -205,15 +211,6 @@ def run(): {Run} Unit
 
   save.setEnabled(false)
   saveAs.setEnabled(false)
-
-/******* Step 2: Instantiate plugins passing in appropriate resources *******/
-/*
-  val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
-  val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
-  val questionnaireCreator = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
-*/
-/****************************************************************************/
 
 //******* Step 3: Register plugins with menu or run them on setup ***********/
 
