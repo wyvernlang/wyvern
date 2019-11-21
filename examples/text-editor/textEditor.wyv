@@ -1,5 +1,5 @@
 import uiEffects
-module def textEditor(java: Java, fs: fileSystem.FileSystem, logger: Logger, createTextEditorInstance: Unit -> TextEditor): TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]
+module def textEditor(java: Java, fs: fileSystem.FileSystem, logger: Logger, createTextEditorInstance: Unit -> TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]): TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]
 
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJTextArea
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJFileChooser
@@ -156,11 +156,10 @@ def performQuitAction(): {Quit} Unit
   logger.updateLog("Closing text editor...\n")
   nativeUtils.exitSystem()
 
-
-def performNewAction(): Unit
-  createTextEditorInstance().run()
+def performNewAction(): {Run} Unit
+  val te: TextEditor[{logger.Update, system.FFI, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}] = createTextEditorInstance()
+  te.run()
   logger.updateLog("New text editor was created.\n")
-
 
 val newFile = nativeActionCreator.createWithAction("New", () => performNewAction())
 val open = nativeActionCreator.createWithAction("Open", () => performOpenAction())

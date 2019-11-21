@@ -4,12 +4,13 @@ import fileSystem
 import logger
 import textEditor
 import TextEditor
+import uiEffects
 
 val fs = fileSystem(java)
 val logFile = fs.fileFor("log.txt") // We create the log file, but not an appender for it to be able to handle several text-editor windows, each of which is a text-editor instance.
 val logger = logger(logFile)
 
-def createTextEditorInstance(): {system.FFI} TextEditor
+def createTextEditorInstance(): {system.FFI} TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]
   textEditor(java, fs, logger, () => createTextEditorInstance())
 
 val te = createTextEditorInstance()
