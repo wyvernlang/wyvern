@@ -1,13 +1,12 @@
 import Plugin
 resource type TextEditor
-  effect SaveFile
-  effect Quit
-  effect PressKey
-  effect Open
+  effect Run
   effect RegisterPlugin
   effect RunPluginExtra
-  effect Run
-  effect PluginRun
+  effect SaveFile
+  effect Open
+  effect Quit
+  effect PressKey
   def run(): {this.Run} Unit
   def saveFile(fileName: String): {this.SaveFile} Unit // N.B.: File exceptions aren't handled.
   def saveFileAs(): {this.SaveFile} Unit

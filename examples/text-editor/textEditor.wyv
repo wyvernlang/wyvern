@@ -46,13 +46,15 @@ val edit = nativeJMenu.create("Edit")
 val plugins = nativeJMenu.create("Plugins")
 val save = nativeActionCreator.create("Save")
 
-effect PluginRun = {logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}
-effect SaveFile = {logger.Update, system.FFI, fs.Write, fs.Append}
-effect Quit = {SaveFile}
-effect PressKey = {system.FFI}
-effect Open = {SaveFile}
+effect Run = {logger.Update, system.FFI, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}
+
 effect RegisterPlugin = {logger.Update, system.FFI}
 effect RunPluginExtra = {logger.Update}
+
+effect SaveFile = {logger.Update, system.FFI, fs.Write, fs.Append}
+effect Open = {SaveFile}
+effect Quit = {SaveFile}
+effect PressKey = {system.FFI}
 
 
 // Attenuators
@@ -154,8 +156,6 @@ def performQuitAction(): {Quit} Unit
   logger.updateLog("Closing text editor...\n")
   nativeUtils.exitSystem()
 
-
-effect Run = {logger.Update, system.FFI, RunPluginExtra, RegisterPlugin, PluginRun}
 
 def performNewAction(): Unit
   createTextEditorInstance().run()
