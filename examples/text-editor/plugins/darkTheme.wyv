@@ -1,17 +1,20 @@
-module def darkTheme(logger: Logger, nativeUIManager: NativeUIManager): Plugin
+import uiEffects
+module def darkTheme(logger: Logger, uiManager: UIManager): {} Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}]
 // N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
 
-def getName(): String
+effect Run = {logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}
+
+def getName(): {} String
   "Dark Theme"
 
-def run(): Unit
-  nativeUIManager.paintUIAttributeGray("MenuBar", "background")
-  nativeUIManager.paintUIAttributeDarkGray("MenuItem", "background")
-  nativeUIManager.paintUIAttributeWhite("MenuItem", "foreground")
-  nativeUIManager.paintUIAttributeDarkGray("TextArea", "background")
-  nativeUIManager.paintUIAttributeWhite("TextArea", "foreground")
-  nativeUIManager.paintUIAttributeWhite("TextArea", "caretForeground")
-  nativeUIManager.paintUIAttributeGray("ScrollPane", "background")
-  nativeUIManager.paintUIAttributeDarkGray("ScrollBar", "background")
-  nativeUIManager.updateLookAndFeel()
+def run(): {Run} Unit
+  uiManager.paintUIAttributeGray("MenuBar", "background")
+  uiManager.paintUIAttributeDarkGray("MenuItem", "background")
+  uiManager.paintUIAttributeWhite("MenuItem", "foreground")
+  uiManager.paintUIAttributeDarkGray("TextArea", "background")
+  uiManager.paintUIAttributeWhite("TextArea", "foreground")
+  uiManager.paintUIAttributeWhite("TextArea", "caretForeground")
+  uiManager.paintUIAttributeGray("ScrollPane", "background")
+  uiManager.paintUIAttributeDarkGray("ScrollBar", "background")
+  uiManager.updateLookAndFeel()
   logger.updateLog("Set text editor theme to dark.\n")

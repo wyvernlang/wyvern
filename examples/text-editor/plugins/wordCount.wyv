@@ -1,12 +1,15 @@
-module def wordCount(logger: Logger, textArea: JTextArea, nativeJOptionPane: NativeJOptionPane): Plugin
-// N.B.: Must pass in JTextArea and not just String because need to get the latest version of the text.
+import uiEffects
+module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane): {} Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}]
+// N.B.: Must pass in TextArea and not just String because need to get the latest version of the text.
 
 import wyvern.String
 
-def getName(): String
+effect Run = {logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}
+
+def getName(): {} String
   "Word Count"
 
-def run(): Unit
+def run(): {Run} Unit
   logger.updateLog("Running the " + getName() + " plugin...\n")
   val text = textArea.getText()
   val length = text.length()
@@ -16,11 +19,11 @@ def run(): Unit
   var word: String = " words.\n"
   if (result == 1)
       word = " word.\n"
-  nativeJOptionPane.showMessageDialog("The document contains " + String.valueOf(result) + word, "Word Count", nativeJOptionPane.getPlainMessageValue())
+  optionPane.showMessageDialog("The document contains " + String.valueOf(result) + word, "Word Count", optionPane.getPlainMessageValue())
   logger.updateLog("Result: The document contains " + String.valueOf(result) + word)
 
 
-def countWords(text: String, currentPosition: Int, prevCharWasSpace: Boolean, result: Int): Int
+def countWords(text: String, currentPosition: Int, prevCharWasSpace: Boolean, result: Int): {} Int
   if (currentPosition == -1)
       result
     else

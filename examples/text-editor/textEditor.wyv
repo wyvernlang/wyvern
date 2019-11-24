@@ -1,4 +1,5 @@
-module def textEditor(java: Java, logger: Logger, createTextEditorInstance: Unit -> TextEditor): TextEditor
+import uiEffects
+module def textEditor(java: Java, fs: fileSystem.FileSystem, logger: Logger, createTextEditorInstance: Unit -> TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]): TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]
 
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJTextArea
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJFileChooser
@@ -15,7 +16,9 @@ import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
 import fileSystem
 import fileSystem.Reader
 import fileSystem.Writer
-import NativeUIManager
+import OptionPane
+import TextArea
+import UIManager
 import Plugin
 
 /******* Step 1: Import plugins *********************************************/
@@ -26,6 +29,9 @@ import plugins.lightTheme
 import plugins.questionnaireCreator
 
 /****************************************************************************/
+
+
+// Field initialization (most of the fields)
 
 nativeUIManager.enableSettingLookAndFeel() // This must happen before jFrame is created.
 val jFrame = nativeJFrame.create()
@@ -38,34 +44,77 @@ val jmb = nativeJMenuBar.create()
 val file = nativeJMenu.create("File")
 val edit = nativeJMenu.create("Edit")
 val plugins = nativeJMenu.create("Plugins")
-val fs = fileSystem(java)
 val save = nativeActionCreator.create("Save")
 
-def getAttenuatedNativeUIManager(): NativeUIManager
+effect Run = {logger.Update, system.FFI, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}
+
+effect RegisterPlugin = {logger.Update, system.FFI}
+effect RunPluginExtra = {logger.Update}
+
+effect SaveFile = {logger.Update, system.FFI, fs.Write, fs.Append}
+effect Open = {SaveFile}
+effect Quit = {SaveFile}
+effect PressKey = {system.FFI}
+
+
+// Attenuators
+
+def getAttenuatedNativeUIManager(): {} UIManager
   new
-    def paintUIAttributeBlack(element: String, attribute: String): Unit
+    effect PaintUI = {uiEffects.PaintUI}
+    effect SetLookAndFeel = {uiEffects.SetUILookAndFeel}
+    def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeBlack(element, attribute)
-    def paintUIAttributeDarkGray(element: String, attribute: String): Unit
+    def paintUIAttributeDarkGray(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeDarkGray(element, attribute)
-    def paintUIAttributeGray(element: String, attribute: String): Unit
+    def paintUIAttributeGray(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeGray(element, attribute)
-    def paintUIAttributeLightGray(element: String, attribute: String): Unit
+    def paintUIAttributeLightGray(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeLightGray(element, attribute)
-    def paintUIAttributeWhite(element: String, attribute: String): Unit
+    def paintUIAttributeWhite(element: String, attribute: String): {this.PaintUI} Unit
       nativeUIManager.paintUIAttributeWhite(element, attribute)
-    def updateLookAndFeel(): Unit
+    def updateLookAndFeel(): {this.SetLookAndFeel} Unit
       nativeUIManager.updateLookAndFeel(jFrame)
 
-def registerPlugin(plugin: Plugin): Unit
+def getAttenuatedNativeJTextArea(): {} TextArea
+  new
+    effect Read = {uiEffects.ReadTextArea}
+    def getText(): {this.Read} String
+      textArea.getText()
+
+def getAttenuatedNativeJOptionPane(): {} OptionPane
+  new
+    effect ShowDialog = {uiEffects.ShowDialog}
+    def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
+      nativeJOptionPane.showMessageDialog(message, title, messageType)
+    def getPlainMessageValue(): {} Int
+      nativeJOptionPane.getPlainMessageValue()
+
+
+// Plugins
+
+/******* Step 2: Instantiate plugins passing in appropriate resources *******/
+
+val darkTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = darkTheme(logger, getAttenuatedNativeUIManager())
+val lightTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = lightTheme(logger, getAttenuatedNativeUIManager())
+val wordCount: Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}] = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
+val questionnaireCreator: Plugin[{logger.Update, fs.Write, fs.Append, uiEffects.ReadTextArea}] = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
+
+/****************************************************************************/
+
+
+// Other methods and remaining field initialization
+
+def registerPlugin(plugin: Plugin): {RegisterPlugin, plugin.Run} Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
   logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
 
-def runPluginOnSetup(plugin: Plugin): Unit
+def runPluginOnSetup(plugin: Plugin): {plugin.Run, RunPluginExtra} Unit
   logger.updateLog("Running plugin " + plugin.getName() + "...\n")
   plugin.run()
   logger.updateLog("Ran plugin " + plugin.getName() + ".\n")
 
-def saveFile(fileName: String): Unit // N.B.: File exceptions aren't handled.
+def saveFile(fileName: String): {SaveFile} Unit // N.B.: File exceptions aren't handled.
   val fileWriter = fs.fileFor(fileName).makeWriter()
   fileWriter.write(textArea.getText())
   fileWriter.close()
@@ -75,31 +124,27 @@ def saveFile(fileName: String): Unit // N.B.: File exceptions aren't handled.
   changed = false
   save.setEnabled(false)
 
-def saveFileAs(): Unit
+def saveFileAs(): {SaveFile} Unit
   if (dialog.showSaveDialog(nativeUtils.getNullValue()) == nativeJFileChooser.getApproveOption())
     saveFile(dialog.getSelectedFile().getAbsolutePath())
 
-def saveOld(): Unit
+def saveOld(): {SaveFile} Unit
   if (changed)
     if (nativeJOptionPane.showConfirmDialog("Would you like to save " + currentFile + " ?", "Save", nativeJOptionPane.getYesNoOptionValue()) == nativeJOptionPane.getYesOptionValue())
       saveFile(currentFile)
 
-def performNewAction(): Unit
-  createTextEditorInstance().run()
-  logger.updateLog("New text editor was created.\n")
-
-def performSaveAction(): Unit
+def performSaveAction(): {SaveFile} Unit
   if ("Untitled".equals(currentFile))
       saveFileAs()
     else
       saveFile(currentFile)
 
-def performSaveAsAction(): Unit
+def performSaveAsAction(): {SaveFile} Unit
   saveFileAs()
 
 val saveAs = nativeActionCreator.createWithAction("Save as...", () => performSaveAsAction())
 
-def performOpenAction(): Unit // N.B.: File exceptions aren't handled.
+def performOpenAction(): {Open} Unit // N.B.: File exceptions aren't handled.
   saveOld()
   if (dialog.showOpenDialog(nativeUtils.getNullValue()) == nativeJFileChooser.getApproveOption())
     val fileName = dialog.getSelectedFile().getAbsolutePath()
@@ -112,17 +157,22 @@ def performOpenAction(): Unit // N.B.: File exceptions aren't handled.
     logger.updateLog("File " + fileName + " was opened.\n")
   saveAs.setEnabled(true)
 
-def performQuitAction(): Unit
+def performQuitAction(): {Quit} Unit
   saveOld()
   logger.updateLog("Closing text editor...\n")
   nativeUtils.exitSystem()
+
+def performNewAction(): {Run} Unit
+  val te: TextEditor[{logger.Update, system.FFI, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}] = createTextEditorInstance()
+  te.run()
+  logger.updateLog("New text editor was created.\n")
 
 val newFile = nativeActionCreator.createWithAction("New", () => performNewAction())
 val open = nativeActionCreator.createWithAction("Open", () => performOpenAction())
 save.setAction(() => performSaveAction())
 val quit = nativeActionCreator.createWithAction("Quit", () => performQuitAction())
 
-def performKeyPressedAction(): Unit
+def performKeyPressedAction(): {PressKey} Unit
   changed = true
   save.setEnabled(true)
   saveAs.setEnabled(true)
@@ -130,7 +180,10 @@ def performKeyPressedAction(): Unit
 val kl = nativeKeyListenerCreator.create(() => performKeyPressedAction())
 val m = textArea.getActionMap()
 
-def run(): Unit
+
+// Main method
+
+def run(): {Run} Unit
   logger.updateLog("New text-editor window is starting...\n")
   jFrame.add(scroll, "Center") // "Center" = BorderLayout.CENTER
   jFrame.setJMenuBar(jmb)
@@ -158,15 +211,6 @@ def run(): Unit
 
   save.setEnabled(false)
   saveAs.setEnabled(false)
-
-/******* Step 2: Instantiate plugins passing in appropriate resources *******/
-
-  val darkTheme = darkTheme(logger, getAttenuatedNativeUIManager())
-  val lightTheme = lightTheme(logger, getAttenuatedNativeUIManager())
-  val wordCount = wordCount(logger, textArea, nativeJOptionPane) // Must pass in JTextArea and not just String because need to get the latest version of the text
-  val questionnaireCreator = questionnaireCreator(logger, textArea, fs) // Must pass in JTextArea and not just String because need to get the latest version of the text
-
-/****************************************************************************/
 
 //******* Step 3: Register plugins with menu or run them on setup ***********/
 

@@ -1,0 +1,4 @@
+import uiEffects
+type TextArea
+  effect Read = {uiEffects.ReadTextArea}
+  def getText(): {this.Read} String
