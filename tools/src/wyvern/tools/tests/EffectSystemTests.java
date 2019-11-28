@@ -356,7 +356,9 @@ public class EffectSystemTests {
         expectedException.expect(ToolError.class);
         expectedException.expectMessage(StringContains.containsString("Effect \"stdout.hi\" not found in scope at location file "
                 + Paths.get(PATH, "effects", "network16.wyv").toAbsolutePath().toString()));
+        Globals.setUsePrelude(true);
         TestUtil.doTestScriptModularly(PATH, "effects.testNetwork16", Util.stringType(), new StringLiteral("Network16 with effects"));
+        Globals.setUsePrelude(false);
     }
 
     @Test
