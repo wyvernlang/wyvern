@@ -49,7 +49,9 @@ public class DemoTests {
 
     @Test
     public void testListClient() throws ParseException {
+        Globals.setUsePrelude(true);
         TestUtil.doTestScriptModularly("demo.ListClient", Util.intType(), new IntegerLiteral(8));
+        Globals.setUsePrelude(false);
     }
 
 

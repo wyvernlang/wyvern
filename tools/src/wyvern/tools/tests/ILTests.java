@@ -30,7 +30,6 @@ import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
-import wyvern.tools.Interpreter;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
@@ -419,13 +418,6 @@ public class ILTests {
     @Test
     public void testRecursiveTypes() throws ParseException {
         TestUtil.doTestScriptModularly("modules.module.recursivetypes", null, null);
-    }
-
-    @Test
-    public void testInterpreterOnScript() {
-        String[] args = new String[] {TestUtil.EXAMPLES_PATH + "rosetta/hello.wyv"};
-        Interpreter.wyvernHome.set("..");
-        Interpreter.main(args);
     }
 
 
@@ -1337,11 +1329,6 @@ public class ILTests {
                 + "    def method(x: Int): Int = x\n"
                 + "obj.method(5)";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(5));
-    }
-
-    @Test
-    public void testPreviousTopLevelBug() throws ParseException {
-        TestUtil.doTestScriptModularly("modules.topLevelBug", null, null);
     }
 
     @Test

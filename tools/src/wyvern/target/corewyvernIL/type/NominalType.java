@@ -102,13 +102,17 @@ public class NominalType extends ValueType {
     
     DeclType getSourceDeclType(TypeContext ctx) {
         final ValueType t = path.typeCheck(ctx, null);
-        nestingCount++;
-        if (nestingCount > 100) {
-            // check for excessive recursion failed
-            throw new RuntimeException("Internal error: recursion");
+        synchronized (NominalType.class) {
+            nestingCount++;
+            if (nestingCount > 100) {
+                // check for excessive recursion failed
+                throw new RuntimeException("Internal error: recursion");
+            }
         }
         final StructuralType structuralType = t.getStructuralType(ctx);
-        nestingCount--;
+        synchronized (NominalType.class) {
+            nestingCount--;
+        }
         // return any DefinedTypeMember or AbstractTypeMember
         return structuralType.findMatchingDecl(typeMember, cdt -> !(cdt instanceof DefinedTypeMember || cdt instanceof AbstractTypeMember), ctx);
     }

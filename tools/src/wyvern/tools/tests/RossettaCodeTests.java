@@ -5,7 +5,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import wyvern.stdlib.Globals;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.RegressionTests;
@@ -15,11 +14,11 @@ public class RossettaCodeTests {
     @BeforeClass public static void setupResolver() {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
-        Globals.setUsePrelude(false);
+        //Globals.setUsePrelude(false);
     }
 
     @AfterClass public static void teardown() {
-        Globals.setUsePrelude(true);  // restore the default to use the prelude
+        //Globals.setUsePrelude(true);  // restore the default to use the prelude
     }
 
     private static final String BASE_PATH = TestUtil.BASE_PATH;
