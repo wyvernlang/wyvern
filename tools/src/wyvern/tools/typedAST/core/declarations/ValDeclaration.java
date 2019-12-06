@@ -18,12 +18,10 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.typedAST.abs.Declaration;
 import wyvern.tools.typedAST.core.binding.NameBinding;
 import wyvern.tools.typedAST.core.binding.NameBindingImpl;
-import wyvern.tools.typedAST.core.values.StringConstant;
 import wyvern.tools.typedAST.interfaces.CoreAST;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 import wyvern.tools.typedAST.interfaces.TypedAST;
 import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
-import wyvern.tools.types.QualifiedType;
 import wyvern.tools.types.Type;
 import wyvern.tools.types.UnresolvedType;
 
@@ -126,7 +124,9 @@ public class ValDeclaration extends Declaration implements CoreAST {
 
                 // convert rhs actual assignment type T to lhs type option.Option[T]
                 // Modify the expr to assign (RHS), to emulate the option expression based on the base type (RHS Expression Type)
-                rhsExpression = new wyvern.target.corewyvernIL.expression.MethodCall((wyvern.target.corewyvernIL.expression.IExpr) new wyvern.target.corewyvernIL.expression.Variable("option", this.getLocation()),
+                rhsExpression = new wyvern.target.corewyvernIL.expression.MethodCall(
+                  (wyvern.target.corewyvernIL.expression.IExpr) 
+                  new wyvern.target.corewyvernIL.expression.Variable("option", this.getLocation()),
                                               "Some",
                                               iExprList,
                                               null);
@@ -138,7 +138,6 @@ public class ValDeclaration extends Declaration implements CoreAST {
           }
         }
 
-        //ExpressionAST modifiedDefinition = new wyvern.tools.typedAST.core.expressions.Application(new Invocation(), arguments, this.getLocation(), genericArguments, false);
         tlc.addLet(new BindingSite(getName()),
                 lhsExpressionExpectedType,
                 rhsExpression,
