@@ -511,9 +511,6 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     dslLine ::= dsl_indent_t:t dslLine_t:line {:
 							RESULT = LexerUtils.makeList(t);
 							RESULT.add(line);
-							if (!flagTokSet) {
-								flagTok = null;
-							}
 							flagTokSet = false; // always reset this bool after each line
 					:};
 	
