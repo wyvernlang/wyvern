@@ -519,6 +519,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     
 	lineElementSequence ::= indent_t:n {: RESULT = LexerUtils.makeList(n); flagTok = null; lastIndent = n; :}
 	                      | nonWSLineElement:n {:
+	                            adjustEQARROW(n);
 	                            lastIndent = null;
 	                            // handles lines that start without any indent
 	                            if (inDSL)
@@ -528,6 +529,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	                      		RESULT = n;
 	                        :}
 	                      | lineElementSequence:list anyLineElement:n {:
+	                            	adjustEQARROW(n);
                                 if (flagTok != null && flagTok.kind == EQARROW && !isEQARROWlast) {
                                     flagTok = null;
                                 }
@@ -557,6 +559,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 	ilineElementSequence ::= iindent_t:n {: RESULT = LexerUtils.makeList(n); flagTok = null; lastIndent = n; :}
 	                      | ilineElementSequence:list anyLineElement:n {:
+	                            	adjustEQARROW(n);
                                 if (flagTok != null && flagTok.kind == EQARROW && !isEQARROWlast) {
                                     flagTok = null;
                                 }
