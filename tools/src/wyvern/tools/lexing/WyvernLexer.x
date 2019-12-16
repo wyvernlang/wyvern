@@ -22,6 +22,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	boolean inDSL = false;							// are we in a DSL?
 	Stack<String> indents = new Stack<String>();	// the stack of indents
 	Token flagTok = null;							// a token that signals whether an indent is for a DSL
+	boolean flagTokSet = false;        // did we set a flagTok while lexing the current line?
 	Token lastIndent = null;
     public FileLocation startLocation = null;
     boolean ilineNext = false;                      // is the first iline in a sequence next?
@@ -195,12 +196,12 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	:};
 
     terminal Token classKwd_t ::= /class/ in (keywds) {: RESULT = token(CLASS,lexeme); :};
-	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(TYPE,lexeme); flagTok = RESULT; :};
+	terminal Token typeKwd_t 	::= /type/ in (keywds) {: RESULT = token(TYPE,lexeme); flagTok = RESULT; flagTokSet = true; :};
 
-	terminal Token datatypeKwd_t ::= /datatype/ in (keywds) {: RESULT = token(DATATYPE, lexeme); flagTok = RESULT; :};
+	terminal Token datatypeKwd_t ::= /datatype/ in (keywds) {: RESULT = token(DATATYPE, lexeme); flagTok = RESULT; flagTokSet = true; :};
 
 	terminal Token valKwd_t 	::= /val/ in (keywds) {: RESULT = token(VAL,lexeme); :};
-	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; :};
+	terminal Token defKwd_t 	::= /def/ in (keywds) {: RESULT = token(DEF,lexeme); flagTok = RESULT; flagTokSet = true; :};
 	terminal Token varKwd_t 	::= /var/ in (keywds) {: RESULT = token(VAR,lexeme); :};
 	terminal Token assertKwd_t 	::= /assert/ in (keywds) {: RESULT = token(ASSERT,lexeme); :};
 	
@@ -215,7 +216,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	//terminal Token Kwd_t 	::= /fn/ in (keywds) {: RESULT = token(FN,lexeme); :};
 	terminal Token requireKwd_t 	::= /require/ in (keywds) {: RESULT = token(REQUIRE,lexeme); :};
 	terminal Token metadataKwd_t 	::= /metadata/ in (keywds) {: RESULT = token(METADATA,lexeme); :};
-	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); flagTok = RESULT; :};
+	terminal Token newKwd_t 	::= /new/ in (keywds) {: RESULT = token(NEW,lexeme); flagTok = RESULT; flagTokSet = true; :};
  	terminal Token importKwd_t   ::= /import/ in (keywds) {: RESULT = token(IMPORT,lexeme); :};
  	terminal Token liftedKwd_t   ::= /lifted/ in (keywds) {: RESULT = token(LIFTED,lexeme); :};
  	terminal Token moduleKwd_t   ::= /module/ in (keywds) {: RESULT = token(MODULE,lexeme); :};
@@ -233,7 +234,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token instantiateKwd_t ::= /instantiate/ in (keywds) {: RESULT = token(INSTANTIATE,lexeme); :};
 
 	terminal Token taggedKwd_t  ::= /tagged/  in (keywds) {: RESULT = token(TAGGED,lexeme); :};
-    terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); flagTok = RESULT; :};
+    terminal Token matchKwd_t   ::= /match/   in (keywds) {: RESULT = token(MATCH,lexeme); flagTok = RESULT; flagTokSet = true; :};
     terminal Token defaultKwd_t ::= /default/ in (keywds) {: RESULT = token(DEFLT,lexeme); :};
     terminal Token caseKwd_t ::= /case/ in (keywds);
     terminal Token ofKwd_t ::= /of/ in (keywds);
@@ -244,7 +245,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
  	terminal Token decimalInteger_t ::= /([1-9][0-9]*)|0/  {: RESULT = token(DECIMAL_LITERAL,lexeme); :};
  	terminal Token rationalLit_t ::= /([1-9][0-9]*|0)\/([1-9][0-9]*|0)/  {: RESULT = token(RATIONAL_LITERAL,lexeme); :};
 
-	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); flagTok = RESULT; :};
+	terminal Token tilde_t ::= /~/ {: RESULT = token(TILDE,lexeme); flagTok = RESULT; flagTokSet = true; :};
 	terminal Token plus_t ::= /\+/ {: RESULT = token(PLUS,lexeme); :};
 	terminal Token dash_t ::= /-/ {: RESULT = token(DASH,lexeme); :};
 	terminal Token mult_t ::= /\*/ {: RESULT = token(MULT,lexeme); :};
@@ -252,8 +253,10 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	terminal Token remainder_t ::= /%/ {: RESULT = token(MOD,lexeme); :};
 	terminal Token equals_t ::= /=/ {:
 		RESULT = token(EQUALS,lexeme);
-		if (flagTok != null && flagTok.kind == DEF) // EQUALS cancels a DEF for the purposes of whether we are looking for a DSL on the next line
+		if (flagTok != null && flagTok.kind == DEF) {// EQUALS cancels a DEF for the purposes of whether we are looking for a DSL on the next line
 			flagTok = null;
+			flagTokSet = false;
+		}
 	:};
 	terminal Token equalsequals_t ::= /==/ {: RESULT = token(EQUALSEQUALS,lexeme); :};
 	terminal Token openParen_t ::= /\(/ {: RESULT = token(LPAREN,lexeme); :};
@@ -263,6 +266,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
         RESULT = token(EQARROW,lexeme);
         if (flagTok == null) {
             flagTok = RESULT;
+					  flagTokSet = true;
         }
     :};
  	terminal Token tarrow_t ::= /-\>/  {: RESULT = token(TARROW,lexeme); :};
@@ -504,7 +508,11 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	                   | keyw:t {: RESULT = LexerUtils.makeList(t); :}
 	                   | parens:l {: RESULT = l; :};
 
-    dslLine ::= dsl_indent_t:t dslLine_t:line {: RESULT = LexerUtils.makeList(t); RESULT.add(line); :};
+    dslLine ::= dsl_indent_t:t dslLine_t:line {:
+							RESULT = LexerUtils.makeList(t);
+							RESULT.add(line);
+							flagTokSet = false; // always reset this bool after each line
+					:};
 	
     inlinelit ::= oCurly_t innerdsl:idsl cCurly_t {: RESULT = idsl; :};
     innerdsl ::= notCurly_t:str {: RESULT = str; :} | notCurly_t:str oCurly_t innerdsl:idsl cCurly_t innerdsl:stre {: RESULT = str + "{" + idsl + "}" + stre; :} | {: RESULT = ""; :};
@@ -533,7 +541,11 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 					    if (foundTilde) {
 						    DSLNext = true;
 						    foundTilde = false;
-						}
+							}
+							if (!flagTokSet) {
+								flagTok = null;
+							}
+							flagTokSet = false; // always reset this bool after each line
 					:}
 				  | newline_t:n {: RESULT = LexerUtils.makeList(n); :}; // an empty line
 				  

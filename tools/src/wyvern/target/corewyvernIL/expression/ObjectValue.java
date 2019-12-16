@@ -10,7 +10,9 @@ import wyvern.target.corewyvernIL.decl.Declaration;
 import wyvern.target.corewyvernIL.decl.DeclarationWithRHS;
 import wyvern.target.corewyvernIL.decl.DefDeclaration;
 import wyvern.target.corewyvernIL.decl.ForwardDeclaration;
+import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.support.EvalContext;
+import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.RefinementType;
@@ -31,7 +33,7 @@ public class ObjectValue extends New implements Invokable {
      */
     public ObjectValue(List<Declaration> decls, BindingSite selfSite, ValueType exprType, ForwardDeclaration forwardDecl, FileLocation loc, EvalContext ctx) {
         super(decls, selfSite, exprType, loc);
-
+        
         if (selfSite == null) {
             throw new RuntimeException("selfName invariant violated");
         }
@@ -48,6 +50,11 @@ public class ObjectValue extends New implements Invokable {
     @Override
     public Value interpret(EvalContext ctx) {
         return this;
+    }
+    
+    @Override
+    public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        return getType();
     }
     
     public Tag getTag() {

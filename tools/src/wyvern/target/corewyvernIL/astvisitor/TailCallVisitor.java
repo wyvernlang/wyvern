@@ -78,7 +78,12 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
         }
 
         if (inTailPosition) {
-            methodCall.addMetadata(new IsTailCall());
+            if (!methodCall.getMethodName().startsWith("_")) {
+                // hack: avoid making accessor methods into tail calls
+                // this is problematic because calls to accessor methods are copied by reference rather than by value
+                // could make copies by value, which would be more principled, but this fix is simpler
+                methodCall.addMetadata(new IsTailCall());
+            }
         }
         return null;
     }
@@ -266,7 +271,7 @@ public class TailCallVisitor extends ASTVisitor<Boolean, Void> {
 
     @Override
     public Void visit(Boolean inTailPosition, ModuleDeclaration moduleDecl) {
-        ((DefDeclaration) moduleDecl).acceptVisitor(this, inTailPosition);
+        //((DefDeclaration) moduleDecl).acceptVisitor(this, inTailPosition); // Stack overflow
         return null;
     }
 
