@@ -19,9 +19,9 @@ public class VarGenContext extends GenContext {
             throw new NullPointerException();
         }*/
         this.site = varBinding;
-        if (expr instanceof Variable && !((Variable) expr).getName().equals(varBinding.getName())) {
+        /*if (expr instanceof Variable && !((Variable) expr).getName().equals(varBinding.getName())) {
             throw new RuntimeException("invariant violated");
-        }
+        }*/
         /*this.name = site.getName();
         this.expr = expr;
         this.type = type;*/

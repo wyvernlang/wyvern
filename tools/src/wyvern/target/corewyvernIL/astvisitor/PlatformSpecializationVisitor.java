@@ -36,6 +36,7 @@ import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.Match;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.New;
+import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.RationalLiteral;
 import wyvern.target.corewyvernIL.expression.SeqExpr;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
@@ -130,6 +131,10 @@ public class PlatformSpecializationVisitor extends ASTVisitor<PSVState, ASTNode>
     }
 
     public ASTNode visit(PSVState state, New newExpr) {
+        if (newExpr instanceof ObjectValue) {
+            // no specialization needed of modules that have already been executed to a value
+            return newExpr;
+        }
         ArrayList<Declaration> newDecls = new ArrayList<>();
         for (Declaration decl : newExpr.getDecls()) {
             ASTNode result = decl.acceptVisitor(this, state);

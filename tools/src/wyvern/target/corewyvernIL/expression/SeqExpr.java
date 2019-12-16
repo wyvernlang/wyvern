@@ -103,6 +103,9 @@ public class SeqExpr extends Expression {
         FailureReason r = new FailureReason();
         if (this.getType() != null) {
             if (!result.isSubtypeOf(getType(), extendedCtx, r)) {
+                // uncomment for debugging
+                // ValueType t = getType();
+                // result.isSubtypeOf(t, extendedCtx, new FailureReason());
                 ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(), result.toString(), getType().toString(),
                         r.getReason());
             }
@@ -143,7 +146,13 @@ public class SeqExpr extends Expression {
         for (HasLocation elem : elements) {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
-                ctx = ctx.extend(binding.getSite(), new Variable(binding.getVarName()), binding.getType());
+                Variable expr = new Variable(binding.getVarName());
+                if (binding.getExpression() instanceof Variable && ((Variable) binding.getExpression()).getName().contains("$")) {
+                    // special case: when copying from a module variable, use the module variable.  This helps with name-dependent types
+                    // TODO: unfortunately this is really only a patch; we need singleton types
+                    expr = (Variable) binding.getExpression();
+                }
+                ctx = ctx.extend(binding.getSite(), expr, binding.getType());
             }
         }
         return ctx;

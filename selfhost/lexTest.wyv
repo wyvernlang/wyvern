@@ -1,0 +1,126 @@
+/* A lexer for the untyped lambda calculus
+
+example: (x => x) (y => y)
+
+IDENTIFIER  [a-zA-Z][a-zA-Z0-9_]*
+LPAREN      (   
+RPAREN      )
+WHITESPACE  [ \t\r\l]+
+DARROW      =>
+
+*/
+
+require stdout
+
+import wyvern.util.matching.regex
+import wyvern.collections.List
+import wyvern.collections.LinkedList
+import wyvern.pair
+//import wyvern.option
+
+type Option = option.Option
+type LinkedList = LinkedList.LinkedList
+
+// FIX: define these with a nice DSL
+val identPat = regex("[a-zA-Z][a-zA-Z0-9_]*")
+val lparenPat = regex("\\(")
+val rparenPat = regex("\\)")
+val whitespacePat = regex("[ \t\r\f]+")
+val darrowPat = regex("=>")
+
+datatype TokenKind
+    IDENTIFIER
+    LPAREN
+    RPAREN
+    WHITESPACE
+    DARROW
+
+type Token
+    val kind:TokenKind
+    val value:String
+
+def Token(kind:TokenKind, value:String):Token = new
+    val kind = kind
+    val value = value
+    
+type MatchResult
+    val token : Token
+    val rest : String
+    
+def MatchResult(mat:regex.Match, kind:TokenKind):MatchResult
+    new
+        val token = Token(kind, mat.matched())
+        val rest = mat.after()
+
+// FIX: no parens for unit constructors    
+val t : TokenKind = IDENTIFIER()
+
+type LexPair = pair.Pair[regex.Regex, TokenKind]
+type TableType = LinkedList.LinkedList[LexPair]
+
+def tryPair(p:LexPair, input:String):option.Option[MatchResult]
+    val optMat = p.first.findPrefixMatchOf(input)
+    optMat.map[MatchResult](mat =>
+      MatchResult(mat, p.second)
+    )
+
+def foldHelper(ro:option.Option[MatchResult], p:LexPair, input:String):Option[MatchResult]
+    val ro2 = tryPair(p, input)
+    match ro:
+        s:option.Some => match ro2:
+            s2:option.Some => ro    // just pick the first match
+            n:option.None => ro
+        n:option.None => ro2
+
+// FIX: should be possible to infer types of r and p below
+// FIX: multi-line lambdas should work below (but avoidance problem bites again)
+def tryAll(table:TableType, input:String):option.Option[MatchResult]
+    table.foldLeft[option.Option[MatchResult]]((r:option.Option[MatchResult], p:LexPair) =>
+        foldHelper(r, p, input)
+    ,option.None[MatchResult]())
+
+datatype ParseResult
+    Success(tokens:LinkedList[Token])
+    Error(unmatchableText:String)
+    
+def parseHelper(table:TableType, input:String, tokens:LinkedList[Token]):ParseResult
+    if (input.length() == 0)
+        // FIX: shouldn't require an annotation below
+        val reversed : LinkedList[Token] = tokens.reverse()
+        Success(reversed)
+      else
+        val omr = tryAll(table, input)
+        match omr:
+            s:option.Some => parseHelper(table, s.content.rest, LinkedList.Cons[Token](s.content.token, tokens))
+            n:option.None => Error(input)
+
+def parse(table:TableType, input:String):ParseResult
+    parseHelper(table, input, LinkedList.Nil[Token]())
+
+/*
+def parse(table:TableType, input:String):Token
+    table.foldLeft[option.Option[Token]](FN HERE,option.None[Token])
+*/
+
+// FIX: Pair and Regex are structural types; should be declared at top level
+// FIX: annoying to not infer type argument to Nil
+var lexTable : TableType = LinkedList.Nil[LexPair]()
+
+// FIX: either use a literal syntax for lists
+// or be imperative with a literal syntax for pairs: lexTable.add({identPat, IDENTIFIER})
+lexTable = LinkedList.Cons[LexPair](pair.Pair[regex.Regex, TokenKind](identPat, IDENTIFIER()), lexTable)
+lexTable = LinkedList.Cons[LexPair](pair.Pair[regex.Regex, TokenKind](lparenPat, LPAREN()), lexTable)
+lexTable = LinkedList.Cons[LexPair](pair.Pair[regex.Regex, TokenKind](rparenPat, RPAREN()), lexTable)
+lexTable = LinkedList.Cons[LexPair](pair.Pair[regex.Regex, TokenKind](whitespacePat, WHITESPACE()), lexTable)
+lexTable = LinkedList.Cons[LexPair](pair.Pair[regex.Regex, TokenKind](darrowPat, DARROW()), lexTable)
+
+
+
+// test it
+val m = identPat.findPrefixMatchOf("h3llo+5").get()
+stdout.print(m.matched())
+stdout.println()
+stdout.print(m.after())
+
+parse(lexTable, "(x => x) (y => y)")
+6

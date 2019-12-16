@@ -20,6 +20,7 @@ import wyvern.target.corewyvernIL.expression.Invokable;
 import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
+import wyvern.target.corewyvernIL.expression.SuspendedTailCall;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
@@ -79,6 +80,9 @@ public class JavaValue extends AbstractValue implements Invokable {
      * null turns into unit.
      */
     private Value javaToWyvern(Object result) {
+        //if (result instanceof SuspendedTailCall) {
+        //    result = MethodCall.trampoline((Value) result);
+        //}
         if (result instanceof Integer) {
             return new IntegerLiteral((Integer) result);
         } else if (result instanceof Long) {
@@ -170,7 +174,10 @@ public class JavaValue extends AbstractValue implements Invokable {
             return ((JavaValue) arg).getWrappedValue();
         } else if (arg instanceof RationalLiteral) {
             return new Rational(((RationalLiteral) arg).getNumerator(), ((RationalLiteral) arg).getDenominator());
+        } else if (arg instanceof SuspendedTailCall) {
+                return wyvernToJava(MethodCall.trampoline(arg), hintClass);
         } else {
+            // return arg;
             throw new RuntimeException("some Wyvern->Java cases not implemented");
         }
     }
