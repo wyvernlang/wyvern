@@ -3,10 +3,13 @@ package wyvern.tools.tests;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.CHARACTER_LITERAL;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DASH;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DATATYPE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DECIMAL_LITERAL;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEDENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DEF;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DIVIDE;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.DSLLINE;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.EQARROW;
+import static wyvern.tools.parsing.coreparser.WyvernParserConstants.GT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.IDENTIFIER;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.INDENT;
 import static wyvern.tools.parsing.coreparser.WyvernParserConstants.LPAREN;
@@ -328,6 +331,19 @@ public class LexingTests {
         int[] expected = new int[] {
                 INDENT, WHITESPACE, IDENTIFIER, WHITESPACE, NEWLINE,
                 WHITESPACE, IDENTIFIER, NEWLINE, DEDENT,
+        };
+        checkLex(input, expected);
+    }
+
+    @Test
+    public void testEqarrowBeforeDSLIndent() throws IOException, CopperParserException {
+        String input =
+                "if ((x => x)(2) > 1)\n"
+                    + "  foo\n";
+        int[] expected = new int[] {
+                IDENTIFIER, WHITESPACE, LPAREN, LPAREN, IDENTIFIER, WHITESPACE, EQARROW, WHITESPACE, IDENTIFIER,
+                RPAREN, LPAREN, DECIMAL_LITERAL, RPAREN, WHITESPACE, GT, WHITESPACE, DECIMAL_LITERAL, RPAREN, WHITESPACE, NEWLINE,
+                WHITESPACE, DSLLINE,
         };
         checkLex(input, expected);
     }
