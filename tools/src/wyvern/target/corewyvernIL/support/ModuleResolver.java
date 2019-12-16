@@ -161,7 +161,7 @@ public class ModuleResolver {
             String[] names = qualifiedName.split("\\.");
             String simpleName = names[names.length - 1];
             Module module = resolveModule(qualifiedName);
-            final Value moduleValue = module.getExpression().interpret(ctx);
+            final Value moduleValue = module.getAsValue(ctx);
             BindingSite simpleBinding = new BindingSite(simpleName);
             ctx = ctx.extend(simpleBinding, moduleValue);
             ctx = ctx.extend(module.getSpec().getSite(), moduleValue);
@@ -427,10 +427,7 @@ public class ModuleResolver {
         // if this is a platform module, adapt any arguments to take the system.Platform object
         if (file != null && platformPath.stream().anyMatch(path -> file.toPath().toAbsolutePath().startsWith(path))) {
             // if the type is in functor form
-            if (moduleType instanceof StructuralType
-                    && ((StructuralType) moduleType).getDeclTypes().size() == 1
-                    && ((StructuralType) moduleType).getDeclTypes().get(0) instanceof DefDeclType
-                    && ((StructuralType) moduleType).getDeclTypes().get(0).getName().equals("apply")) {
+            if (isFunctionType(moduleType)) {
                 DefDeclType appType = (DefDeclType) ((StructuralType) moduleType).getDeclTypes().get(0);
                 // if the functor takes a system.X object for current platform type X
                 ILFactory f = ILFactory.instance();
@@ -456,10 +453,12 @@ public class ModuleResolver {
                 }
             }
         }
-
+        
+        Value programValue = null;
         if (!toplevel && !moduleType.isResource(ctx)) {
-            Value v = wrapWithCtx(program, dependencies, Globals.getStandardEvalContext()).interpret(Globals.getStandardEvalContext());
-            moduleType = v.getType();
+            TailCallVisitor.annotate(program);
+            programValue = wrapWithCtx(program, dependencies, Globals.getStandardEvalContext()).interpret(Globals.getStandardEvalContext());
+            moduleType = programValue.getType();
         }
 
         String typeName = null;
@@ -478,7 +477,14 @@ public class ModuleResolver {
 
         TypedModuleSpec spec;
         spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, valueName, isAnnotated);
-        return new Module(spec, program, dependencies);
+        return new Module(spec, program, programValue, dependencies);
+    }
+
+    public static boolean isFunctionType(ValueType type) {
+        return type instanceof StructuralType
+                && ((StructuralType) type).getDeclTypes().size() == 1
+                && ((StructuralType) type).getDeclTypes().get(0) instanceof DefDeclType
+                && ((StructuralType) type).getDeclTypes().get(0).getName().equals("apply");
     }
 
     private String capitalize(String input) {
@@ -587,14 +593,16 @@ public class ModuleResolver {
             final Expression liftResult = null; // TODO (@justinlubin)
 
             final BindingSite bindingSite = m.getSpec().getSite();
-            final Expression expression;
+            final IExpr expression;
             final ValueType valueType;
 
             if (liftResult != null) {
                 expression = liftResult;
                 valueType = liftResult.getType();
             } else {
-                expression = m.getExpression();
+                //expression = m.getExpression();
+                //above fixes simplest Python compilation textExplicitCrossPlatformHello; below is necessary for testLex
+                expression = m.getExprWithCache();
                 valueType = m.getSpec().getType();
             }
 
@@ -664,6 +672,7 @@ public class ModuleResolver {
             TypedModuleSpec spec = noDups.get(i);
             Module m = spec.getModule();
             ValueType type = m.getSpec().getType();
+            // below is necessary for Python OIRTests.testImperativeIf; changing to m.getExprWithCache() might be useful for stability of tags in some cases
             seqProg.addBinding(m.getSpec().getSite(), type, m.getExpression(), true);
         }
     }

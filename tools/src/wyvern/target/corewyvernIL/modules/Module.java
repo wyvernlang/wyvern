@@ -16,18 +16,29 @@ public class Module {
     private final TypedModuleSpec spec;
     private final IExpr expr;
     private final List<TypedModuleSpec> dependencies;
+    private final boolean isPure;
     private Value cachedValue;
     private BindingSite site;
 
-    public Module(TypedModuleSpec spec, IExpr program, List<TypedModuleSpec> dependencies) {
+    public Module(TypedModuleSpec spec, IExpr program, Value valueForCache, List<TypedModuleSpec> dependencies) {
         this.spec = spec;
         this.expr = program;
         this.dependencies = dependencies;
+        if (valueForCache != null && !ModuleResolver.isFunctionType(spec.getType())) {
+            this.cachedValue = valueForCache;
+            this.isPure = true;
+        } else {
+            this.isPure = false;
+        }
         spec.setModule(this);
     }
 
     public TypedModuleSpec getSpec() {
         return spec;
+    }
+    
+    public boolean isPure() {
+        return isPure;
     }
 
     /** Returns an expression representing this module or module def.  The expresison will evalute to an object.
@@ -40,6 +51,13 @@ public class Module {
         return (Expression) expr;
     }
 
+    public IExpr getExprWithCache() {
+        if (isPure()) {
+            return cachedValue;
+        }
+        return expr;
+    }
+    
     /** Returns the binding site related to this module.
      * 
      * @return

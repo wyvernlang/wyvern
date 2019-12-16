@@ -410,7 +410,7 @@ public class REPL {
             moduleType.checkWellFormed(ctx);
         }
         TypedModuleSpec spec = new TypedModuleSpec(qualifiedName, moduleType, typeName, "type name", false);
-        return new Module(spec, program, dependencies);
+        return new Module(spec, program, null, dependencies);
     }
     
     public SeqExpr wrapWithCtx(IExpr program, List<TypedModuleSpec> dependencies, EvalContext ctx, InterpreterState state) {

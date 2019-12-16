@@ -34,6 +34,12 @@ public class ExampleTests {
         TestUtil.setPaths();
         WyvernResolver.getInstance().addPath(PATH);
     }
+    
+    @Test
+    public void testLex() throws ParseException {
+      TestUtil.doTestScriptModularly(TestUtil.WYVERN_HOME + "/selfhost/", "lexTest",
+          Util.intType(), new IntegerLiteral(6));
+    }
 
     @Test
     public void testFib() throws ParseException {
