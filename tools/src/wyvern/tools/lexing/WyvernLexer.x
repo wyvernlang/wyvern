@@ -266,7 +266,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
         RESULT = token(EQARROW,lexeme);
         if (flagTok == null) {
             flagTok = RESULT;
-					  flagTokSet = true;
+			flagTokSet = true;
         }
     :};
  	terminal Token tarrow_t ::= /-\>/  {: RESULT = token(TARROW,lexeme); :};
@@ -519,6 +519,7 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
     
 	lineElementSequence ::= indent_t:n {: RESULT = LexerUtils.makeList(n); flagTok = null; lastIndent = n; :}
 	                      | nonWSLineElement:n {:
+	                            adjustEQARROW(n);
 	                            lastIndent = null;
 	                            // handles lines that start without any indent
 	                            if (inDSL)
@@ -528,7 +529,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 	                      		RESULT = n;
 	                        :}
 	                      | lineElementSequence:list anyLineElement:n {:
-                                if (flagTok != null && flagTok.kind == EQARROW && list.size() > 0 && ((Token) list.get(list.size()-1)).kind != EQARROW && ((Token) list.get(list.size()-1)).kind != WHITESPACE) {
+	                            	adjustEQARROW(n);
+                                if (flagTok != null && flagTok.kind == EQARROW && !isEQARROWlast) {
                                     flagTok = null;
                                 }
                                 list.addAll(n); RESULT = list;
@@ -557,7 +559,8 @@ import static wyvern.tools.parsing.coreparser.WyvernParserConstants.*;
 
 	ilineElementSequence ::= iindent_t:n {: RESULT = LexerUtils.makeList(n); flagTok = null; lastIndent = n; :}
 	                      | ilineElementSequence:list anyLineElement:n {:
-                                if (flagTok != null && flagTok.kind == EQARROW && list.size() > 0 && ((Token) list.get(list.size()-1)).kind != EQARROW && ((Token) list.get(list.size()-1)).kind != WHITESPACE) {
+	                            	adjustEQARROW(n);
+                                if (flagTok != null && flagTok.kind == EQARROW && !isEQARROWlast) {
                                     flagTok = null;
                                 }
                                 list.addAll(n); RESULT = list;
