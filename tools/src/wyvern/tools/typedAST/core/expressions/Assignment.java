@@ -90,20 +90,7 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
         }
     }
 
-    @Override
-    public Expression generateIL(
-            GenContext ctx,
-            ValueType expectedType,
-            List<TypedModuleSpec> dependencies) {
-
-        // Figure out expression being assigned and target it is being assigned to
-        IExpr lhsExpression = generateFieldGet(ctx, dependencies);
-
-        // obtain the type of the express field and pass it to the generateIL function for exprToAssign
-        ValueType lhsExpressionExpectedType = lhsExpression.typeCheck(ctx, null);
-        IExpr rhsExpression = value.generateIL(ctx, lhsExpressionExpectedType, dependencies);
-        ValueType rhsExpressionType = rhsExpression.typeCheck(ctx, null);
-
+    public static IExpr generateOptionExpr(ValueType lhsExpressionExpectedType, IExpr rhsExpression, ValueType rhsExpressionType, FileLocation location) {
         // when LHS Type = RefinementType(option.Option[T]),
         // check if T matches between the base type of LHS expression and the RHS expression.
         // If so, change the RHS from a regular type T to option.Option[T] (MethodCall object)
@@ -139,13 +126,13 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
                   new wyvern.target.corewyvernIL.decl.TypeDeclaration(
                       "T", 
                       rhsExpressionType,
-                      this.getLocation()), 
-                  this.getLocation()));
+                      location), 
+                location));
                 iExprList.add(rhsExpression);
 
                 // convert rhs actual assignment type T to lhs type option.Option[T]
                 // Modify the expr to assign (RHS), to emulate the option expression based on the base type (RHS Expression Type)
-                rhsExpression = new MethodCall((IExpr) new wyvern.target.corewyvernIL.expression.Variable("option", this.getLocation()),
+                rhsExpression = new MethodCall((IExpr) new wyvern.target.corewyvernIL.expression.Variable("option", location),
                                               "Some",
                                               iExprList,
                                               null);
@@ -156,6 +143,31 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
             }
           }
         }
+        return null;
+    }
+
+    @Override
+    public Expression generateIL(
+            GenContext ctx,
+            ValueType expectedType,
+            List<TypedModuleSpec> dependencies) {
+
+        // Figure out expression being assigned and target it is being assigned to
+        IExpr lhsExpression = generateFieldGet(ctx, dependencies);
+
+        // obtain the type of the express field and pass it to the generateIL function for exprToAssign
+        ValueType lhsExpressionExpectedType = lhsExpression.typeCheck(ctx, null);
+        IExpr rhsExpression = value.generateIL(ctx, lhsExpressionExpectedType, dependencies);
+        ValueType rhsExpressionType = rhsExpression.typeCheck(ctx, null);
+
+        // obtain the option expression for the rhs of the assignment
+        IExpr rhsOptionExpression = wyvern.tools.typedAST.core.expressions.Assignment.generateOptionExpr(
+          lhsExpressionExpectedType, 
+          rhsExpression, 
+          rhsExpressionType, 
+          this.getLocation());
+          
+        rhsExpression = rhsOptionExpression == null ? rhsExpression : rhsOptionExpression; 
 
         // Assigning to a top-level var.
         if (lhsExpression instanceof MethodCall) {

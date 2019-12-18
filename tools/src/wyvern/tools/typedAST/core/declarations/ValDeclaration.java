@@ -1,16 +1,13 @@
 package wyvern.tools.typedAST.core.declarations;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.ValDeclType;
-import wyvern.target.corewyvernIL.generics.GenericArgument;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TopLevelContext;
-import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -83,60 +80,13 @@ public class ValDeclaration extends Declaration implements CoreAST {
         wyvern.target.corewyvernIL.expression.IExpr rhsExpression = definition.generateIL(tlc.getContext(), declType, tlc.getDependencies());
         ValueType rhsExpressionType = rhsExpression.typeCheck(tlc.getContext(), null);
 
-        // when LHS Type = RefinementType(option.Option[T]),
-        // check if T matches between the base type of LHS expression and the RHS expression.
-        // If so, change the RHS from a regular type T to option.Option[T] (MethodCall object)
-        // If so, change the RHS type from NominalType([T]) to RefinementType(option.Option[T])
+        wyvern.target.corewyvernIL.expression.IExpr rhsOptionExpression = wyvern.tools.typedAST.core.expressions.Assignment.generateOptionExpr(
+          lhsExpressionExpectedType, 
+          rhsExpression, 
+          rhsExpressionType, 
+          this.getLocation());
 
-        // case when lhs has expected type of RefinementType and rhs has actually that is not of Refinement Type
-        if (lhsExpressionExpectedType instanceof wyvern.target.corewyvernIL.type.RefinementType) {
-          // cast the type memeber to refinement type
-          wyvern.target.corewyvernIL.type.RefinementType lhsExpectedType = (wyvern.target.corewyvernIL.type.RefinementType) lhsExpressionExpectedType;
-
-          // extract base type of the LHS expected type, "option.Option", getBase returns ValueType
-          ValueType lhsBaseType = lhsExpectedType.getBase();
-
-          // check whether the base type of the refinement type is of option.Option type
-          if (lhsBaseType.equals(new NominalType("option", "Option"))) {
-
-            // obtain the generic argument list from the lhs Refinement Type
-            List<GenericArgument> genList = lhsExpectedType.getGenericArguments();
-
-            // ensure that generic list only has 1 argument.
-            // requirement for option.Option type
-            if (genList.size() == 1) {
-
-              // type check the generic argument (if it matches the rhs assignment type)
-              if (rhsExpressionType.equals(genList.get(0).getType())) {
-
-                // list of intermediate expressions, to be passed into the MethodCall object that is created.
-                List<wyvern.target.corewyvernIL.expression.IExpr> iExprList = new LinkedList<>();
-
-                // iExprList[0] = New(TypeDeclaration(type T = system.string)), type declaration
-                // iExprList[1] = RHS Expression
-                iExprList.add(new wyvern.target.corewyvernIL.expression.New(
-                  new wyvern.target.corewyvernIL.decl.TypeDeclaration(
-                      "T", 
-                      rhsExpressionType,
-                      this.getLocation()), 
-                  this.getLocation()));
-                iExprList.add(rhsExpression);
-
-                // convert rhs actual assignment type T to lhs type option.Option[T]
-                // Modify the expr to assign (RHS), to emulate the option expression based on the base type (RHS Expression Type)
-                rhsExpression = new wyvern.target.corewyvernIL.expression.MethodCall(
-                  (wyvern.target.corewyvernIL.expression.IExpr) 
-                  new wyvern.target.corewyvernIL.expression.Variable("option", this.getLocation()),
-                                              "Some",
-                                              iExprList,
-                                              null);
-              }
-              // otherwise the type T in option.Option[T] does not match the actual type T on the rhs
-              // do nothing, proceed with the normal approach for assignment statements
-              // implicit conversion is not performed
-            }
-          }
-        }
+        rhsExpression = rhsOptionExpression == null ? rhsExpression : rhsOptionExpression; 
 
         tlc.addLet(new BindingSite(getName()),
                 lhsExpressionExpectedType,
