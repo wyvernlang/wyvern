@@ -86,7 +86,10 @@ public class ValDeclaration extends Declaration implements CoreAST {
           rhsExpressionType, 
           this.getLocation());
 
-        rhsExpression = rhsOptionExpression == null ? rhsExpression : rhsOptionExpression; 
+        // keep the original rhs expression or
+        // obtain the option type expression
+        // if passed type check.
+        rhsExpression = (rhsOptionExpression == null ? rhsExpression : rhsOptionExpression); 
 
         tlc.addLet(new BindingSite(getName()),
                 lhsExpressionExpectedType,
