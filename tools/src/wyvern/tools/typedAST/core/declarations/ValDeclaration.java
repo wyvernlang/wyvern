@@ -74,9 +74,23 @@ public class ValDeclaration extends Declaration implements CoreAST {
     @Override
     public void genTopLevel(TopLevelContext tlc) {
         ValueType declType = getILValueType(tlc.getContext());
+
+        // obtain LHS and RHS types and expressions
+        ValueType lhsExpressionExpectedType = getILValueType(tlc.getContext());
+        wyvern.target.corewyvernIL.expression.IExpr rhsExpression = definition.generateIL(tlc.getContext(), declType, tlc.getDependencies());
+        ValueType rhsExpressionType = rhsExpression.typeCheck(tlc.getContext(), null);
+
+        wyvern.target.corewyvernIL.expression.IExpr rhsOptionExpression = wyvern.tools.typedAST.core.expressions.Assignment.generateOptionExpr(
+          lhsExpressionExpectedType, 
+          rhsExpression, 
+          rhsExpressionType, 
+          this.getLocation());
+
+        rhsExpression = rhsOptionExpression == null ? rhsExpression : rhsOptionExpression; 
+
         tlc.addLet(new BindingSite(getName()),
-                getILValueType(tlc.getContext()),
-                definition.generateIL(tlc.getContext(), declType, tlc.getDependencies()),
+                lhsExpressionExpectedType,
+                rhsExpression,
                 false);
     }
 

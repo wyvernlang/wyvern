@@ -253,7 +253,7 @@ public class RefinementType extends ValueType {
         }
     }
 
-    private List<GenericArgument> getGenericArguments() {
+    public List<GenericArgument> getGenericArguments() {
         if (genericArguments != null) {
             return genericArguments;
         }
