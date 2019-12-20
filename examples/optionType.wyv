@@ -10,7 +10,7 @@ def print(str: String?): Unit
 var str1: String? = option.Some[String]("Hello, World!")
 print(str1)
 
-// implicit type conversion from String to String?
+// implicit type conversion from String to String? for assignment
 str1 = "Life is Good!"
 print(str1)
 
@@ -18,5 +18,6 @@ print(str1)
 str1 = NONE
 print(str1)
 
+// implicit type conversion from String to String? for val declaration
 val str2: String? = "Life is Wonderful!"
 print(str2)
