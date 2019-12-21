@@ -7,7 +7,7 @@ def print(str: String?): Unit
     else
         stdout.print("NONE\n")
 
-var str1: String? = option.Some[String]("Hello, World!")
+var str1: String? = "Hello, World!"
 print(str1)
 
 // implicit type conversion from String to String? for assignment

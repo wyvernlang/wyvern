@@ -782,7 +782,7 @@ public class OIRTests {
     public void testOptionTypeSugar() throws ParseException {
         String input =
           "require stdout\n"
-          + "var str1: String? = option.Some[String](\"Hello, World!\")\n"
+          + "var str1: String? = \"Hello, World!\"\n"
           + "stdout.print(str1.get())\n"
           + "stdout.println()\n"
           + "\n"
