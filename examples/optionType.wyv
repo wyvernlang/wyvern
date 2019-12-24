@@ -1,13 +1,23 @@
 require stdout
 
+// helper function to print out strings with String? type
 def print(str: String?): Unit
   if (str.isDefined)
         stdout.print(str.get() + "\n")
     else
-        stdout.print("None\n")
+        stdout.print("NONE\n")
 
-var str: String? = option.Some[String]("Life is Good!")
-print(str)
+var str1: String? = "Hello, World!"
+print(str1)
 
-str = NONE
-print(str)
+// implicit type conversion from String to String? for assignment
+str1 = "Life is Good!"
+print(str1)
+
+// str1 is assignable to NONE since NONE is the supertype of option types
+str1 = NONE
+print(str1)
+
+// implicit type conversion from String to String? for val declaration
+val str2: String? = "Life is Wonderful!"
+print(str2)

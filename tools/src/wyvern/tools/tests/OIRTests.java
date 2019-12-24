@@ -779,6 +779,28 @@ public class OIRTests {
     }
 
     @Test
+    public void testOptionTypeSugar() throws ParseException {
+        String input =
+          "require stdout\n"
+          + "var str1: String? = \"Hello, World!\"\n"
+          + "stdout.print(str1.get())\n"
+          + "stdout.println()\n"
+          + "\n"
+          + "str1 = \"Life is Good!\"\n"
+          + "stdout.print(str1.get())\n"
+          + "stdout.println()\n"
+          + "\n"
+          + "str1 = NONE\n"
+          + "\n"
+          + "val str2: String? = \"Life is Wonderful!\"\n"
+          + "stdout.print(str2.get())\n"
+          + "stdout.println()\n"
+          + "\n"
+          + "0";
+      testPyFromInput(input, "Hello, World!\nLife is Good!\nLife is Wonderful!\n0");
+    }
+
+    @Test
     @Category(CurrentlyBroken.class)
     public void testRationalOperators() throws ParseException {
         String input =

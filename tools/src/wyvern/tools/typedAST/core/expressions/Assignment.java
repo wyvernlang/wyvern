@@ -98,14 +98,15 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
 
         // case when lhs has expected type of RefinementType and rhs has actually that is not of Refinement Type
         if (lhsExpressionExpectedType instanceof RefinementType) {
+
           // cast the type memeber to refinement type
           RefinementType lhsExpectedType = (RefinementType) lhsExpressionExpectedType;
 
           // extract base type of the LHS expected type, "option.Option", getBase returns ValueType
           ValueType lhsBaseType = lhsExpectedType.getBase();
 
-          // check whether the base type of the refinement type is of option.Option type
-          if (lhsBaseType.equals(new NominalType("option", "Option"))) {
+          if (lhsBaseType.equals(new NominalType("option", "Option")) 
+           || lhsBaseType.equals(new NominalType("MOD$wyvern.option", "Option"))) {
 
             // obtain the generic argument list from the lhs Refinement Type
             List<GenericArgument> genList = lhsExpectedType.getGenericArguments();
@@ -132,7 +133,7 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
 
                 // convert rhs actual assignment type T to lhs type option.Option[T]
                 // Modify the expr to assign (RHS), to emulate the option expression based on the base type (RHS Expression Type)
-                rhsExpression = new MethodCall((IExpr) new wyvern.target.corewyvernIL.expression.Variable("option", location),
+                return new MethodCall((IExpr) new wyvern.target.corewyvernIL.expression.Variable(((NominalType) lhsBaseType).getPath().toString(), location),
                                               "Some",
                                               iExprList,
                                               null);
@@ -166,8 +167,11 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
           rhsExpression, 
           rhsExpressionType, 
           this.getLocation());
-          
-        rhsExpression = rhsOptionExpression == null ? rhsExpression : rhsOptionExpression; 
+
+        // keep the original rhs expression or
+        // obtain the option type expression
+        // if passed type check.
+        rhsExpression = (rhsOptionExpression == null ? rhsExpression : rhsOptionExpression); 
 
         // Assigning to a top-level var.
         if (lhsExpression instanceof MethodCall) {
