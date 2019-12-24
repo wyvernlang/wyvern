@@ -49,7 +49,7 @@ def compile(wyb: Dyn): Unit
             val p: String = imp.getPath()
             val n: String = imp.getName()
             // Undesirable coupling with rename?
-            stdout.print("const " + rename.renameVariable("FFI_" + n) + " = require(process.env.WYVERN_HOME + \"/backend/" + util.replace(p, ".", "/") + "\");")
+            stdout.print("const " + rename.renameVariable("FFI_" + n) + " = require(process.env.WYVERN_HOME + \"/native/javascript/" + util.replace(p, ".", "/") + "\");")
             stdout.println()
             recur importLoop(i + 1, c)
     val c: Int = wyb.getImportsCount()

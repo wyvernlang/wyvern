@@ -7,11 +7,11 @@ python:
   - "3.6"
 cache:
   directories:
-    - "backend/node_modules"
+    - "native/javascript/node_modules"
 install:
-  - cd backend
+  - cd native/javascript
   - npm install
-  - cd ..
+  - cd ../..
 before_script:
   - export WYVERN_HOME="$(pwd)"
   - export _JAVA_OPTIONS="-Xmx6144m -Xms512m -XX:+UseParallelGC"

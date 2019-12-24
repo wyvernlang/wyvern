@@ -1,0 +1,34 @@
+module def regexjs(javascript:JavaScript)
+
+import wyvern.option
+
+//import java:wyvern.stdlib.support.Regex.utils
+import javascript:regexSupport
+
+type Regex
+    def findPrefixOf(source:String):option.Option[String]
+    def findPrefixMatchOf(source:String):option.Option[Match]
+
+type Match
+    def matched():String
+    def after():String
+
+def apply(regex:String):Regex = new
+    def findPrefixOf(source:String):option.Option[String]
+        // invoke .match.  What's below may not work since String doesn't have this by default.  Plus match is a keyword!
+        //val matchArray = source.match(regex)
+        // if returned null, or if matchArray.index != 0, return None
+        // otherwise, return Some(matchArray[0])
+        option.None[String]()
+        //utils.findPrefixOf(regex,source)
+    def findPrefixMatchOf(source:String):option.Option[Match]
+        //utils.findPrefixMatchOf(regex,source)
+        val matchInfo = regexSupport.doMatch(source, regex)
+        if (matchInfo.found)
+            val m:Match = new
+                def matched():String = matchInfo.matched
+                def after():String = matchInfo.after
+            option.Some[Match](m)
+          else
+            option.None[Match]()
+        
