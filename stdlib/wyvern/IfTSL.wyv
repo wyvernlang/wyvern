@@ -3,8 +3,10 @@ module IfTSL
 import platform.java.debug
 import wyvern.internal.ast
 import wyvern.option
-import wyvern.util.matching.regex
+import wyvern.util.matching.regexInternal
 import wyvern.internal.list              // We use wyvern.internal.list because wyvern.collections.list depends on IfTSL
+
+val regex = regexInternal
 
 type AST = ast.AST
 

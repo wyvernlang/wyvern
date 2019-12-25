@@ -67,7 +67,7 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.ArrayWrapper.arr");
         
         // similar, for JavaScript
-        javascriptWhiteList.add("regexSupport");
+        javascriptWhiteList.add("stdlib.support.regexUtils");
     }
 
     static {

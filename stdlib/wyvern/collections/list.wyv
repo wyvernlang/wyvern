@@ -3,7 +3,7 @@ module list
 import wyvern.internal.ast
 import wyvern.internal.list
 import wyvern.option
-import wyvern.util.matching.regex
+//import wyvern.util.matching.regex
 import metadata wyvern.IfTSL
 
 type List = list.List

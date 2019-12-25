@@ -1,9 +1,9 @@
-module regexjs
+module regex
 
 import wyvern.option
 
 //import java:wyvern.stdlib.support.Regex.utils
-import javascript:regexSupport
+import javascript:stdlib.support.regexUtils
 
 type Regex
     def findPrefixOf(source:String):option.Option[String]
@@ -23,7 +23,7 @@ def apply(regex:String):Regex = new
         //utils.findPrefixOf(regex,source)
     def findPrefixMatchOf(source:String):option.Option[Match]
         //utils.findPrefixMatchOf(regex,source)
-        val matchInfo = regexSupport.doMatch(source, regex)
+        val matchInfo = regexUtils.doMatch(source, regex)
         if (matchInfo.found)
             val m:Match = new
                 def matched():String = matchInfo.matched
