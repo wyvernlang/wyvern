@@ -1,4 +1,4 @@
-module def regexjs(javascript:JavaScript)
+module regexjs
 
 import wyvern.option
 

@@ -10,7 +10,6 @@ DARROW      =>
 
 */
 
-require javascript
 require stdout
 
 import wyvern.util.matching.regexjs
@@ -21,7 +20,7 @@ import wyvern.pair
 type Option = option.Option
 type LinkedList = LinkedList.LinkedList
 
-val regex = regexjs(javascript) // alias with a non-platform specific name
+val regex = regexjs // alias with a non-platform specific name
 
 // FIX: define these with a nice DSL
 val identPat = regex("[a-zA-Z][a-zA-Z0-9_]*")
