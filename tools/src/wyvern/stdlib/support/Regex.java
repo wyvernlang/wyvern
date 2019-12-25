@@ -28,13 +28,13 @@ public class Regex {
 
     public ObjectValue findPrefixMatchOf(String regex, String source) {
         Matcher m = Pattern.compile(regex).matcher(source);
-        EvalContext ctx = ModuleResolver.getLocal().contextWith("wyvern.option", "wyvern.util.matching.regex");
+        EvalContext ctx = ModuleResolver.getLocal().contextWith("wyvern.option", "wyvern.util.matching.regexInternal");
         Expression call = null;
-        Expression typeParam = ExpressionUtils.typeParam("T", AST.utils.nominalType("regex", "Match"));
+        Expression typeParam = ExpressionUtils.typeParam("T", AST.utils.nominalType("regexInternal", "Match"));
         if (m.find() && m.start() == 0) {
             String matchedString = m.group();
             String rest = source.substring(m.end());
-            Expression match = ExpressionUtils.call("regex", "makeMatch", new StringLiteral(matchedString), new StringLiteral(rest));
+            Expression match = ExpressionUtils.call("regexInternal", "makeMatch", new StringLiteral(matchedString), new StringLiteral(rest));
             call = ExpressionUtils.call("option", "Some", typeParam, match);
         } else {
             call = ExpressionUtils.call("option", "None", typeParam);
