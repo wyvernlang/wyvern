@@ -515,7 +515,7 @@ public class ModuleResolver {
 
     public SeqExpr addSystemObject(Expression expression) {
         SeqExpr expr = new SeqExpr();
-        expr.addBinding(new BindingSite("system"), Globals.getSystemType(), Globals.getSystemValue(), false);
+        expr.addBinding(new BindingSite("system"), Globals.getSystemType(), new Variable("MOD$system"), false);
         expr.merge(expression);
         return expr;
     }
@@ -567,7 +567,14 @@ public class ModuleResolver {
 
             wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath(spec.getQualifiedName()).setValueModule(v));
         }
-
+        
+        // output a module encapsulating the system object (which otherwise would be duplicated a lot)
+        v = BytecodeOuterClass.Module.ValueModule.newBuilder()
+                .setType(Globals.getSystemType().emitBytecodeType())
+                .setExpression(Globals.getSystemValue().emitBytecode());
+        
+        wyb.addModules(BytecodeOuterClass.Module.newBuilder().setPath("system").setValueModule(v));
+        
         wyb.addAllImports(InterpreterState.getLocalThreadInterpreter().getJavascriptFFIImports());
 
         return wyb.build();

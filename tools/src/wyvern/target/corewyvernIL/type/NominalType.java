@@ -176,10 +176,11 @@ public class NominalType extends ValueType {
         }
     }
 
+    private static final NominalType topType = new NominalType("system", "Unit");
+    private static final NominalType dynType = new NominalType("system", "Dyn");
+    
     @Override
     public BytecodeOuterClass.Type emitBytecodeType() {
-        NominalType topType = new NominalType("system", "Unit");
-        NominalType dynType = new NominalType("system", "Dyn");
         if (equals(topType)) {
             return BytecodeOuterClass.Type.newBuilder().setSimpleType(BytecodeOuterClass.Type.SimpleType.Top).build();
         } else if (equals(dynType)) {
