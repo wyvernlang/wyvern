@@ -20,12 +20,14 @@ public class TypeOrEffectGenContext extends GenContext {
 
     public TypeOrEffectGenContext(String typeName, Path objName, GenContext genContext) {
         super(genContext);
+        Util.check(typeName != null, "null type");
         this.typeName = typeName;
         this.objName = objName;
     }
 
     public TypeOrEffectGenContext(String typeName, BindingSite site, GenContext genContext) {
         super(genContext);
+        Util.check(typeName != null, "null type");
         this.typeName = typeName;
         this.objName = new Variable(site);
     }

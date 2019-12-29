@@ -91,6 +91,12 @@ public final class Util {
     public static boolean isBooleanType(ValueType type) {
       return type.equals(new NominalType("system", "Boolean"));
     }
+    
+    public static void check(boolean condition, String reason) {
+        if (!condition) {
+            throw new RuntimeException("internal compiler error: " + reason);
+        }
+    }
 
     public static Value intValue(int i) {
         return new IntegerLiteral(i);

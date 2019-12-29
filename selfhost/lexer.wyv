@@ -1,0 +1,68 @@
+import wyvern.pair
+import wyvern.util.matching.regex
+import wyvern.collections.llist
+
+module def lexer[TokKind](table:llist.LinkedList[pair.Pair[regex.Regex, TokKind]]) : Lexer[TokKind]
+
+import Token
+
+
+type Option = option.Option
+type LinkedList = llist.LinkedList
+type LexPair = pair.Pair[regex.Regex, TokKind]
+type LexTable = llist.LinkedList[LexPair]
+type TokenKind = TokKind
+
+datatype ParseResult
+    Success(tokens:llist.LinkedList[Token[TokKind]])
+    Error(unmatchableText:String)
+
+def Token(kind:TokKind, value:String):Token[TokKind] = new
+    type TokenKind = TokKind
+    val kind = kind
+    val value = value
+    
+type MatchResult
+    val token : Token
+    val rest : String
+    
+def MatchResult(mat:regex.Match, kind:TokKind):MatchResult
+    new
+        val token = Token(kind, mat.matched())
+        val rest = mat.after()
+
+def tryPair(p:LexPair, input:String):option.Option[MatchResult]
+    val optMat = p.first.findPrefixMatchOf(input)
+    optMat.map[MatchResult](mat =>
+      MatchResult(mat, p.second)
+    )
+
+def foldHelper(ro:option.Option[MatchResult], p:LexPair, input:String):Option[MatchResult]
+    val ro2 = tryPair(p, input)
+    match ro:
+        s:option.Some => match ro2:
+            s2:option.Some => ro    // just pick the first match
+            n:option.None => ro
+        n:option.None => ro2
+
+// FIX: should be possible to infer types of r and p below
+// FIX: multi-line lambdas should work below (but avoidance problem bites again)
+def tryAll(table:LexTable, input:String):option.Option[MatchResult]
+    table.foldLeft[option.Option[MatchResult]]((r:option.Option[MatchResult], p:LexPair) =>
+        foldHelper(r, p, input)
+    ,option.None[MatchResult]())
+
+def lexHelper(table:LexTable, input:String, tokens:LinkedList[Token[TokKind]]):ParseResult
+    if (input.length() == 0)
+        // FIX: shouldn't require an annotation below
+        val reversed : LinkedList[Token[TokKind]] = tokens.reverse()
+        Success(reversed)
+      else
+        val omr = tryAll(table, input)
+        match omr:
+            s:option.Some =>
+                lexHelper(table, s.content.rest, llist.Cons[Token[TokKind]](s.content.token, tokens))
+            n:option.None => Error(input)
+
+def lex(input:String):ParseResult
+    lexHelper(table, input, llist.Nil[Token]())

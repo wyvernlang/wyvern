@@ -43,6 +43,11 @@ public class TypeDeclaration extends AbstractTypeDeclaration implements CoreAST 
     private FileLocation location = FileLocation.UNKNOWN;
 
     @Override
+    public String toString() {
+        return "TypeDeclaration(" + name + ")";
+    }
+
+    @Override
     public FileLocation getLocation() {
         return location;
     }

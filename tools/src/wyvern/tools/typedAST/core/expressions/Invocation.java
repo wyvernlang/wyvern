@@ -21,6 +21,19 @@ import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
 
 public class Invocation extends AbstractExpressionAST implements CoreAST, Assignable {
 
+    @Override
+    public String toString() {
+        String result = "";
+        if (receiver != null) {
+            result += receiver + ".";
+        }
+        result += operationName;
+        if (argument != null) {
+            result += "(" + argument + ')';
+        }
+        return result;
+    }
+
     private String operationName;
     private ExpressionAST receiver;
     private ExpressionAST argument;

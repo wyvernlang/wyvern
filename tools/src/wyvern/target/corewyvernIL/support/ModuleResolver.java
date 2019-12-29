@@ -121,6 +121,16 @@ public class ModuleResolver {
         if (!unliftedModuleCache.containsKey(qualifiedName)) {
             File f = resolve(qualifiedName, true);
             if (f == null || !f.exists()) {
+                // is it a qualified name?  If so, try loading the base part.
+                int dotLoc = qualifiedName.lastIndexOf('.');
+                if (dotLoc != -1) {
+                    String baseName = qualifiedName.substring(0, dotLoc);
+                    File f2 = resolve(baseName, false);
+                    if (f2 != null && f2.exists()) {
+                        Module m = resolveModule(baseName, false, false);
+                        return m;
+                    }
+                }
                 ToolError.reportError(ErrorMessage.MODULE_NOT_FOUND_ERROR, location, "type", qualifiedName);
             }
             typeDefiningModule = load(qualifiedName, f, toplevel);

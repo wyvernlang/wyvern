@@ -188,7 +188,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
                                  TypedAST metadata,
                                  FileLocation loc,
                                  boolean isResource,
-                                 String selfName) {
+                                 String outerThisName) {
 
         LinkedList<TypedAST> exps = new LinkedList<>();
         LinkedList<TypedAST> ctors = new LinkedList<>();
@@ -203,7 +203,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
                 ToolError.reportError(ErrorMessage.PARSE_ERROR, elem, "Datatype declarations may only have datatype case declarations");
             }
             String nameCons = ((TypeVarDecl) elem).getName();
-            Type t = nominalType(nameCons, null);
+            Type t = possiblyQualifiedType(outerThisName, nameCons, null);
             compriseList.add(t);
         }
         Object tagInfoComprise = tagInfo(null, compriseList);
@@ -213,11 +213,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             LinkedList<TypedAST> newExps = makeGenericDecls(generics, loc);
             datatypeBody = new DeclSequence(newExps);
         }
-        TypedAST dt = new TypeVarDecl(name, datatypeBody, (TaggedInfo) tagInfoComprise, null, metadata, loc, isResource, selfName);
+        TypedAST dt = new TypeVarDecl(name, datatypeBody, (TaggedInfo) tagInfoComprise, null, metadata, loc, isResource, null);
         exps.add(dt);
 
         /* Produce declarations for the type constructors and value constructors */
-        Type extended = nominalType(name, null);
+        Type extended = possiblyQualifiedType(outerThisName, name, null);
         Object tagInfoExtend = tagInfo(extended, null);
         for (TypedAST elem : ((DeclSequence) body).getIterator()) {
             /* The value constructor */
@@ -270,12 +270,14 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
             ctors.add(valueConstructor);
 
             /* The type constructor */
-            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, loc, isResource, null);
+            TypedAST cons = new TypeVarDecl(nameCons, bodyCons, (TaggedInfo) tagInfoExtend, constructorGenerics, null, loc, isResource, "datatypeCaseThis$");
             exps.add(cons);
 
         }
-
-        exps.addAll(ctors);
+        if (outerThisName == null) {
+            // only add value constructors if we are not in a type decl, in which case outerThisName != null
+            exps.addAll(ctors);
+        }
         body = new DeclSequence(exps);
 
         return body;
@@ -315,7 +317,7 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     public Type nominalType(String name, FileLocation loc) {
         return new UnresolvedType(name, loc);
     }
-
+    
     @Override
     public Type arrowType(List<Type> arguments, Type result, boolean isResource, String effects, FileLocation location) {
         return new Arrow(arguments, result, isResource, effects, location);
@@ -331,6 +333,14 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
         return new QualifiedType(base, name);
     }
 
+    private Type possiblyQualifiedType(String maybeBase, String name, FileLocation loc) {
+        if (maybeBase == null) {
+            return nominalType(name, loc);
+        } else {
+            TypedAST base = var(maybeBase, loc);
+            return qualifiedType(base, name);
+        }
+    }
 
     @Override
     public TypedAST var(String name, FileLocation loc) {

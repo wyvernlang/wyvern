@@ -364,7 +364,10 @@ public class ModuleDeclaration extends DeclarationWithGenerics implements CoreAS
             methodContext = methodContext.extend(internalSite, new Variable(internalSite), lt.getSpec().getType());
             // include the type abbreviation
             methodContext = ImportDeclaration.addDepsToCtx(lt, methodContext);
-            methodContext = new TypeOrEffectGenContext(lt.getSpec().getDefinedTypeName(), internalSite, methodContext);
+            String definedTypeName = lt.getSpec().getDefinedTypeName();
+            if (definedTypeName != null) {
+                methodContext = new TypeOrEffectGenContext(definedTypeName, internalSite, methodContext);
+            }
             if (dependencies != null) {
                 dependencies.add(lt.getSpec());
                 dependencies.addAll(lt.getDependencies());

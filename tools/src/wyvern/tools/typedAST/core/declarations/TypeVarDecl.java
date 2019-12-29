@@ -143,6 +143,11 @@ public class TypeVarDecl extends Declaration {
     }
 
     @Override
+    public String toString() {
+        return "TypeVarDeclaration(" + name + ")";
+    }
+
+    @Override
     public DeclType genILType(GenContext ctx) {
         wyvern.target.corewyvernIL.type.Type type = computeInternalILType(ctx);
         return new ConcreteTypeMember(getName(), type, getMetadata(ctx));

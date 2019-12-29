@@ -19,6 +19,7 @@ import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.SubtypeAssumption;
 import wyvern.target.corewyvernIL.support.TypeContext;
+import wyvern.target.corewyvernIL.support.Util;
 import wyvern.target.corewyvernIL.support.View;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
@@ -31,16 +32,16 @@ public class NominalType extends ValueType {
 
     public NominalType(String pathVariable, String typeMember) {
         this (new Variable(pathVariable), typeMember, null);
+        Util.check(pathVariable != null && typeMember != null, "null pointer");
     }
 
     public NominalType(Path path, String typeMember) {
         this(path, typeMember, null);
+        Util.check(path != null && typeMember != null, "null pointer");
     }
     public NominalType(Path path, String typeMember, FileLocation location) {
         super(location);
-        if (path.equals(null)) {
-            throw new IllegalStateException("Path cannot be null.");
-        }
+        Util.check(path != null && typeMember != null, "null pointer");
         this.path = path;
         this.typeMember = typeMember;
     }
@@ -58,6 +59,9 @@ public class NominalType extends ValueType {
         DeclType dt = getSourceDeclType(ctx);
         if (dt instanceof DefinedTypeMember) {
             ValueType vt = ((DefinedTypeMember) dt).getResultType(View.from(path, ctx));
+            if (vt == this) {
+                ToolError.reportError(ErrorMessage.RECURSIVE_TYPE, dt, typeMember);
+            }
             return vt.isResource(ctx);
         } else {
             return ((AbstractTypeMember) dt).isResource();

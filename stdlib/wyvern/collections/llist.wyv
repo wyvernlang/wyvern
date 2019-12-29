@@ -11,6 +11,9 @@ type None = option.None
 type Pair = pair.Pair
 // type List = List.List
 
+// Would like to declare these types in 3 different files
+// But we cannot, because they are recursive and Wyvern's current module system does not permit this.
+
 tagged type LinkedList comprises Cons, Nil
     type E
     def size():Int 

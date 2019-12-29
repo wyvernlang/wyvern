@@ -352,7 +352,7 @@ AST Declaration(boolean inModule) :
 |
    LOOKAHEAD(4) exp = TaggedTypeDeclaration()  { return exp; }
 |
-   LOOKAHEAD(4) exp = DatatypeDeclaration() { return exp; }
+   LOOKAHEAD(4) exp = DatatypeDeclaration(null) { return exp; }
 |
    LOOKAHEAD(4) exp = TypeAbbrevDeclaration() { return exp; }
 |
@@ -445,7 +445,7 @@ AST TypeDeclaration() :
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
   [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW> ]
-  <NEWLINE> <INDENT> body=DeclTypes()
+  <NEWLINE> <INDENT> body=DeclTypes(selfName)
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT> {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
@@ -468,7 +468,7 @@ AST TaggedTypeDeclaration() :
   [ <EXTENDS> extendedType=Type() ]
   [ <COMPRISES> comprisesList=TypeList() ]
   [ <LPAREN> selfName=<IDENTIFIER> <RPAREN> <EQARROW> ]
-  <NEWLINE> (<INDENT> body=DeclTypes()
+  <NEWLINE> (<INDENT> body=DeclTypes(selfName)
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT>)?
   {
@@ -478,35 +478,35 @@ AST TaggedTypeDeclaration() :
   }
 }
 
-AST DatatypeDeclaration() :
+AST DatatypeDeclaration(String outerThisName) :
 { Token name; AST body = null; AST metadata = null; Type extendedType=null; List<Type> comprisesList=null; boolean isTagged = false;
-  Token selfName = null; List<GenericParameter> gentypes = null;
+  List<GenericParameter> gentypes = null;
   Object tagInfo = null; boolean isResource = false;
 }
 {
   [<RESOURCE> { isResource = true; } ]
   <DATATYPE> name=<IDENTIFIER> [gentypes = GenericsDecl()]
   [ <LPAREN> <IDENTIFIER> <RPAREN> <ARROW> ]
-  <NEWLINE> <INDENT> body=DeclTypes()
+  <NEWLINE> <INDENT> body=DeclTypes(null)
                     [ <METADATA> metadata = ExpressionLine(false) ]
              <DEDENT> {
     if (isTagged || (extendedType != null) || (comprisesList != null)) {
       tagInfo = build.tagInfo(extendedType, comprisesList);
     }
-    String self = null;
-	return build.datatypeDecl(name.image, gentypes, body, tagInfo, metadata, loc(name), isResource, self);
+	return build.datatypeDecl(name.image, gentypes, body, tagInfo, metadata, loc(name), isResource, outerThisName);
   }
 }
 
-AST DeclTypes() :
-{ AST decl1; AST decl2; AST body; }
+AST DeclTypes(Token thisToken) :
+{ AST decl1; AST decl2; AST body;
+  String thisName = thisToken == null ? "this" : thisToken.image; }
 {
-  decl1 = DeclType()
-  ( decl2 = DeclType() { decl1 = build.sequence(decl1, decl2, true); } )*
+  decl1 = DeclType(thisName)
+  ( decl2 = DeclType(thisName) { decl1 = build.sequence(decl1, decl2, true); } )*
     { return decl1; }
 }
 
-AST DeclType() :
+AST DeclType(String thisName) :
 { AST exp; }
 {
   exp = DefDeclType()  { return exp; }
@@ -523,7 +523,7 @@ AST DeclType() :
 |
   LOOKAHEAD(4) exp = TaggedTypeDeclaration()  { return exp; }
 |
-  LOOKAHEAD(4) exp = DatatypeDeclaration()  { return exp; }
+  LOOKAHEAD(4) exp = DatatypeDeclaration(thisName)  { return exp; }
 |
   exp = TypeAbbrevDeclaration() { return exp; }
 }

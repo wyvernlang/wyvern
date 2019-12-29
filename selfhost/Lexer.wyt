@@ -1,0 +1,9 @@
+import wyvern.collections.llist
+import Token
+
+type Lexer
+    type TokenKind
+    datatype ParseResult
+        Success(tokens:llist.LinkedList[Token[this.TokenKind]])
+        Error(unmatchableText:String)
+    def lex(input:String):this.ParseResult

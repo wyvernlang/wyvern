@@ -53,6 +53,7 @@ public enum ErrorMessage {
     EFFECT_ANNOTATION_SEPARATION("Effect-annotated module depends on an effect-unannotated module", 0),
     EFFECT_ANNOTATION_DEF("Module definition has incorrect annotation", 0),
     PURE_MODULE_ANNOTATION("Pure module should always have empty effect annotation", 0),
+    RECURSIVE_TYPE("Type \"%ARG\" is being defined recursively", 1),
 
     // Syntax errors
     LEXER_ERROR("Error during lexing (often caused by inconsistent whitespace for indentation)", 0),
