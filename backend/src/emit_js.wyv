@@ -167,11 +167,17 @@ def sequenceExpression(s: wyb_ast.SequenceExpression): LiftedExpression
             e: wyb_ast.E => 0
             d: wyb_ast.D => 1
         if (i > statements.length() - 2)
-                val return = match s:
-                    e: wyb_ast.E => tmp + " = "
-                    d: wyb_ast.D => ""
                 val sJS = visitStatement(s)
-                acc + "; " + sJS.lifting + return +  sJS.expr + ";" + repeat("}", lets + isLet, "")
+                val return = match s:
+                    e: wyb_ast.E => tmp + " = " + sJS.expr
+                    d: wyb_ast.D =>
+                        val decl = d.declaration
+                        val partial = match decl:
+                            vd:wyb_ast.VariableDeclaration => ";" + tmp + " = " + vd.variable
+                            default => ""
+                        val x : String = sJS.expr + partial
+                        x 
+                acc + "; " + sJS.lifting + return + ";" + repeat("}", lets + isLet, "")
             else
                 recur loop(statements, tmp, i + 1, lets + isLet, acc + ";" + flattenListing(visitStatement(s)))
     val tmp = tempVar()
