@@ -13,17 +13,8 @@ DARROW      =>
 require stdout
 
 import wyvern.util.matching.regex
-import wyvern.collections.llist
-import wyvern.pair
 
-import lexer
-
-// FIX: define these with a nice DSL
-val identPat = regex("[a-zA-Z][a-zA-Z0-9_]*")
-val lparenPat = regex("\\(")
-val rparenPat = regex("\\)")
-val whitespacePat = regex("[ \t\r\f]+")
-val darrowPat = regex("=>")
+import lexBuilder
 
 datatype TokenKind
     IDENTIFIER
@@ -32,28 +23,24 @@ datatype TokenKind
     WHITESPACE
     DARROW
     
+val builder = lexBuilder[TokenKind]()
+
+// FIX: define these with a nice DSL
+
+// FIX: either use a literal syntax for lists
+// or be imperative with a literal syntax for pairs: lexTable.add({identPat, IDENTIFIER})
+
+builder.addEntry(regex("[a-zA-Z][a-zA-Z0-9_]*"), IDENTIFIER())
+builder.addEntry(regex("\\("), LPAREN())
+builder.addEntry(regex("\\)"), RPAREN())
+builder.addEntry(regex("[ \t\r\f]+"), WHITESPACE())
+builder.addEntry(regex("=>"), DARROW())
+
+val testLexer = builder.build()
+
 // FIX: no parens for unit constructors    
 val t : TokenKind = IDENTIFIER()
 
-type LexPair = pair.Pair[regex.Regex, TokenKind]
-type TableType = llist.LinkedList[LexPair]
-
-// FIX: Pair and Regex are structural types; should be declared at top level
-// FIX: annoying to not infer type argument to Nil
-var lexTable : TableType = llist.Nil[LexPair]()
-
-def addLexEntry(pattern: regex.Regex, kind:TokenKind):Unit
-    lexTable = llist.Cons[LexPair](pair.Pair[regex.Regex, TokenKind](pattern, kind), lexTable)
-    
-// FIX: either use a literal syntax for lists
-// or be imperative with a literal syntax for pairs: lexTable.add({identPat, IDENTIFIER})
-addLexEntry(identPat, IDENTIFIER())
-addLexEntry(lparenPat, LPAREN())
-addLexEntry(rparenPat, RPAREN())
-addLexEntry(whitespacePat, WHITESPACE())
-addLexEntry(darrowPat, DARROW())
-
-val testLexer = lexer[TokenKind](lexTable)
 
 // FIX: don't need a _ for these!
 def printKind(kind:TokenKind):Unit = match kind:
