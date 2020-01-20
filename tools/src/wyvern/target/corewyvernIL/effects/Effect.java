@@ -1,6 +1,7 @@
 package wyvern.target.corewyvernIL.effects;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;
@@ -94,6 +95,16 @@ public class Effect {
     /** Check that an effect exists in the context, returning its corresponding effect set at the end. */
     public EffectSet effectCheck(TypeContext ctx) {
         return findEffectDeclType(ctx).getEffectSet();
+    }
+
+    /** Check that an effect exists in the context, returning the supereffect if there is one */
+    public EffectSet getSupereffect(TypeContext ctx) {
+        return findEffectDeclType(ctx).getSupereffect();
+    }
+
+    /** Check that an effect exists in the context, returning the subeffect if there is one */
+    public EffectSet getSubeffect(TypeContext ctx) {
+        return findEffectDeclType(ctx).getSubeffect();
     }
 
     /** Find this effect's (effect)DeclType; report error if not found, else return effectDeclType. */

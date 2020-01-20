@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -82,6 +83,113 @@ public class EffectSet {
             // TODO: what's below should check out, except verifyInType is called a lot when the effects still are on a null variable
             getEffects().stream().forEach(e -> e.findEffectDeclType(ctx));
         }
+    }
+
+    private enum DecomposeType { DEF, SUPEREFFECT, SUBEFFECT }
+
+    /**
+     * Check if this effect set is a subeffect of es
+     */
+    public boolean isSubeffectOf(EffectSet es, TypeContext ctx) {
+        Set<Effect> effects1 = getEffects();
+        Set<Effect> effects2 = es.getEffects();
+
+        if (effects1 == null) {
+            return true;
+        }
+
+        if (effects2 == null) {
+            return effects1.isEmpty();
+        }
+
+        // Check if this is a subset of es
+        // TODO why I need h1 and h2 to check inclusion
+        Set<Effect> h1 = new HashSet<>(effects1);
+        Set<Effect> h2 = new HashSet<>(effects2);
+        if (h2.containsAll(h1)) {
+            return true;
+        }
+
+        // Implementation of rule Subeffect-Def-1
+        for (Effect e : effects2) {
+            EffectSet decomposed = decomposeEffectSet(es, e, DecomposeType.DEF, ctx);
+            if (decomposed != null) {
+                if (isSubeffectOf(decomposed, ctx)) {
+                    return true;
+                }
+            }
+        }
+
+        // Implementation of rule Subeffect-Def-2
+        for (Effect e : effects1) {
+            EffectSet decomposed = decomposeEffectSet(this, e, DecomposeType.DEF, ctx);
+            if (decomposed != null) {
+                if (decomposed.isSubeffectOf(es, ctx)) {
+                    return true;
+                }
+            }
+        }
+
+        // Implementation of rule Subeffect-Upperbound
+        for (Effect e : effects1) {
+            EffectSet decomposed = decomposeEffectSet(this, e, DecomposeType.SUPEREFFECT, ctx);
+            if (decomposed != null) {
+                if (decomposed.isSubeffectOf(es, ctx)) {
+                    return true;
+                }
+            }
+        }
+
+        // Implementation of rule Subeffect-Lowerbound
+        for (Effect e : effects2) {
+            EffectSet decomposed = decomposeEffectSet(es, e, DecomposeType.SUBEFFECT, ctx);
+            if (decomposed != null) {
+                if (this.isSubeffectOf(decomposed, ctx)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Decompose the definition of e in the EffectSet effects
+     * @param effects The effect set that contains e
+     * @param e Expose the definition of e
+     * @return The effect set after decomposition, or null if e can't be decomposed
+     */
+    private EffectSet decomposeEffectSet(EffectSet effects, Effect e, DecomposeType t, TypeContext ctx) {
+        //TODO I don't understand why I need h
+        Set<Effect> h = new HashSet<>(effects.getEffects());
+        assert(h.contains(e));
+
+        EffectSet s = null;
+        switch (t) {
+            case DEF:
+                s = e.effectCheck(ctx);
+                break;
+            case SUPEREFFECT:
+                s = e.getSupereffect(ctx);
+                break;
+            case SUBEFFECT:
+                s = e.getSubeffect(ctx);
+                break;
+        }
+        if (s != null) {
+            View view = View.from(e.getPath(), ctx);
+            Set<Effect> eDef = s.adapt(view).getEffects();
+            Set<Effect> newEffects = new HashSet<>();
+            for (Effect f : effects.getEffects()) {
+                if (!f.equals(e)) {
+                    newEffects.add(f);
+                }
+            }
+            newEffects.addAll(eDef);
+            EffectSet newEffectSet = new EffectSet(newEffects);
+            return newEffectSet;
+        }
+        return null;
     }
 
     //    /** Return free vars in the set (the paths of the effects). */

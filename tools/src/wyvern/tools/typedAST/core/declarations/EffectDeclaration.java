@@ -26,6 +26,10 @@ public class EffectDeclaration extends Declaration {
     private EffectSet effectSet;
     private FileLocation loc;
     private boolean adapted = false;
+    private EffectSet supereffect = null;
+    private boolean supereffectAdapted = false;
+    private EffectSet subeffect = null;
+    private boolean subeffectAdapted = false;
 
     public EffectDeclaration(String name, String effects, FileLocation fileLocation) {
         this.name = name;
@@ -34,6 +38,18 @@ public class EffectDeclaration extends Declaration {
         /* Parses the String effects into a set. If it was not defined:
          * effectSet==null if in type signature, else error is reported */
         this.effectSet = EffectSet.parseEffects(name, effects, true, fileLocation);
+    }
+
+    public EffectDeclaration(String name, String bound, boolean isSupereffect, FileLocation filelocation) {
+        this.name = name;
+        this.loc = filelocation;
+
+        this.effectSet = null;
+        if (isSupereffect) {
+            this.supereffect = EffectSet.parseEffects(name, bound, true, filelocation);
+        } else {
+            this.subeffect = EffectSet.parseEffects(name, bound, true, filelocation);
+        }
     }
 
     public Effect getEffect() {
@@ -71,14 +87,40 @@ public class EffectDeclaration extends Declaration {
         return effectSet;
     }
 
+    public EffectSet getSupereffectInContext(GenContext ctx) {
+        assert(supereffect != null);
+        if (!supereffectAdapted) {
+            supereffect.contextualize(ctx);
+            supereffectAdapted = true;
+        }
+        return supereffect;
+    }
+
+    public EffectSet getSubeffectInContext(GenContext ctx) {
+        assert(subeffect!= null);
+        if (!subeffectAdapted) {
+            subeffect.contextualize(ctx);
+            subeffectAdapted = true;
+        }
+        return subeffect;
+    }
+
     @Override
     public DeclType genILType(GenContext ctx) {
+        if (supereffect != null) {
+            return new EffectDeclType(getName(), getSupereffectInContext(ctx), true, getLocation());
+        }
+
+        if (subeffect != null) {
+            return new EffectDeclType(getName(), getSubeffectInContext(ctx), false, getLocation());
+        }
+
         return new EffectDeclType(getName(), getEffectSetInContext(ctx), getLocation());
     }
 
     @Override
     public wyvern.target.corewyvernIL.decl.Declaration generateDecl(GenContext ctx, GenContext thisContext) {
-        EffectSet effectSetInContext = getEffectSetInContext(ctx);
+       EffectSet effectSetInContext = getEffectSetInContext(ctx);
         if (effectSetInContext != null) {
             effectSetInContext.verifyInType(ctx);
         }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Optional;
 
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;
@@ -124,6 +125,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     @Override
     public TypedAST effectDeclType(String name, String effects, FileLocation loc) {
         return new EffectDeclaration(name, effects, loc);
+    }
+
+    @Override
+    public TypedAST effectDeclType(String name, String bound, boolean isSupereffect, FileLocation loc) {
+        return new EffectDeclaration(name, bound, isSupereffect, loc);
     }
 
     @Override

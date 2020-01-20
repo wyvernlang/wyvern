@@ -1,0 +1,4 @@
+type File
+
+  effect Read
+  effect Write

@@ -20,6 +20,9 @@ import wyvern.tools.errors.FileLocation;
 public class EffectDeclType extends DeclType implements IASTNode {
     private EffectSet effectSet;
 
+    private EffectSet supereffect;
+    private EffectSet subeffect;
+
     public EffectDeclType(String name, EffectSet effectSet, FileLocation loc, EffectSet lb, EffectSet ub) {
         super(name);
         this.effectSet = effectSet;
@@ -32,11 +35,48 @@ public class EffectDeclType extends DeclType implements IASTNode {
         this.effectSet = effectSet;
     }
 
+    /**
+     * Effect Declaration type that declares supereffect or subeffect
+     * @param bound Supereffect or Subeffect
+     * @param isSupereffect Determine the type of bound
+     */
+    public EffectDeclType(String name, EffectSet bound, boolean isSupereffect, FileLocation loc) {
+        super(name);
+        this.effectSet = null;
+        if (isSupereffect) {
+            this.supereffect = bound;
+        } else {
+            this.subeffect = bound;
+        }
+    }
+
+    /**
+     * Effect Declaration type that declares supereffect or subeffect
+     * @param bound Supereffect or Subeffect
+     * @param isSupereffect Determine the type of bound
+     */
+    public EffectDeclType(String name, EffectSet bound,
+                          boolean isSupereffect, EffectSet upperbound, EffectSet lowerbound) {
+        super(name);
+        this.effectSet = null;
+        if (isSupereffect) {
+            this.supereffect = bound;
+        } else {
+            this.subeffect = bound;
+        }
+        this.upperBound = upperbound;
+        this.lowerBound = lowerbound;
+    }
+
     private EffectSet lowerBound;
     private EffectSet upperBound;
 
-    public EffectSet getLowerBound() {
-        return lowerBound;
+    public EffectSet getSupereffect() {
+        return supereffect;
+    }
+
+    public EffectSet getSubeffect() {
+        return subeffect;
     }
 
     @Override
@@ -61,68 +101,62 @@ public class EffectDeclType extends DeclType implements IASTNode {
      */
     @Override
     public boolean isSubtypeOf(DeclType dt, TypeContext ctx, FailureReason reason) {
-        // TODO: instead of the code below, implement semantics comparison
         if (!(dt instanceof EffectDeclType)) {
             return false;
         }
         EffectDeclType edt = (EffectDeclType) dt;
 
-        /* edt == type or method annotations, vs.
-         * this == module def or method calls:
-         * if edt.getEffectSet()==null: this.getEffectSet() can be anything (null or not)
-         * else: this.getEffectSet() can't be null (though can't happen in the first place),
-         * and edt.getEffectSet().containsAll(this.getEffectSet())
-         */
+        if (this.getEffectSet() != null) {
+            if (edt.getEffectSet() != null) {
+                return this.getEffectSet().isSubeffectOf(edt.getEffectSet(), ctx);
+            } else if (edt.getSupereffect() != null) {
+                return this.getEffectSet().isSubeffectOf(edt.getSupereffect(), ctx);
+            } else if (edt.getSubeffect() != null) {
+                return edt.getSubeffect().isSubeffectOf(this.getEffectSet(), ctx);
+            } else {
+                return true;
+            }
+        }
 
-        /* this.getEffectSet()==null only if edt.getEffectSet()==null
-         * (the reverse isn't necessarily true) */
-        if ((edt.getEffectSet() != null) && (edt.getEffectSet().getEffects() != null)) {
-            if (getEffectSet() == null) {
+        if (this.getSupereffect() != null) {
+            if (edt.getEffectSet() != null) {
                 return false;
-            }
-            Set<Effect> thisEffects = recursiveEffectCheck(ctx, getEffectSet().getEffects());
-            Set<Effect> edtEffects =  recursiveEffectCheck(ctx, edt.getEffectSet().getEffects());
-            if (!edtEffects.containsAll(thisEffects)) {
-                return false; // "this" is not a subtype of dt, i.e. not all of its effects are covered by edt's effectSet
-            } // effect E = S ("this") <: effect E = S' (edt) if S <= S' (both are concrete)
-        }
-
-        /* if edt.getEffectSet()==null (i.e. undefined in the type, or no method annotations),
-         * anything (defined in the module def, or the effects of the method calls) is a subtype */
-        // i.e. effect E = {} (concrete "this") <: effect E (abstract dt which is undefined)
-        return true;
-    }
-
-    /** Decompose set of effects to lowest-level ones in scope (obeys any type ascription) **/
-    public Set<Effect> recursiveEffectCheck(TypeContext ctx, Set<Effect> effects) {
-        if (effects == null) {
-            return null;
-        }
-
-        Set<Effect> allEffects =  new HashSet<Effect>(); // collects lower-level effects from effectSets of arg "effects"
-        Set<Effect> moreEffects = null; // get the effectSet belonging to an effect in arg "effects"
-        for (Effect e : effects) {
-            EffectSet s = e.effectCheck(ctx);
-            if (s != null) {
-                View view = View.from(e.getPath(), ctx);
-                moreEffects = s.adapt(view).getEffects();
-                allEffects.addAll(moreEffects);
-            } else { // e was the lowest-level in scope (hidden by type ascription)
-                allEffects.add(e);
+            } else if (edt.getSupereffect() != null) {
+                return this.getSupereffect().isSubeffectOf(edt.getSupereffect(), ctx);
+            } else if (edt.getSubeffect() != null) {
+                return false;
+            } else {
+                return true;
             }
         }
 
-        // if it is null, then everything in "effects" are of the lowest-level in scope
-        if (moreEffects != null) {
-            allEffects = recursiveEffectCheck(ctx, allEffects);
+        if (this.getSubeffect() != null) {
+            if (edt.getEffectSet() != null) {
+                return false;
+            } else if (edt.getSupereffect() != null) {
+                return false;
+            } else if (edt.getSubeffect() != null) {
+                return edt.getSubeffect().isSubeffectOf(this.getSubeffect(), ctx);
+            } else {
+                return true;
+            }
         }
-        return allEffects;
+
+        return edt.getEffectSet() == null && edt.getSupereffect() == null && edt.getSubeffect() == null;
     }
 
-    @Override
+   @Override
     public void checkWellFormed(TypeContext ctx) {
         if (effectSet != null) {
             effectSet.effectsCheck(ctx);
+        }
+
+        if (supereffect != null) {
+            supereffect.effectsCheck(ctx);
+        }
+
+        if (subeffect != null) {
+           subeffect.effectsCheck(ctx);
         }
     }
 
@@ -130,6 +164,14 @@ public class EffectDeclType extends DeclType implements IASTNode {
     public void canonicalize(TypeContext ctx) {
         if (effectSet != null) {
             effectSet.canonicalize(ctx);
+        }
+
+        if (supereffect != null) {
+            supereffect.canonicalize(ctx);
+        }
+
+        if (subeffect != null) {
+            subeffect.canonicalize(ctx);
         }
     }
     
@@ -160,6 +202,23 @@ public class EffectDeclType extends DeclType implements IASTNode {
             //            !getPath().equals(other.getPath())) {
             return false;
         }
+
+        if (getSupereffect() == null) {
+            if (other.getSupereffect() != null) {
+                return false;
+            }
+        } else if (!getSupereffect().equals(other.getSupereffect())) { //||
+            return false;
+        }
+
+        if (getSubeffect() == null) {
+            if (other.getSubeffect() != null) {
+                return false;
+            }
+        } else if (!getSubeffect().equals(other.getSubeffect())) { //||
+            return false;
+        }
+
         return true;
     }
 
@@ -170,9 +229,16 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
     @Override
     public void doPrettyPrint(Appendable dest, String indent) throws IOException {
-        dest.append(indent).append("effect ").append(getName()).append(" = ");
+        dest.append(indent).append("effect ").append(getName());
         if (effectSet != null) {
+            dest.append(" = ");
             dest.append(effectSet.toString());
+        } else if (supereffect != null) {
+            dest.append(" <= ");
+            dest.append(supereffect.toString());
+        } else if (subeffect != null) {
+            dest.append(" >= ");
+            dest.append(subeffect.toString());
         }
         dest.append('\n');
     }
@@ -184,17 +250,38 @@ public class EffectDeclType extends DeclType implements IASTNode {
 
         //        return new EffectDeclType(getName(), this.getRawResultType().adapt(v));
         EffectSet lb = lowerBound;
-        EffectSet up =  upperBound;
-        return new EffectDeclType(getName(), effectSet == null ? null : getEffectSet().adapt(v), getLocation(), lb, up);
+        EffectSet ub =  upperBound;
+        if (effectSet != null) {
+            return new EffectDeclType(getName(), getEffectSet().adapt(v), getLocation(), lb, ub);
+        }
+
+        if (supereffect != null) {
+            return new EffectDeclType(getName(), getSupereffect().adapt(v), true, lb, ub);
+        }
+
+        if (subeffect != null) {
+            return new EffectDeclType(getName(), getSubeffect().adapt(v), false, lb, ub);
+        }
+
+        return new EffectDeclType(getName(), null, getLocation(), lb, ub);
     }
 
     @Override
     public DeclType doAvoid(String varName, TypeContext ctx, int count) {
         // TODO: similar to NominalType.doAvoid()
-        if (getEffectSet() == null) {
-            return this;
+        if (effectSet != null) {
+            return new EffectDeclType(getName(), getEffectSet().doAvoid(varName, ctx, count), getLocation());
         }
-        return new EffectDeclType(getName(), getEffectSet().doAvoid(varName, ctx, count), getLocation());
+
+        if (supereffect != null) {
+            return new EffectDeclType(getName(), getSupereffect().doAvoid(varName, ctx, count), getLocation());
+        }
+
+        if (subeffect != null) {
+            return new EffectDeclType(getName(), getSubeffect().doAvoid(varName, ctx, count), getLocation());
+        }
+
+        return this;
     }
 
     @Override
