@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -162,7 +161,7 @@ public class EffectSet {
     private EffectSet decomposeEffectSet(EffectSet effects, Effect e, DecomposeType t, TypeContext ctx) {
         //TODO I don't understand why I need h
         Set<Effect> h = new HashSet<>(effects.getEffects());
-        assert(h.contains(e));
+        assert (h.contains(e));
 
         EffectSet s = null;
         switch (t) {
@@ -174,6 +173,8 @@ public class EffectSet {
                 break;
             case SUBEFFECT:
                 s = e.getSubeffect(ctx);
+                break;
+            default:
                 break;
         }
         if (s != null) {

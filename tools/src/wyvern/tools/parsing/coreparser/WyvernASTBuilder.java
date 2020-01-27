@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Optional;
 
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.ToolError;

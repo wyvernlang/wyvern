@@ -3,13 +3,10 @@
 package wyvern.target.corewyvernIL.decltype;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
-import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.support.FailureReason;
 import wyvern.target.corewyvernIL.support.TypeContext;
@@ -123,10 +120,8 @@ public class EffectDeclType extends DeclType implements IASTNode {
                 return false;
             } else if (edt.getSupereffect() != null) {
                 return this.getSupereffect().isSubeffectOf(edt.getSupereffect(), ctx);
-            } else if (edt.getSubeffect() != null) {
-                return false;
             } else {
-                return true;
+                return edt.getSubeffect() == null;
             }
         }
 

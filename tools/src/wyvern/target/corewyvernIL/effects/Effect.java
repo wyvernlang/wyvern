@@ -1,7 +1,6 @@
 package wyvern.target.corewyvernIL.effects;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import wyvern.target.corewyvernIL.decltype.DeclType;

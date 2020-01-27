@@ -88,7 +88,7 @@ public class EffectDeclaration extends Declaration {
     }
 
     public EffectSet getSupereffectInContext(GenContext ctx) {
-        assert(supereffect != null);
+        assert (supereffect != null);
         if (!supereffectAdapted) {
             supereffect.contextualize(ctx);
             supereffectAdapted = true;
@@ -97,7 +97,7 @@ public class EffectDeclaration extends Declaration {
     }
 
     public EffectSet getSubeffectInContext(GenContext ctx) {
-        assert(subeffect!= null);
+        assert (subeffect != null);
         if (!subeffectAdapted) {
             subeffect.contextualize(ctx);
             subeffectAdapted = true;
