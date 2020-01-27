@@ -43,4 +43,12 @@ public class EffectHierarchyTests {
         expectedException.expectMessage(StringContains.containsString("not a subtype of the expected declaration"));
         TestUtil.doTestScriptModularly(PATH, "hierarchy.subtypingerror", Util.unitType(), Util.unitValue());
     }
+
+    @Test
+    public void testAccumulate() throws ParseException {
+        /* Add empty effect set where annotation is missing */
+        TestUtil.doTestScriptModularly(PATH, "hierarchy.accumulateEffects", Util.unitType(), Util.unitValue());
+    }
+
 }
+
