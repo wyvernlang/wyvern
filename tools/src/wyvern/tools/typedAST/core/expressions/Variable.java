@@ -20,10 +20,16 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
 
     private String name;
     private FileLocation location = FileLocation.UNKNOWN;
+    private boolean isExplicitTypeConversion;
 
     public Variable(String name, FileLocation location) {
+        this(name, location, false);
+    }
+
+    public Variable(String name, FileLocation location, boolean isExplicitTypeConversion) {
         this.name = name;
         this.location = location;
+        this.isExplicitTypeConversion = isExplicitTypeConversion;
     }
 
     public String getName() {
@@ -49,7 +55,21 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
             GenContext ctx,
             ValueType expectedType,
             List<TypedModuleSpec> dependencies) {
-        return ctx.lookupExp(getName(), location);
+        IExpr match = ctx.lookupExp(getName(), location);
+        
+        if (match instanceof wyvern.target.corewyvernIL.expression.Variable
+          && isExplicitTypeConversion) {
+
+          // set explicit conversion flag to true for the matched variable expression
+          ((wyvern.target.corewyvernIL.expression.Variable) match).setExplicitConversionFlag();
+
+        } else if (match instanceof wyvern.target.corewyvernIL.expression.MethodCall
+          && isExplicitTypeConversion) {
+
+          // set explicit conversion flag to true for the matched method calls
+          ((wyvern.target.corewyvernIL.expression.MethodCall) match).setExplicitConversionFlag();
+        }
+        return match;
     }
 
     @Override
