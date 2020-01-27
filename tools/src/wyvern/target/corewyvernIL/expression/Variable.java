@@ -19,23 +19,39 @@ public class Variable extends Expression implements Path {
 
     private String name;
     private BindingSite site;
+    private boolean isExplicitConversion;
 
     public Variable(BindingSite site) {
         this(site.getName());
         this.site = site;
+        this.isExplicitConversion = false;
     }
+    
     public Variable(BindingSite site, FileLocation loc) {
         super(loc);
         this.name = site.getName();
         this.site = site;
+        this.isExplicitConversion = false;
     }
+    
     public Variable(String name, FileLocation loc) {
         super(loc);
         this.name = name;
+        this.isExplicitConversion = false;
     }
+
     public Variable(String name) {
         super();
         this.name = name;
+        this.isExplicitConversion = false;
+    }
+    
+    public void setExplicitConversionFlag() {
+      this.isExplicitConversion = true;
+    }
+
+    public boolean getExplicitConversionFlag() {
+      return this.isExplicitConversion;
     }
     
     @Override
@@ -101,7 +117,20 @@ public class Variable extends Expression implements Path {
 
     @Override
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
-        return env.lookupTypeOf(this);
+        ValueType matchedType = env.lookupTypeOf(this);
+        if (getExplicitConversionFlag()) {
+
+          // obtain the option type of the matched type
+          ValueType optionType = wyvern.tools.typedAST.core.expressions.Assignment.getOptionType(matchedType);
+
+          // return the option type if null is not returned. Otherwise throw RuntimeException
+          if (optionType != null) {
+            return optionType;
+          } else {
+            throw new RuntimeException("Explicit type conversion only applies to Wyvern option types, not " + matchedType.getClass());
+          }
+        }
+        return matchedType;
     }
 
     @Override
@@ -112,6 +141,11 @@ public class Variable extends Expression implements Path {
     @Override
     public Value interpret(EvalContext ctx) {
         Value exp =  ctx.lookupValue(name);
+        if (getExplicitConversionFlag()) {
+          exp = ((wyvern.target.corewyvernIL.expression.ObjectValue) exp).getField("content");
+          // System.out.println(exp);
+        }
+
         return exp;
     }
 

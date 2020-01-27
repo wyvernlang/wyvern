@@ -998,11 +998,11 @@ void Extension(LinkedList<String> names, LinkedList<AST> args) :
 }
 
 AST PrimaryPrefix(ExpFlags flags) :
-{ AST exp; Token t; boolean recur = false; }
+{ AST exp; Token t; Token t2 = null; boolean recur = false; }
 {
   exp = Literal() { return exp; }
 |
-  (<RECUR>)? { recur = true; } t = <IDENTIFIER> { return build.var(t.image, loc(t));  }
+  (<RECUR>)? { recur = true; } t = <IDENTIFIER> [ t2 = <BOOLEANNOT> ] { return build.var(t.image, loc(t), t2 != null);  }
 |
   <LPAREN> exp = Expression(flags) <RPAREN> { return exp; }
 |

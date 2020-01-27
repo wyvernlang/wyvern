@@ -42,6 +42,7 @@ interface ASTBuilder<AST, Type> {
     Object formalArg(String name, Type type);
     AST fn(List args, AST body, FileLocation loc);
     AST var(String name, FileLocation loc);
+    AST var(String name, FileLocation loc, boolean isExplicitTypeConversion);
     AST stringLit(String value, FileLocation loc);
     AST characterLit(char value, FileLocation loc);
     AST integerLit(BigInteger value, FileLocation loc);

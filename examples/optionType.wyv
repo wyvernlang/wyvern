@@ -7,10 +7,13 @@ def print(str: String?): Unit
     else
         stdout.print("NONE\n")
 
+// Section for implicit option type conversion
+
+// implicit type conversion from String to String? for var declaration
 var str1: String? = "Hello, World!"
 print(str1)
 
-// implicit type conversion from String to String? for assignment
+// implicit type conversion from String to String? for assignment statement
 str1 = "Life is Good!"
 print(str1)
 
@@ -21,3 +24,19 @@ print(str1)
 // implicit type conversion from String to String? for val declaration
 val str2: String? = "Life is Wonderful!"
 print(str2)
+
+
+// Section for explicit option type conversion
+// Note that at this point, str2 is of type String?
+
+// explicit type conversion from String? (str2) to String (str3) for var declaration
+var str3: String = str2!
+stdout.print(str3 + "\n")
+
+// explicit type conversion from String? (str2) to String (str3) for assignment statement
+str3 = str2!
+stdout.print(str3 + "\n")
+
+// explicit type conversion from String? (str2) to String (str4) for val declaration
+val str4:String = str2!
+stdout.print(str4 + "\n")

@@ -349,7 +349,12 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
 
     @Override
     public TypedAST var(String name, FileLocation loc) {
-        return new Variable(name, loc);
+        return new Variable(name, loc, false);
+    }
+
+    @Override
+    public TypedAST var(String name, FileLocation loc, boolean isExplicitTypeConversion) {
+        return new Variable(name, loc, isExplicitTypeConversion);
     }
 
     @Override
