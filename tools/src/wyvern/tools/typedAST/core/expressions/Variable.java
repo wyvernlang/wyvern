@@ -63,11 +63,6 @@ public class Variable extends AbstractExpressionAST implements CoreAST, Assignab
           // set explicit conversion flag to true for the matched variable expression
           ((wyvern.target.corewyvernIL.expression.Variable) match).setExplicitConversionFlag();
 
-        } else if (match instanceof wyvern.target.corewyvernIL.expression.MethodCall
-          && isExplicitTypeConversion) {
-
-          // set explicit conversion flag to true for the matched method calls
-          ((wyvern.target.corewyvernIL.expression.MethodCall) match).setExplicitConversionFlag();
         }
         return match;
     }
