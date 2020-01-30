@@ -33,7 +33,7 @@ def parse(input:String):option.Option[AST] // Option of AST
 
 	// create a scanner and scan the input
 	val scanner = lexer.makeScanner(config, input)
-	debug.print(input)
+	// debug.print(input)
 	doParse(scanner)
 
 // The starting point for recursive-descent parsing	

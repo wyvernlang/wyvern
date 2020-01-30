@@ -3,16 +3,21 @@ require stdout
 import metadata wyvern.collections.list
 import metadata tsls.postfix
 
-val fibonacci : list.List = { 1, 1, 2, 3, 5, 8 }
+val fibonacci : list.List[Int] = { 1, 1, 2, 3, 5, 8 }
 
+stdout.print("Printing 5th list element:\n")
+stdout.printInt(fibonacci.get(5).getOrElse(() => -1))
+stdout.println()
 
 def run(expr:postfix.PostfixExpr):Int
 	expr.eval()
 
 val x = run(~)
-	2 3 2 6
+	2 3 2 9
 	* + 3 / +
 
+stdout.print("Printing x:\n")
 stdout.printInt(x)
+stdout.println()
 
-x
+// x
