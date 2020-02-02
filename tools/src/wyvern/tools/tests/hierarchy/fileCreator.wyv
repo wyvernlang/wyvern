@@ -1,0 +1,21 @@
+import hierarchy.File
+module fileCreator
+
+def createFile(hasEffect : Boolean) : {} File
+    if (hasEffect) {
+      new
+      effect Read = {system.FFI}
+      effect Write = {system.FFI}
+      def read() : {this.Read} Unit
+        unit
+      def write() : {this.Read} Unit
+        unit
+    } else {
+      new
+      effect Read = {}
+      effect Write = {}
+      def read() : {this.Read} Unit
+        unit
+      def write() : {this.Read} Unit
+        unit
+    }
