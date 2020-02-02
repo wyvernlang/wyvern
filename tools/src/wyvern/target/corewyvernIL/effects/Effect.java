@@ -144,7 +144,14 @@ public class Effect {
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
         if (path != null && path.getFreeVariables().contains(varName)) {
             final EffectDeclType dt = findEffectDeclType(ctx);
-            if (dt.getEffectSet() != null) {
+            if (dt.getSupereffect() != null) {
+                EffectSet supereffect = dt.getSupereffect();
+                final Set<Effect> s = new HashSet<Effect>();
+                for (final Effect e : supereffect.getEffects()) {
+                    s.addAll(e.doAvoid(varName, ctx, count + 1));
+                }
+                return s;
+            } else if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1
                         && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
                     // avoid infinite loops, just in case
