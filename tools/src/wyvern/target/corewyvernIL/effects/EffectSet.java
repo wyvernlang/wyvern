@@ -208,15 +208,51 @@ public class EffectSet {
         return effectSet == null ? "" : effectSet.toString().replace("[", "{").replace("]", "}");
     }
 
-    public EffectSet doAvoid(String varName, TypeContext ctx, int count) {
+
+    /**
+     * Avoid variables and effect set stays the same
+     */
+    public EffectSet exactAvoid(String varName, TypeContext ctx, int count) {
         if (effectSet.isEmpty()) {
             return this;
         }
         final Set<Effect> newSet = new HashSet<Effect>();
         for (final Effect e:effectSet) {
-            newSet.addAll(e.doAvoid(varName, ctx, count));
+            newSet.addAll(e.exactAvoid(varName, ctx, count));
         }
         return new EffectSet(newSet);
+    }
+
+    /**
+     * Avoid variables, and allows increase in effect set
+     */
+    public EffectSet increasingAvoid(String varName, TypeContext ctx, int count) {
+        if (effectSet.isEmpty()) {
+            return this;
+        }
+        final Set<Effect> newSet = new HashSet<Effect>();
+        for (final Effect e:effectSet) {
+            newSet.addAll(e.increasingAvoid(varName, ctx, count));
+        }
+        return new EffectSet(newSet);
+    }
+
+    /**
+     * Avoid variables and allows decrease in effect set
+     */
+    public EffectSet decreasingAvoid(String varName, TypeContext ctx, int count) {
+        if (effectSet.isEmpty()) {
+            return this;
+        }
+        final Set<Effect> newSet = new HashSet<Effect>();
+        for (final Effect e:effectSet) {
+            newSet.addAll(e.decreasingAvoid(varName, ctx, count));
+        }
+        return new EffectSet(newSet);
+    }
+
+    public EffectSet doAvoid(String varName, TypeContext ctx, int count) {
+        return increasingAvoid(varName, ctx, count);
     }
 
     public EffectSet adapt(View v) {

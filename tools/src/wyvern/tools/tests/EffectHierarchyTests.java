@@ -50,5 +50,22 @@ public class EffectHierarchyTests {
         TestUtil.doTestScriptModularly(PATH, "hierarchy.accumulateEffects", Util.unitType(), Util.unitValue());
     }
 
+    @Test
+    public void testAvoid1() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "hierarchy.avoidType", Util.unitType(), Util.unitValue());
+    }
+
+    @Test
+    public void testAvoid2() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "hierarchy.avoidType2", Util.unitType(), Util.unitValue());
+    }
+
+    //TODO This test case should work
+    /*
+    @Test
+    public void testAvoid3() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "hierarchy.avoidTypeIncrease", Util.unitType(), Util.unitValue());
+    }
+    */
 }
 

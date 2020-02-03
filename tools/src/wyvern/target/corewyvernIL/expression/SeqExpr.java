@@ -137,7 +137,6 @@ public class SeqExpr extends Expression {
         }
 
 
-        // TODO We shouldn't avoid variables here
         if (getType() == null) {
             for (int i = elements.size() - 1; i >= 0; --i) {
                 HasLocation elem = elements.get(i);

@@ -265,15 +265,15 @@ public class EffectDeclType extends DeclType implements IASTNode {
     public DeclType doAvoid(String varName, TypeContext ctx, int count) {
         // TODO: similar to NominalType.doAvoid()
         if (effectSet != null) {
-            return new EffectDeclType(getName(), getEffectSet().doAvoid(varName, ctx, count), getLocation());
+            return new EffectDeclType(getName(), getEffectSet().exactAvoid(varName, ctx, count), getLocation());
         }
 
         if (supereffect != null) {
-            return new EffectDeclType(getName(), getSupereffect().doAvoid(varName, ctx, count), getLocation());
+            return new EffectDeclType(getName(), getSupereffect().increasingAvoid(varName, ctx, count), getLocation());
         }
 
         if (subeffect != null) {
-            return new EffectDeclType(getName(), getSubeffect().doAvoid(varName, ctx, count), getLocation());
+            return new EffectDeclType(getName(), getSubeffect().decreasingAvoid(varName, ctx, count), getLocation());
         }
 
         return this;

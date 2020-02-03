@@ -8,6 +8,5 @@ def fun() : {system.FFI} Unit
       def foo() : {this.e} Unit
         unit
   x.foo()
-  unit
 
 unit

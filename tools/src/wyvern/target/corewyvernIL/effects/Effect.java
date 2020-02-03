@@ -141,16 +141,46 @@ public class Effect {
         unscopedEffect.add(new Effect(new Variable("system"), "EffectNotInScope", null));
     }
 
+
+    private enum AvoidType {
+        INCREASING,
+        DECREASING,
+        EXACT
+    }
+
+    public Set<Effect> increasingAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.INCREASING);
+    }
+
+    public Set<Effect> decreasingAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.DECREASING);
+    }
+
+    public Set<Effect> exactAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.EXACT);
+    }
+
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.INCREASING);
+    }
+
+    /* Avoid variable but effect set is allowed in increase */
+    public Set<Effect> doAvoid(String varName, TypeContext ctx, int count, AvoidType t) {
         if (path != null && path.getFreeVariables().contains(varName)) {
             final EffectDeclType dt = findEffectDeclType(ctx);
-            if (dt.getSupereffect() != null) {
+            if (t == AvoidType.INCREASING && dt.getSupereffect() != null) {
                 EffectSet supereffect = dt.getSupereffect();
                 final Set<Effect> s = new HashSet<Effect>();
                 for (final Effect e : supereffect.getEffects()) {
-                    s.addAll(e.doAvoid(varName, ctx, count + 1));
+                    s.addAll(e.doAvoid(varName, ctx, count + 1, t));
                 }
                 return s;
+            } else if (t == AvoidType.DECREASING && dt.getSubeffect() != null) {
+                EffectSet subeffect = dt.getSubeffect();
+                final Set<Effect> s = new HashSet<>();
+                for (final Effect e : subeffect.getEffects()) {
+                    s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                }
             } else if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1
                         && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
@@ -164,7 +194,7 @@ public class Effect {
                 // different effects, so call recursively
                 final Set<Effect> s = new HashSet<Effect>();
                 for (final Effect e : dt.getEffectSet().getEffects()) {
-                    s.addAll(e.doAvoid(varName, ctx, count + 1));
+                    s.addAll(e.doAvoid(varName, ctx, count + 1, t));
                 }
                 return s;
             } else {
