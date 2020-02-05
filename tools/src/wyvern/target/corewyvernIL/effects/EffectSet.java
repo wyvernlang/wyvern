@@ -211,6 +211,7 @@ public class EffectSet {
 
     /**
      * Avoid variables and effect set stays the same
+     * @return Effect set if avoidance is possible, null if not possible
      */
     public EffectSet exactAvoid(String varName, TypeContext ctx, int count) {
         if (effectSet.isEmpty()) {
@@ -218,13 +219,19 @@ public class EffectSet {
         }
         final Set<Effect> newSet = new HashSet<Effect>();
         for (final Effect e:effectSet) {
-            newSet.addAll(e.exactAvoid(varName, ctx, count));
+            Set<Effect> eAvoid = e.exactAvoid(varName, ctx, count);
+            if (Effect.isUnscopedEffect(eAvoid)) {
+                return null;
+            } else {
+                newSet.addAll(eAvoid);
+            }
         }
         return new EffectSet(newSet);
     }
 
     /**
      * Avoid variables, and allows increase in effect set
+     * @return Effect set if avoidance is possible, null if not possible
      */
     public EffectSet increasingAvoid(String varName, TypeContext ctx, int count) {
         if (effectSet.isEmpty()) {
@@ -232,13 +239,19 @@ public class EffectSet {
         }
         final Set<Effect> newSet = new HashSet<Effect>();
         for (final Effect e:effectSet) {
-            newSet.addAll(e.increasingAvoid(varName, ctx, count));
+            Set<Effect> eAvoid = e.increasingAvoid(varName, ctx, count);
+            if (Effect.isUnscopedEffect(eAvoid)) {
+                return null;
+            } else {
+                newSet.addAll(eAvoid);
+            }
         }
         return new EffectSet(newSet);
     }
 
     /**
      * Avoid variables and allows decrease in effect set
+     * @return Effect set if avoidance is possible, null if not possible
      */
     public EffectSet decreasingAvoid(String varName, TypeContext ctx, int count) {
         if (effectSet.isEmpty()) {
@@ -246,7 +259,12 @@ public class EffectSet {
         }
         final Set<Effect> newSet = new HashSet<Effect>();
         for (final Effect e:effectSet) {
-            newSet.addAll(e.decreasingAvoid(varName, ctx, count));
+            Set<Effect> eAvoid = e.decreasingAvoid(varName, ctx, count);
+            if (Effect.isUnscopedEffect(eAvoid)) {
+                return null;
+            } else {
+                newSet.addAll(eAvoid);
+            }
         }
         return new EffectSet(newSet);
     }

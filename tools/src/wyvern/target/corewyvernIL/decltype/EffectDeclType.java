@@ -265,15 +265,38 @@ public class EffectDeclType extends DeclType implements IASTNode {
     public DeclType doAvoid(String varName, TypeContext ctx, int count) {
         // TODO: similar to NominalType.doAvoid()
         if (effectSet != null) {
-            return new EffectDeclType(getName(), getEffectSet().exactAvoid(varName, ctx, count), getLocation());
+            EffectSet exactAvoid = getEffectSet().exactAvoid(varName, ctx, count);
+            if (exactAvoid != null) {
+                return new EffectDeclType(getName(), exactAvoid, getLocation());
+            }
+
+            EffectSet increasingAvoid = getEffectSet().increasingAvoid(varName, ctx, count);
+            if (increasingAvoid != null) {
+                return new EffectDeclType(getName(), increasingAvoid, true, getLocation());
+            }
+
+            EffectSet decreasingAvoid = getEffectSet().decreasingAvoid(varName, ctx, count);
+            if (decreasingAvoid != null) {
+                return new EffectDeclType(getName(), decreasingAvoid, false, getLocation());
+            }
+
+            return new EffectDeclType(getName(), null, getLocation());
         }
 
         if (supereffect != null) {
-            return new EffectDeclType(getName(), getSupereffect().increasingAvoid(varName, ctx, count), getLocation());
+            EffectSet increasingAvoid = getSupereffect().increasingAvoid(varName, ctx, count);
+            if (increasingAvoid != null) {
+                return new EffectDeclType(getName(), increasingAvoid, true, getLocation());
+            }
+            return new EffectDeclType(getName(), null, getLocation());
         }
 
         if (subeffect != null) {
-            return new EffectDeclType(getName(), getSubeffect().decreasingAvoid(varName, ctx, count), getLocation());
+            EffectSet decreasingAvoid = getSubeffect().decreasingAvoid(varName, ctx, count);
+            if (decreasingAvoid != null) {
+                return new EffectDeclType(getName(), decreasingAvoid, false, getLocation());
+            }
+            return new EffectDeclType(getName(), null, getLocation());
         }
 
         return this;

@@ -142,6 +142,10 @@ public class Effect {
     }
 
 
+    public static boolean isUnscopedEffect(Set<Effect> e) {
+        return e.contains(new Effect(new Variable("system"), "EffectNotInScope", null));
+    }
+
     private enum AvoidType {
         INCREASING,
         DECREASING,
@@ -164,23 +168,38 @@ public class Effect {
         return doAvoid(varName, ctx, count, AvoidType.INCREASING);
     }
 
-    /* Avoid variable but effect set is allowed in increase */
+    /**
+     * Avoid variable in an effect
+     * @param t The parameter which determine if the effect set can increase or decrease.
+     * @return A effect set that doesn't contain the variable to avoid, or unscopedEffect if avoidance is not possible
+     */
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count, AvoidType t) {
         if (path != null && path.getFreeVariables().contains(varName)) {
             final EffectDeclType dt = findEffectDeclType(ctx);
+            EffectSet supereffect = dt.getSupereffect();
             if (t == AvoidType.INCREASING && dt.getSupereffect() != null) {
-                EffectSet supereffect = dt.getSupereffect();
                 final Set<Effect> s = new HashSet<Effect>();
                 for (final Effect e : supereffect.getEffects()) {
-                    s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    Set<Effect> eAvoid = e.doAvoid(varName, ctx, count + 1, t);
+                    if (isUnscopedEffect(eAvoid)) {
+                        return unscopedEffect;
+                    } else {
+                        s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    }
                 }
                 return s;
             } else if (t == AvoidType.DECREASING && dt.getSubeffect() != null) {
                 EffectSet subeffect = dt.getSubeffect();
                 final Set<Effect> s = new HashSet<>();
                 for (final Effect e : subeffect.getEffects()) {
-                    s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    Set<Effect> eAvoid = e.doAvoid(varName, ctx, count + 1, t);
+                    if (isUnscopedEffect(eAvoid)) {
+                        return unscopedEffect;
+                    } else {
+                        s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    }
                 }
+                return s;
             } else if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1
                         && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
@@ -194,7 +213,12 @@ public class Effect {
                 // different effects, so call recursively
                 final Set<Effect> s = new HashSet<Effect>();
                 for (final Effect e : dt.getEffectSet().getEffects()) {
-                    s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    Set<Effect> eAvoid = e.doAvoid(varName, ctx, count + 1, t);
+                    if (isUnscopedEffect(eAvoid)) {
+                        return unscopedEffect;
+                    } else {
+                        s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    }
                 }
                 return s;
             } else {

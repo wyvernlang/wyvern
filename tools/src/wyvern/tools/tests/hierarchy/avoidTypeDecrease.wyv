@@ -1,0 +1,14 @@
+type A
+    effect e >= {system.FFI}
+
+type T
+    effect f >= {system.FFI}
+
+def fun() : {} T
+    val a : A = new
+        effect e = {system.FFI}
+    val b = new
+        effect f = {a.e}
+    b
+
+unit
