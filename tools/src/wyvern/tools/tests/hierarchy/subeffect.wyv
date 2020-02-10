@@ -1,6 +1,6 @@
 import hierarchy.T
 
 def f (x : T) : {x.G} Unit
-  x.f1()
+  x.f2()
   unit
 unit

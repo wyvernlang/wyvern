@@ -1,6 +1,6 @@
 import hierarchy.fileEffects
-type File
+resource type File
   effect Read <= {fileEffects.Read}
   effect Write <= {fileEffects.Write}
-  def read() : {this.Read} Unit
-  def write() : {this.Write} Unit
+  def read() : {this.Read} String
+  def write(s : String) : {this.Write} Unit

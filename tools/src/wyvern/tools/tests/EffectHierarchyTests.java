@@ -69,5 +69,10 @@ public class EffectHierarchyTests {
     public void testAvoid4() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "hierarchy.avoidTypeDecrease", Util.unitType(), Util.unitValue());
     }
+
+    @Test
+    public void testFile() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "hierarchy.main", Util.unitType(), Util.unitValue());
+    }
 }
 
