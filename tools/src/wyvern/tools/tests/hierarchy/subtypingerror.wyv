@@ -1,0 +1,15 @@
+import hierarchy.File
+import hierarchy.T
+
+def createT (f : File)  : {} T
+  val x : T = new
+    effect E = {f.Read}
+    effect F = {}
+    effect G = {}
+    def f1() : {this.F} Unit
+      unit
+    def f2() : {this.E} Unit
+      unit
+  x
+
+unit

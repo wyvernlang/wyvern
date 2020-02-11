@@ -1,0 +1,6 @@
+import hierarchy.T
+
+def f (x : T) : {x.E} Unit
+  x.f1()
+  unit
+unit

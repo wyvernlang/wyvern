@@ -1,0 +1,46 @@
+module def fileReader(fileEffects : hierarchy.FileEffects) : {}
+
+resource type File
+  effect Read <= {fileEffects.Read}
+  effect Write <= {fileEffects.Write}
+  def read() : {this.Read} String
+  def write(s : String) : {this.Write} Unit
+
+def createFile(hasEffect : Boolean) : {} File
+    if (hasEffect) {
+      new
+      effect Read = {fileEffects.Read}
+      effect Write = {fileEffects.Write}
+      def read() : {this.Read} String
+        ""
+      def write(s : String) : {this.Read} Unit
+        unit
+    } else {
+      new
+      effect Read = {}
+      effect Write = {}
+      def read() : {this.Read} String
+        ""
+      def write(s : String) : {this.Read} Unit
+        unit
+    }
+
+def readFile() : {fileEffects.Read} Unit
+  val hasEffect : Boolean = false
+  val f : File = createFile(hasEffect)
+  f.read()
+  unit
+
+def copyFile(f : File) : {fileEffects.Write, f.Read} File
+  val g : File = new
+    var t : String = ""
+    effect Read = {fileEffects.Read}
+    effect Write = {fileEffects.Write}
+    def read() : {this.Read} String
+      this.t
+    def write(s : String) : {this.Write} Unit
+      this.t = s
+  f.read()
+  g.write (f.read())
+  g
+

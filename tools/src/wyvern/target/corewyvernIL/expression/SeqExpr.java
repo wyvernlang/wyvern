@@ -80,14 +80,39 @@ public class SeqExpr extends Expression {
     public Pair<TypeContext, ValueType> typecheckWithCtx(TypeContext ctx, EffectAccumulator effectAccumulator) {
         TypeContext extendedCtx = ctx;
         ValueType result = Util.unitType();
+        Set<VarBinding> bindings = new HashSet<>();
         for (HasLocation elem : elements) {
             if (elem instanceof VarBinding) {
                 VarBinding binding = (VarBinding) elem;
-                extendedCtx = binding.typecheck(extendedCtx, effectAccumulator);
+
+                /* Avoid variables created within the expression sequence */
+                EffectAccumulator tempAccumulator = new EffectAccumulator();
+                extendedCtx = binding.typecheck(extendedCtx, tempAccumulator);
+                for (VarBinding bindingToAvoid : bindings) {
+                    String varName = bindingToAvoid.getVarName();
+                    tempAccumulator.avoidVar(varName, extendedCtx);
+                }
+
+                if (effectAccumulator == null) {
+                    effectAccumulator = new EffectAccumulator();
+                }
+                effectAccumulator.addEffects(tempAccumulator.getEffectSet());
+
+                bindings.add(binding);
                 // TODO: make this Unit
                 result = binding.getType(); // Util.unitType();
             } else if (elem instanceof Expression) {
-                result = ((Expression) elem).typeCheck(extendedCtx, effectAccumulator);
+                EffectAccumulator tempAccumulator = new EffectAccumulator();
+                result = ((Expression) elem).typeCheck(extendedCtx, tempAccumulator);
+                for (VarBinding bindingToAvoid : bindings) {
+                    String varName = bindingToAvoid.getVarName();
+                    tempAccumulator.avoidVar(varName, extendedCtx);
+                }
+
+                if (effectAccumulator == null) {
+                    effectAccumulator = new EffectAccumulator();
+                }
+                effectAccumulator.addEffects(tempAccumulator.getEffectSet());
             } else {
                 throw new RuntimeException("invariant broken");
             }
@@ -110,7 +135,9 @@ public class SeqExpr extends Expression {
                         r.getReason());
             }
         }
-        if (getType() == null || effectAccumulator != null) {
+
+
+        if (getType() == null) {
             for (int i = elements.size() - 1; i >= 0; --i) {
                 HasLocation elem = elements.get(i);
                 if (elem instanceof VarBinding) {
@@ -119,9 +146,6 @@ public class SeqExpr extends Expression {
                     if (!ctx.isPresent(varName, true)) {
                         if (getType() == null) {
                             result = result.avoid(varName, extendedCtx);
-                        }
-                        if (effectAccumulator != null) {
-                            effectAccumulator.avoidVar(varName, extendedCtx);
                         }
                     }
                 }

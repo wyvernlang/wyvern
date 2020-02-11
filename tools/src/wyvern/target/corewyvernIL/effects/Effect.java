@@ -96,6 +96,16 @@ public class Effect {
         return findEffectDeclType(ctx).getEffectSet();
     }
 
+    /** Check that an effect exists in the context, returning the supereffect if there is one */
+    public EffectSet getSupereffect(TypeContext ctx) {
+        return findEffectDeclType(ctx).getSupereffect();
+    }
+
+    /** Check that an effect exists in the context, returning the subeffect if there is one */
+    public EffectSet getSubeffect(TypeContext ctx) {
+        return findEffectDeclType(ctx).getSubeffect();
+    }
+
     /** Find this effect's (effect)DeclType; report error if not found, else return effectDeclType. */
     public EffectDeclType findEffectDeclType(TypeContext ctx) {
         ValueType vt = null;
@@ -131,10 +141,66 @@ public class Effect {
         unscopedEffect.add(new Effect(new Variable("system"), "EffectNotInScope", null));
     }
 
+
+    public static boolean isUnscopedEffect(Set<Effect> e) {
+        return e.contains(new Effect(new Variable("system"), "EffectNotInScope", null));
+    }
+
+    private enum AvoidType {
+        INCREASING,
+        DECREASING,
+        EXACT
+    }
+
+    public Set<Effect> increasingAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.INCREASING);
+    }
+
+    public Set<Effect> decreasingAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.DECREASING);
+    }
+
+    public Set<Effect> exactAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.EXACT);
+    }
+
     public Set<Effect> doAvoid(String varName, TypeContext ctx, int count) {
+        return doAvoid(varName, ctx, count, AvoidType.INCREASING);
+    }
+
+    /**
+     * Avoid variable in an effect
+     * @param t The parameter which determine if the effect set can increase or decrease.
+     * @return A effect set that doesn't contain the variable to avoid, or unscopedEffect if avoidance is not possible
+     */
+    public Set<Effect> doAvoid(String varName, TypeContext ctx, int count, AvoidType t) {
         if (path != null && path.getFreeVariables().contains(varName)) {
             final EffectDeclType dt = findEffectDeclType(ctx);
-            if (dt.getEffectSet() != null) {
+            EffectSet supereffect = dt.getSupereffect();
+            if (t == AvoidType.INCREASING && dt.getSupereffect() != null) {
+                final Set<Effect> s = new HashSet<Effect>();
+                for (final Effect e : supereffect.getEffects()) {
+                    Set<Effect> eAvoid = e.doAvoid(varName, ctx, count + 1, t);
+                    if (isUnscopedEffect(eAvoid)) {
+                        return unscopedEffect;
+                    } else {
+                        s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    }
+                }
+                return s;
+            } else if (t == AvoidType.DECREASING && dt.getSubeffect() != null) {
+                EffectSet subeffect = dt.getSubeffect();
+                final Set<Effect> s = new HashSet<>();
+                for (final Effect e : subeffect.getEffects()) {
+                    Set<Effect> eAvoid = e.doAvoid(varName, ctx, count + 1, t);
+                    if (isUnscopedEffect(eAvoid)) {
+                        return unscopedEffect;
+                    } else {
+                        s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    }
+                }
+                return s;
+            } else if (dt.getEffectSet() != null) {
                 if (dt.getEffectSet().getEffects().size() == 1
                         && dt.getEffectSet().getEffects().iterator().next().equals(this)) {
                     // avoid infinite loops, just in case
@@ -147,7 +213,12 @@ public class Effect {
                 // different effects, so call recursively
                 final Set<Effect> s = new HashSet<Effect>();
                 for (final Effect e : dt.getEffectSet().getEffects()) {
-                    s.addAll(e.doAvoid(varName, ctx, count + 1));
+                    Set<Effect> eAvoid = e.doAvoid(varName, ctx, count + 1, t);
+                    if (isUnscopedEffect(eAvoid)) {
+                        return unscopedEffect;
+                    } else {
+                        s.addAll(e.doAvoid(varName, ctx, count + 1, t));
+                    }
                 }
                 return s;
             } else {
