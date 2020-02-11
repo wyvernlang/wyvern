@@ -1,5 +1,13 @@
 import hierarchy.fileReader
+import hierarchy.fileWriter
 import hierarchy.fileEffects
 
 val x = fileReader(fileEffects)
+
+def f(y : x.File) : {fileEffects.Read} Unit
+    y.read()
+    unit
+
+val y = fileWriter(fileEffects, fileEffects)
+
 unit
