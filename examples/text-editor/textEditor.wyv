@@ -13,9 +13,6 @@ import java:wyvern.stdlib.support.TextEditorHelper.nativeActionCreator
 import java:wyvern.stdlib.support.TextEditorHelper.nativeKeyListenerCreator
 import java:wyvern.stdlib.support.TextEditorHelper.nativeUIManager
 
-import fileSystem
-import fileSystem.Reader
-import fileSystem.Writer
 import OptionPane
 import TextArea
 import UIManager
