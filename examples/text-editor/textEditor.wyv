@@ -1,5 +1,5 @@
 import uiEffects
-module def textEditor(java: Java, fs: fileSystem.FileSystem, logger: Logger, createTextEditorInstance: Unit -> TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]): TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]
+module def textEditor(java: Java, fs: fileSystem.FileSystem, logger: Logger, createTextEditorInstance: Unit -> TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]): {system.FFI} TextEditor[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel, uiEffects.ReadTextArea, uiEffects.ShowDialog, fs.Write, fs.Append}]
 
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJTextArea
 import java:wyvern.stdlib.support.TextEditorHelper.nativeJFileChooser
