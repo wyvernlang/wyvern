@@ -1,0 +1,7 @@
+import uiEffects
+module def themePlugin(logger : Logger) : {}
+
+resource type ThemePlugin
+  effect Run <= {logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}
+  def getName(): {} String
+  def run(): {this.Run} Unit

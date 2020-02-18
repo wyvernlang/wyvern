@@ -1,0 +1,5 @@
+import uiEffects
+resource type OptionPane
+  effect ShowDialog = {uiEffects.ShowDialog}
+  def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
+  def getPlainMessageValue(): {} Int
