@@ -1,4 +1,3 @@
-import uiEffects
 resource type TextArea
-  effect Read = {uiEffects.ReadTextArea}
+  effect Read
   def getText(): {this.Read} String
