@@ -166,7 +166,7 @@ public class New extends Expression {
             // and sometimes fails to reason about an object in a field of this new being the
             // same as a let-bound object in an earlier part of the module.
             if (!moduleFlag) {
-                //ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
+                ToolError.reportError(ErrorMessage.NOT_SUBTYPE, this, actualT.desugar(ctx), requiredT.desugar(ctx), r.getReason());
             }
         }
 
