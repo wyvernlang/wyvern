@@ -107,14 +107,15 @@ def registerPlugin(plugin: Plugin): {RegisterPlugin, plugin.Run} Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
   logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
 
-def registerThemePlugin(plugin: ThemePlugin): {RegisterPlugin, plugin.Run} Unit
-  plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
-  logger.updateLog("Registered theme plugin " + plugin.getName() + ".\n")
-
 def runPluginOnSetup(plugin: Plugin): {plugin.Run, RunPluginExtra} Unit
   logger.updateLog("Running plugin " + plugin.getName() + "...\n")
   plugin.run()
   logger.updateLog("Ran plugin " + plugin.getName() + ".\n")
+
+def runThemePluginOnSetup(plugin: ThemePlugin): {plugin.Run, RunPluginExtra} Unit
+  logger.updateLog("Running theme plugin " + plugin.getName() + "...\n")
+  plugin.run()
+  logger.updateLog("Ran theme plugin " + plugin.getName() + ".\n")
 
 def saveFile(fileName: String): {SaveFile} Unit // N.B.: File exceptions aren't handled.
   val fileWriter = fs.fileFor(fileName).makeWriter()
@@ -219,13 +220,12 @@ def run(): {Run} Unit
   // Register plugins to be displayed in the menu so that the user can activate them on demand during the execution
   registerPlugin(wordCount)
   registerPlugin(questionnaireCreator)
-  registerThemePlugin(lightTheme)
 
   // Run plugins that should be run once on setup
   // Choose a theme: In Java, once the theme is changed, apparently, there is no way to change it again,
   // so only one theme can be used at a time.
-  runPluginOnSetup(darkTheme)
-  //runPluginOnSetup(lightTheme)
+  runThemePluginOnSetup(darkTheme)
+  //runThemePluginOnSetup(lightTheme)
 
 /****************************************************************************/
 

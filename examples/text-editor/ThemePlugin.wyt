@@ -1,5 +1,4 @@
 import uiEffects
-
 resource type ThemePlugin
   effect Run >= {uiEffects.PaintUI, uiEffects.SetUILookAndFeel}
   def getName(): {} String
