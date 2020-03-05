@@ -1,3 +1,0 @@
-resource type TextArea
-  effect Read
-  def getText(): {this.Read} String

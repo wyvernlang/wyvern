@@ -1,6 +1,0 @@
-module def themePlugin(logger : Logger, uiManager : UIManager) : {}
-
-resource type ThemePlugin
-  effect Run <= {logger.Update, uiManager.PaintUI, uiManager.SetLookAndFeel}
-  def getName(): {} String
-  def run(): {this.Run} Unit

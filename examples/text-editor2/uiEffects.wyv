@@ -1,5 +1,0 @@
-module uiEffects: {} UIEffects
-effect PaintUI = {system.FFI}
-effect SetUILookAndFeel = {system.FFI}
-effect ShowDialog = {system.FFI}
-effect ReadTextArea = {system.FFI}

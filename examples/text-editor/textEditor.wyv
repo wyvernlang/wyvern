@@ -17,6 +17,7 @@ import OptionPane
 import TextArea
 import UIManager
 import Plugin
+import ThemePlugin
 
 /******* Step 1: Import plugins *********************************************/
 
@@ -105,6 +106,10 @@ val questionnaireCreator: Plugin[{logger.Update, fs.Write, fs.Append, uiEffects.
 def registerPlugin(plugin: Plugin): {RegisterPlugin, plugin.Run} Unit
   plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
   logger.updateLog("Registered plugin " + plugin.getName() + ".\n")
+
+def registerThemePlugin(plugin: ThemePlugin): {RegisterPlugin, plugin.Run} Unit
+  plugins.add(nativeActionCreator.createWithAction(plugin.getName(), () => plugin.run()))
+  logger.updateLog("Registered theme plugin " + plugin.getName() + ".\n")
 
 def runPluginOnSetup(plugin: Plugin): {plugin.Run, RunPluginExtra} Unit
   logger.updateLog("Running plugin " + plugin.getName() + "...\n")
@@ -214,6 +219,7 @@ def run(): {Run} Unit
   // Register plugins to be displayed in the menu so that the user can activate them on demand during the execution
   registerPlugin(wordCount)
   registerPlugin(questionnaireCreator)
+  registerThemePlugin(lightTheme)
 
   // Run plugins that should be run once on setup
   // Choose a theme: In Java, once the theme is changed, apparently, there is no way to change it again,

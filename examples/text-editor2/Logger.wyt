@@ -1,3 +1,0 @@
-resource type Logger
-  effect Update
-  def updateLog(msg: String): {this.Update} Unit
