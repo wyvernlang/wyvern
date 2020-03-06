@@ -17,6 +17,7 @@ import OptionPane
 import TextArea
 import UIManager
 import Plugin
+import ThemePlugin
 
 /******* Step 1: Import plugins *********************************************/
 
@@ -110,6 +111,11 @@ def runPluginOnSetup(plugin: Plugin): {plugin.Run, RunPluginExtra} Unit
   logger.updateLog("Running plugin " + plugin.getName() + "...\n")
   plugin.run()
   logger.updateLog("Ran plugin " + plugin.getName() + ".\n")
+
+def runThemePluginOnSetup(plugin: ThemePlugin): {plugin.Run, RunPluginExtra} Unit
+  logger.updateLog("Running theme plugin " + plugin.getName() + "...\n")
+  plugin.run()
+  logger.updateLog("Ran theme plugin " + plugin.getName() + ".\n")
 
 def saveFile(fileName: String): {SaveFile} Unit // N.B.: File exceptions aren't handled.
   val fileWriter = fs.fileFor(fileName).makeWriter()
@@ -218,8 +224,8 @@ def run(): {Run} Unit
   // Run plugins that should be run once on setup
   // Choose a theme: In Java, once the theme is changed, apparently, there is no way to change it again,
   // so only one theme can be used at a time.
-  runPluginOnSetup(darkTheme)
-  //runPluginOnSetup(lightTheme)
+  runThemePluginOnSetup(darkTheme)
+  //runThemePluginOnSetup(lightTheme)
 
 /****************************************************************************/
 
