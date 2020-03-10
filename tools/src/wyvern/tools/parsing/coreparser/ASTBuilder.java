@@ -35,6 +35,7 @@ interface ASTBuilder<AST, Type> {
     AST varDeclType(String name, Type type, FileLocation loc);
     AST typeAbbrevDecl(String alias, Type reference, AST metadata, FileLocation loc);
     AST effectDeclType(String name, String effects, FileLocation loc);
+    AST effectDeclType(String name, String bound, boolean isSupereffect, FileLocation loc);
 
     AST constructDeclType(String name, List<GenericParameter> generics, List args, FileLocation loc);
 

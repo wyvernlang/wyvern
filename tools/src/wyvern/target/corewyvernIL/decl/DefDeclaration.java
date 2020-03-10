@@ -9,7 +9,6 @@ import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
-import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectAccumulator;
 import wyvern.target.corewyvernIL.effects.EffectSet;
@@ -153,10 +152,8 @@ public class DefDeclaration extends NamedDeclaration {
             final Set<Effect> actualEffectSet = effectAccumulator.getEffectSet();
 
             // compare method call effects with annotated ones
-            final EffectDeclType actualEffects = new EffectDeclType(getName() + "-actualEffects", new EffectSet(actualEffectSet), getLocation());
-            final EffectDeclType annotatedEffects = new EffectDeclType(getName() + "-annotatedEffects", effectSet, getLocation());
             final FailureReason r = new FailureReason();
-            if (!actualEffects.isSubtypeOf(annotatedEffects, methodCtx, r)) { // changed from ctx
+            if (!(new EffectSet(actualEffectSet)).isSubeffectOf(effectSet, methodCtx)) {
                 ToolError.reportError(ErrorMessage.NOT_SUBTYPE, getLocation(),
                         "Effect annotation " + effectSet.toString() + " on method " + getName(),
                         "effects that method produces, which are " + actualEffectSet.toString(),

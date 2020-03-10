@@ -558,12 +558,28 @@ AST VarDeclType() :
 AST EffectDeclType() :
 { Token name; Token effects = null;}
 {
-  <EFFECT> name = <IDENTIFIER> [<EQUALS> effects = <DSL_LITERAL>] <NEWLINE> {
+  LOOKAHEAD(10)
+  <EFFECT> name = <IDENTIFIER> <LE> effects = <DSL_LITERAL> <NEWLINE> {
+     return build.effectDeclType(name.image, effects.image, true, loc(name));
+  }
+|
+  LOOKAHEAD(10)
+  <EFFECT> name = <IDENTIFIER> <GE> effects = <DSL_LITERAL> <NEWLINE> {
+      return build.effectDeclType(name.image, effects.image, false, loc(name));
+    }
+|
+  LOOKAHEAD(4)
+  <EFFECT> name = <IDENTIFIER> <EQUALS> effects = <DSL_LITERAL> <NEWLINE> {
   	if (effects==null) {
     	return build.effectDeclType(name.image, null, loc(name));
   	}
   	return build.effectDeclType(name.image, effects.image, loc(name));
-  }
+   }
+|
+   <EFFECT> name = <IDENTIFIER> <NEWLINE> {
+      	return build.effectDeclType(name.image, null, loc(name));
+    }
+
 }
 
 AST ConstructDeclType() :

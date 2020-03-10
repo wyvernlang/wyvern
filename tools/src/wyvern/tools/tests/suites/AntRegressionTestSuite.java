@@ -30,6 +30,7 @@ import wyvern.tools.tests.RossettaCodeTests;
 import wyvern.tools.tests.StdlibTests;
 import wyvern.tools.tests.TransformTests;
 import wyvern.tools.tests.EffectSeparationTests;
+import wyvern.tools.tests.EffectHierarchyTests;
 
 /**
  * This test suite includes all working tests (as of this writing) that
@@ -68,7 +69,8 @@ import wyvern.tools.tests.EffectSeparationTests;
             HigherOrderTests.class,
             EffectSeparationTests.class,
             FileTest.class,
-            BackEndTests.class
+            BackEndTests.class,
+            EffectHierarchyTests.class
         }
         )
 public class AntRegressionTestSuite { }

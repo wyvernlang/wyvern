@@ -1,5 +1,5 @@
 import uiEffects
-type UIManager
+resource type UIManager
   effect PaintUI = {uiEffects.PaintUI}
   effect SetLookAndFeel = {uiEffects.SetUILookAndFeel}
   def paintUIAttributeBlack(element: String, attribute: String): {this.PaintUI} Unit

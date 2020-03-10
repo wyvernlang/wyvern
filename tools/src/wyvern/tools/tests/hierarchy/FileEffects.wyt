@@ -1,0 +1,4 @@
+type FileEffects
+
+    effect Read
+    effect Write

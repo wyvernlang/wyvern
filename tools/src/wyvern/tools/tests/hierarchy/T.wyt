@@ -1,0 +1,6 @@
+type T
+  effect E
+  effect F <= {this.E}
+  effect G >= {this.E}
+  def f1() : {this.F} Unit
+  def f2() : {this.E} Unit

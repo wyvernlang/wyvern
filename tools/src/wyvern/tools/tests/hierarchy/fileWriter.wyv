@@ -1,0 +1,24 @@
+module def fileWriter(fileEffects1 : hierarchy.FileEffects, fileEffects2 : hierarchy.FileEffects) : {}
+
+resource type File
+  effect Read <= {fileEffects1.Read, fileEffects2.Read}
+  effect Write <= {fileEffects1.Write, fileEffects2.Write}
+  def read() : {this.Read} String
+  def write(s : String) : {this.Write} Unit
+
+resource type File1
+  effect Read = {fileEffects1.Read}
+  effect Write = {fileEffects1.Write}
+  def read() : {this.Read} String
+  def write(s : String) : {this.Write} Unit
+  def append(f : File) : {this.Write, f.Read} Unit
+
+resource type File2
+  effect Read = {fileEffects2.Read}
+  effect Write = {fileEffects2.Write}
+  def read() : {this.Read} String
+  def write(s : String) : {this.Write} Unit
+  def append(f : File) : {this.Write, f.Read} Unit
+
+def appendfile1(f1 : File1, f2 : File2) : {f1.Write, f2.Read} Unit
+  f1.append(f2)

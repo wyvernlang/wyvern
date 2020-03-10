@@ -127,6 +127,11 @@ public class WyvernASTBuilder implements ASTBuilder<TypedAST, Type> {
     }
 
     @Override
+    public TypedAST effectDeclType(String name, String bound, boolean isSupereffect, FileLocation loc) {
+        return new EffectDeclaration(name, bound, isSupereffect, loc);
+    }
+
+    @Override
     public TypedAST constructDeclType(String name, List<GenericParameter> generics, List args, FileLocation loc) {
         TypedAST body;
         if (args == null) {

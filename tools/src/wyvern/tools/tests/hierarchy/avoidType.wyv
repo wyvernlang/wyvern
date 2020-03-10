@@ -1,0 +1,15 @@
+type S
+    effect e <= {system.FFI}
+
+type T
+    def foo() : {system.FFI} Unit
+
+def fun() : {} T
+    val x : S = new
+        effect e = {system.FFI}
+    val y = new
+        def foo() : {x.e} Unit
+            unit
+    y
+
+unit

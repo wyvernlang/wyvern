@@ -1,0 +1,4 @@
+module fileEffects
+
+effect Read = {system.FFI}
+effect Write = {system.FFI}
