@@ -9,3 +9,5 @@ exports.doMatch = function(s,r) {
     }
     return {found:found, matched:matched, after:after};
 }
+
+exports.RegExp = function(s) { return new RegExp(s); }

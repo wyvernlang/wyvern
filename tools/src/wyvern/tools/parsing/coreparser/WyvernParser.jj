@@ -380,7 +380,7 @@ AST DefDeclaration() :
 AST ValDeclaration() :
 { Type type = null; Token name; AST body; List args; }
 {
-  <VAL> name=<IDENTIFIER> [ <COLON> type = Type() ] <EQUALS> body = ExpressionLine(false) {
+  <VAL> (name=<IDENTIFIER> | name=<STRING_LITERAL>) [ <COLON> type = Type() ] <EQUALS> body = ExpressionLine(false) {
 	return build.valDecl(name.image, type, body, loc(name));
   }
 }
@@ -542,7 +542,7 @@ AST DefDeclType() :
 AST ValDeclType() :
 { Type type; Token name; List args; }
 {
-  <VAL> name=<IDENTIFIER> <COLON> type = Type() <NEWLINE> {
+  <VAL> (name=<IDENTIFIER> | name=<STRING_LITERAL>) <COLON> type = Type() <NEWLINE> {
 	return build.valDeclType(name.image, type, loc(name));
   }
 }
@@ -1022,7 +1022,7 @@ AST Literal() :
 AST PrimarySuffix(AST lhs, ExpFlags flags, boolean recur) :
 { List<AST> rhs; Token t; List<GenericArgument> generics = null;}
 {
-  <DOT> t = <IDENTIFIER> { 
+  <DOT> (t = <IDENTIFIER> | t = <STRING_LITERAL>) { 
     return build.invocation(lhs, t.image, null, loc(t)); }
 |
   [generics = Generics()] rhs = Arguments(flags) {
