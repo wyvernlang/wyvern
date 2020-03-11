@@ -46,6 +46,7 @@ public class NominalType extends ValueType {
         this.typeMember = typeMember;
     }
 
+    @Override
     public Path getPath() {
         return path;
     }

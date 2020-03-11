@@ -61,6 +61,7 @@ import wyvern.tools.errors.ToolError;
 import wyvern.tools.interop.FFI;
 import wyvern.tools.interop.FFIImport;
 import wyvern.tools.interop.JavaValue;
+import wyvern.tools.parsing.DSLLit;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.parsing.coreparser.ParseUtils;
 import wyvern.tools.parsing.coreparser.WyvernParser;
@@ -441,6 +442,10 @@ public class AST {
             }
         }
         return count;
+    }
+    
+    public IExpr getMetadataTypeReceiver(GenContext ctx) {
+        return ctx.lookupExp(DSLLit.METADATA_TYPE_RECEIVER, null);
     }
     
     public ValueType getObjectType(ObjectValue o, GenContext ctx) {

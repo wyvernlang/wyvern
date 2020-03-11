@@ -16,6 +16,7 @@ import wyvern.target.corewyvernIL.decltype.ConcreteTypeMember;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.EffectSet;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.generics.GenericArgument;
@@ -382,6 +383,11 @@ public class RefinementType extends ValueType {
         return BytecodeOuterClass.Type.newBuilder().setCompoundType(ct).build();
     }
 
+    @Override
+    public Path getPath() {
+        return base.getPath();
+    }
+    
     @Override
     public Value getMetadata(TypeContext ctx) {
         return base.getMetadata(ctx);

@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.IASTNode;
 import wyvern.target.corewyvernIL.decltype.DeclType;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.support.EvalContext;
@@ -62,6 +63,10 @@ public abstract class ValueType extends Type implements IASTNode {
      */
     public abstract void doPrettyPrint(Appendable dest, String indent, TypeContext ctx) throws IOException;
 
+    public Path getPath() {
+        return null;
+    }
+    
     public final void doPrettyPrint(Appendable dest, String indent) throws IOException {
         doPrettyPrint(dest, indent, null);
     }

@@ -10,7 +10,9 @@ import wyvern.target.corewyvernIL.expression.BooleanLiteral;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.IExpr;
 import wyvern.target.corewyvernIL.expression.Invokable;
+import wyvern.target.corewyvernIL.expression.Let;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
+import wyvern.target.corewyvernIL.expression.Path;
 import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -30,6 +32,7 @@ import wyvern.tools.typedAST.typedastvisitor.TypedASTVisitor;
  * Created by Ben Chung on 3/11/14.
  */
 public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
+    public static final String METADATA_TYPE_RECEIVER = "$metadataTypeReceiver$";
     private Optional<String> dslText = Optional.empty();
     private TypedAST dslAST = null;
     private FileLocation location;
@@ -85,7 +88,8 @@ public class DSLLit extends AbstractExpressionAST implements ExpressionAST {
         // TODO: check that parseTSLDecl has the right signature
         List<wyvern.target.corewyvernIL.expression.Value> args = new LinkedList<wyvern.target.corewyvernIL.expression.Value>();
         args.add(new StringLiteral(dslText.get()));
-        args.add(new JavaValue(JavaWrapper.wrapObject(ctx), new NominalType("system", "Context")));
+        GenContext ctxWithReceiver = ctx.extend(METADATA_TYPE_RECEIVER, (Expression) expectedType.getPath(), expectedType);
+        args.add(new JavaValue(JavaWrapper.wrapObject(ctxWithReceiver), new NominalType("system", "Context")));
         try {
             wyvern.target.corewyvernIL.expression.Value parsedAST = ((Invokable) metadata).invoke("parseTSL", args).executeIfThunk();
             // we get an option back, is it success?
