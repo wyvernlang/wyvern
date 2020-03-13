@@ -78,6 +78,7 @@ public final class Globals {
         javascriptWhiteList.add("stdlib.support.string");
         javascriptWhiteList.add("stdlib.support.float");
         javascriptWhiteList.add("stdlib.support.lexing");
+        javascriptWhiteList.add("stdlib.support.parsing");
     }
 
     private static boolean gettingPrelude = false;
