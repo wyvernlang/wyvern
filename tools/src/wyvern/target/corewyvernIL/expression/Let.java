@@ -3,6 +3,7 @@ package wyvern.target.corewyvernIL.expression;
 import java.io.IOException;
 import java.util.Set;
 
+import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.BindingSite;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -103,5 +104,23 @@ public class Let extends Expression {
 
     public BindingSite getSite() {
         return binding.getSite();
+    }
+    
+    @Override
+    public BytecodeOuterClass.Expression emitBytecode() {
+        BytecodeOuterClass.Expression.SequenceExpression.Builder sequence = BytecodeOuterClass.Expression.SequenceExpression
+                .newBuilder();
+        
+        BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.Builder builder 
+        = BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.newBuilder();
+        builder.setDeclaration(binding.emitBytecode());
+        sequence.addStatements(builder);
+        
+        BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.Builder builder2 
+        = BytecodeOuterClass.Expression.SequenceExpression.SequenceStatement.newBuilder();
+        builder2.setExpression(((Expression) inExpr).emitBytecode());
+        sequence.addStatements(builder2);
+        
+        return BytecodeOuterClass.Expression.newBuilder().setSequenceExpression(sequence).build();
     }
 }

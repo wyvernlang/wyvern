@@ -93,5 +93,8 @@ def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = ast.s
 
 def genIdent() : String = ast.genIdent()
 
+def getMetadataTypeReceiver(ctx : system.Context) : AST
+    ast.getMetadataTypeReceiver(ctx)
+
 def getType(e : AST, ctx : system.Context) : Type
   ast.getType(e, ctx)

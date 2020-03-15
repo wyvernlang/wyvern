@@ -11,6 +11,8 @@ public interface TypedAST extends TreeWritable, HasLocation, TypedASTNode {
     }
 
     default StringBuilder prettyPrint() {
-        throw new RuntimeException("prettyPrint not implemented for " + this.getClass());
+        StringBuilder sb = new StringBuilder();
+        sb.append("(prettyPrint not implemented for ").append(this.getClass()).append(')');
+        return sb;
     }
 }

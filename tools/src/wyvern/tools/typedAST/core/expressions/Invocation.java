@@ -5,6 +5,7 @@ import java.util.List;
 
 import wyvern.target.corewyvernIL.expression.FieldGet;
 import wyvern.target.corewyvernIL.expression.IExpr;
+import wyvern.target.corewyvernIL.expression.MethodCall;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.CallableExprGenerator;
 import wyvern.target.corewyvernIL.support.GenContext;
@@ -83,23 +84,30 @@ public class Invocation extends AbstractExpressionAST implements CoreAST, Assign
 
         CallableExprGenerator generator = getCallableExpr(ctx);
 
-        // Invoking property of a dynamic object; don't bother validating things.
-        if (generator.getDeclType(ctx) == null) {
-            return new FieldGet(
-                    receiver.generateIL(ctx, null, null),
-                    operationName,
-                    location);
-        }
-
+        List<IExpr> args = null;
         if (argument != null) {
-            IExpr arg  = ((ExpressionAST) argument)
-                    .generateIL(ctx, null, dependencies);
-
-            List<IExpr> args = new ArrayList<IExpr>();
+            args = new ArrayList<IExpr>();
+            IExpr arg = ((ExpressionAST) argument).generateIL(ctx, null, dependencies); 
             if (!(argument instanceof UnitVal)) { // TODO: This is hacky. Refactor me to avoid
                 args.add(arg);
             }
+        }
+        
+        // Invoking property of a dynamic object; don't bother validating things.
+        if (generator.getDeclType(ctx) == null) {
+            if (argument != null) {
+                return new MethodCall(
+                        receiver.generateIL(ctx, null, null),
+                        operationName, args, this, false);
+            } else {
+                return new FieldGet(
+                        receiver.generateIL(ctx, null, null),
+                        operationName,
+                        location);
+            }
+        }
 
+        if (argument != null) {
             return generator.genExprWithArgs(args, this, false, ctx);
         } else {
             return generator.genExpr(this.getLocation());

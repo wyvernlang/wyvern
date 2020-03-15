@@ -43,6 +43,7 @@ def compile(wyb: Dyn): Unit
     stdout.print("String.prototype._PLUS_ = function(x) { return this + x; };")
     stdout.print("String.prototype._length = function(x) { return this.length; };")
     stdout.print("String.prototype.equals = function(x) { return this === x; };")
+    stdout.print("Array.prototype.get = function(x) { return this[x]; };")
     def importLoop(i: Int, c: Int): Unit
         if (i < c)
             val imp = wyb.getImports(i)

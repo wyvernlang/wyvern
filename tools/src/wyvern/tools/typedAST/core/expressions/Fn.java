@@ -234,4 +234,12 @@ public class Fn extends AbstractExpressionAST implements CoreAST, BoundCode {
         }
         return ctx;
     }
+    
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("fn (").append(bindings.size()).append(") =>\n");
+        sb.append(body.prettyPrint());
+        return sb;
+    }
 }

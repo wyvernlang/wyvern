@@ -4,6 +4,10 @@ const generate = require("nearley/lib/generate");
 const nearleyGrammar = require("nearley/lib/nearley-language-bootstrapped");
 
 exports.makeParser = function (sourceCode, theLexer) {
+    return exports.makeParserWithContext(sourceCode, theLexer, undefined);
+}
+
+exports.makeParserWithContext = function (sourceCode, theLexer, context) {
     // Parse the grammar source into an AST
     const grammarParser = new nearley.Parser(nearleyGrammar);
     sourceCode = "@lexer theLexer\n" + sourceCode;
@@ -17,6 +21,7 @@ exports.makeParser = function (sourceCode, theLexer) {
 
     // Pretend this is a CommonJS environment to catch exports from the grammar.
     const module = { exports: {} };
+    // context is in scope for this evaluation
     eval(grammarJs);
 
     return new nearley.Parser(nearley.Grammar.fromCompiled(module.exports));

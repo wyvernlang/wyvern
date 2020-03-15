@@ -14,4 +14,8 @@ public abstract class AbstractExpressionAST extends AbstractTreeWritable impleme
     public CallableExprGenerator getCallableExpr(GenContext ctx) {
         return new DefaultExprGenerator(generateIL(ctx, null, new LinkedList<TypedModuleSpec>()));
     }
+    @Override
+    public String toString() {
+        return prettyPrint().toString();
+    }
 }

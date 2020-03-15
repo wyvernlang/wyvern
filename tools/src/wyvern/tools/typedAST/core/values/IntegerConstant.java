@@ -56,5 +56,10 @@ public class IntegerConstant extends AbstractExpressionAST implements InvokableV
     public <S, T> T acceptVisitor(TypedASTVisitor<S, T> visitor, S state) {
         return visitor.visit(state, this);
     }
-
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(value);
+        return sb;
+    }
 }

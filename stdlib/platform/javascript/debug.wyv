@@ -1,0 +1,12 @@
+module debug
+
+import javascript:stdlib.support.runtime
+
+def print(text:String):Unit
+	runtime.log(text)
+
+def printInt(n:Int):Unit
+	runtime.log(n)
+
+def println():Unit
+	runtime.log("\n")

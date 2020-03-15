@@ -66,8 +66,6 @@ public final class Globals {
         javaWhiteList.add("wyvern.stdlib.support.HashMapWrapper.hashmapwrapper");
         javaWhiteList.add("wyvern.stdlib.support.ArrayWrapper.arr");
         
-        // similar, for JavaScript
-        javascriptWhiteList.add("stdlib.support.regexUtils");
     }
 
     static {
@@ -77,8 +75,10 @@ public final class Globals {
         javascriptWhiteList.add("stdlib.support.jsinterop");
         javascriptWhiteList.add("stdlib.support.string");
         javascriptWhiteList.add("stdlib.support.float");
+        javascriptWhiteList.add("stdlib.support.int");
         javascriptWhiteList.add("stdlib.support.lexing");
         javascriptWhiteList.add("stdlib.support.parsing");
+        javascriptWhiteList.add("stdlib.support.regexUtils");
     }
 
     private static boolean gettingPrelude = false;

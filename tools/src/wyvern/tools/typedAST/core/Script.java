@@ -64,4 +64,13 @@ public class Script extends AbstractExpressionAST implements CoreAST {
         return visitor.visit(state, this);
     }
 
+    @Override
+    public StringBuilder prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("script\n");
+        sb.append("imports").append(requires);
+        sb.append("requires ").append(requires);
+        sb.append(body.prettyPrint());
+        return sb;
+    }
 }
