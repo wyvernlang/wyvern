@@ -20,6 +20,11 @@ public class StructuralTypesFromJava extends StructuralType {
     }
 
     public ValueType getJavaType(Class<?> javaClass, TypeContext ctx) {
+        return getJavaType(javaClass, ctx, true);
+    }
+
+    public ValueType getJavaType(Class<?> javaClass, TypeContext ctx, boolean safe) {
+        boolean helper = (javaClass.toString().contains("CallFrom"));
         Package package1 = javaClass.getPackage();
         String packageName = package1 == null ? "noPackage" : package1.getName();
         String className = javaClass.getSimpleName();
@@ -35,7 +40,7 @@ public class StructuralTypesFromJava extends StructuralType {
         StructuralTypesFromJava packageType = (StructuralTypesFromJava) ((ValDeclType) packageDecl).getRawResultType();
         ConcreteTypeMember classDecl = (ConcreteTypeMember) packageType.findDecl(className, ctx);
         if (classDecl == null) {
-            LazyStructuralType classType = new LazyStructuralType(javaClass, ctx);
+            LazyStructuralType classType = new LazyStructuralType(javaClass, ctx, safe);
             classDecl = new ConcreteTypeMember(className, classType);
 
             List<DeclType> newDeclTypes = new ArrayList<DeclType>(packageType.getDeclTypes().size() + 1);

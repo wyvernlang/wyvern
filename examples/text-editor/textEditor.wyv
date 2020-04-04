@@ -85,7 +85,7 @@ def getAttenuatedNativeJOptionPane(): {} OptionPane
     effect ShowDialog = {uiEffects.ShowDialog}
     def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
       nativeJOptionPane.showMessageDialog(message, title, messageType)
-    def getPlainMessageValue(): {} Int
+    def getPlainMessageValue(): {system.FFI} Int
       nativeJOptionPane.getPlainMessageValue()
 
 

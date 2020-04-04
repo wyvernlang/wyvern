@@ -26,7 +26,7 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
 
     val f = file.createNewFile(path)
 
-    def makeReader(): {} BoundedReader
+    def makeReader(): {system.FFI} BoundedReader
         val br = file.openBRForRead(this.f)
         new
             effect Read = {fileEffects.Read}
@@ -40,16 +40,16 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
                     option.Some[String](line)
             def readFully(): {this.Read} String
                 file.readFullyFile(br)
-            def close(): {} Unit
+            def close(): {system.FFI} Unit
                 file.closeReader(br)
 
-    def makeWriter(): {} Writer[{fileEffects.Write, fileEffects.Append}]
+    def makeWriter(): {system.FFI} Writer[{fileEffects.Write, fileEffects.Append}]
         val bw = file.openBWForWrite(this.f)
         new
             effect Write = {fileEffects.Write, fileEffects.Append}
             def write(s: String): {this.Write} Unit
                 file.writeString(bw, s)
-            def close(): {} Unit
+            def close(): {system.FFI} Unit
                 file.closeWriter(bw)
 
     /* For now this seems a little messy, considering the typical default
@@ -57,16 +57,16 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender(): {} Writer[{fileEffects.Append}]
+    def makeAppender(): {system.FFI} Writer[{fileEffects.Append}]
         val bw = file.openBWForAppend(this.f)
         new
             effect Write = {fileEffects.Append}
             def write(s: String): {this.Write} Unit
                 file.writeString(bw, s)
-            def close(): {} Unit
+            def close(): {system.FFI} Unit
                 file.closeWriter(bw)
 
-    def makeBinaryReader(): {} BinaryReader
+    def makeBinaryReader(): {system.FFI} BinaryReader
         val br = file.makeFileInputStream(this.f)
 
         new
@@ -88,10 +88,10 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
             */
             def readUTF(): {this.Read} String
                 file.readUTFFileInputStream(br)
-            def close(): {} Unit
+            def close(): {system.FFI} Unit
                 file.closeFileInputStream(br)
 
-    def makeBinaryWriter(): {} BinaryWriter
+    def makeBinaryWriter(): {system.FFI} BinaryWriter
         val bw = file.makeFileOutputStream(this.f)
         new
             effect Write = {fileEffects.Write}
@@ -105,21 +105,21 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
             */
             def writeUTF(s: String): {this.Write} Unit
                 file.writeUTFFileOutputStream(bw, s)
-            def close(): {} Unit
+            def close(): {system.FFI} Unit
                 file.closeFileOutputStream(bw)
 
-    def makeRandomAccessFile(mode: String): {} RandomAccessFile
+    def makeRandomAccessFile(mode: String): {system.FFI} RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new
             effect Read = {fileEffects.Read}
             effect Write = {fileEffects.Write}
-            def close(): {} Unit
+            def close(): {system.FFI} Unit
                 file.closeRandomAccessFile(rf)
-            def getPosition(): {} Int
+            def getPosition(): {system.FFI} Int
                 file.accessFilePointer(rf)
-            def seek(pos: Int): {} Unit
+            def seek(pos: Int): {system.FFI} Unit
                 file.seekFilePointer(rf, pos)
-            def length(): {} Int
+            def length(): {system.FFI} Int
                 file.getRandomAccessFileLength(rf)
             def readLine(): {this.Read} String
                 file.readLineRandomAccess(rf)
@@ -130,10 +130,10 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
             def writeUTF(s: String): {this.Write} Unit
                 file.writeUTFRandomAccess(rf, s)
 
-def makeByteArray(size: Int): {} ByteArray
+def makeByteArray(size: Int): {system.FFI} ByteArray
     val bytes = file.makeByteArray(size)
     new
-        def get(i: Int): {} Int
+        def get(i: Int): {system.FFI} Int
             file.getByteArray(bytes, i)
-        def set(i: Int, n: Int): {} Unit
+        def set(i: Int, n: Int): {system.FFI} Unit
             file.setByteArray(bytes, i, n)

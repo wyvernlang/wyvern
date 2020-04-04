@@ -74,5 +74,10 @@ public class EffectHierarchyTests {
     public void testFile() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "hierarchy.main", Util.unitType(), Util.unitValue());
     }
+
+    @Test
+    public void testImport() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "hierarchy.import", Util.unitType(), Util.unitValue());
+    }
 }
 
