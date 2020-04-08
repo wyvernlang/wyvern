@@ -2,9 +2,9 @@ module def bytebuffer(java:Java)
 
 import java:wyvern.stdlib.support.ByteBufferWrapper.bb
 
-import filesystem.fileEffects
-import filesystem.BinaryWriter
-import filesystem.BinaryReader
+import fileSystem.fileEffects
+import fileSystem.BinaryWriter
+import fileSystem.BinaryReader
 
 // TODO: can add more functionality, dealing with marks, clearing, relative operations, resetting the pointer
 type ByteBuffer
