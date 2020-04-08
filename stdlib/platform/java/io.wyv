@@ -5,10 +5,10 @@ import java:wyvern.stdlib.support.IO.io
 import io.networkEffects
 
 //Import types
-import filesystem.BinaryReader
-import filesystem.BinaryWriter
-import filesystem.Reader
-import filesystem.Writer
+import fileSystem.BinaryReader
+import fileSystem.BinaryWriter
+import fileSystem.Reader
+import fileSystem.Writer
 
 //Import modules
 import bytebuffer
