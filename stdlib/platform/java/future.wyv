@@ -1,0 +1,21 @@
+module def future(java : Java) : {}
+
+import java:wyvern.stdlib.support.NIO.nio
+
+resource type Future
+    type T
+    def get() : this.T //blocking call
+    def isCancelled() : Boolean
+    def isDone() : Boolean
+    def cancel() : Boolean
+    def andThen[U](cb : this.T -> U) : Future[U]
+    // also can add timeout for get as an Option later
+
+// takes in x of Java type Future<T>
+def Future[T](x:Unit):Future[T] = new
+    type T = T
+    def get() : T = nio.futureGet(x)
+    def isCancelled() : Boolean = nio.futureIsCancelled(x)
+    def isDone() : Boolean = nio.futureIsDone(x)
+    def cancel() : Boolean = nio.futureCancel(x)
+    def andThen[U](cb : T -> U) : Future[U] = Future[U](nio.applyCallback(x, cb))

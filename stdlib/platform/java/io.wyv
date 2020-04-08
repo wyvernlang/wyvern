@@ -1,50 +1,166 @@
 module def io(java:Java)
 import java:wyvern.stdlib.support.IO.io
 
+//Import effects
+import io.networkEffects
+
+//Import types
+import filesystem.BinaryReader
+import filesystem.BinaryWriter
+import filesystem.Reader
+import filesystem.Writer
+
+//Import modules
+import bytebuffer
+import wyvern.option
+
+val bytebuffer = bytebuffer(java)
+type ByteBuffer = bytebuffer.ByteBuffer
+
+effect Connect = {networkEffects.Connect}
+
 // === Library Types ===
-type InputStream
-    def close():Unit
-
-type OutputStream
-    def close():Unit
-
-type DataInputStream
-    def readUTF():String
-    def readLine(): String
-    def close():Unit
-
-type DataOutputStream
-    def writeUTF(str:String):Unit
-    def writeBytes(str:String):Unit
-    def close():Unit
 
 type Socket
-    def getOutputStream():OutputStream
-    def getInputStream():InputStream
+    def makeReader():Reader
+    def makeWriter():Writer
+    def makeBinaryReader():BinaryReader
+    def makeBinaryWriter():BinaryWriter
     def close():Unit
 
 type ServerSocket
-    def accept():Socket
+    def accept():{Connect}Socket
+    def close():Unit
+
+type DatagramChannel
+    def send(p:Packet):{networkEffects.Write}Int
+    def receive(buf:ByteBuffer):{networkEffects.Read}Packet
+    def close():Unit
+
+resource type Packet
+    val data : ByteBuffer
+    val address : Unit // java SocketAddress
 
 // === Creator Functions ===
 def makeServerSocket(port:Int):ServerSocket
-    io.makeServerSocket(port)
+    val serverSocket = io.makeServerSocket(port)
+    new
+        def accept():{Connect}Socket
+            val socket = serverSocket.accept()
+            //copied from makeSocket
+            new
+                def makeReader():Reader
+                    val reader = io.makeReader(socket)
+                    new
+                        effect Read = {networkEffects.Read}
+                        def read():{this.Read}Int
+                            reader.read()
+                        def readLine():{this.Read}option.Option[String]
+                            val s : String = reader.readLine()
+                            if(io.isNull(s))
+                                option.None[String]()
+                              else
+                                option.Some[String](s)
+                        def close():{}Unit
+                            reader.close()
+                def makeWriter():Writer
+                    val writer = io.makeWriter(socket)
+                    new
+                        effect Write = {networkEffects.Write}
+                        def write(s:String):{this.Write}Unit
+                            writer.write(s)
+                        def close():{}Unit
+                            writer.close()
+                //DataInputStream abstraction
+                def makeBinaryReader():BinaryReader
+                    val reader = io.makeBinaryReader(socket)
+                    new
+                        effect Read = {networkEffects.Read}
+                        def read():{this.Read}Int
+                            reader.read()
+                        def readUTF():{this.Read}String
+                            reader.readUTF()
+                        def close():Unit
+                            reader.close()
+                //DataOutputStream abstraction
+                def makeBinaryWriter():BinaryWriter
+                    val writer = io.makeBinaryWriter(socket)
+                    new
+                        effect Write = {networkEffects.Write}
+                        def write(b:Int):{this.Write}Unit
+                            writer.write(b)
+                        def writeUTF(s:String):{this.Write}Unit
+                            writer.writeUTF(s)
+                        def close():Unit
+                            writer.close()
+                def close():Unit
+                    socket.close()
+        def close():Unit
+            serverSocket.close()
 
-def makeSocket(hostname:String, port:Int):Socket
-    io.makeSocket(hostname, port)
+def makeSocket(hostname:String, port:Int):{Connect}Socket
+    val socket = io.makeSocket(hostname, port)
+    new
+        def makeReader():Reader
+            val reader = io.makeReader(socket)
+            new
+                effect Read = {networkEffects.Read}
+                def read():{this.Read}Int
+                    reader.read()
+                def readLine():{this.Read}option.Option[String]
+                    val s : String = reader.readLine()
+                    if(io.isNull(s))
+                        option.None[String]()
+                      else
+                        option.Some[String](s)
+                def close():{}Unit
+                    reader.close()
+        def makeWriter():Writer
+            val writer = io.makeWriter(socket)
+            new
+                effect Write = {networkEffects.Write}
+                def write(s:String):{this.Write}Unit
+                    writer.write(s)
+                def close():{}Unit
+                    writer.close()
+        def makeBinaryReader():BinaryReader
+            val reader = io.makeBinaryReader(socket)
+            new
+                effect Read = {networkEffects.Read}
+                def read():{this.Read}Int
+                    reader.read()
+                def readUTF():{this.Read}String
+                    reader.readUTF()
+                def close():Unit
+                    reader.close()
+        def makeBinaryWriter():BinaryWriter
+            val writer = io.makeBinaryWriter(socket)
+            new
+                effect Write = {networkEffects.Write}
+                def write(b:Int):{this.Write}Unit
+                    writer.write(b)
+                def writeUTF(s:String):{this.Write}Unit
+                    writer.writeUTF(s)
+                def close():Unit
+                    writer.close()
+        def close():Unit
+            socket.close()
+            
 
-/**
-* TODO: Hide functions that take arg:Dyn from the user
-*/
+def makeSocketAddress(hostname : String, port : Int) : Unit
+    io.makeSocketAddress(hostname, port)
 
-def getDataOutputStream(out:Dyn):DataOutputStream // This will be the hidden function
-    io.getDataOutputStream(out)
+def makeDatagramChannel(port:Int):DatagramChannel
+    val chan = io.makeDatagramChannel(port)
+    new
+        def send(p:Packet):{networkEffects.Write}Int
+            io.sendDatagram(chan, p.data.buffer, p.address)
+        def receive(buf:ByteBuffer):{networkEffects.Read}Packet = new
+            val data = buf
+            val address = io.receiveDatagram(chan, buf.buffer)
+        def close():Unit
+            io.closeChannel(chan)
 
-def makeDataOutputStream(out:OutputStream):DataOutputStream
-    getDataOutputStream(out)
-
-def getDataInputStream(in:Dyn):DataInputStream // This will be the hidden function
-    io.getDataInputStream(in)
-
-def makeDataInputStream(in:InputStream):DataInputStream
-    getDataInputStream(in)
+def makePacket(data:ByteBuffer, hostname:String, port:Int):Packet = new
+    val data = data
+    val address = io.makeSocketAddress(hostname, port)

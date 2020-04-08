@@ -179,6 +179,7 @@ public class FileIO {
     }
     
     //reads UTF-16 encoding, little endian with no byte marker for cleaner reads
+    //TODO: UTF-16 is variable length, 2 or 4 bytes, revise to reflect
     public String readUTFFileInputStream(FileInputStream f) throws IOException {
         byte[] readData = new byte[2];
         for (int i = 0; i < 2; i++) {

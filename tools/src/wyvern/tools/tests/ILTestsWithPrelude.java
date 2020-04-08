@@ -8,6 +8,7 @@ import org.junit.experimental.categories.Category;
 import wyvern.stdlib.Globals;
 import wyvern.target.corewyvernIL.expression.IntegerLiteral;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.tools.Interpreter;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.parsing.coreparser.ParseException;
@@ -40,6 +41,18 @@ public class ILTestsWithPrelude {
                 + "x.append(2)\n"
                 + "x.length()\n";
         TestUtil.doTest(src, Util.dynType(), new IntegerLiteral(2));
+    }
+
+    @Test
+    public void testInterpreterOnScript() {
+        String[] args = new String[] {TestUtil.EXAMPLES_PATH + "rosetta/hello.wyv"};
+        Interpreter.wyvernHome.set("..");
+        Interpreter.main(args);
+    }
+
+    @Test
+    public void testPreviousTopLevelBug() throws ParseException {
+        TestUtil.doTestScriptModularly("modules.topLevelBug", null, null);
     }
 
     @Test
