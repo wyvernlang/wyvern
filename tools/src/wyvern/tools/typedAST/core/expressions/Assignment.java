@@ -90,60 +90,66 @@ public class Assignment extends AbstractExpressionAST implements CoreAST {
         }
     }
 
+    public static ValueType getOptionType(ValueType optionType) {
+      if (optionType instanceof RefinementType) {
+
+        // cast the type memeber to refinement type
+        RefinementType optionRefinementType = (RefinementType) optionType;
+
+        // extract base type of the passed in option type, "option.Option".
+        // note that getBase returns ValueType
+        ValueType optionBaseType = optionRefinementType.getBase();
+
+        if (optionBaseType.equals(new NominalType("option", "Option")) 
+         || optionBaseType.equals(new NominalType("MOD$wyvern.option", "Option"))) {
+
+          // obtain the generic argument list from the lhs Refinement Type
+          List<GenericArgument> genList = optionRefinementType.getGenericArguments();
+
+          // ensure that generic list only has 1 argument.
+          // requirement for option.Option type
+          if (genList.size() == 1) {
+            return genList.get(0).getType();
+          }
+        }
+      }
+
+      // return null if any of the type checks above failed
+      return null;
+    }
+
     public static IExpr generateOptionExpr(ValueType lhsExpressionExpectedType, IExpr rhsExpression, ValueType rhsExpressionType, FileLocation location) {
         // when LHS Type = RefinementType(option.Option[T]),
         // check if T matches between the base type of LHS expression and the RHS expression.
         // If so, change the RHS from a regular type T to option.Option[T] (MethodCall object)
         // If so, change the RHS type from NominalType([T]) to RefinementType(option.Option[T])
 
-        // case when lhs has expected type of RefinementType and rhs has actually that is not of Refinement Type
-        if (lhsExpressionExpectedType instanceof RefinementType) {
+        // Type check: check if the LHS option type matches the RHS type
+        if (rhsExpressionType.equals(getOptionType(lhsExpressionExpectedType))) {
 
-          // cast the type memeber to refinement type
-          RefinementType lhsExpectedType = (RefinementType) lhsExpressionExpectedType;
+          // list of intermediate expressions, to be passed into the MethodCall object that is created.
+          List<IExpr> iExprList = new LinkedList<>();
 
-          // extract base type of the LHS expected type, "option.Option", getBase returns ValueType
-          ValueType lhsBaseType = lhsExpectedType.getBase();
-
-          if (lhsBaseType.equals(new NominalType("option", "Option")) 
-           || lhsBaseType.equals(new NominalType("MOD$wyvern.option", "Option"))) {
-
-            // obtain the generic argument list from the lhs Refinement Type
-            List<GenericArgument> genList = lhsExpectedType.getGenericArguments();
-
-            // ensure that generic list only has 1 argument.
-            // requirement for option.Option type
-            if (genList.size() == 1) {
-
-              // type check the generic argument (if it matches the rhs assignment type)
-              if (rhsExpressionType.equals(genList.get(0).getType())) {
-
-                // list of intermediate expressions, to be passed into the MethodCall object that is created.
-                List<IExpr> iExprList = new LinkedList<>();
-
-                // iExprList[0] = New(TypeDeclaration(type T = system.string)), type declaration
-                // iExprList[1] = RHS Expression
-                iExprList.add(new wyvern.target.corewyvernIL.expression.New(
-                  new wyvern.target.corewyvernIL.decl.TypeDeclaration(
-                      "T", 
-                      rhsExpressionType,
-                      location), 
-                location));
-                iExprList.add(rhsExpression);
-
-                // convert rhs actual assignment type T to lhs type option.Option[T]
-                // Modify the expr to assign (RHS), to emulate the option expression based on the base type (RHS Expression Type)
-                return new MethodCall((IExpr) new wyvern.target.corewyvernIL.expression.Variable(((NominalType) lhsBaseType).getPath().toString(), location),
-                                              "Some",
-                                              iExprList,
-                                              null);
-              }
-              // otherwise the type T in option.Option[T] does not match the actual type T on the rhs
-              // do nothing, proceed with the normal approach for assignment statements
-              // implicit conversion is not performed
-            }
-          }
+          // iExprList[0] = New(TypeDeclaration(type T = system.string)), type declaration
+          // iExprList[1] = RHS Expression
+          iExprList.add(new wyvern.target.corewyvernIL.expression.New(
+            new wyvern.target.corewyvernIL.decl.TypeDeclaration(
+                "T", 
+                rhsExpressionType,
+                location), 
+          location));
+          iExprList.add(rhsExpression);
+          
+          // convert rhs actual assignment type T to lhs type option.Option[T]
+          // Modify the expr to assign (RHS), to emulate the option expression based on the base type (RHS Expression Type)
+          return new MethodCall((IExpr) new wyvern.target.corewyvernIL.expression.Variable("MOD$wyvern.option", location),
+                                        "Some",
+                                        iExprList,
+                                        null);
         }
+        // otherwise the type T in option.Option[T] does not match the actual type T on the rhs
+        // do nothing, proceed with the normal approach for assignment statements
+        // implicit conversion is not performed
         return null;
     }
 
