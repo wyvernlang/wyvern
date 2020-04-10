@@ -1,5 +1,6 @@
 resource type BinaryWriter
     effect Write
+    effect Close
     def write(b: Int): {this.Write}Unit
     def writeUTF(s: String): {this.Write}Unit
     /*
@@ -9,4 +10,4 @@ resource type BinaryWriter
     def writeShort(b: Int): Unit
     def writeLong(b: Int): Unit
     */
-    def close(): {} Unit
+    def close(): {this.Close} Unit

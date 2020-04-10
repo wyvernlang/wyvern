@@ -1,3 +1,5 @@
 resource type ByteArray
-    def get(i:Int):{}Int
-    def set(i:Int,n:Int):{}Unit
+    effect Read
+    effect Write
+    def get(i:Int):{this.Read}Int
+    def set(i:Int,n:Int):{this.Write}Unit

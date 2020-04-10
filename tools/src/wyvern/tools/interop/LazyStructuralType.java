@@ -20,8 +20,12 @@ public class LazyStructuralType extends StructuralType {
     private Class<?> javaClass;
     private TypeContext ctx;
     private boolean initialized = false;
-    private boolean safe = true;
+    private boolean safe;
 
+    /**
+     * @param safe if safe==true, then javaClass doesn't contain mutable state or access system resources
+     *             If !safe, all methods in javaClass should be annotated with {system.FFI}
+     */
     public LazyStructuralType(Class<?> javaClass, TypeContext ctx, boolean safe) {
         super("java_type", new ArrayList<DeclType>());
         this.javaClass = javaClass;

@@ -23,8 +23,10 @@ public class StructuralTypesFromJava extends StructuralType {
         return getJavaType(javaClass, ctx, true);
     }
 
+    /**
+     * @param safe if safe==true, then javaClass doesn't contain mutable state or access system resources
+     */
     public ValueType getJavaType(Class<?> javaClass, TypeContext ctx, boolean safe) {
-        boolean helper = (javaClass.toString().contains("CallFrom"));
         Package package1 = javaClass.getPackage();
         String packageName = package1 == null ? "noPackage" : package1.getName();
         String className = javaClass.getSimpleName();
