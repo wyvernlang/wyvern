@@ -53,6 +53,7 @@ def makeServerSocket(port:Int):ServerSocket
                     val reader = io.makeReader(socket)
                     new
                         effect Read = {networkEffects.Read}
+                        effect Close = {networkEffects.Close}
                         def read():{this.Read}Int
                             reader.read()
                         def readLine():{this.Read}option.Option[String]
@@ -67,31 +68,34 @@ def makeServerSocket(port:Int):ServerSocket
                     val writer = io.makeWriter(socket)
                     new
                         effect Write = {networkEffects.Write}
+                        effect Close = {networkEffects.Close}
                         def write(s:String):{this.Write}Unit
                             writer.write(s)
-                        def close():{}Unit
+                        def close():{this.Close}Unit
                             writer.close()
                 //DataInputStream abstraction
                 def makeBinaryReader():BinaryReader
                     val reader = io.makeBinaryReader(socket)
                     new
                         effect Read = {networkEffects.Read}
+                        effect Close = {networkEffects.Close}
                         def read():{this.Read}Int
                             reader.read()
                         def readUTF():{this.Read}String
                             reader.readUTF()
-                        def close():Unit
+                        def close(): {this.Close} Unit
                             reader.close()
                 //DataOutputStream abstraction
                 def makeBinaryWriter():BinaryWriter
                     val writer = io.makeBinaryWriter(socket)
                     new
                         effect Write = {networkEffects.Write}
+                        effect Close = {networkEffects.Close}
                         def write(b:Int):{this.Write}Unit
                             writer.write(b)
                         def writeUTF(s:String):{this.Write}Unit
                             writer.writeUTF(s)
-                        def close():Unit
+                        def close(): {this.Close} Unit
                             writer.close()
                 def close():Unit
                     socket.close()
@@ -105,6 +109,7 @@ def makeSocket(hostname:String, port:Int):{Connect}Socket
             val reader = io.makeReader(socket)
             new
                 effect Read = {networkEffects.Read}
+                effect Close = {networkEffects.Close}
                 def read():{this.Read}Int
                     reader.read()
                 def readLine():{this.Read}option.Option[String]
@@ -113,35 +118,38 @@ def makeSocket(hostname:String, port:Int):{Connect}Socket
                         option.None[String]()
                       else
                         option.Some[String](s)
-                def close():{}Unit
+                def close():{this.Close}Unit
                     reader.close()
         def makeWriter():Writer
             val writer = io.makeWriter(socket)
             new
                 effect Write = {networkEffects.Write}
+                effect Close = {networkEffects.Close}
                 def write(s:String):{this.Write}Unit
                     writer.write(s)
-                def close():{}Unit
+                def close():{this.Close}Unit
                     writer.close()
         def makeBinaryReader():BinaryReader
             val reader = io.makeBinaryReader(socket)
             new
                 effect Read = {networkEffects.Read}
+                effect Close = {networkEffects.Close}
                 def read():{this.Read}Int
                     reader.read()
                 def readUTF():{this.Read}String
                     reader.readUTF()
-                def close():Unit
+                def close(): {this.Close} Unit
                     reader.close()
         def makeBinaryWriter():BinaryWriter
             val writer = io.makeBinaryWriter(socket)
             new
                 effect Write = {networkEffects.Write}
+                effect Close = {networkEffects.Close}
                 def write(b:Int):{this.Write}Unit
                     writer.write(b)
                 def writeUTF(s:String):{this.Write}Unit
                     writer.writeUTF(s)
-                def close():Unit
+                def close(): {this.Close} Unit
                     writer.close()
         def close():Unit
             socket.close()

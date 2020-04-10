@@ -42,6 +42,7 @@ def makeBinaryReaderFor(buf : ByteBuffer) : BinaryReader
     bb.initializeForRead(buf.buffer)
     new
         effect Read = {fileEffects.Read}
+        effect Close = {fileEffects.Close}
         def read() : {this.Read} Int
             bb.getNext(buf.buffer)
         def readUTF() : {this.Read} String
@@ -53,6 +54,7 @@ def makeBinaryWriterFor(buf : ByteBuffer) : BinaryWriter
     bb.initializeForWrite(buf.buffer)
     new
         effect Write = {fileEffects.Write}
+        effect Close = {fileEffects.Close}
         //write byte
         def write(b : Int) : {this.Write} Unit
             bb.writeNext(buf.buffer, b)
