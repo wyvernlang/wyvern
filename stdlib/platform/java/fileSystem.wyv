@@ -26,10 +26,11 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
 
     val f = file.createNewFile(path)
 
-    def makeReader(): {} BoundedReader
+    def makeReader(): {fileEffects.Read} BoundedReader
         val br = file.openBRForRead(this.f)
         new
             effect Read = {fileEffects.Read}
+            effect Close = {fileEffects.Close}
             def read(): {this.Read} Int
                 file.readCharFromFile(br)
             def readLine(): {this.Read} Option[String]
@@ -40,16 +41,17 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
                     option.Some[String](line)
             def readFully(): {this.Read} String
                 file.readFullyFile(br)
-            def close(): {} Unit
+            def close(): {this.Close} Unit
                 file.closeReader(br)
 
-    def makeWriter(): {} Writer[{fileEffects.Write, fileEffects.Append}]
+    def makeWriter(): {fileEffects.Read} Writer[{fileEffects.Write, fileEffects.Append}, {fileEffects.Close}]
         val bw = file.openBWForWrite(this.f)
         new
             effect Write = {fileEffects.Write, fileEffects.Append}
+            effect Close = {fileEffects.Close}
             def write(s: String): {this.Write} Unit
                 file.writeString(bw, s)
-            def close(): {} Unit
+            def close(): {this.Close} Unit
                 file.closeWriter(bw)
 
     /* For now this seems a little messy, considering the typical default
@@ -57,20 +59,22 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
      * Consider how to design this better
      * Name method openForAppend or openForWrite? Since they're just returning Writer
      */
-    def makeAppender(): {} Writer[{fileEffects.Append}]
+    def makeAppender(): {fileEffects.Read} Writer[{fileEffects.Append}, {fileEffects.Close}]
         val bw = file.openBWForAppend(this.f)
         new
             effect Write = {fileEffects.Append}
+            effect Close = {fileEffects.Close}
             def write(s: String): {this.Write} Unit
                 file.writeString(bw, s)
-            def close(): {} Unit
+            def close(): {this.Close} Unit
                 file.closeWriter(bw)
 
-    def makeBinaryReader(): {} BinaryReader
+    def makeBinaryReader(): {fileEffects.Write} BinaryReader
         val br = file.makeFileInputStream(this.f)
 
         new
             effect Read = {fileEffects.Read}
+            effect Close = {fileEffects.Close}
             def read(): {this.Read} Int
                 file.readArbitraryPrecisionInteger(br)
             /*
@@ -88,13 +92,14 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
             */
             def readUTF(): {this.Read} String
                 file.readUTFFileInputStream(br)
-            def close(): {} Unit
+            def close(): {this.Close} Unit
                 file.closeFileInputStream(br)
 
-    def makeBinaryWriter(): {} BinaryWriter
+    def makeBinaryWriter(): {fileEffects.Write} BinaryWriter
         val bw = file.makeFileOutputStream(this.f)
         new
             effect Write = {fileEffects.Write}
+            effect Close = {fileEffects.Close}
             def write(b: Int): {this.Write} Unit
                 file.writeArbitraryPrecisionInteger(bw, b)
             /*
@@ -105,21 +110,22 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
             */
             def writeUTF(s: String): {this.Write} Unit
                 file.writeUTFFileOutputStream(bw, s)
-            def close(): {} Unit
+            def close(): {this.Close} Unit
                 file.closeFileOutputStream(bw)
 
-    def makeRandomAccessFile(mode: String): {} RandomAccessFile
+    def makeRandomAccessFile(mode: String): {fileEffects.Write} RandomAccessFile
         val rf = file.makeRandomAccessFile(this.f, mode)
         new
             effect Read = {fileEffects.Read}
             effect Write = {fileEffects.Write}
-            def close(): {} Unit
+            effect Close = {fileEffects.Close}
+            def close(): {this.Close} Unit
                 file.closeRandomAccessFile(rf)
-            def getPosition(): {} Int
+            def getPosition(): {this.Read} Int
                 file.accessFilePointer(rf)
-            def seek(pos: Int): {} Unit
+            def seek(pos: Int): {this.Read} Unit
                 file.seekFilePointer(rf, pos)
-            def length(): {} Int
+            def length(): {this.Read} Int
                 file.getRandomAccessFileLength(rf)
             def readLine(): {this.Read} String
                 file.readLineRandomAccess(rf)
@@ -130,10 +136,12 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
             def writeUTF(s: String): {this.Write} Unit
                 file.writeUTFRandomAccess(rf, s)
 
-def makeByteArray(size: Int): {} ByteArray
+def makeByteArray(size: Int): {fileEffects.Write} ByteArray
     val bytes = file.makeByteArray(size)
     new
-        def get(i: Int): {} Int
+        effect Read = {fileEffects.Read}
+        effect Write = {fileEffects.Write}
+        def get(i: Int): {this.Read} Int
             file.getByteArray(bytes, i)
-        def set(i: Int, n: Int): {} Unit
+        def set(i: Int, n: Int): {this.Write} Unit
             file.setByteArray(bytes, i, n)

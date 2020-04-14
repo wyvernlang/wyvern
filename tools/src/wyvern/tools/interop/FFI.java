@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import wyvern.stdlib.Globals;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -103,7 +104,10 @@ public class FFI extends AbstractValue {
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
         ctx = ImportDeclaration.extendWithImportCtx(obj, ctx);
 
-        ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx);
+        assert (uri.toString().substring(0, 5).equals("java:"));
+        boolean safe = Globals.checkSafeJavaImport(uri.toString().substring(5));
+        ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx, safe);
+
         Expression importExp = new FFIImport(new NominalType("system", "java"), importPath, type);
         ctx = ctx.extend(importName, new Variable(importName), type);
         return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);

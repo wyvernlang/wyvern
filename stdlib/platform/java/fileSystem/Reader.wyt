@@ -3,7 +3,8 @@ type Option = option.Option
 
 resource type Reader
     effect Read
+    effect Close
     def read():{this.Read}Int
     def readLine():{this.Read}Option[String]
     //def readFully():{this.Read}String //reader default, bounded reader as subclass
-    def close():{}Unit
+    def close():{this.Close}Unit

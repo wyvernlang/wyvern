@@ -13,6 +13,14 @@ public final class GenUtil {
     private static ValueType javaTypes = new StructuralTypesFromJava();;
 
     public static ValueType javaClassToWyvernType(Class<?> javaClass, TypeContext ctx) {
+        return javaClassToWyvernType(javaClass, ctx, true);
+    }
+
+    /**
+     * Convert Java class into Wyvern types
+     * @param safe A java class is safe if it doesn't have mutable state or access system resources.
+     */
+    public static ValueType javaClassToWyvernType(Class<?> javaClass, TypeContext ctx, boolean safe) {
         //return javaClassToWyvernTypeRec(javaClass, new HashSet<String>());
         // TODO: extend to types other than int, and structural types based on that
         if (javaClass.getName().equals("int")) {
@@ -92,7 +100,7 @@ public final class GenUtil {
         }
 
         StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupTypeOf(javaTypesObjectName);
-        return type.getJavaType(javaClass, ctx);
+        return type.getJavaType(javaClass, ctx, safe);
     }
 
     public static Variable getJavaTypesObject() {

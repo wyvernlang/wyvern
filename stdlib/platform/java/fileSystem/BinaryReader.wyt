@@ -1,6 +1,7 @@
 resource type BinaryReader
     effect Read
+    effect Close
     def read(): {this.Read}Int
     //def readBytes(numBytes: Int): {this.Read}Int
     def readUTF(): {this.Read}String
-    def close(): {} Unit
+    def close(): {this.Close} Unit

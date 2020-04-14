@@ -1,7 +1,8 @@
 resource type RandomAccessFile //can be renamed later if necessary
     effect Read
     effect Write
-    def close() : {} Unit
+    effect Close
+    def close() : {this.Close} Unit
     def getPosition() : {} Int
     def seek(pos : Int) : {} Unit
     def length() : {} Int
