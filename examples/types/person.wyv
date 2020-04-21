@@ -1,0 +1,10 @@
+type Person
+    val name:String
+    val address:Address
+
+// error: Address must be a resource type since it has a var member (street)
+type Address            // can fix by making a resource type
+    var street:String   // alternatively, can fix by making this a val
+    val city:String
+    val state:String
+    val zip:Int
