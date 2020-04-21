@@ -1,4 +1,6 @@
-module def stringSQL(java : Java)
+module def stringSQL(java : Java):db.StringSQL
+
+effect UnsafeQuery = {system.FFI}
 
 type SQL
 	def query():String
@@ -15,5 +17,5 @@ def prepareSelectFromWhereEquals(selectColumn:String, table:String, \
 	5
 def substitute(queryNumber:Int, searchValue:String):Int
 	5
-def runQuery(queryNumber:Int):Int
+def runQuery(queryNumber:Int): {UnsafeQuery} Int
 	5

@@ -2,7 +2,7 @@ module def sqlApplication(safeSQL : db.SafeSQL)
 
 //import db.stringSQL
 
-def run() : Int
+def run() : {safeSQL.SafeQuery} Int
     val input = "CouldBeUnsafe"
 	
 	//val query : safeSQL.SQL = ~
