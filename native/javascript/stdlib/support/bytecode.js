@@ -55,10 +55,46 @@ function wrap(o) {
     return wrapper;
 }
 
+var root = undefined;
+
+function setRoot() {
+	if (root === undefined) {
+		root = protobuf.loadSync(process.env.WYVERN_HOME + "/backend/bytecode.proto");
+	}
+}
+
+exports.Type = function() {
+	setRoot();
+	return root.lookupType('Type');
+}
+
 exports.loadBytecode = function(path) {
-    var root = protobuf.loadSync(process.env.WYVERN_HOME + "/backend/bytecode.proto");
+	setRoot();
     const Bytecode = root.lookupType('Bytecode');
     var bytes = fs.readFileSync(path);
     var bytecode = Bytecode.decode(bytes);
     return wrap(bytecode);
+}
+
+exports.saveBytecode = function(path, bytecodeObject) {
+	setRoot();
+    const Bytecode = root.lookupType('Bytecode');
+	var errMsg = Bytecode.verify(bytecodeObject);
+    if (errMsg)
+        throw Error(errMsg);
+	var bmsg = Bytecode.create(bytecodeObject);
+	var bbuffer = Bytecode.encode(bmsg).finish();
+	fs.writeFileSync(path, bbuffer);
+}
+
+exports.encodeExpr = function(exprObject) {
+	setRoot();
+    const Expression= root.lookupType('Expression');
+	var errMsg = Expression.verify(exprObject);
+    if (errMsg)
+        throw Error(errMsg);
+	var bmsg = Expression.create(exprObject);
+	var bbuffer = Expression.encode(bmsg).finish();
+	var msg2 = Expression.decode(bbuffer);
+	console.log(msg2)
 }
