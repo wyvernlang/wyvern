@@ -204,9 +204,18 @@ def flatten[T](L:LinkedList[LinkedList[T]]):LinkedList[T]
     val g = (x:LinkedList[T], xs:LinkedList[T]) => x.append(xs)
     L.foldRight[LinkedList[T]](g,id)
 
+def find[T](l:LinkedList[T], pred:T -> Boolean):Option[T] = match l:
+    n:Nil => option.None[T]()
+    c:Cons =>
+        if (pred(c.value))
+            option.Some[T](c.value)
+          else
+            recur find[T](c.next, pred)
 
 def tabulate[U](f:Int->U, n:Int):LinkedList[U]
     if(n==0)
       Nil[U]()
      else
       Cons[U](f(0), tabulate[U]((i:Int) => f(i+1), n-1))
+
+def Singleton[U](x:U):Cons[U] = Cons[U](x, Nil[U]())
