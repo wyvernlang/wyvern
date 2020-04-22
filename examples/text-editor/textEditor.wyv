@@ -83,9 +83,10 @@ def getAttenuatedNativeJTextArea(): {} TextArea
 def getAttenuatedNativeJOptionPane(): {} OptionPane
   new
     effect ShowDialog = {uiEffects.ShowDialog}
+    effect GetMessageValue = {uiEffects.GetMessageValue}
     def showMessageDialog(message: String, title: String, messageType: Int): {this.ShowDialog} Unit
       nativeJOptionPane.showMessageDialog(message, title, messageType)
-    def getPlainMessageValue(): {system.FFI} Int
+    def getPlainMessageValue(): {this.GetMessageValue} Int
       nativeJOptionPane.getPlainMessageValue()
 
 
@@ -95,7 +96,7 @@ def getAttenuatedNativeJOptionPane(): {} OptionPane
 
 val darkTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = darkTheme(logger, getAttenuatedNativeUIManager())
 val lightTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = lightTheme(logger, getAttenuatedNativeUIManager())
-val wordCount: Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}] = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
+val wordCount: Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog, uiEffects.GetMessageValue}] = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
 val questionnaireCreator: Plugin[{logger.Update, fs.Write, fs.Append, uiEffects.ReadTextArea}] = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
 
 /****************************************************************************/

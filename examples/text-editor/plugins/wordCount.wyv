@@ -1,10 +1,10 @@
 import uiEffects
-module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane): {} Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}]
+module def wordCount(logger: Logger, textArea: TextArea, optionPane: OptionPane): {} Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog, uiEffects.GetMessageValue}]
 // N.B.: Must pass in TextArea and not just String because need to get the latest version of the text.
 
 import wyvern.String
 
-effect Run = {logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog}
+effect Run = {logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog, uiEffects.GetMessageValue}
 
 def getName(): {} String
   "Word Count"
