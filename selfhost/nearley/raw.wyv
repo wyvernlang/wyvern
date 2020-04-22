@@ -1,0 +1,6 @@
+module raw
+
+datatype Exp
+    Var(name:String)
+    App(func:Exp, arg:Exp)
+    Lambda(name:String, body:Exp)

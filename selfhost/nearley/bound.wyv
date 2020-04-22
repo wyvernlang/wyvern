@@ -1,0 +1,21 @@
+module bound
+
+resource type Counter
+    var value:Int
+def Counter():Counter = new
+    var value:Int = 0
+
+type Binding
+    val name:String
+    val id:Int
+def Binding(name:String, c:Counter):Binding
+    val count = c.value
+    c.value = c.value + 1
+    new
+        val name = name
+        val id = count
+
+datatype Exp
+    Var(binding:Binding)
+    App(func:Exp, arg:Exp)
+    Lambda(binding:Binding, body:Exp)

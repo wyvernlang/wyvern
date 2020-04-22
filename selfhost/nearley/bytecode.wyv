@@ -1,0 +1,124 @@
+module def bytecode(javascript:JavaScript, js:Dyn)
+
+import javascript:stdlib.support.bytecode
+
+import wyvern.collections.llist
+
+type List = llist.LinkedList
+
+// PUBLIC TYPES AND VALUES REPRESENTING TYPES
+tagged type Type
+
+val dynType:Type = new
+    val simpleType = bytecode.Type().SimpleType.Dyn
+
+// PRIVATE TYPES
+tagged type Literal
+tagged type StrLit extends Literal
+    val stringLiteral : String
+tagged type Arg
+    val variable : String
+    val type_ : Type
+tagged type MDecl
+    val methodName : String
+    val arguments_ : Dyn // List[Arg]
+    val returnType : Type
+    val body : Expr
+tagged type NExpr
+    val type_ : Type
+    val selfName : String
+    val declarations : Dyn //List[Decl]
+type CExpr
+    val receiver : Expr
+    val method : String
+    val arguments_ : Dyn //List[Expr]
+    val isTailCall : Boolean
+type ValueModule
+    val type_ : Type
+    val expression : Expr
+type Version
+    val magic:Int
+    val major:Int
+    val minor:Int
+    
+// constructors for private types
+def Arg(name:String):Arg = new
+    val variable = name
+    val type_ = dynType
+
+// PUBLIC TYPES REPRESENTING DECLARATIONS
+tagged type Decl
+tagged type MethodDecl extends Decl
+    val methodDeclaration : MDecl
+
+
+// Public types representing Expressions
+tagged type Expr
+tagged type LitExpr extends Expr
+    val literal:Literal
+tagged type VarExpr extends Expr
+    val variable:String
+    val type_:Type
+tagged type NewExpr extends Expr
+    val newExpression : NExpr
+tagged type CallExpr extends Expr
+    val callExpression : CExpr
+
+// public types representing modules and the bytecode
+tagged type Module
+tagged type Bytecode
+    val version:Version
+    val path:String
+    val imports:Dyn // List[...]
+    val modules:Dyn // List[Module]
+    
+// Public constructors for expressions
+def StrLit(s:String):LitExpr = new
+    val literal:StrLit = new
+        val stringLiteral = s
+def VarExpr(s:String):VarExpr = new
+    val variable = s
+    val type_ = dynType
+def NewExpr(selfName:String, decls:List[Decl]):NewExpr = new
+    val newExpression : NExpr = new
+        val type_ = dynType
+        val selfName = selfName
+        val declarations = js.toArray(decls)
+def CallExpr(receiver:Expr, method:String, args:List[Expr], isTailCall:Boolean):CallExpr = new
+    val callExpression : CExpr = new
+        val receiver : Expr = receiver
+        val method : String = method
+        val arguments_ : Dyn = js.toArray(args)
+        val isTailCall : Boolean = isTailCall
+
+// Public constructors for declarations
+def MethodDecl(name:String, args:List[String], body:Expr):MethodDecl = new
+    val methodDeclaration : MDecl = new
+        val methodName = name
+        val arguments_ = js.toArray(args.map[Arg](a => Arg(a)))
+        val returnType = dynType
+        val body = body
+            
+// Public constructors for modules and bytecode
+def toplevel(e:Expr):Module = new
+    val path:String = "toplevel"
+    val valueModule : ValueModule = new
+        val type_ : Type = dynType
+        val expression : Expr = e
+
+def singletonBytecode(m:Module):Bytecode = new
+    val version:Version = new
+        val magic:Int = 42
+        val major:Int = 0
+        val minor:Int = 1
+    val path:String = ""
+    val imports:Dyn = js.toArray(llist.Nil[Dyn]())
+    val modules:Dyn = js.toArray(llist.Singleton[Module](m))
+
+// Encoding test function
+def encodeExpr(e:Expr):Unit
+    bytecode.encodeExpr(e)
+    
+// Functions for writing bytecode
+def saveBytecode(path:String, b:Bytecode):Unit
+    bytecode.saveBytecode(path, b)

@@ -1,0 +1,127 @@
+require javascript
+require stdout
+
+import javascript:stdlib.js
+import metadata lexing
+import metadata parsing
+import bytecode
+import raw
+import bound
+import wyvern.collections.llist
+
+val b = bytecode(javascript, js)
+type List = llist.LinkedList
+
+val lowLevelLexer : lexing.Lexer = ~
+        WS:         /[ \t]+/,
+        NL:         {match: /\n/, lineBreaks: true},
+        identifier: /[a-zA-Z][a-zA-Z0-9_]*/,
+        lparen:     '(',
+        rparen:     ')',
+        darrow:     '=>'
+
+val lexer = new
+    def next():Dyn
+        val token = lowLevelLexer.next()
+        // awkward JS-specific detail
+        if (js.isUndefined(token))
+            token
+          else
+            // something is not quite right about == for strings with the JavaScript back end!
+            if (js.equalsJS("WS", token."type"))
+                this.next()
+              else
+                token
+    def save():Dyn = lowLevelLexer.save()
+    def reset(chunk:String, info:Dyn):Unit = lowLevelLexer.reset(chunk, info)
+    def formatError(token:Dyn):String = lowLevelLexer.formatError(token)
+    def has(name:String):Boolean = lowLevelLexer.has(name)
+    
+def expToString(e:raw.Exp):String = match e:
+    v:raw.Var    => v.name
+    a:raw.App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
+    l:raw.Lambda => l.name + " => " + expToString(l.body)
+    default  => "typecheck issue!"
+
+val grammar: parsing.Grammar = ~
+    Stmts -> Stmt                               : a:Dyn => a.get(0)
+           | Stmts Stmt                         : a:Dyn => a.get(1)
+           
+    Stmt  -> Expression %NL                     : a:Dyn => a.get(0)
+    
+    Expression -> Primary                       : a:Dyn => a.get(0)
+                | Expression Primary            : a:Dyn => raw.App(a.get(0), a.get(1))
+
+    Primary -> %identifier                      : a:Dyn => raw.Var(a.get(0).value)
+             | %lparen Expression %rparen       : a:Dyn => a.get(1)
+             | %identifier %darrow Expression   : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
+
+val parser = parsing.makeParser(grammar, lexer)
+
+parser.feed(" \t ( x => x)\n ( x => x) (x => x) \n ")
+js.log("Results:\n")
+stdout.print(expToString(parser.results.get(0)))
+
+def bind(e:raw.Exp):bound.Exp
+    bindHelper(e, llist.Nil[bound.Binding](), bound.Counter())
+
+def bindHelper(e:raw.Exp, context:List[bound.Binding], counter:bound.Counter):bound.Exp = match e:
+    v:raw.Var    => bound.Var(llist.find[bound.Binding](context, (b:bound.Binding) => v.name==b.name).get())
+    a:raw.App    => bound.App(bindHelper(a.func, context, counter), bindHelper(a.arg, context, counter))
+    l:raw.Lambda =>
+        val b = bound.Binding(l.name, counter)
+        bound.Lambda(b, bindHelper(l.body, llist.Cons[bound.Binding](b, context), counter))
+
+val boundExp = bind(parser.results.get(0))
+        
+datatype OOExp
+    OOVar(binding:bound.Binding)
+    Obj(meths:List[Method])
+    Call(receiver:OOExp, name:String, arg:OOExp)
+
+type Method
+    val name:String
+    val binding:bound.Binding
+    val body:OOExp
+
+def Method(name:String, binding:bound.Binding, body:OOExp):Method = new
+    val name = name
+    val binding = binding
+    val body = body
+
+def lower(e:bound.Exp):OOExp = match e:
+    v:bound.Var    => OOVar(v.binding)
+    a:bound.App    => Call(lower(a.func), "apply", lower(a.arg))
+    l:bound.Lambda => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
+
+val ooExp = lower(boundExp)
+
+// test code
+val expr = b.StrLit("Hello")
+b.encodeExpr(expr)
+js.log("1:\n")
+val apply = b.MethodDecl("apply", llist.Singleton[String]("x"), b.VarExpr("x"))
+val expr2 = b.NewExpr("this", llist.Singleton[b.Decl](apply))
+val callExpr = b.CallExpr(expr2, "apply", llist.Singleton[b.Expr](expr), false)
+js.log("2:\n")
+b.encodeExpr(callExpr)
+js.log("3:\n")
+
+// to bytecode
+def toBytecodeMethod(m:Method):b.MethodDecl
+    b.MethodDecl(m.name, llist.Singleton[String](m.binding.name), toBytecode(m.body))
+
+def toBytecode(e:OOExp):b.Expr = match e:
+    v:OOVar => b.VarExpr(v.binding.name)
+    o:Obj   => b.NewExpr("this", o.meths.map[b.MethodDecl](m => toBytecodeMethod(m)))
+    c:Call  => b.CallExpr(toBytecode(c.receiver), c.name, llist.Singleton[b.Expr](toBytecode(c.arg)), false)
+
+js.log("4:\n")
+val bytecodeExpr = toBytecode(ooExp)
+    
+js.log("5:\n")
+val bytecode = b.singletonBytecode(b.toplevel(bytecodeExpr))
+js.log("6:\n")
+b.saveBytecode("sample.wyb", bytecode)
+js.log("7:\n")
+
