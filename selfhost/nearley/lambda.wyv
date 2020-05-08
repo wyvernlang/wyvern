@@ -2,23 +2,28 @@ require javascript
 require stdout
 
 import javascript:stdlib.js
-import metadata lexing
+import javascript:stdlib.support.regexUtils
+//import metadata lexing
+import wyvernLexer
 import metadata parsing
 import bytecode
 import raw
 import bound
 import wyvern.collections.llist
 
+val wyvernLexer = wyvernLexer(js, regexUtils)
 val b = bytecode(javascript, js)
 type List = llist.LinkedList
 
+/*
 val lowLevelLexer : lexing.Lexer = ~
         WS:         /[ \t]+/,
         NL:         {match: /\n/, lineBreaks: true},
-        identifier: /[a-zA-Z][a-zA-Z0-9_]*/,
+        identifier: {match: /[a-zA-Z][a-zA-Z0-9_]* /, type: moo.keywords({ val : 'val', def : 'def' })},
         lparen:     '(',
         rparen:     ')',
-        darrow:     '=>'
+        darrow:     '=>',
+        eq:         '='
 
 val lexer = new
     def next():Dyn
@@ -36,19 +41,31 @@ val lexer = new
     def reset(chunk:String, info:Dyn):Unit = lowLevelLexer.reset(chunk, info)
     def formatError(token:Dyn):String = lowLevelLexer.formatError(token)
     def has(name:String):Boolean = lowLevelLexer.has(name)
-    
+*/
+val lexer = wyvernLexer.makeLexer()
+
 def expToString(e:raw.Exp):String = match e:
     v:raw.Var    => v.name
     a:raw.App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
     l:raw.Lambda => l.name + " => " + expToString(l.body)
-    default  => "typecheck issue!"
+    v:raw.Val    => "val " + v.name + " = " + expToString(v.exp)
+    s:raw.Seq    => s.exps.foldRight[String]((e:raw.Exp, s:String) => s + "\n" + expToString(e), "")
+    default      =>
+                    js.log(e)
+                    "typecheck issue!"
 
+def makeSeq(e1:raw.Exp, e2:raw.Exp):raw.Seq = match e1:
+    s:raw.Seq   => raw.Seq(llist.Cons[raw.Exp](e2, s.exps))
+    default     => raw.Seq(llist.Cons[raw.Exp](e2, llist.Singleton[raw.Exp](e1)))
+    
 val grammar: parsing.Grammar = ~
     Stmts -> Stmt                               : a:Dyn => a.get(0)
-           | Stmts Stmt                         : a:Dyn => a.get(1)
+           | Stmts %NL Stmt                         : a:Dyn => makeSeq(a.get(0), a.get(2))
            
-    Stmt  -> Expression %NL                     : a:Dyn => a.get(0)
-    
+    Stmt  -> Expression                     : a:Dyn => a.get(0)
+           | %val %identifier %eq Expression: a:Dyn => raw.Val(a.get(1).value, a.get(3))
+           | %def %identifier %lparen %identifier %rparen %eq Expression: a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
+
     Expression -> Primary                       : a:Dyn => a.get(0)
                 | Expression Primary            : a:Dyn => raw.App(a.get(0), a.get(1))
 
@@ -58,19 +75,39 @@ val grammar: parsing.Grammar = ~
 
 val parser = parsing.makeParser(grammar, lexer)
 
-parser.feed(" \t ( x => x)\n ( x => x) (x => x) \n ")
+// TODO: right now there's an internal error in nearly if there's a parse error.  Need to fix this; somehow we are using nearly wrong.
+parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x) \n ")
+//parser.feed("(x => x)")
+js.log("Raw Results:\n")
+js.log(parser.results)
 js.log("Results:\n")
 stdout.print(expToString(parser.results.get(0)))
 
-def bind(e:raw.Exp):bound.Exp
-    bindHelper(e, llist.Nil[bound.Binding](), bound.Counter())
 
-def bindHelper(e:raw.Exp, context:List[bound.Binding], counter:bound.Counter):bound.Exp = match e:
-    v:raw.Var    => bound.Var(llist.find[bound.Binding](context, (b:bound.Binding) => v.name==b.name).get())
-    a:raw.App    => bound.App(bindHelper(a.func, context, counter), bindHelper(a.arg, context, counter))
+// es is in program order
+def bindList(es:List[raw.Exp], ctx:bound.Context):List[bound.Exp] = match es:
+    c:llist.Cons =>
+        val b = bindHelper(c.value, ctx)
+        match b:
+            v:bound.Val =>
+                val newCtx = ctx.extend(v.binding)
+                llist.Cons[bound.Exp](b, bindList(c.next, newCtx))
+            default   => llist.Cons[bound.Exp](b, bindList(c.next, ctx))
+    n:llist.Nil  => llist.Nil[bound.Exp]()
+
+def bind(e:raw.Exp):bound.Exp
+    bindHelper(e, bound.emptyContext())
+
+def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
+    v:raw.Var    => bound.Var(llist.find[bound.Binding](context.bindings, (b:bound.Binding) => v.name==b.name).get())
+    a:raw.App    => bound.App(bindHelper(a.func, context), bindHelper(a.arg, context))
     l:raw.Lambda =>
-        val b = bound.Binding(l.name, counter)
-        bound.Lambda(b, bindHelper(l.body, llist.Cons[bound.Binding](b, context), counter))
+        val b = bound.Binding(l.name, context.counter)
+        bound.Lambda(b, bindHelper(l.body, context.extend(b)))
+    v:raw.Val    =>
+        val b = bound.Binding(v.name, context.counter)
+        bound.Val(b, bindHelper(v.exp, context))
+    s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
 
 val boundExp = bind(parser.results.get(0))
         
@@ -78,6 +115,8 @@ datatype OOExp
     OOVar(binding:bound.Binding)
     Obj(meths:List[Method])
     Call(receiver:OOExp, name:String, arg:OOExp)
+    Val(binding:bound.Binding, exp:OOExp)
+    Seq(exps:List[OOExp])
 
 type Method
     val name:String
@@ -90,9 +129,11 @@ def Method(name:String, binding:bound.Binding, body:OOExp):Method = new
     val body = body
 
 def lower(e:bound.Exp):OOExp = match e:
-    v:bound.Var    => OOVar(v.binding)
-    a:bound.App    => Call(lower(a.func), "apply", lower(a.arg))
-    l:bound.Lambda => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
+    v:bound.Var     => OOVar(v.binding)
+    a:bound.App     => Call(lower(a.func), "apply", lower(a.arg))
+    l:bound.Lambda  => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
+    v:bound.Val     => Val(v.binding, lower(v.exp))
+    s:bound.Seq     => Seq(s.exps.map[OOExp](e => lower(e)))
 
 val ooExp = lower(boundExp)
 
@@ -115,11 +156,24 @@ def toBytecode(e:OOExp):b.Expr = match e:
     v:OOVar => b.VarExpr(v.binding.name)
     o:Obj   => b.NewExpr("this", o.meths.map[b.MethodDecl](m => toBytecodeMethod(m)))
     c:Call  => b.CallExpr(toBytecode(c.receiver), c.name, llist.Singleton[b.Expr](toBytecode(c.arg)), false)
+    s:Seq   =>
+        val processStmt : OOExp -> b.SeqStmt = (exp =>
+          val result:b.SeqStmt = match exp:
+            v:Val   => b.DeclStmt(b.ValDecl(v.binding.name, toBytecode(v.exp)))
+            default => b.ExpStmt(toBytecode(exp))
+          result
+        )
+        // TODO: should be able to put this lambda inline!
+        val seqStmts = s.exps.map[b.SeqStmt](processStmt)
+        b.SeqExpr(seqStmts)
+    // no "val" case - should exist only under Seq
 
 js.log("4:\n")
 val bytecodeExpr = toBytecode(ooExp)
-    
+val d:Dyn = bytecodeExpr
+
 js.log("5:\n")
+js.log(d.sequenceExpression.statements.get(0).declaration)
 val bytecode = b.singletonBytecode(b.toplevel(bytecodeExpr))
 js.log("6:\n")
 b.saveBytecode("sample.wyb", bytecode)

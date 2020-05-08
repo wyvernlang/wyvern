@@ -6,6 +6,10 @@ exports.isUndefined = function(x) {
     return x === undefined
 }
 
+exports.getUndefined = function(x) {
+    return undefined
+}
+
 exports.log = function(x) {
     console.log(x);
 }

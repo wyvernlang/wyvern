@@ -32,6 +32,7 @@ tagged type LinkedList comprises Cons, Nil
     def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
     def isEmpty():Boolean
     def iterator():Iterator[this.E]
+    def push(e:this.E):Cons[this.E]
 
 tagged type Nil extends LinkedList
     type E
@@ -51,6 +52,7 @@ tagged type Nil extends LinkedList
     def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
     def isEmpty():Boolean
     def iterator():Iterator[this.E]
+    def push(e:this.E):Cons[this.E]
 
 tagged type Cons extends LinkedList 
     type E
@@ -72,6 +74,7 @@ tagged type Cons extends LinkedList
     def reduce(f:this.E*this.E=>this.E, x:this.E):this.E
     def isEmpty():Boolean
     def iterator():Iterator[this.E]
+    def push(e:this.E):Cons[this.E]
  
 def Nil[U]():Nil[U] = new
     type E = U
@@ -105,13 +108,14 @@ def Nil[U]():Nil[U] = new
         type E = U
         def hasNext():Boolean = false
         def next(): Option[U] = option.None[U]()
+    def push(e:U):Cons[U] = Cons[U](e, this)
 
 
 /*dummy code to solve
 This new statement captures a resource and must be 
 assigned to a resource type at location file
 */
-val a = Nil[Int]()
+//val a = Nil[Int]()
 
 def Cons[U](x:U, list:LinkedList[U]):Cons[U] = new
     type E = U
@@ -185,6 +189,7 @@ def Cons[U](x:U, list:LinkedList[U]):Cons[U] = new
                 c:Cons => 
                     self.current = (c.next)
                     option.Some[U](c.value)
+    def push(e:U):Cons[U] = Cons[U](e, this)
             
             
 

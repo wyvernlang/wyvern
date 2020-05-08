@@ -18,7 +18,7 @@ import javascript:stdlib.support.lexing
 def makeLexer(lexDesc:String):Lexer
     lexing.makeLexer(lexDesc)
 
-type Lexer
+resource type Lexer
     def next():Dyn
     def save():Dyn
     def reset(chunk:String, info:Dyn):Unit

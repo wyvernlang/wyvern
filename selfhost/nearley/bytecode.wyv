@@ -24,6 +24,11 @@ tagged type MDecl
     val arguments_ : Dyn // List[Arg]
     val returnType : Type
     val body : Expr
+tagged type VDecl
+    val declarationType : Dyn
+    val variable : String
+    val type_ : Type
+    val initializer : Expr
 tagged type NExpr
     val type_ : Type
     val selfName : String
@@ -33,6 +38,8 @@ type CExpr
     val method : String
     val arguments_ : Dyn //List[Expr]
     val isTailCall : Boolean
+type SExpr
+    val statements : Dyn //List[SStmt]
 type ValueModule
     val type_ : Type
     val expression : Expr
@@ -46,10 +53,16 @@ def Arg(name:String):Arg = new
     val variable = name
     val type_ = dynType
 
+tagged type SeqStmt
+tagged type ExpStmt extends SeqStmt
+tagged type DeclStmt extends SeqStmt
+    
 // PUBLIC TYPES REPRESENTING DECLARATIONS
 tagged type Decl
 tagged type MethodDecl extends Decl
     val methodDeclaration : MDecl
+tagged type ValDecl extends Decl
+    val variableDeclaration : VDecl
 
 
 // Public types representing Expressions
@@ -63,6 +76,8 @@ tagged type NewExpr extends Expr
     val newExpression : NExpr
 tagged type CallExpr extends Expr
     val callExpression : CExpr
+tagged type SeqExpr extends Expr
+    val sequenceExpression:SExpr
 
 // public types representing modules and the bytecode
 tagged type Module
@@ -90,6 +105,15 @@ def CallExpr(receiver:Expr, method:String, args:List[Expr], isTailCall:Boolean):
         val method : String = method
         val arguments_ : Dyn = js.toArray(args)
         val isTailCall : Boolean = isTailCall
+def SeqExpr(seqStmts:List[SeqStmt]):SeqExpr = new
+    val sequenceExpression : SExpr = new
+        val statements = js.toArray(seqStmts)
+        
+def ExpStmt(e:Expr):ExpStmt = new
+    val expression:Expr = e
+
+def DeclStmt(d:Decl):DeclStmt = new
+    val declaration:Decl = d
 
 // Public constructors for declarations
 def MethodDecl(name:String, args:List[String], body:Expr):MethodDecl = new
@@ -98,6 +122,13 @@ def MethodDecl(name:String, args:List[String], body:Expr):MethodDecl = new
         val arguments_ = js.toArray(args.map[Arg](a => Arg(a)))
         val returnType = dynType
         val body = body
+            
+def ValDecl(name:String, initializer:Expr):ValDecl = new
+    val variableDeclaration : VDecl = new
+        val declarationType = bytecode.VariableDeclarationType().values.VAL
+        val variable = name
+        val initializer = initializer
+        val type_ = dynType
             
 // Public constructors for modules and bytecode
 def toplevel(e:Expr):Module = new

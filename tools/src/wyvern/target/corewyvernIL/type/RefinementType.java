@@ -176,14 +176,18 @@ public class RefinementType extends ValueType {
         }
     }
 
+    private static int checkWellFormed = 0;
+    
     @Override
     public void checkWellFormed(TypeContext ctx) {
+        checkWellFormed++;
         base.checkWellFormed(ctx);
         final TypeContext selfCtx = selfSite == null ? ctx : ctx.extend(selfSite, this);
         for (DeclType dt : getDeclTypes(ctx)) {
             dt.canonicalize(ctx);
             dt.checkWellFormed(selfCtx);
         }
+        checkWellFormed--;
     }
 
     /** Returns the self name if there is one, otherwise null */
@@ -201,7 +205,10 @@ public class RefinementType extends ValueType {
 
     @Override
     public StructuralType getStructuralType(TypeContext ctx, StructuralType theDefault) {
-        checkWellFormed(ctx);
+        if (checkWellFormed == 0) {
+            // short-circuits an infinite well-formedness check loop
+            checkWellFormed(ctx);
+        }
         StructuralType baseST = base.getStructuralType(ctx, theDefault);
         List<DeclType> newDTs = new LinkedList<DeclType>();
         int current = 0;

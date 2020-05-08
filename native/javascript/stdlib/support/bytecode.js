@@ -68,6 +68,13 @@ exports.Type = function() {
 	return root.lookupType('Type');
 }
 
+exports.VariableDeclarationType = function() {
+	setRoot();
+	let result = root.lookupEnum('VariableDeclarationType');
+	console.log(result)
+	return result;
+}
+
 exports.loadBytecode = function(path) {
 	setRoot();
     const Bytecode = root.lookupType('Bytecode');
