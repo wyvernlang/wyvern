@@ -9,9 +9,26 @@ import wyvern.collections.llist
 
 type List = llist.LinkedList
 
+/************** Tokens ***************/
+
+type Token
+    val "type":String
+    val value:String
+    val line:Int
+    val col:Int
+
+def Token(t:String, value:String, line:Int, col:Int):Token = new
+    val "type":String = t
+    val value:String = value
+    val line:Int = line
+    val col:Int = col
+
+
+/************** First Level Lexer ***************/
+
 val lowLevelLexer : lexing.Lexer = ~
         WS:         /[ \t]+/,
-        NL:         {match: /\n/, lineBreaks: true},
+        logline:    {match: /\n/, lineBreaks: true},
         identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ val : 'val', def : 'def' })},
         lparen:     '(',
         rparen:     ')',
@@ -21,12 +38,11 @@ val lowLevelLexer : lexing.Lexer = ~
 
 val startLexerState = lowLevelLexer.save()
         
-var inLine : Boolean = false
-var lineCont : Boolean = false
-
 def lowerLexOrdinaryLine(input:String):List[Dyn]
     var tokens : List[Dyn] = llist.Nil[Dyn]()
+    lowLevelLexer.reset(input, startLexerState)
     var token : Dyn = lowLevelLexer.next()
+    js.log("called lowerLexOrdinaryLine")
     def loop():Unit
         if (!js.isUndefined(token))
             tokens = tokens.push(token)
@@ -36,17 +52,51 @@ def lowerLexOrdinaryLine(input:String):List[Dyn]
     val result = tokens.reverse()
     result
 
+    
+/************** Second Level Lexer ***************/
+    
+var inLine : Boolean = false
+var lineCont : Boolean = false
 
-// passes input one line at a time, not including the terminating \n
-/*
+def getIndent(input:String) : String = ""
+    // TODO: implement me properly
+
+// passed input one line at a time, not including the terminating \n
 def lexLine(input:String):List[Dyn]
     lexOrdinaryLine(input)
-     
-/*def lexOrdinaryLine(input:String):List[Dyn]
-    val tokens = lowerLexOrdinaryLine(input)
 
- OLD VERSION OF lexLine */
- 
+def lexOrdinaryLine(input:String):List[Dyn]
+    val tokens = lowerLexOrdinaryLine(input)
+    var pending:List[Dyn] = llist.Nil[Dyn]() // in reverse order
+    if (lineCont)
+        lineCont = false
+        handleLine(pending, tokens)
+      else
+        val currentIndent = ""
+        val lineIndent = getIndent(input)
+        if (inLine && lineIndent == currentIndent)
+            pending = pending.push(Token("logline","\n",0,0))
+            js.log("adding")
+            handleLine(pending, tokens)
+          else
+            js.log("not adding")
+            // lineIndent > currentIndent
+            handleLine(pending, tokens)
+            
+            
+def handleLine(pending:List[Dyn], tokens:List[Token]):List[Dyn]
+    inLine = true
+    var toks:List[Dyn] = tokens
+    // if ends with linecont, set the flag
+    val revTokens = tokens.reverse()
+    match revTokens:
+        c:llist.Cons => if (c.value."type" == "linecont")
+            toks = c.next.reverse()
+            lineCont = true
+    // append everything to pending except newlines, linecont
+    pending.reverse().append(toks)
+
+/* OLD VERSION OF lexLine:
 def lexLine(input:String):List[Dyn]
     js.log("line " + input + "\n")
     var tokens : List[Dyn] = llist.Nil[Dyn]()
@@ -77,7 +127,7 @@ def lexLine(input:String):List[Dyn]
         //result.do((t:Dyn) => printToken(t))
         //js.log("done with line\n")
         result
-
+*/
 
 //lexLine("( x => x) (x => x)")
 
@@ -123,6 +173,7 @@ def makeLexer():lexing.Lexer
             tokens = lexLines(chunk).filter((t:Dyn) => !js.equalsJS("WS", t."type"))
             tokens.do((t:Dyn) => printToken(t))
         def formatError(token:Dyn):String
-            js.log("called formatError\n")
+            js.log("called formatError")
+            js.log(token)
             "this is an error"
         def has(name:String):Boolean = lowLevelLexer.has(name)

@@ -60,7 +60,7 @@ def makeSeq(e1:raw.Exp, e2:raw.Exp):raw.Seq = match e1:
     
 val grammar: parsing.Grammar = ~
     Stmts -> Stmt                               : a:Dyn => a.get(0)
-           | Stmts %NL Stmt                         : a:Dyn => makeSeq(a.get(0), a.get(2))
+           | Stmts %logline Stmt                         : a:Dyn => makeSeq(a.get(0), a.get(2))
            
     Stmt  -> Expression                     : a:Dyn => a.get(0)
            | %val %identifier %eq Expression: a:Dyn => raw.Val(a.get(1).value, a.get(3))
@@ -76,7 +76,7 @@ val grammar: parsing.Grammar = ~
 val parser = parsing.makeParser(grammar, lexer)
 
 // TODO: right now there's an internal error in nearly if there's a parse error.  Need to fix this; somehow we are using nearly wrong.
-parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x) \n ")
+parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)")
 //parser.feed("(x => x)")
 js.log("Raw Results:\n")
 js.log(parser.results)
