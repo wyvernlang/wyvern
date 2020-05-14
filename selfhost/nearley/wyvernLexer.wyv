@@ -96,40 +96,6 @@ def handleLine(pending:List[Dyn], tokens:List[Token]):List[Dyn]
     // append everything to pending except newlines, linecont
     pending.reverse().append(toks)
 
-/* OLD VERSION OF lexLine:
-def lexLine(input:String):List[Dyn]
-    js.log("line " + input + "\n")
-    var tokens : List[Dyn] = llist.Nil[Dyn]()
-    if (input == "")
-        tokens
-      else
-        if (inLine && !lineCont)
-            lowLevelLexer.reset("\n" + input, startLexerState)
-            val nlToken = lowLevelLexer.next()
-            val firstToken = lowLevelLexer.next()
-            if (!js.equalsJS("WS", firstToken."type"))
-                // add the newline token
-                tokens = tokens.push(nlToken)
-            // add the first token
-            tokens = tokens.push(firstToken)
-          else
-            inLine = true
-            lowLevelLexer.reset(input, startLexerState)
-        // read and return all remaining tokens from this line
-        var token : Dyn = lowLevelLexer.next()
-        def loop():Unit
-            if (!js.isUndefined(token))
-                tokens = tokens.push(token)
-                token = lowLevelLexer.next()
-                loop()
-        loop()
-        val result = tokens.reverse()
-        //result.do((t:Dyn) => printToken(t))
-        //js.log("done with line\n")
-        result
-*/
-
-//lexLine("( x => x) (x => x)")
 
 // WITH CONTINUATION: lex a line and return whether it is a complete logical line or not (store internally if not, return if so)
         
@@ -151,14 +117,27 @@ def lexLines(input:String):List[Dyn]
     //js.log(newlineMatch.after)
 
 def printToken(t:Dyn):Unit = js.log(t."type")
-    
-//lexLines("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x) \n ")
 
-// lex multiple lines and return a compatible lexer
-// then integrate into lambda.wyv
+resource type IncrementalLexer
+    def addLine(input:String):option.Option[lexing.Lexer]
+
+def incrementalLexer():IncrementalLexer
+    // TODO: make all the state above, such as inLine, local
+    inLine = false
+    new
+        var tokens : List[Dyn] = llist.Nil[Dyn]()
+        def addLine(input:String):option.Option[lexing.Lexer]
+            this.tokens = this.tokens.append(lexLine(input))
+            if (lineCont)
+                option.None[lexing.Lexer]()
+              else
+                option.Some[lexing.Lexer](initLexer(this.tokens))
 
 def makeLexer():lexing.Lexer
-    var tokens : List[Dyn] = llist.Nil[Dyn]()
+    initLexer(llist.Nil[Dyn]())
+    
+def initLexer(toks : List[Dyn]):lexing.Lexer
+    var tokens : List[Dyn] = toks
     new
         def next():Dyn = match tokens:
             c:llist.Cons =>
