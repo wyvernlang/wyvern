@@ -1,0 +1,30 @@
+require fileSystem
+
+import wyvern.collections.llist
+import fileSystem.BoundedReader
+import fileSystem.Directory
+import fileSystem.File
+
+type List = llist.LinkedList
+
+// read only types
+resource type ReadOnlyFile
+    def makeReader() : BoundedReader
+
+resource type ReadOnlyDir
+    def files() : List[ReadOnlyFile]
+
+val dataDir = fileSystem.directoryFor("/data")
+
+def restrictDir(d:Directory):ReadOnlyDir = new
+    def files() : List[ReadOnlyFile]
+        d.files().map[ReadOnlyFile](
+                         (f:File) => restrictFile(f))
+    
+def restrictFile(f:File):ReadOnlyFile = new
+    def makeReader() : BoundedReader = f.makeReader()
+
+val restrictedDir = restrictDir(dataDir)
+
+//val untrustedInst = untrustedModule(restrictedDir)
+//untrustedInst.getProcessedData()

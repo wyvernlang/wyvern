@@ -31,6 +31,19 @@ public class FileIO {
 
         return new BufferedReader(bufferedReader);
     }
+    
+    public DynArrayList getDirFiles(String path) throws IOException {
+        File dir = new File(path);
+        if (!dir.isDirectory()) {
+            throw new IOException("not a directory");
+        }
+        File[] files = dir.listFiles(f -> !f.isDirectory());
+        DynArrayList result = new DynArrayList();
+        for (File f : files) {
+            result.add(f);
+        }
+        return result;
+    }
 
     public String readFileIntoString(BufferedReader br) throws IOException {
         String line = "";

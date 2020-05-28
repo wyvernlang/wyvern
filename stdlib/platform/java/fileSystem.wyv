@@ -5,6 +5,7 @@ import fileSystem.fileEffects
 
 /* Import Types */
 import fileSystem.File
+import fileSystem.Directory
 import fileSystem.BoundedReader
 import fileSystem.Writer
 import fileSystem.RandomAccessFile
@@ -13,11 +14,28 @@ import fileSystem.BinaryWriter
 import fileSystem.ByteArray
 
 import wyvern.option
+import wyvern.collections.llist
+
 type Option = option.Option
+
+type List = llist.LinkedList
 
 effect Read = {fileEffects.Read}
 effect Write = {fileEffects.Write}
 effect Append = {fileEffects.Append}
+
+def directoryFor(path: String): {} Directory[{fileEffects.Read}, {fileEffects.Write}, {fileEffects.Append}] = new
+    effect Read = {fileEffects.Read}
+    effect Write = {fileEffects.Write}
+    effect Append = {fileEffects.Append}
+    def files() : {fileEffects.Read} List[File]
+        val filesArrayList = file.getDirFiles(path)
+        def addHelper(l:List[File], i:Int):List[File]
+            if (filesArrayList.size() > i)
+                addHelper(l.push(filesArrayList.get(i)), i+1)
+              else
+                l
+        addHelper(llist.Nil[File](), 0)
 
 def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fileEffects.Append}] = new
     effect Read = {fileEffects.Read}

@@ -22,8 +22,10 @@ effect Connect = {networkEffects.Connect}
 // === Library Types ===
 
 type Socket
-    def makeReader():Reader
-    def makeWriter():Writer
+    effect Read
+    effect Write
+    def makeReader():Reader[{this.Read}]
+    def makeWriter():Writer[{this.Write}]
     def makeBinaryReader():BinaryReader
     def makeBinaryWriter():BinaryWriter
     def close():Unit
@@ -49,7 +51,9 @@ def makeServerSocket(port:Int):ServerSocket
             val socket = serverSocket.accept()
             //copied from makeSocket
             new
-                def makeReader():Reader
+                effect Read = {networkEffects.Read}
+                effect Write = {networkEffects.Write}
+                def makeReader():Reader[{networkEffects.Read}]
                     val reader = io.makeReader(socket)
                     new
                         effect Read = {networkEffects.Read}
@@ -64,7 +68,7 @@ def makeServerSocket(port:Int):ServerSocket
                                 option.Some[String](s)
                         def close():{}Unit
                             reader.close()
-                def makeWriter():Writer
+                def makeWriter():Writer[{networkEffects.Write}]
                     val writer = io.makeWriter(socket)
                     new
                         effect Write = {networkEffects.Write}
@@ -102,10 +106,12 @@ def makeServerSocket(port:Int):ServerSocket
         def close():Unit
             serverSocket.close()
 
-def makeSocket(hostname:String, port:Int):{Connect}Socket
+def makeSocket(hostname:String, port:Int):{Connect}Socket[{networkEffects.Read},{networkEffects.Write}]
     val socket = io.makeSocket(hostname, port)
     new
-        def makeReader():Reader
+        effect Read = {networkEffects.Read}
+        effect Write = {networkEffects.Write}
+        def makeReader():Reader[{networkEffects.Read}]
             val reader = io.makeReader(socket)
             new
                 effect Read = {networkEffects.Read}
@@ -120,7 +126,7 @@ def makeSocket(hostname:String, port:Int):{Connect}Socket
                         option.Some[String](s)
                 def close():{this.Close}Unit
                     reader.close()
-        def makeWriter():Writer
+        def makeWriter():Writer[{networkEffects.Write}]
             val writer = io.makeWriter(socket)
             new
                 effect Write = {networkEffects.Write}

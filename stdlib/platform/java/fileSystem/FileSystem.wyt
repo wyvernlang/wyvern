@@ -1,8 +1,10 @@
 import fileSystem.File
+import fileSystem.Directory
 import fileSystem.ByteArray
 type FileSystem
     effect Read
     effect Write
     effect Append
     def fileFor(path: String): {} File[{this.Read}, {this.Write}, {this.Append}]
+    def directoryFor(path: String): {} Directory[{this.Read}, {this.Write}, {this.Append}]
     def makeByteArray(size:Int) : {} ByteArray

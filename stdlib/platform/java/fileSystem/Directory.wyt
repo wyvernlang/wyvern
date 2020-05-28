@@ -1,0 +1,10 @@
+import fileSystem.File
+import wyvern.collections.llist
+
+type List = llist.LinkedList
+
+resource type Directory
+    effect Read
+    effect Write
+    effect Append
+    def files() : {this.Read} List[File]
