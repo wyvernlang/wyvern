@@ -32,17 +32,17 @@ def directoryFor(path: String): {} Directory[{fileEffects.Read}, {fileEffects.Wr
         val filesArrayList = file.getDirFiles(path)
         def addHelper(l:List[File], i:Int):List[File]
             if (filesArrayList.size() > i)
-                addHelper(l.push(filesArrayList.get(i)), i+1)
+                addHelper(l.push(makeFileHelper(filesArrayList.get(i))), i+1)
               else
                 l
         addHelper(llist.Nil[File](), 0)
 
-def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fileEffects.Append}] = new
+def makeFileHelper(javaFile:Dyn): {} File[{fileEffects.Read}, {fileEffects.Write}, {fileEffects.Append}] = new
     effect Read = {fileEffects.Read}
     effect Write = {fileEffects.Write}
     effect Append = {fileEffects.Append}
 
-    val f = file.createNewFile(path)
+    val f = javaFile
 
     def makeReader(): {fileEffects.Read} BoundedReader
         val br = file.openBRForRead(this.f)
@@ -153,6 +153,10 @@ def fileFor(path: String): {} File[{fileEffects.Read}, {fileEffects.Write}, {fil
                 file.writeStringRandomAccess(rf, s)
             def writeUTF(s: String): {this.Write} Unit
                 file.writeUTFRandomAccess(rf, s)
+
+def fileFor(path: String): {fileEffects.Read} File[{fileEffects.Read}, {fileEffects.Write}, {fileEffects.Append}]
+    val f = file.createNewFile(path)
+    makeFileHelper(f)
 
 def makeByteArray(size: Int): {fileEffects.Write} ByteArray
     val bytes = file.makeByteArray(size)
