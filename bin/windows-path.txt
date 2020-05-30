@@ -1,0 +1,2 @@
+
+tools\build;tools\bin;tools\lib\CopperRuntime.jar;tools\lib\asm-debug-all-5.0.1.jar;tools\lib\junit-4.11.jar;tools\lib\protobuf-java-3.5.1.jar

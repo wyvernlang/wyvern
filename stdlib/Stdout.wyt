@@ -1,4 +1,4 @@
-import lifted formatstring
+//import lifted formatstring
 
 resource type Stdout
     effect print
@@ -10,5 +10,5 @@ resource type Stdout
     def println() : {this.print} Unit
     def flush() : {this.flush} Unit
     def printFloat(f : Float) : {this.print} Unit
-    def printf(str : formatstring.FormatString) : {this.print} Unit
+    //def printf(str : formatstring.FormatString) : {this.print} Unit
     def printRational(r : Rational) : {this.print} Unit
