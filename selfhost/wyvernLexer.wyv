@@ -42,7 +42,7 @@ def lowerLexOrdinaryLine(input:String):List[Dyn]
     var tokens : List[Dyn] = llist.Nil[Dyn]()
     lowLevelLexer.reset(input, startLexerState)
     var token : Dyn = lowLevelLexer.next()
-    js.log("called lowerLexOrdinaryLine")
+    //js.log("called lowerLexOrdinaryLine")
     def loop():Unit
         if (!js.isUndefined(token))
             tokens = tokens.push(token)
@@ -76,10 +76,10 @@ def lexOrdinaryLine(input:String):List[Dyn]
         val lineIndent = getIndent(input)
         if (inLine && lineIndent == currentIndent)
             pending = pending.push(Token("logline","\n",0,0))
-            js.log("adding")
+            //js.log("adding")
             handleLine(pending, tokens)
           else
-            js.log("not adding")
+            //js.log("not adding")
             // lineIndent > currentIndent
             handleLine(pending, tokens)
             
@@ -143,14 +143,14 @@ def initLexer(toks : List[Dyn]):lexing.Lexer
             c:llist.Cons =>
                            tokens = c.next
                            val token:Dyn = c.value
-                           js.log("lexer returning " + token.value)
+                           //js.log("lexer returning " + token.value)
                            c.value
             n:llist.Nil => js.getUndefined()
         def save():Dyn = js.log("called save\n")
         def reset(chunk:String, info:Dyn):Unit
             js.log("called reset\n")
             tokens = lexLines(chunk).filter((t:Dyn) => !js.equalsJS("WS", t."type"))
-            tokens.do((t:Dyn) => printToken(t))
+            //tokens.do((t:Dyn) => printToken(t))
         def formatError(token:Dyn):String
             js.log("called formatError")
             js.log(token)

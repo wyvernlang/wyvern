@@ -1,0 +1,47 @@
+module def toBytecode(javascript:JavaScript, js:Dyn)
+
+import bound
+import bytecode
+import wyvern.collections.llist
+
+val b = bytecode(javascript, js)
+
+// to bytecode
+def toBytecodeMethod(m:bound.Method):b.MethodDecl
+    b.MethodDecl(m.name, llist.Singleton[String](m.binding.name), toBytecode(m.body))
+
+def toBytecode(e:bound.Exp):b.Expr = match e:
+    v:bound.Var   => b.VarExpr(v.binding.name)
+    o:bound.Obj   => b.NewExpr("this", o.meths.map[b.MethodDecl](m => toBytecodeMethod(m)))
+    c:bound.Call  => b.CallExpr(toBytecode(c.receiver), c.name, llist.Singleton[b.Expr](toBytecode(c.arg)), false)
+    s:bound.Seq   =>
+        val processStmt : bound.Exp -> b.SeqStmt = (exp =>
+          val result:b.SeqStmt = match exp:
+            v:bound.Val => b.DeclStmt(b.ValDecl(v.binding.name, toBytecode(v.exp)))
+            default     => b.ExpStmt(toBytecode(exp))
+          result
+        )
+        // TODO: should be able to put this lambda inline!
+        val seqStmts = s.exps.map[b.SeqStmt](processStmt)
+        b.SeqExpr(seqStmts)
+    // no "val" case - should exist only under Seq
+    // no lambda or app case - should have been lowered away
+
+def writeExpToFile(e:bound.Exp, filename:String):Unit
+    js.log("Converting expression to bytecode...\n")
+    val expBytecode = toBytecode(e)
+    //js.log(d.sequenceExpression.statements.get(0).declaration)
+    js.log("Creating top level bytecode...\n")
+    val fileBytecode = b.singletonBytecode(b.toplevel(expBytecode))
+    js.log("Actually saving...\n")
+    b.saveBytecode(filename, fileBytecode)
+
+/*
+// test code
+val expr = b.StrLit("Hello")
+b.encodeExpr(expr)
+val apply = b.MethodDecl("apply", llist.Singleton[String]("x"), b.VarExpr("x"))
+val expr2 = b.NewExpr("this", llist.Singleton[b.Decl](apply))
+val callExpr = b.CallExpr(expr2, "apply", llist.Singleton[b.Expr](expr), false)
+b.encodeExpr(callExpr)
+*/

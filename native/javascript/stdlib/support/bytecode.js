@@ -71,7 +71,7 @@ exports.Type = function() {
 exports.VariableDeclarationType = function() {
 	setRoot();
 	let result = root.lookupEnum('VariableDeclarationType');
-	console.log(result)
+	//console.log(result)
 	return result;
 }
 
@@ -103,5 +103,5 @@ exports.encodeExpr = function(exprObject) {
 	var bmsg = Expression.create(exprObject);
 	var bbuffer = Expression.encode(bmsg).finish();
 	var msg2 = Expression.decode(bbuffer);
-	console.log(msg2)
+	//console.log(msg2)
 }

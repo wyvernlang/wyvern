@@ -1,153 +1,46 @@
+// required FFI and resources
 require javascript
 require stdout
 
+// imports
 import javascript:stdlib.js
 import javascript:stdlib.support.regexUtils
 import wyvernLexer
-import metadata parsing
+import wyvernParser
 import bytecode
 import raw
+import binding
 import bound
+import toBytecode
 import wyvern.collections.llist
 
-val wyvernLexer = wyvernLexer(js, regexUtils)
-val b = bytecode(javascript, js)
+// instantiate imports and create aliases
 type List = llist.LinkedList
+val wyvernLexer = wyvernLexer(js, regexUtils)
+val toBytecode = toBytecode(javascript, js)
+val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
 
-def expToString(e:raw.Exp):String = match e:
-    v:raw.Var    => v.name
-    a:raw.App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
-    l:raw.Lambda => l.name + " => " + expToString(l.body)
-    v:raw.Val    => "val " + v.name + " = " + expToString(v.exp)
-    s:raw.Seq    => s.exps.foldRight[String]((e:raw.Exp, s:String) => s + "\n" + expToString(e), "")
-    default      =>
-                    js.log(e)
-                    "typecheck issue!"
-
-def makeSeq(e1:raw.Exp, e2:raw.Exp):raw.Seq = match e1:
-    s:raw.Seq   => raw.Seq(llist.Cons[raw.Exp](e2, s.exps))
-    default     => raw.Seq(llist.Cons[raw.Exp](e2, llist.Singleton[raw.Exp](e1)))
-    
-val grammar: parsing.Grammar = ~
-    Stmts -> Stmt                               : a:Dyn => a.get(0)
-           | Stmts %logline Stmt                         : a:Dyn => makeSeq(a.get(0), a.get(2))
-           
-    Stmt  -> Expression                     : a:Dyn => a.get(0)
-           | %val %identifier %eq Expression: a:Dyn => raw.Val(a.get(1).value, a.get(3))
-           | %def %identifier %lparen %identifier %rparen %eq Expression: a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
-
-    Expression -> Primary                       : a:Dyn => a.get(0)
-                | Expression Primary            : a:Dyn => raw.App(a.get(0), a.get(1))
-
-    Primary -> %identifier                      : a:Dyn => raw.Var(a.get(0).value)
-             | %lparen Expression %rparen       : a:Dyn => a.get(1)
-             | %identifier %darrow Expression   : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
-
-val parser = parsing.makeParser(grammar, lexer)
+val parser = wyvernParser.makeParser(lexer)
 
 // TODO: right now there's an internal error in nearly if there's a parse error.  Need to fix this; somehow we are using nearly wrong.
+// simple test case
 parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)")
+
 //parser.feed("(x => x)")
-js.log("Raw Results:\n")
-js.log(parser.results)
-js.log("Results:\n")
-stdout.print(expToString(parser.results.get(0)))
+/* debugging code, currently commented out
+    js.log("Raw Results:\n")
+    js.log(parser.results)
+    js.log("Results:\n")
+    stdout.print(raw.expToString(parser.results.get(0)))
+*/
 
-
-// es is in program order
-def bindList(es:List[raw.Exp], ctx:bound.Context):List[bound.Exp] = match es:
-    c:llist.Cons =>
-        val b = bindHelper(c.value, ctx)
-        match b:
-            v:bound.Val =>
-                val newCtx = ctx.extend(v.binding)
-                llist.Cons[bound.Exp](b, bindList(c.next, newCtx))
-            default   => llist.Cons[bound.Exp](b, bindList(c.next, ctx))
-    n:llist.Nil  => llist.Nil[bound.Exp]()
-
-def bind(e:raw.Exp):bound.Exp
-    bindHelper(e, bound.emptyContext())
-
-def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
-    v:raw.Var    => bound.Var(llist.find[bound.Binding](context.bindings, (b:bound.Binding) => v.name==b.name).get())
-    a:raw.App    => bound.App(bindHelper(a.func, context), bindHelper(a.arg, context))
-    l:raw.Lambda =>
-        val b = bound.Binding(l.name, context.counter)
-        bound.Lambda(b, bindHelper(l.body, context.extend(b)))
-    v:raw.Val    =>
-        val b = bound.Binding(v.name, context.counter)
-        bound.Val(b, bindHelper(v.exp, context))
-    s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
-
-val boundExp = bind(parser.results.get(0))
+stdout.print("Binding...\n")
+val boundExp = binding.bind(parser.results.get(0))
         
-datatype OOExp
-    OOVar(binding:bound.Binding)
-    Obj(meths:List[Method])
-    Call(receiver:OOExp, name:String, arg:OOExp)
-    Val(binding:bound.Binding, exp:OOExp)
-    Seq(exps:List[OOExp])
+stdout.print("Lowering...\n")
+val ooExp = bound.lower(boundExp)
 
-type Method
-    val name:String
-    val binding:bound.Binding
-    val body:OOExp
-
-def Method(name:String, binding:bound.Binding, body:OOExp):Method = new
-    val name = name
-    val binding = binding
-    val body = body
-
-def lower(e:bound.Exp):OOExp = match e:
-    v:bound.Var     => OOVar(v.binding)
-    a:bound.App     => Call(lower(a.func), "apply", lower(a.arg))
-    l:bound.Lambda  => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
-    v:bound.Val     => Val(v.binding, lower(v.exp))
-    s:bound.Seq     => Seq(s.exps.map[OOExp](e => lower(e)))
-
-val ooExp = lower(boundExp)
-
-// test code
-val expr = b.StrLit("Hello")
-b.encodeExpr(expr)
-js.log("1:\n")
-val apply = b.MethodDecl("apply", llist.Singleton[String]("x"), b.VarExpr("x"))
-val expr2 = b.NewExpr("this", llist.Singleton[b.Decl](apply))
-val callExpr = b.CallExpr(expr2, "apply", llist.Singleton[b.Expr](expr), false)
-js.log("2:\n")
-b.encodeExpr(callExpr)
-js.log("3:\n")
-
-// to bytecode
-def toBytecodeMethod(m:Method):b.MethodDecl
-    b.MethodDecl(m.name, llist.Singleton[String](m.binding.name), toBytecode(m.body))
-
-def toBytecode(e:OOExp):b.Expr = match e:
-    v:OOVar => b.VarExpr(v.binding.name)
-    o:Obj   => b.NewExpr("this", o.meths.map[b.MethodDecl](m => toBytecodeMethod(m)))
-    c:Call  => b.CallExpr(toBytecode(c.receiver), c.name, llist.Singleton[b.Expr](toBytecode(c.arg)), false)
-    s:Seq   =>
-        val processStmt : OOExp -> b.SeqStmt = (exp =>
-          val result:b.SeqStmt = match exp:
-            v:Val   => b.DeclStmt(b.ValDecl(v.binding.name, toBytecode(v.exp)))
-            default => b.ExpStmt(toBytecode(exp))
-          result
-        )
-        // TODO: should be able to put this lambda inline!
-        val seqStmts = s.exps.map[b.SeqStmt](processStmt)
-        b.SeqExpr(seqStmts)
-    // no "val" case - should exist only under Seq
-
-js.log("4:\n")
-val bytecodeExpr = toBytecode(ooExp)
-val d:Dyn = bytecodeExpr
-
-js.log("5:\n")
-js.log(d.sequenceExpression.statements.get(0).declaration)
-val bytecode = b.singletonBytecode(b.toplevel(bytecodeExpr))
-js.log("6:\n")
-b.saveBytecode("sample.wyb", bytecode)
-js.log("7:\n")
-
+stdout.print("Writing to sample.wyb...\n")
+toBytecode.writeExpToFile(ooExp, "sample.wyb")

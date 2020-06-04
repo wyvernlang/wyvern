@@ -1,0 +1,30 @@
+import raw
+import bound
+import wyvern.collections.llist
+
+type List = llist.LinkedList
+
+// es is in program order
+def bindList(es:List[raw.Exp], ctx:bound.Context):List[bound.Exp] = match es:
+    c:llist.Cons =>
+        val b = bindHelper(c.value, ctx)
+        match b:
+            v:bound.Val =>
+                val newCtx = ctx.extend(v.binding)
+                llist.Cons[bound.Exp](b, bindList(c.next, newCtx))
+            default   => llist.Cons[bound.Exp](b, bindList(c.next, ctx))
+    n:llist.Nil  => llist.Nil[bound.Exp]()
+
+def bind(e:raw.Exp):bound.Exp
+    bindHelper(e, bound.emptyContext())
+
+def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
+    v:raw.Var    => bound.Var(llist.find[bound.Binding](context.bindings, (b:bound.Binding) => v.name==b.name).get())
+    a:raw.App    => bound.App(bindHelper(a.func, context), bindHelper(a.arg, context))
+    l:raw.Lambda =>
+        val b = bound.Binding(l.name, context.counter)
+        bound.Lambda(b, bindHelper(l.body, context.extend(b)))
+    v:raw.Val    =>
+        val b = bound.Binding(v.name, context.counter)
+        bound.Val(b, bindHelper(v.exp, context))
+    s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))

@@ -32,9 +32,30 @@ def Binding(name:String, c:Counter):Binding
         val name = name
         val id = count
 
+type Method
+    val name:String
+    val binding:Binding
+    val body:Exp
+
+def Method(name:String, binding:Binding, body:Exp):Method = new
+    val name = name
+    val binding = binding
+    val body = body
+
+    
 datatype Exp
     Var(binding:Binding)
     App(func:Exp, arg:Exp)
     Lambda(binding:Binding, body:Exp)
+    Obj(meths:List[Method])
+    Call(receiver:Exp, name:String, arg:Exp)
     Val(binding:Binding, exp:Exp)
     Seq(exps:List[Exp])
+
+def lower(e:Exp):Exp = match e:
+    v:Var     => v
+    a:App     => Call(lower(a.func), "apply", lower(a.arg))
+    l:Lambda  => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
+    v:Val     => Val(v.binding, lower(v.exp))
+    s:Seq     => Seq(s.exps.map[Exp](e => lower(e)))
+
