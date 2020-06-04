@@ -100,3 +100,7 @@ out.js
 boot.js
 *.js.old
 out.gradver
+native/javascript/package-lock.json
+selfhost/lambda.js
+selfhost/sample.js
+native/javascript/package-lock.json
