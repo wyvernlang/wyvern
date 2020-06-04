@@ -1,0 +1,40 @@
+module bound
+
+import wyvern.collections.llist
+type List = llist.LinkedList
+
+resource type Counter
+    var value:Int
+def Counter():Counter = new
+    var value:Int = 0
+
+resource type Context
+    val bindings:List[Binding]
+    val counter:Counter
+    def extend(b:Binding):Context
+
+def Context(bs:List[Binding], c:Counter) : Context = new
+    val bindings = bs
+    val counter = c
+    def extend(b:Binding):Context
+        Context(llist.Cons[Binding](b, bs), c)
+    
+def emptyContext():Context = Context(llist.Nil[Binding](), Counter())
+
+
+type Binding
+    val name:String
+    val id:Int
+def Binding(name:String, c:Counter):Binding
+    val count = c.value
+    c.value = c.value + 1
+    new
+        val name = name
+        val id = count
+
+datatype Exp
+    Var(binding:Binding)
+    App(func:Exp, arg:Exp)
+    Lambda(binding:Binding, body:Exp)
+    Val(binding:Binding, exp:Exp)
+    Seq(exps:List[Exp])

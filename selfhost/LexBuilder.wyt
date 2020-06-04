@@ -1,7 +1,0 @@
-import wyvern.util.matching.regex
-import Lexer
-
-resource type LexBuilder
-    type TokenKind
-    def addEntry(pattern: regex.Regex, kind:this.TokenKind):Unit
-    def build():Lexer[this.TokenKind]

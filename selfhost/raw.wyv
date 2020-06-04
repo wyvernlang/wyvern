@@ -1,0 +1,12 @@
+module raw
+
+import wyvern.collections.llist
+type List = llist.LinkedList
+
+
+datatype Exp
+    Var(name:String)
+    App(func:Exp, arg:Exp)
+    Lambda(name:String, body:Exp)
+    Val(name:String, exp:Exp)
+    Seq(exps:List[Exp])

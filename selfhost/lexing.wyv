@@ -1,0 +1,35 @@
+module lexing
+
+import wyvern.ast
+import metadata wyvern.collections.list
+import javascript:stdlib.support.lexing
+
+// based on moo - see https://github.com/no-context/moo
+// for Wyvern indentation, see https://gist.github.com/nathan/d8d1adea38a1ef3a6d6a06552da641aa
+
+// need a helper module helperMod with a single function helperMod.makeLexer(String):Lexer
+// the helper module will need to use moo and related functions from javascript, but it can't be a module def because it needs to be globally accessible
+// or else we need to pass the current context (from the lexer module) to the place where this is used
+//      e.g. could pass an AST object representing the receiver x of the type x.T that has the metadata
+//      e.g. or ctx could have a variable "metadataTypeReceiver" that's in scope, where metadataTypeReceiver.T has the metadata.
+//          implemented as let typeReceiver=x in <metadata-generated>
+//          could test this by binding metadataTypeReceiver at the use site (temporary hack)
+
+def makeLexer(lexDesc:String):Lexer
+    lexing.makeLexer(lexDesc)
+
+resource type Lexer
+    def next():Dyn
+    def save():Dyn
+    def reset(chunk:String, info:Dyn):Unit
+    def formatError(token:Dyn):String
+    def has(name:String):Boolean
+    metadata new
+        def parseTSL(input : String, ctx : system.Context) : option.Option
+            // create a string ast from input
+            val stringAST = ast.string(input) // input
+            val receiverAST = ast.getMetadataTypeReceiver(ctx)
+            val args : list.List[ast.AST] = { stringAST }
+            // create an ast representing instantiation of a lexer
+            val lexerCreationAST = ast.call(receiverAST, "makeLexer", args) // metadataTypeReceiver.makeLexer(input)
+            option.Some(lexerCreationAST)

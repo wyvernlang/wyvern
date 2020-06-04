@@ -1,0 +1,19 @@
+require javascript
+
+import javascript:stdlib.js
+import javascript:stdlib.support.regexUtils
+import lexing
+import wyvernLexer
+
+val wyvernLexer = wyvernLexer(js, regexUtils)
+
+val incrementalLexer = wyvernLexer.incrementalLexer()
+
+def printLineResult(opt: option.Option[lexing.Lexer]):String = match opt:
+    s:option.Some => "Some!"
+    n:option.None => "None"
+
+val res1 = incrementalLexer.addLine("( x => x) \\")
+js.log(printLineResult(res1))
+val res2 = incrementalLexer.addLine("(x => x)")
+js.log(printLineResult(res2))

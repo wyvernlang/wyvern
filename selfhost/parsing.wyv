@@ -1,0 +1,82 @@
+module parsing
+
+import javaMetaDebug
+import wyvern.ast
+import metadata wyvern.collections.list
+import javascript:stdlib.support.parsing
+import lexing
+import wyvern.util.matching.regexInternal
+import java:wyvern.stdlib.support.StringHelper.utils
+
+// based on Nearly, see https://nearley.js.org/docs/grammar
+// also an article: https://medium.com/@gajus/parsing-absolutely-anything-in-javascript-using-earley-algorithm-886edcc31e5e
+
+val regex = regexInternal
+val lineRegex = regex(".*\n")
+val untilColonRegex = regex("[^:]*:")
+
+def linesCollect(input:String, f : String -> String):String
+    def linesCollectHelper(input:String, f : String -> String, acc:String):String
+        match lineRegex.findPrefixMatchOf(input):
+            s:option.Some => linesCollectHelper(s.content.after(), f, acc + f(s.content.matched()))
+            n:option.None => acc+f(input)
+    linesCollectHelper(input, f, "")
+
+/*    
+def lines(input:String):list.List[String]
+    val result = list.make[String]()
+    var current : String = input
+    var r : regex.Regex = lineRegex.findPrefixMatchOf(input)
+    while {r.isDefined}
+        val match = r.get()
+        val line = match.matched()
+        result.append(line)
+        current = match.after()
+        r = lineRegex.findPrefixMatchOf(current)
+    result.append(current)
+    result
+*/
+/* input is the body of the TSL block
+ * decls is the list of decls we will add functions to
+ * we return a String which is the Nearly code to use in generating the parser
+ */
+def parse(input : String, decls : list.List[ast.Decl], ctx : system.Context) : String
+    var index : Int = 0
+    def processLine(line : String) : String
+        match untilColonRegex.findPrefixMatchOf(line):
+            s:option.Some =>
+                val m = s.content.matched()
+                val production = m.substring(0, m.length()-1)
+                val result = production + "{% function(a) { return context.f" + utils.ofInt(index) + ".apply(a) } %}\n"
+                val wyvExp = s.content.after()
+                val bodyAST = ast.parseExpression(wyvExp, ctx)
+                val realAST:Dyn = bodyAST.ast
+                //val arg = ast.formalArg("x",ast.types.dyn())
+                val valAST = ast.valDeclaration("f" + utils.ofInt(index), ast.types.dyn(), bodyAST)
+                decls.append(valAST)
+                index = index + 1
+                result
+            n:option.None =>
+                line // empty line, or no processing done
+    linesCollect(input, x => processLine(x))
+
+type Grammar
+    val parseInfo:String
+    metadata new
+        def parseTSL(input : String, ctx : system.Context) : option.Option
+            // create a string ast from input
+            val decls = list.make[ast.Decl]()
+            val nearlyString = parse(input, decls, ctx)
+            val stringAST = ast.string(nearlyString) // input
+            // create an object with the string as a field
+            decls.append(ast.valDeclaration("parseInfo", ast.types.string(), stringAST))
+            val result = ast.object(decls)
+            option.Some(result)
+    
+type Parser
+    def feed(input:String):Unit
+    val results:Dyn
+
+def makeParser(grammar: Grammar, lexer : lexing.Lexer):Parser
+    parsing.makeParserWithContext(grammar.parseInfo, lexer, grammar)
+

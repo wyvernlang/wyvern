@@ -1,4 +1,0 @@
-type Token
-    type TokenKind
-    val kind:this.TokenKind
-    val value:String
