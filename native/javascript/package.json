@@ -5,6 +5,8 @@
   "main": "",
   "directories": {},
   "dependencies": {
+    "moo": "^0.5.1",
+    "nearley": "^2.19.3",
     "protobufjs": "^6.8.6",
     "sprintf-js": "^1.1.1"
   },
