@@ -7,7 +7,6 @@ import javascript:stdlib.js
 import javascript:stdlib.support.regexUtils
 import wyvernLexer
 import wyvernParser
-import bytecode
 import raw
 import binding
 import bound
@@ -18,7 +17,6 @@ import wyvern.collections.llist
 type List = llist.LinkedList
 val wyvernLexer = wyvernLexer(js, regexUtils)
 val toBytecode = toBytecode(javascript, js)
-val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
 

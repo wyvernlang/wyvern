@@ -45,12 +45,6 @@ public class ExampleTests {
     }
     
     @Test
-    public void testLex() throws ParseException {
-      TestUtil.doTestScriptModularly(TestUtil.WYVERN_HOME + "/selfhost/", "lexTest",
-          Util.intType(), new IntegerLiteral(15));
-    }
-
-    @Test
     public void testFib() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "rosetta.fibonacci", Util.unitType(),
                 Util.unitValue());
