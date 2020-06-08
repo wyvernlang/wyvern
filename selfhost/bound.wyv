@@ -1,6 +1,7 @@
 module bound
 
 import wyvern.collections.llist
+import wyvern.String
 type List = llist.LinkedList
 
 resource type Counter
@@ -51,11 +52,13 @@ datatype Exp
     Call(receiver:Exp, name:String, arg:Exp)
     Val(binding:Binding, exp:Exp)
     Seq(exps:List[Exp])
+    Integer(str:String)
 
 def lower(e:Exp):Exp = match e:
     v:Var     => v
     a:App     => Call(lower(a.func), "apply", lower(a.arg))
     l:Lambda  => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
+    c:Call    => Call(lower(c.receiver),c.name,lower(c.arg))
     v:Val     => Val(v.binding, lower(v.exp))
     s:Seq     => Seq(s.exps.map[Exp](e => lower(e)))
-
+    i:Integer    => i

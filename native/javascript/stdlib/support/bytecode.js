@@ -105,3 +105,19 @@ exports.encodeExpr = function(exprObject) {
 	var msg2 = Expression.decode(bbuffer);
 	//console.log(msg2)
 }
+
+exports.intStringToBuffer = function(s) {
+    var num = parseInt(s);  
+    var data = [];
+    while (num > 0) {
+        var d = num % 256;
+        data.push(d);
+        num = Math.floor((num-d)/256);
+    }
+    if (data.length == 0) {
+        data.push(0);
+    }
+    data.reverse();
+    var buf = Buffer.from(data);
+    return buf;
+}
