@@ -1,7 +1,6 @@
 module bound
 
 import wyvern.collections.llist
-import wyvern.String
 type List = llist.LinkedList
 
 resource type Counter

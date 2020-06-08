@@ -71,8 +71,6 @@ tagged type ValDecl extends Decl
 tagged type Expr
 tagged type LitExpr extends Expr
     val literal:Literal
-tagged type IntExpr extends Expr
-    val literal:Literal
 tagged type VarExpr extends Expr
     val variable:String
     val type_:Type
@@ -92,7 +90,7 @@ tagged type Bytecode
     val modules:Dyn // List[Module]
     
 // Public constructors for expressions
-def IntExpr(s:String):IntExpr = new
+def IntLit(s:String):LitExpr = new
     val literal:IntLit = new
         val integerLiteral:Dyn = bytecode.intStringToBuffer(s)
 def StrLit(s:String):LitExpr = new
