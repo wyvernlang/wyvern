@@ -1,4 +1,5 @@
 lambda: bootstrap node_modules
+	wyby lambda.wyv
 	node ../backend/boot.js lambda.wyb > lambda.js
 
 bootstrap: ../backend/boot.js
