@@ -1,11 +1,8 @@
 module def wyvernLexer(js:Dyn, regexUtils:Dyn)
 
-//require javascript
-//import javascript:stdlib.js
-//import javascript:stdlib.support.regexUtils
-
 import metadata lexing
 import wyvern.collections.llist
+import wyvern.runtime
 
 type List = llist.LinkedList
 
@@ -32,7 +29,11 @@ val lowLevelLexer : lexing.Lexer = ~
         identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ val : 'val', def : 'def' })},
         lparen:     '(',
         rparen:     ')',
+        lbrack:     '[',
+        rbrack:     ']',
         darrow:     '=>',
+        arrow:      '->',
+        colon:      ':',
         eq:         '=',
         linecont:   '\\',
 
@@ -52,49 +53,207 @@ def lowerLexOrdinaryLine(input:String):List[Dyn]
     val result = tokens.reverse()
     result
 
+// converts the string into a token.  We assume the string does not include a newline.
+// TODO: return token with correct line/column
+def lexIndentedLine(input:String):Token = Token("indentedLine", input, -1, -1)
+
+// true if the string contains only whitespace characters    
+def allWhitespace(input:String):Boolean
+    val lineMatch = regexUtils.doMatch(input, "[ \\t]*")
+    if (lineMatch.found)
+        lineMatch.after == ""
+      else
+        false
     
 /************** Second Level Lexer ***************/
     
-var inLine : Boolean = false
-var lineCont : Boolean = false
+datatype LexerState
+    Indent(level:String)
+    LParen()
+    RParen()
+    LBrack()
+    RBrack()
+    Block(text:String)
+    LineCont()
+    OpenComment()
+    DontCare()
 
-def getIndent(input:String) : String = ""
-    // TODO: implement me properly
+var lexerState:List[LexerState] = llist.Nil[LexerState]()
+    
+val NO_INDENT = "NONE"
+
+def getCurrentIndent() : String
+    def findIndent(l:List[LexerState]):String = match l:
+        n:llist.Nil => NO_INDENT
+        c:llist.Cons => match c.value:
+            i:Indent => i.level
+            default  => findIndent(c.next)
+    findIndent(lexerState)
+
+def getIndent(input:String) : String
+    val lineMatch = regexUtils.doMatch(input, "[ \\t]+")
+    if (lineMatch.found)
+        lineMatch.matched
+      else
+        ""
+
+def isStrictSubstring(s1:String,s2:String):Boolean
+    if (s1.length() < s2.length())
+        val s2part = s2.substring(0, s1.length())
+        s1 == s2part
+      else
+        false
+        
+def setIndent(lineIndent:String):Unit
+    match lexerState:
+        c:llist.Cons =>
+            lexerState = lexerState.drop(1).get()
+            match c.value:
+                i:Indent =>
+                    lexerState = lexerState.push(Indent(lineIndent))
+                default =>
+                    setIndent(lineIndent)
+                    lexerState = lexerState.push(c.value)
+        default => unit
+
+// returns a new pending list with dedents prepended
+def addDedents(lineIndent:String, pending:List[Dyn], tokens:List[Token]):List[Dyn]
+    match lexerState:
+        c:llist.Cons =>
+            lexerState = lexerState.drop(1).get()
+            match c.value:
+                i:Indent => addDedents(lineIndent, pending.push(Token("dedent","", 0, 0)), tokens)
+                l:LParen => pending
+                l:LBrack => pending
+        n:llist.Nil =>
+            runtime.fail("didn't match indent/dedent")
+
+def allWhitespaceTokens(toks:List[Token]):Boolean = match toks:
+    c:llist.Cons =>
+        if (c.value."type" == "WS")
+            allWhitespaceTokens(c.next)
+          else
+            false
+    default => true
 
 // passed input one line at a time, not including the terminating \n
 def lexLine(input:String):List[Dyn]
-    lexOrdinaryLine(input)
-
-def lexOrdinaryLine(input:String):List[Dyn]
-    val tokens = lowerLexOrdinaryLine(input)
     var pending:List[Dyn] = llist.Nil[Dyn]() // in reverse order
-    if (lineCont)
-        lineCont = false
-        handleLine(pending, tokens)
+    val topState = lexerState.nth(0).getOrElse(() => DontCare())
+    // TODO: bug in codegen means have to let-bind topState
+    match topState:
+        b:Block =>
+            var currentIndent : String = getCurrentIndent()
+            if (currentIndent == "NONE")
+                currentIndent = ""
+            val lineIndent = getIndent(input)
+            if (isStrictSubstring(currentIndent,lineIndent) || allWhitespace(input))
+                // extending the block
+                val token = lexIndentedLine(input)
+                lexerState = lexerState.drop(1).get()
+                lexerState = lexerState.push(Block(b.text + token.value))
+                pending // empty
+              else
+                // ending the block
+                pending = pending.push(b)
+                lexerState = lexerState.drop(1).get()
+                lexOrdinaryLine(pending, input)
+        default =>
+            lexOrdinaryLine(pending, input)
+
+def lexOrdinaryLine(pending_:List[Dyn], input:String):List[Dyn]
+    val tokens = lowerLexOrdinaryLine(input)
+    var pending:List[Dyn] = pending_ // in reverse order
+    val topState = lexerState.nth(0).getOrElse(() => DontCare())
+    if (allWhitespace(input))
+        // if lexerState.top()==LINECONTINUATION && tokens.last != LINECONTINUATION
+        match topState:
+            l:LineCont =>
+                if (!(tokens.nth(tokens.size()-1).map[String](x:Token => x."type").getOrElse(() => "") == "linecont"))
+                    lexerState = lexerState.drop(1).get()
+            default    =>
+                unit
+        pending.reverse().append(tokens)
       else
-        val currentIndent = ""
-        val lineIndent = getIndent(input)
-        if (inLine && lineIndent == currentIndent)
-            pending = pending.push(Token("logline","\n",0,0))
-            //js.log("adding")
-            handleLine(pending, tokens)
-          else
-            //js.log("not adding")
-            // lineIndent > currentIndent
-            handleLine(pending, tokens)
+        match topState:
+            l:LineCont =>
+                lexerState = lexerState.drop(1).get()
+                handleLine(pending, tokens)
+            l:LParen => handleLine(pending, tokens)
+            l:LBrack => handleLine(pending, tokens)
+            default =>
+                var currentIndent : String = getCurrentIndent()
+                val lineIndent = getIndent(input)
+                if (currentIndent == NO_INDENT)
+                    setIndent(lineIndent)
+                    currentIndent = ""
+                if (currentIndent == lineIndent)
+                    // new line at same indent level
+                    // TODO: fix line/column here
+                    pending = pending.push(Token("logline","\n",0,0))
+                    handleLine(pending, tokens)
+                  elif (isStrictSubstring(lineIndent,currentIndent))
+                    // one or more dedents
+                    addDedents(lineIndent, pending, tokens)
+                  else
+                    // lineIndent > currentIndent
+                    handleLine(pending, tokens)
             
-            
-def handleLine(pending:List[Dyn], tokens:List[Token]):List[Dyn]
-    inLine = true
+def handleLine(pending_:List[Dyn], tokens:List[Token]):List[Dyn]
+    //inLine = true
     var toks:List[Dyn] = tokens
-    // if ends with linecont, set the flag
-    val revTokens = tokens.reverse()
-    match revTokens:
-        c:llist.Cons => if (c.value."type" == "linecont")
-            toks = c.next.reverse()
-            lineCont = true
-    // append everything to pending except newlines, linecont
-    pending.reverse().append(toks)
+    printTokens(toks)
+    var pending:List[Dyn] = pending_ // in reverse order
+    
+    def computeDedents(matchingType:String):Unit
+        val top = lexerState.nth(0).get()
+        lexerState = lexerState.drop(1).get()
+        val errorString = "didn't match token " + matchingType
+        match top:
+            i:Indent =>
+                pending = pending.push(Token("dedent", "", 0, 0))
+                computeDedents(matchingType)
+            l:LParen => runtime.assertion(errorString, matchingType == "lparen")
+            l:LBrack => runtime.assertion(errorString, matchingType == "lbrack")
+            default  => runtime.fail(errorString)
+    
+    def loop():Unit
+      match toks:
+        c:llist.Cons => 
+            toks = c.next
+            val t:Token = c.value
+            val kind = t."type"
+            if (kind == "lparen")
+                lexerState = lexerState.push(LParen())
+              elif (kind == "lbrack")
+                lexerState = lexerState.push(LBrack())
+              elif (kind == "rparen")
+                computeDedents("lparen")
+              elif (kind == "rbrack")
+                computeDedents("lbrack")
+              elif (kind == "colon")
+                if (allWhitespaceTokens(toks))
+                    lexerState = lexerState.push(Block(""))
+              elif (kind == "eqarrow")
+                if (allWhitespaceTokens(toks))
+                    lexerState = lexerState.push(Indent(NO_INDENT))
+              else
+                unit
+            pending = pending.push(c.value)
+            loop()
+        n:llist.Nil => unit
+    
+    loop()
+    // if ends with linecont, set the flag and don't add linecont
+    match pending:
+        c:llist.Cons =>
+            val t : Token = c.value
+            if (t."type" == "linecont")
+                pending = c.next
+                lexerState = lexerState.push(LineCont())
+
+    // return pending (reversed)
+    pending.reverse()
 
 
 // WITH CONTINUATION: lex a line and return whether it is a complete logical line or not (store internally if not, return if so)
@@ -103,7 +262,9 @@ def handleLine(pending:List[Dyn], tokens:List[Token]):List[Dyn]
 def lexLines(input:String):List[Dyn]
     val lineMatch = regexUtils.doMatch(input, "[^\\n]*")
     if (lineMatch.found)
+        js.log("reading line " + lineMatch.matched)
         val firstTokens = lexLine(lineMatch.matched)
+        printTokens(firstTokens)
         if (lineMatch.after == "")
             firstTokens
           else
@@ -118,12 +279,16 @@ def lexLines(input:String):List[Dyn]
 
 def printToken(t:Dyn):Unit = js.log(t."type")
 
+def printTokens(tokens:List[Dyn]):Unit
+    tokens.do(x => printToken(x))
+
 resource type IncrementalLexer
     def addLine(input:String):option.Option[lexing.Lexer]
 
+    /*
+// TODO: revise to work with lineCont
 def incrementalLexer():IncrementalLexer
-    // TODO: make all the state above, such as inLine, local
-    inLine = false
+    // TODO: make all the state above local
     new
         var tokens : List[Dyn] = llist.Nil[Dyn]()
         def addLine(input:String):option.Option[lexing.Lexer]
@@ -132,6 +297,7 @@ def incrementalLexer():IncrementalLexer
                 option.None[lexing.Lexer]()
               else
                 option.Some[lexing.Lexer](initLexer(this.tokens))
+*/
 
 def makeLexer():lexing.Lexer
     initLexer(llist.Nil[Dyn]())
