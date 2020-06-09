@@ -8,21 +8,35 @@ import wyvern.collections.llist
 def makeSeq(e1:raw.Exp, e2:raw.Exp):raw.Seq = match e1:
     s:raw.Seq   => raw.Seq(llist.Cons[raw.Exp](e2, s.exps))
     default     => raw.Seq(llist.Cons[raw.Exp](e2, llist.Singleton[raw.Exp](e1)))
-    
+
 val grammar: parsing.Grammar = ~
-    Stmts -> %logline Stmt                               : a:Dyn => a.get(1)
-           | Stmts %logline Stmt                         : a:Dyn => makeSeq(a.get(0), a.get(2))
+    Stmts -> %logline Stmt                                : a:Dyn => a.get(1)
+           | Stmts %logline Stmt                          : a:Dyn => makeSeq(a.get(0), a.get(2))
            
-    Stmt  -> Expression                     : a:Dyn => a.get(0)
-           | %val %identifier %eq Expression: a:Dyn => raw.Val(a.get(1).value, a.get(3))
-           | %def %identifier %lparen %identifier %rparen %eq Expression: a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
+    Stmt  -> ExprLambda                                                  : a:Dyn => a.get(0)
+           | %val %identifier %eq ExprLambda                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
+           | %def %identifier %lparen %identifier %rparen %eq ExprLambda : a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
 
-    Expression -> Primary                       : a:Dyn => a.get(0)
-                | Expression Primary            : a:Dyn => raw.App(a.get(0), a.get(1))
+    ExprLambda -> ExprAddSub                              : a:Dyn => a.get(0)
+                | %identifier %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
 
-    Primary -> %identifier                      : a:Dyn => raw.Var(a.get(0).value)
-             | %lparen Expression %rparen       : a:Dyn => a.get(1)
-             | %identifier %darrow Expression   : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
+    ExprAddSub -> ExprMultDiv                             : a:Dyn => a.get(0)
+                | ExprAddSub %plus ExprMultDiv            : a:Dyn => raw.Call(a.get(0),"_PLUS_",a.get(2))
+                | ExprAddSub %minus ExprMultDiv           : a:Dyn => raw.Call(a.get(0),"_HYPHEN_",a.get(2))
+
+    ExprMultDiv -> ExprAppl                               : a:Dyn => a.get(0)
+                 | ExprMultDiv %times ExprAppl            : a:Dyn => raw.Call(a.get(0),"_TIMES_",a.get(2))
+                 | ExprMultDiv %divide ExprAppl           : a:Dyn => raw.Call(a.get(0),"_DIVIDE_",a.get(2))
+                 | ExprMultDiv %mod ExprAppl              : a:Dyn => raw.Call(a.get(0),"_MOD_",a.get(2))
+
+    ExprAppl -> Primary                                   : a:Dyn => a.get(0)
+              | ExprAppl Primary                          : a:Dyn => raw.App(a.get(0), a.get(1))
+
+    Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
+             | %lparen ExprLambda %rparen                 : a:Dyn => a.get(1)
+             | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
+             | %minus Primary                             : a:Dyn => raw.Call(raw.Integer("0"),"_MINUS_",a.get(1))
+
 
 def makeParser(lexer:lexing.Lexer):parsing.Parser
     parsing.makeParser(grammar, lexer)

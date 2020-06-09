@@ -8,15 +8,20 @@ datatype Exp
     Var(name:String)
     App(func:Exp, arg:Exp)
     Lambda(name:String, body:Exp)
+    Call(receiver:Exp, name:String, arg:Exp)
     Val(name:String, exp:Exp)
     Seq(exps:List[Exp])
+    Integer(str:String)
+
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
     a:App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
     l:Lambda => l.name + " => " + expToString(l.body)
+    c:Call   => expToString(c.receiver) + "." + c.name + "(" + expToString(c.arg) + ")" 
     v:Val    => "val " + v.name + " = " + expToString(v.exp)
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")
+    i:Integer => i.str
     default  =>
                     "typecheck issue!"
 

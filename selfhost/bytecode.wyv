@@ -16,6 +16,8 @@ val dynType:Type = new
 tagged type Literal
 tagged type StrLit extends Literal
     val stringLiteral : String
+tagged type IntLit extends Literal
+    val integerLiteral : Dyn //buffer
 tagged type Arg
     val variable : String
     val type_ : Type
@@ -79,7 +81,7 @@ tagged type CallExpr extends Expr
 tagged type SeqExpr extends Expr
     val sequenceExpression:SExpr
 
-// public types representing modules and the bytecode
+// public types representing modules and the Bytecode
 tagged type Module
 tagged type Bytecode
     val version:Version
@@ -88,6 +90,9 @@ tagged type Bytecode
     val modules:Dyn // List[Module]
     
 // Public constructors for expressions
+def IntLit(s:String):LitExpr = new
+    val literal:IntLit = new
+        val integerLiteral:Dyn = bytecode.intStringToBuffer(s)
 def StrLit(s:String):LitExpr = new
     val literal:StrLit = new
         val stringLiteral = s

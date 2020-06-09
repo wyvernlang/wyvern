@@ -36,6 +36,12 @@ val lowLevelLexer : lexing.Lexer = ~
         colon:      ':',
         eq:         '=',
         linecont:   '\\',
+        plus:       '+',
+        minus:      '-',
+        times:      '*',
+        divide:     '/',
+        mod:        '%',
+        integer:    /\d+/,
 
 val startLexerState = lowLevelLexer.save()
         
