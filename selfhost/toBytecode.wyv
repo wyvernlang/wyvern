@@ -26,6 +26,7 @@ def toBytecode(e:bound.Exp):b.Expr = match e:
         b.SeqExpr(seqStmts)
     // no "val" case - should exist only under Seq
     // no lambda or app case - should have been lowered away
+    i:bound.Integer => b.IntLit(i.str)
 
 def writeExpToFile(e:bound.Exp, filename:String):Unit
     js.log("Converting expression to bytecode...\n")

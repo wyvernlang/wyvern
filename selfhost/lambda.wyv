@@ -7,6 +7,7 @@ import javascript:stdlib.js
 import javascript:stdlib.support.regexUtils
 import wyvernLexer
 import wyvernParser
+import bytecode
 import raw
 import binding
 import bound
@@ -17,6 +18,7 @@ import wyvern.collections.llist
 type List = llist.LinkedList
 val wyvernLexer = wyvernLexer(js, regexUtils)
 val toBytecode = toBytecode(javascript, js)
+val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
 
@@ -24,21 +26,25 @@ val parser = wyvernParser.makeParser(lexer)
 
 // TODO: right now there's an internal error in nearly if there's a parse error.  Need to fix this; somehow we are using nearly wrong.
 // simple test case
-parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)")
-
-//parser.feed("(x => x)")
+parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)\n(x => x) (003+3202 * (65537 % 2) / -2 + -(2 - 3))")
+//parser.feed("(x => -x / -(3*5))")
+//parser.feed("val t = (x => y => x)\nval y = (x => x) 5\nt y ((x => (x x)) (x => (x x)))")
 /* debugging code, currently commented out
-    js.log("Raw Results:\n")
-    js.log(parser.results)
-    js.log("Results:\n")
-    stdout.print(raw.expToString(parser.results.get(0)))
 */
+js.log("Raw Results:\n")
+js.log(parser.results)
+js.log("Results:\n")
+
+stdout.print(raw.expToString(parser.results.get(0)))
+stdout.println()
 
 stdout.print("Binding...\n")
 val boundExp = binding.bind(parser.results.get(0))
-        
+
 stdout.print("Lowering...\n")
 val ooExp = bound.lower(boundExp)
 
 stdout.print("Writing to sample.wyb...\n")
 toBytecode.writeExpToFile(ooExp, "sample.wyb")
+/*testing parsing
+*/

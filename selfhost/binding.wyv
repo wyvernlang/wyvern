@@ -24,7 +24,9 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     l:raw.Lambda =>
         val b = bound.Binding(l.name, context.counter)
         bound.Lambda(b, bindHelper(l.body, context.extend(b)))
+    c:raw.Call   => bound.Call(bindHelper(c.receiver, context), c.name, bindHelper(c.arg, context))
     v:raw.Val    =>
         val b = bound.Binding(v.name, context.counter)
         bound.Val(b, bindHelper(v.exp, context))
     s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
+    i:raw.Integer     => bound.Integer(i.str)
