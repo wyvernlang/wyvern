@@ -72,6 +72,7 @@ public final class Globals {
         // the whitelist that anyone can import without requiring javascript or becoming a resource module
         // WARNING: do NOT add anything to this list that is a resource we might conceivably want to limit!
         javascriptWhiteList.add("stdlib.support.runtime");
+        javascriptWhiteList.add("stdlib.support.exns");
         javascriptWhiteList.add("stdlib.support.jsinterop");
         javascriptWhiteList.add("stdlib.support.string");
         javascriptWhiteList.add("stdlib.support.float");

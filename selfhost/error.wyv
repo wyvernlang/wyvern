@@ -1,0 +1,26 @@
+module errors
+
+import wyvern.exception
+import Location
+import wyvern.String
+
+type ErrorReportingException extends exception.Exception
+    val error:String
+    val location:Location
+    
+def Location(file:String, line:Int, character:Int):Location = new
+    val file:String = file
+    val line:Int = line
+    val character:Int = character
+
+def report(error:String, location:Location):Nothing
+    val errorReport:ErrorReportingException = new
+        val error = error
+        val location = location
+    exception.throw(errorReport)
+    
+def locationString(location:Location):String
+    location.file + " line " + String.ofInt(location.line) + ":" + String.ofInt(location.character)
+    
+def asString(error:ErrorReportingException):String
+    locationString(error.location) + " : " + error.error

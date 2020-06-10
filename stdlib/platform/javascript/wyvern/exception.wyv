@@ -1,0 +1,35 @@
+module exception
+
+import javascript:stdlib.support.exns
+
+tagged type Exception
+
+tagged type Answer
+    type S
+    type F
+tagged type Success extends Answer
+    type S
+    type F
+    val value:this.S
+tagged type Failure extends Answer
+    type S
+    type F
+    val exception:this.F
+    
+def throw(exn:Exception):Nothing
+    exns.throwExn(exn)
+    
+def try[S](f:Unit -> S):Answer[S,Exception]
+    val answer = exns.tryFunc(f)
+    if (answer.success)
+        val s:Success = new
+            type S = S
+            type F = Exception
+            val value:S = answer.result
+        s
+      else
+        val f:Failure = new
+            type S = S
+            type F = Exception
+            val exception:Exception = answer.result
+        f

@@ -10,7 +10,7 @@ def makeSeq(e1:raw.Exp, e2:raw.Exp):raw.Seq = match e1:
     default     => raw.Seq(llist.Cons[raw.Exp](e2, llist.Singleton[raw.Exp](e1)))
 
 val grammar: parsing.Grammar = ~
-    Stmts -> Stmt                                         : a:Dyn => a.get(0)
+    Stmts -> %logline Stmt                                : a:Dyn => a.get(1)
            | Stmts %logline Stmt                          : a:Dyn => makeSeq(a.get(0), a.get(2))
            
     Stmt  -> ExprLambda                                                  : a:Dyn => a.get(0)
