@@ -16,7 +16,11 @@ val grammar: parsing.Grammar = ~
     Stmt  -> ExprLambda                                                  : a:Dyn => a.get(0)
            | %val %identifier %eq ExprLambda                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
            | %def %identifier %lparen %identifier %rparen %eq ExprLambda : a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
+           | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
+           | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
 
+    Type  -> %identifier                                                 : a:Dyn => a.get(0).value
+           
     ExprLambda -> ExprAddSub                              : a:Dyn => a.get(0)
                 | %identifier %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
 

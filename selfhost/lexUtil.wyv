@@ -1,0 +1,50 @@
+module lexUtil
+
+import javascript:stdlib.support.regexUtils
+import wyvern.collections.llist
+import wyvern.runtime
+
+type List = llist.LinkedList
+
+
+def getIndent(input:String) : String
+    val lineMatch = regexUtils.doMatch(input, "[ \\t]+")
+    if (lineMatch.found)
+        lineMatch.matched
+      else
+        ""
+
+def splitLines(input:String) : llist.Cons[String]
+    val lineMatch = regexUtils.doMatch(input, "[^\\n]*\\n")
+    if (lineMatch.found)
+        splitLines(lineMatch.after).push(lineMatch.matched)
+      else
+        llist.Singleton[String](input)
+        
+// true if the string contains only whitespace characters    
+def allWhitespace(input:String):Boolean
+    val lineMatch = regexUtils.doMatch(input, "[ \\t\\n]*")
+    if (lineMatch.found)
+        lineMatch.after == ""
+      else
+        false
+    
+def getCommonLeadingWhitespace(lines:List[String]):String
+    val nonemptyLineIndents:List[String] = lines.filter(s:String => !allWhitespace(s)).map[String](s:String => getIndent(s))
+    def minLength(s1:String, s2:String):String
+        if (s1.length() < s2.length())
+            s1
+          else
+            s2
+    match nonemptyLineIndents:
+        n:llist.Nil  => ""
+        c:llist.Cons => c.next.reduce((s1:String, s2:String) => minLength(s1, s2), c.value)
+
+
+def stripLeadingWhitespace(s:String):String
+    val lines = splitLines(s)
+    val leadingLength = getCommonLeadingWhitespace(lines).length()
+    val strippedLines = lines.map[String](s => s.substring(leadingLength, s.length()))
+    match strippedLines:
+        c:llist.Cons => c.next.reduce((s1:String, s2:String) => s1 + s2, c.value)
+        // Nil impossible

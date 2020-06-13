@@ -1,5 +1,7 @@
 import raw
 import bound
+import error
+import lexUtil
 import wyvern.collections.llist
 
 type List = llist.LinkedList
@@ -15,9 +17,16 @@ def bindList(es:List[raw.Exp], ctx:bound.Context):List[bound.Exp] = match es:
             default   => llist.Cons[bound.Exp](b, bindList(c.next, ctx))
     n:llist.Nil  => llist.Nil[bound.Exp]()
 
-def bind(e:raw.Exp):bound.Exp
-    bindHelper(e, bound.emptyContext())
+def bind(e:raw.Exp, parse: String -> raw.Exp):bound.Exp
+    bindHelper(e, bound.emptyContext(parse))
 
+def bindDeclTypes(e:raw.Exp, context:bound.Context):List[bound.DeclType] = match e:
+    s:raw.Seq     => llist.flatten[bound.DeclType](s.exps.map[List[bound.DeclType]](x => bindDeclTypes(x, context)))
+    v:raw.ValType =>
+        val b = bound.Binding(v.name, context.counter)
+        llist.Singleton[bound.DeclType](bound.ValType(b,v.typ))
+    default       => error.report("unexpected construct", error.unknownLocation)
+    
 def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     v:raw.Var    => bound.Var(llist.find[bound.Binding](context.bindings, (b:bound.Binding) => v.name==b.name).get())
     a:raw.App    => bound.App(bindHelper(a.func, context), bindHelper(a.arg, context))
@@ -28,5 +37,9 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     v:raw.Val    =>
         val b = bound.Binding(v.name, context.counter)
         bound.Val(b, bindHelper(v.exp, context))
+    t:raw.TypeDecl   =>
+        val b = bound.Binding(t.name, context.counter)
+        bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context))
     s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
     i:raw.Integer     => bound.Integer(i.str)
+    default      => error.report("unexpected construct", error.unknownLocation)

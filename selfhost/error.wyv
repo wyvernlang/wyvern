@@ -12,6 +12,8 @@ def Location(file:String, line:Int, character:Int):Location = new
     val file:String = file
     val line:Int = line
     val character:Int = character
+    
+val unknownLocation = Location("UNKNOWN", -1, -1)
 
 def report(error:String, location:Location):Nothing
     val errorReport:ErrorReportingException = new
