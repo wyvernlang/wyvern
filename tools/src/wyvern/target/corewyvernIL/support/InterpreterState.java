@@ -4,7 +4,8 @@ import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.tools.typedAST.core.declarations.ModuleDeclaration;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class InterpreterState {
     private static final ThreadLocal<InterpreterState> localInterpreter = new ThreadLocal<InterpreterState>() {
@@ -16,9 +17,9 @@ public class InterpreterState {
     private ModuleResolver resolver;
     private GenContext genCtx;
 
-    private ArrayList<BytecodeOuterClass.Bytecode.Import> javascriptFFIImports = new ArrayList<>();
+    private HashSet<BytecodeOuterClass.Bytecode.Import> javascriptFFIImports = new HashSet<BytecodeOuterClass.Bytecode.Import>();
 
-    public ArrayList<BytecodeOuterClass.Bytecode.Import> getJavascriptFFIImports() {
+    public Set<BytecodeOuterClass.Bytecode.Import> getJavascriptFFIImports() {
         return javascriptFFIImports;
     }
 
