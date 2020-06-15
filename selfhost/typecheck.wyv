@@ -1,0 +1,70 @@
+module typecheck
+
+import types
+import bound
+import error
+import wyvern.collections.llist
+type List = llist.LinkedList
+
+type TPair //gamma is list of these
+	val decl:types.DeclType
+	val unfold:List[types.DeclType]
+def TPair(decl:types.DeclType, unfold:List[types.DeclType]):TPair = new
+	val decl:types.DeclType = decl
+	val unfold:List[types.DeclType] = unfold
+
+def fetchType(x:types.Type, gamma:List[TPair]):TPair //fetch previously defined type in gamma
+	val pred = ((b:TPair) =>
+		val z = match b.decl:
+			t:types.TypeType => types.equalType(x,t.typ)
+			default => false
+		z
+	)
+	llist.find[TPair](gamma, pred).get()
+
+def typecheck(e:bound.Exp):types.Type
+	getType(e,llist.Nil[TPair]())
+
+def getType(e:bound.Exp, gamma:List[TPair]):types.Type = match e:
+	v:bound.Var =>
+		val pred = ((b:TPair) => 
+			val z = match b.decl:
+				va:types.ValType => types.equalBinding(v.binding,va.name)
+				default => false
+			z
+		)
+		val value = llist.find[TPair](gamma, pred).get()
+		match value.decl:
+			va:types.ValType => va.typ
+			default => error.report("var not bound",error.unknownLocation)
+
+	s:bound.Seq => typeSeq(s.exps,gamma)
+
+	i:bound.Integer =>
+		val intType = fetchType(types.Object("Int"), gamma)
+		match intType.decl:
+			t:types.TypeType => t.typ
+			default => error.report("int not declared",error.unknownLocation)
+
+	default => error.report("type error: not implemented yet",error.unknownLocation)
+
+def typeSeq(es:List[bound.Exp], gamma:List[TPair]):types.Type = match es:
+	c:llist.Cons =>
+		match c.next:
+			n:llist.Nil => getType(c.value, gamma) //last expression
+			cc:llist.Cons => 
+				match c.value:
+					v:bound.Val => 
+						val typ = getType(v.exp, gamma)
+						val unfold = fetchType(typ, gamma).unfold //fetch unfolded type in gamma
+						val vt = types.ValType(v.binding, typ)
+						val gammaPrime = llist.Cons[TPair](TPair(vt, unfold), gamma)
+						typeSeq(c.next, gammaPrime)
+					t:bound.TypeDecl =>
+						val tt = TPair(types.TypeType(t.name,types.Object(t.name.name)), t.members)
+						val gammaPrime = llist.Cons[TPair](tt, gamma)
+						typeSeq(c.next, gammaPrime)
+					default =>
+						val typ = getType(c.value, gamma)
+						typeSeq(c.next, gamma)
+	n:llist.Nil => error.report("program doesn't end in an expression", error.unknownLocation)

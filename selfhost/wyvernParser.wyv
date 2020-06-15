@@ -3,6 +3,7 @@ module wyvernParser
 import lexing
 import metadata parsing
 import raw
+import types
 import wyvern.collections.llist
 
 def makeSeq(e1:raw.Exp, e2:raw.Exp):raw.Seq = match e1:
@@ -19,7 +20,7 @@ val grammar: parsing.Grammar = ~
            | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
            | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
 
-    Type  -> %identifier                                                 : a:Dyn => a.get(0).value
+    Type  -> %identifier                                  : a:Dyn => types.Object(a.get(0).value)
            
     ExprLambda -> ExprAddSub                              : a:Dyn => a.get(0)
                 | %identifier %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
@@ -33,13 +34,16 @@ val grammar: parsing.Grammar = ~
                  | ExprMultDiv %divide ExprAppl           : a:Dyn => raw.Call(a.get(0),"_DIVIDE_",a.get(2))
                  | ExprMultDiv %mod ExprAppl              : a:Dyn => raw.Call(a.get(0),"_MOD_",a.get(2))
 
-    ExprAppl -> Primary                                   : a:Dyn => a.get(0)
+    ExprAppl -> ExprUnary                                 : a:Dyn => a.get(0)
               | ExprAppl Primary                          : a:Dyn => raw.App(a.get(0), a.get(1))
+
+    ExprUnary -> Primary                                  : a:Dyn => a.get(0)
+               | %minus Primary                           : a:Dyn => raw.Call(raw.Integer("0"),"_MINUS_",a.get(1))
 
     Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
              | %lparen ExprLambda %rparen                 : a:Dyn => a.get(1)
              | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
-             | %minus Primary                             : a:Dyn => raw.Call(raw.Integer("0"),"_MINUS_",a.get(1))
+             
 
 
 def makeParser(lexer:lexing.Lexer):parsing.Parser

@@ -1,14 +1,11 @@
 module bound
 
 import raw
-
+import types
 import wyvern.collections.llist
 type List = llist.LinkedList
-
-resource type Counter
-    var value:Int
-def Counter():Counter = new
-    var value:Int = 0
+type Counter = types.Counter
+type Binding = types.Binding
 
 resource type Context
     val bindings:List[Binding]
@@ -23,18 +20,8 @@ def Context(bs:List[Binding], c:Counter, p:String -> raw.Exp) : Context = new
     def extend(b:Binding):Context
         Context(llist.Cons[Binding](b, bs), c, p)
     
-def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[Binding](), Counter(), p)
+def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[Binding](), types.Counter(), p)
 
-
-type Binding
-    val name:String
-    val id:Int
-def Binding(name:String, c:Counter):Binding
-    val count = c.value
-    c.value = c.value + 1
-    new
-        val name = name
-        val id = count
 
 type Method
     val name:String
@@ -46,8 +33,6 @@ def Method(name:String, binding:Binding, body:Exp):Method = new
     val binding = binding
     val body = body
 
-datatype DeclType
-    ValType(name:Binding, typ:String)  // eventually the type will be a Type not a String
     
 datatype Exp
     Var(binding:Binding)
@@ -56,7 +41,7 @@ datatype Exp
     Obj(meths:List[Method])
     Call(receiver:Exp, name:String, arg:Exp)
     Val(binding:Binding, exp:Exp)
-    TypeDecl(name:Binding, members:List[DeclType])
+    TypeDecl(name:Binding, members:List[types.DeclType])
     Seq(exps:List[Exp])
     Integer(str:String)
     UnitVal()
