@@ -25,7 +25,7 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):List[types.DeclType] = match
     s:raw.Seq     => llist.flatten[types.DeclType](s.exps.map[List[types.DeclType]](x => bindDeclTypes(x, context)))
     v:raw.ValType =>
         val b = types.Binding(v.name, context.counter)
-        llist.Singleton[types.DeclType](types.ValType(b,v.typ))
+        llist.Singleton[types.DeclType](types.ValType(b,types.stringToType(v.typ)))
     default       => error.report("unexpected construct", error.unknownLocation)
     
 def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:

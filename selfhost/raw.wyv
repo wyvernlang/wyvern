@@ -1,6 +1,5 @@
 module raw
 
-import types
 import wyvern.collections.llist
 type List = llist.LinkedList
 
@@ -11,11 +10,10 @@ datatype Exp
     Lambda(name:String, body:Exp)
     Call(receiver:Exp, name:String, arg:Exp)
     Val(name:String, exp:Exp)
-    ValType(name:String, typ:types.Type)
+    ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
     Seq(exps:List[Exp])
-    Integer(str:String)
-
+    Integer(str:String)    
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name

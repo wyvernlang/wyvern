@@ -19,26 +19,33 @@ def Binding(name:String, c:Counter):Binding
         val id = count
 
 def equalBinding(b1:Binding, b2:Binding):Boolean
-	b1.name == b2.name && b1.id == b2.id
+    b1.name == b2.name && b1.id == b2.id
 
 def equalType(t1:Type, t2:Type):Boolean
-	match t1:
-		u:UnitType => match t2:
-			v:UnitType => true
-			default => false
-		o:Object => match t2:
-			v:Object => o.L == v.L
-			default => false
+    match t1:
+        u:UnitType => match t2:
+            v:UnitType => true
+            default => false
+        n:NominalType => match t2:
+            v:NominalType => n.L == v.L
+            default => false
+
+def stringToType(s:String):Type
+    if (s == "Unit")
+            UnitType()
+        else
+            NominalType(s)
 
 datatype Type
-	UnitType()
-	Object(L:String)
+    UnitType()
+    NominalType(L:String)
+    UnfoldedType(decls:List[DeclType])
 
 datatype DeclType
-    ValType(name:Binding, typ:Type)  // eventually the type will be a Type not a String
-    TypeType(name:Binding, typ:Type)
+    ValType(name:Binding, typ:Type)
+    TypeType(name:Binding, typ:UnfoldedType)
     DefType(name:Binding, argTyp:Type, retTyp:Type)
 
 def typeToString(t:Type):String = match t:
-	u:UnitType => "Unit"
-	o:Object => o.L
+    u:UnitType => "Unit"
+    n:NominalType => n.L
