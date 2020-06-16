@@ -12,6 +12,7 @@ datatype Exp
     Val(name:String, exp:Exp)
     ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
+    DefDecl(name:String, arg:String, argTyp:String, retTyp:String)
     Seq(exps:List[Exp])
     Integer(str:String)    
 

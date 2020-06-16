@@ -18,6 +18,9 @@ val grammar: parsing.Grammar = ~
            | %def %identifier %lparen %identifier %rparen %eq ExprLambda : a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
            | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
            | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
+           | %def %identifier %lparen %identifier %colon Type %rparen %colon Type : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3).value, a.get(5), a.get(8))
+           | %def %plus %lparen %identifier %colon Type %rparen %colon Type  : a:Dyn => raw.DefDecl("+", a.get(3).value, a.get(5), a.get(8))
+           | %def %minus %lparen %identifier %colon Type %rparen %colon Type : a:Dyn => raw.DefDecl("-", a.get(3).value, a.get(5), a.get(8))
 
     Type  -> %identifier                                  : a:Dyn => a.get(0).value
            
@@ -25,13 +28,13 @@ val grammar: parsing.Grammar = ~
                 | %identifier %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
 
     ExprAddSub -> ExprMultDiv                             : a:Dyn => a.get(0)
-                | ExprAddSub %plus ExprMultDiv            : a:Dyn => raw.Call(a.get(0),"_PLUS_",a.get(2))
-                | ExprAddSub %minus ExprMultDiv           : a:Dyn => raw.Call(a.get(0),"_HYPHEN_",a.get(2))
+                | ExprAddSub %plus ExprMultDiv            : a:Dyn => raw.Call(a.get(0),"+",a.get(2))
+                | ExprAddSub %minus ExprMultDiv           : a:Dyn => raw.Call(a.get(0),"-",a.get(2))
 
     ExprMultDiv -> ExprAppl                               : a:Dyn => a.get(0)
-                 | ExprMultDiv %times ExprAppl            : a:Dyn => raw.Call(a.get(0),"_TIMES_",a.get(2))
-                 | ExprMultDiv %divide ExprAppl           : a:Dyn => raw.Call(a.get(0),"_DIVIDE_",a.get(2))
-                 | ExprMultDiv %mod ExprAppl              : a:Dyn => raw.Call(a.get(0),"_MOD_",a.get(2))
+                 | ExprMultDiv %times ExprAppl            : a:Dyn => raw.Call(a.get(0),"*",a.get(2))
+                 | ExprMultDiv %divide ExprAppl           : a:Dyn => raw.Call(a.get(0),"/",a.get(2))
+                 | ExprMultDiv %mod ExprAppl              : a:Dyn => raw.Call(a.get(0),"%",a.get(2))
 
     ExprAppl -> ExprUnary                                 : a:Dyn => a.get(0)
               | ExprAppl Primary                          : a:Dyn => raw.App(a.get(0), a.get(1))
