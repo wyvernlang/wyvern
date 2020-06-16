@@ -10,7 +10,7 @@ type DeclType = types.DeclType
 def unfoldType(x:types.NominalType, gamma:List[DeclType]):DeclType
     val pred = ((b:DeclType) =>
         val z = match b:
-            t:types.TypeType => x.L == t.name.name
+            t:types.TypeType => types.equalBinding(x.L, t.name)
             default => false
         z
     )
@@ -34,7 +34,7 @@ def getType(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
 
     s:bound.Seq => typeSeq(s.exps,gamma)
 
-    i:bound.Integer => types.NominalType("Int")
+    i:bound.Integer => types.NominalType(types.Binding("Int",types.Counter())) //wrong--fix this rule
 
     default => error.report("type error: not implemented yet",error.unknownLocation)
 

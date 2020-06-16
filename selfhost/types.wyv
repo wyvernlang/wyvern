@@ -27,18 +27,12 @@ def equalType(t1:Type, t2:Type):Boolean
             v:UnitType => true
             default => false
         n:NominalType => match t2:
-            v:NominalType => n.L == v.L
+            v:NominalType => equalBinding(n.L, v.L)
             default => false
-
-def stringToType(s:String):Type
-    if (s == "Unit")
-            UnitType()
-        else
-            NominalType(s)
 
 datatype Type
     UnitType()
-    NominalType(L:String)
+    NominalType(L:Binding)
     UnfoldedType(decls:List[DeclType])
 
 datatype DeclType
@@ -48,4 +42,4 @@ datatype DeclType
 
 def typeToString(t:Type):String = match t:
     u:UnitType => "Unit"
-    n:NominalType => n.L
+    n:NominalType => n.L.name
