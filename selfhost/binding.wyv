@@ -2,9 +2,17 @@ import raw
 import bound
 import error
 import lexUtil
+import types
 import wyvern.collections.llist
 
 type List = llist.LinkedList
+
+def stringToType(s:String, ctx:bound.Context):types.Type
+    if (s == "Unit")
+            types.UnitType()
+        else
+            val b:types.Binding = llist.find[types.Binding](ctx.bindings, (b:types.Binding) => b.name == s).get()
+            types.NominalType(b)
 
 // es is in program order
 def bindList(es:List[raw.Exp], ctx:bound.Context):List[bound.Exp] = match es:
@@ -20,26 +28,26 @@ def bindList(es:List[raw.Exp], ctx:bound.Context):List[bound.Exp] = match es:
 def bind(e:raw.Exp, parse: String -> raw.Exp):bound.Exp
     bindHelper(e, bound.emptyContext(parse))
 
-def bindDeclTypes(e:raw.Exp, context:bound.Context):List[bound.DeclType] = match e:
-    s:raw.Seq     => llist.flatten[bound.DeclType](s.exps.map[List[bound.DeclType]](x => bindDeclTypes(x, context)))
+def bindDeclTypes(e:raw.Exp, context:bound.Context):List[types.DeclType] = match e:
+    s:raw.Seq     => llist.flatten[types.DeclType](s.exps.map[List[types.DeclType]](x => bindDeclTypes(x, context)))
     v:raw.ValType =>
-        val b = bound.Binding(v.name, context.counter)
-        llist.Singleton[bound.DeclType](bound.ValType(b,v.typ))
+        val b = types.Binding(v.name, context.counter)
+        llist.Singleton[types.DeclType](types.ValType(b,stringToType(v.typ, context)))
     default       => error.report("unexpected construct", error.unknownLocation)
     
 def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
-    v:raw.Var    => bound.Var(llist.find[bound.Binding](context.bindings, (b:bound.Binding) => v.name==b.name).get())
+    v:raw.Var    => bound.Var(llist.find[types.Binding](context.bindings, (b:types.Binding) => v.name==b.name).get())
     a:raw.App    => bound.App(bindHelper(a.func, context), bindHelper(a.arg, context))
     l:raw.Lambda =>
-        val b = bound.Binding(l.name, context.counter)
+        val b = types.Binding(l.name, context.counter)
         bound.Lambda(b, bindHelper(l.body, context.extend(b)))
     c:raw.Call   => bound.Call(bindHelper(c.receiver, context), c.name, bindHelper(c.arg, context))
     v:raw.Val    =>
-        val b = bound.Binding(v.name, context.counter)
+        val b = types.Binding(v.name, context.counter)
         bound.Val(b, bindHelper(v.exp, context))
     t:raw.TypeDecl   =>
-        val b = bound.Binding(t.name, context.counter)
-        bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context))
+        val b = types.Binding(t.name, context.counter)
+        bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context.extend(b)))
     s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
     i:raw.Integer     => bound.Integer(i.str)
     default      => error.report("unexpected construct", error.unknownLocation)

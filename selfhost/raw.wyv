@@ -13,8 +13,7 @@ datatype Exp
     ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
     Seq(exps:List[Exp])
-    Integer(str:String)
-
+    Integer(str:String)    
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
@@ -25,6 +24,5 @@ def expToString(e:Exp):String = match e:
     t:TypeDecl => "type " + t.name + ":\n" + t.decls
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")
     i:Integer => i.str
-    default  =>
-                    "typecheck issue!"
+    default   => "typecheck issue!"
 

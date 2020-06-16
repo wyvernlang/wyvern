@@ -1,0 +1,45 @@
+module types
+
+import wyvern.collections.llist
+type List = llist.LinkedList
+
+resource type Counter
+    var value:Int
+def Counter():Counter = new
+    var value:Int = 0
+
+type Binding
+    val name:String
+    val id:Int
+def Binding(name:String, c:Counter):Binding
+    val count = c.value
+    c.value = c.value + 1
+    new
+        val name = name
+        val id = count
+
+def equalBinding(b1:Binding, b2:Binding):Boolean
+    b1.name == b2.name && b1.id == b2.id
+
+def equalType(t1:Type, t2:Type):Boolean
+    match t1:
+        u:UnitType => match t2:
+            v:UnitType => true
+            default => false
+        n:NominalType => match t2:
+            v:NominalType => equalBinding(n.L, v.L)
+            default => false
+
+datatype Type
+    UnitType()
+    NominalType(L:Binding)
+    UnfoldedType(decls:List[DeclType])
+
+datatype DeclType
+    ValType(name:Binding, typ:Type)
+    TypeType(name:Binding, typ:UnfoldedType)
+    DefType(name:Binding, argTyp:Type, retTyp:Type)
+
+def typeToString(t:Type):String = match t:
+    u:UnitType => "Unit"
+    n:NominalType => n.L.name
