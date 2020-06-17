@@ -33,6 +33,9 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):List[types.DeclType] = match
     v:raw.ValType =>
         val b = types.Binding(v.name, context.counter)
         llist.Singleton[types.DeclType](types.ValType(b,stringToType(v.typ, context)))
+    d:raw.DefDecl =>
+        val b = types.Binding(d.name, context.counter)
+        llist.Singleton[types.DeclType](types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context)))
     default       => error.report("unexpected construct", error.unknownLocation)
     
 def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
@@ -41,7 +44,8 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     l:raw.Lambda =>
         val b = types.Binding(l.name, context.counter)
         bound.Lambda(b, bindHelper(l.body, context.extend(b)))
-    c:raw.Call   => bound.Call(bindHelper(c.receiver, context), c.name, bindHelper(c.arg, context))
+    c:raw.Call   => 
+        bound.Call(bindHelper(c.receiver, context), c.name, bindHelper(c.arg, context))
     v:raw.Val    =>
         val b = types.Binding(v.name, context.counter)
         bound.Val(b, bindHelper(v.exp, context))
