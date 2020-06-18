@@ -36,6 +36,7 @@ val lowLevelLexer : lexing.Lexer = ~
         arrow:      '->',
         colon:      ':',
         eq:         '=',
+        dot:        '.',
         linecont:   '\\',
         plus:       '+',
         minus:      '-',

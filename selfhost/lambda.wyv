@@ -29,8 +29,8 @@ val parser = wyvernParser.makeParser(lexer)
 // TODO: right now there's an internal error in nearly if there's a parse error.  Need to fix this; somehow we are using nearly wrong.
 // simple test case
 //parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)\n(x => x) (003+3202 * (65537 % 2) / -2 + -(2 - 3))\ntype foo:\n    val x:Int\n    val y:Int\n5\n")
-//parser.feed("(x => -x / -(3*5))")
-parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\nval x = 5\nval y = x\nval z = y\nz+0-x+3+5")
+//parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\nval x = 5\nval y = x\nval z = y\nz+0-x+3+5")
+parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\n    val a:Int\nval x = 5\n-x.a.a+3-x")
 /* debugging code, currently commented out
 */
 js.log("Raw Results:\n")

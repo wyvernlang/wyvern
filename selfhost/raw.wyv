@@ -9,6 +9,7 @@ datatype Exp
     App(func:Exp, arg:Exp)
     Lambda(name:String, body:Exp)
     Call(receiver:Exp, name:String, arg:Exp)
+    Field(receiver:Exp, field:String)
     Val(name:String, exp:Exp)
     ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
@@ -21,6 +22,7 @@ def expToString(e:Exp):String = match e:
     a:App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
     l:Lambda => l.name + " => " + expToString(l.body)
     c:Call   => expToString(c.receiver) + "." + c.name + "(" + expToString(c.arg) + ")" 
+    f:Field  => expToString(f.receiver) + "." + f.field
     v:Val    => "val " + v.name + " = " + expToString(v.exp)
     t:TypeDecl => "type " + t.name + ":\n" + t.decls
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")

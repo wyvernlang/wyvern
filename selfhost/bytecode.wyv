@@ -40,6 +40,9 @@ type CExpr
     val method : String
     val arguments_ : Dyn //List[Expr]
     val isTailCall : Boolean
+type AExpr
+    val expression: Expr
+    val field : String
 type SExpr
     val statements : Dyn //List[SStmt]
 type ValueModule
@@ -78,6 +81,8 @@ tagged type NewExpr extends Expr
     val newExpression : NExpr
 tagged type CallExpr extends Expr
     val callExpression : CExpr
+tagged type AccessExpr extends Expr
+    val accessExpression : AExpr
 tagged type SeqExpr extends Expr
     val sequenceExpression:SExpr
 
@@ -110,6 +115,10 @@ def CallExpr(receiver:Expr, method:String, args:List[Expr], isTailCall:Boolean):
         val method : String = method
         val arguments_ : Dyn = js.toArray(args)
         val isTailCall : Boolean = isTailCall
+def AccessExpr(receiver:Expr, field:String):AccessExpr = new
+    val accessExpression : AExpr = new
+        val expression : Expr = receiver
+        val field : String = field
 def SeqExpr(seqStmts:List[SeqStmt]):SeqExpr = new
     val sequenceExpression : SExpr = new
         val statements = js.toArray(seqStmts)
