@@ -14,6 +14,7 @@ def toBytecode(e:bound.Exp):b.Expr = match e:
     v:bound.Var   => b.VarExpr(v.binding.name)
     o:bound.Obj   => b.NewExpr("this", o.meths.map[b.MethodDecl](m => toBytecodeMethod(m)))
     c:bound.Call  => b.CallExpr(toBytecode(c.receiver), c.name, llist.Singleton[b.Expr](toBytecode(c.arg)), false)
+    f:bound.Field => b.AccessExpr(toBytecode(f.receiver), f.field)
     s:bound.Seq   =>
         val processStmt : bound.Exp -> b.SeqStmt = (exp =>
           val result:b.SeqStmt = match exp:

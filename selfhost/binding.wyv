@@ -46,6 +46,8 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
         bound.Lambda(b, bindHelper(l.body, context.extend(b)))
     c:raw.Call   => 
         bound.Call(bindHelper(c.receiver, context), c.name, bindHelper(c.arg, context))
+    f:raw.Field  =>
+        bound.Field(bindHelper(f.receiver, context), f.field)
     v:raw.Val    =>
         val b = types.Binding(v.name, context.counter)
         bound.Val(b, bindHelper(v.exp, context))

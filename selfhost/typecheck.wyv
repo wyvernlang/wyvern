@@ -3,21 +3,23 @@ module typecheck
 import types
 import bound
 import error
+import wyvern.option
 import wyvern.collections.llist
 type List = llist.LinkedList
 type DeclType = types.DeclType
+type Option = option.Option
 
-/*
-def searchGamma[T](gamma:List[DeclType], pred:DeclType->Boolean):T
-    val opt = llist.find[DeclType](gamma, pred)
-    match opt:
-        s:option.Some => 
-            val ret:DeclType = opt.get()
-            match ret:
-                t:T => t
-                default => error.report("search in gamma failed",error.unknownLocation)
-        n:option.None => error.report("search in gamma failed",error.unknownLocation)
-*/
+def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
+    def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
+        match gamma:
+            c:llist.Cons => 
+                match (pred(c.value)):
+                    s:option.Some => s
+                    default => f(c.next, pred)
+            n:llist.Nil => option.None[T]()
+    match f(gamma, pred):
+        s:option.Some => s.get()
+        default => error.report("search in decllist failed",error.unknownLocation)
 
 def unfoldType(x:types.Type, gamma:List[DeclType]):types.UnfoldedType
     match x:
@@ -25,14 +27,12 @@ def unfoldType(x:types.Type, gamma:List[DeclType]):types.UnfoldedType
         x:types.NominalType => 
             val pred = ((b:DeclType) =>
                 val z = match b:
-                    t:types.TypeType => types.equalBinding(x.L, t.name)
-                    default => false
+                    t:types.TypeType => 
+                        if (types.equalBinding(x.L, t.name)) { option.Some[types.TypeType](t) } else { option.None[types.TypeType]() }
+                    default => option.None[types.TypeType]()
                 z
             )
-            val ret = llist.find[DeclType](gamma, pred).get()
-            match ret:
-                t:types.TypeType => t.typ
-                default => error.report("unfolding error",error.unknownLocation)
+            findInDeclList[types.TypeType](gamma, pred).typ
         u:types.UnfoldedType => u
 
 
@@ -43,42 +43,48 @@ def getType(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
     v:bound.Var =>
         val pred = ((b:DeclType) => 
             val z = match b:
-                va:types.ValType => types.equalBinding(v.binding,va.name)
-                default => false
+                va:types.ValType => 
+                    if (types.equalBinding(v.binding,va.name)) { option.Some[types.ValType](va) } else { option.None[types.ValType]() }
+                default => option.None[types.ValType]()
             z
         )
-        val value = llist.find[DeclType](gamma, pred).get()
-        match value:
-            va:types.ValType => va.typ
-            default => error.report("var not bound",error.unknownLocation)
+        findInDeclList[types.ValType](gamma, pred).typ
 
     c:bound.Call => //T-Invk
         val recType = getType(c.receiver, gamma)
         val unfold:types.UnfoldedType = unfoldType(recType, gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
-                da:types.DefType => c.name == da.name.name && types.equalType(getType(c.arg,gamma), da.argTyp)
-                default => false
+                da:types.DefType => 
+                    if (c.name == da.name.name && types.equalType(getType(c.arg,gamma), da.argTyp)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
+                default => option.None[types.DefType]()
             z
         )
-        val meth = llist.find[DeclType](unfold.decls, pred).get()
-        match meth:
-            da:types.DefType => da.retTyp
-            default => error.report("method not found",error.unknownLocation)
+        findInDeclList[types.DefType](unfold.decls, pred).retTyp
+
+    f:bound.Field => //T-Field
+        val recType = getType(f.receiver, gamma)
+        val unfold:types.UnfoldedType = unfoldType(recType, gamma)
+        val pred = ((b:DeclType) =>
+            val z = match b:
+                va:types.ValType => 
+                    if (f.field == va.name.name) { option.Some[types.ValType](va) } else { option.None[types.ValType]() }
+                default => option.None[types.ValType]()
+            z
+        )
+        findInDeclList[types.ValType](unfold.decls, pred).typ
 
     s:bound.Seq => typeSeq(s.exps,gamma)
 
     i:bound.Integer => 
         val pred = ((b:DeclType) =>
             val z = match b:
-                tt:types.TypeType => tt.name.name == "Int"
-                default => false
+                tt:types.TypeType => 
+                    if (tt.name.name == "Int") { option.Some[types.TypeType](tt) } else { option.None[types.TypeType]() }
+                default => option.None[types.TypeType]()
             z
-        )
-        val t = llist.find[DeclType](gamma, pred).get()  
-        match t:
-            tt:types.TypeType => types.NominalType(tt.name)
-            default => error.report("aaa",error.unknownLocation)
+        ) 
+        types.NominalType(findInDeclList[types.TypeType](gamma, pred).name)
 
     default => error.report("type error: not implemented yet",error.unknownLocation)
 
