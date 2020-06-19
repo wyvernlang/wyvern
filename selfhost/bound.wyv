@@ -43,6 +43,7 @@ datatype Exp
     Field(receiver:Exp, field:String)
     Val(binding:Binding, exp:Exp)
     TypeDecl(name:Binding, members:List[types.DeclType])
+    NewType(binding:Binding, body:List[Exp])
     Seq(exps:List[Exp])
     Integer(str:String)
     UnitVal()
@@ -54,6 +55,7 @@ def lower(e:Exp):Exp = match e:
     c:Call    => Call(lower(c.receiver),c.name,lower(c.arg))
     f:Field   => Field(lower(f.receiver),f.field)
     v:Val     => Val(v.binding, lower(v.exp))
+    n:NewType => UnitVal()
     s:Seq     => Seq(s.exps.map[Exp](e => lower(e)))
     i:Integer    => i
     t:TypeDecl => UnitVal()

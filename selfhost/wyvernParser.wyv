@@ -13,9 +13,9 @@ val grammar: parsing.Grammar = ~
     Stmts -> %logline Stmt                                : a:Dyn => a.get(1)
            | Stmts %logline Stmt                          : a:Dyn => makeSeq(a.get(0), a.get(2))
            
-    Stmt  -> ExprLambda                                                  : a:Dyn => a.get(0)
-           | %val %identifier %eq ExprLambda                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
-           | %def %identifier %lparen %identifier %rparen %eq ExprLambda : a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
+    Stmt  -> Expression                                                  : a:Dyn => a.get(0)
+           | %val %identifier %eq Expression                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
+           | %def %identifier %lparen %identifier %rparen %eq Expression : a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
            | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
            | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
            | %def %identifier %lparen %identifier %colon Type %rparen %colon Type : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3).value, a.get(5), a.get(8))
@@ -23,6 +23,8 @@ val grammar: parsing.Grammar = ~
            | %def %minus %lparen %identifier %colon Type %rparen %colon Type : a:Dyn => raw.DefDecl("-", a.get(3).value, a.get(5), a.get(8))
 
     Type  -> %identifier                                  : a:Dyn => a.get(0).value
+
+    Expression -> ExprLambda                              : a:Dyn => a.get(0) 
            
     ExprLambda -> ExprAddSub                              : a:Dyn => a.get(0)
                 | %identifier %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
@@ -46,8 +48,9 @@ val grammar: parsing.Grammar = ~
              | ExprDot %dot %identifier                   : a:Dyn => raw.Field(a.get(0), a.get(2).value)
 
     Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
-             | %lparen ExprLambda %rparen                 : a:Dyn => a.get(1)
+             | %lparen Expression %rparen                 : a:Dyn => a.get(1)
              | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
+             | %new_ %identifier %colon %block            : a:Dyn => raw.NewType(a.get(1).value, a.get(3).value)
              
 
 

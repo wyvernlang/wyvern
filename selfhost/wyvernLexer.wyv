@@ -27,7 +27,7 @@ def Token(t:String, value:String, line:Int, col:Int):Token = new
 val lowLevelLexer : lexing.Lexer = ~
         WS:         /[ \t]+/,
         logline:    {match: /\n/, lineBreaks: true},
-        identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ val : 'val', def : 'def', type : 'type' })},
+        identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ val : 'val', def : 'def', type : 'type', new_: 'new' })},
         lparen:     '(',
         rparen:     ')',
         lbrack:     '[',

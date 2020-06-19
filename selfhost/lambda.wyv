@@ -30,7 +30,7 @@ val parser = wyvernParser.makeParser(lexer)
 // simple test case
 //parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)\n(x => x) (003+3202 * (65537 % 2) / -2 + -(2 - 3))\ntype foo:\n    val x:Int\n    val y:Int\n5\n")
 //parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\nval x = 5\nval y = x\nval z = y\nz+0-x+3+5")
-parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\n    val a:Int\nval x = 5\n-x.a.a+3-x")
+parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\ntype Foo:\n    val a:Int\n    val b:Int\nval x = new Foo:\n    val a = 5\n    val b = 3-2+4\ntype Bar:\n    val a:Foo\n    val b:Int\nval y = new Bar:\n    val a = x\n    val b = 3\ny.a.a")
 /* debugging code, currently commented out
 */
 js.log("Raw Results:\n")
