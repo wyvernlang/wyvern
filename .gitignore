@@ -103,4 +103,5 @@ out.gradver
 native/javascript/package-lock.json
 selfhost/lambda.js
 selfhost/sample.js
-native/javascript/package-lock.json
+selfhost/sample.wyb
+selfhost/lambda.wyb
