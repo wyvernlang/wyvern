@@ -74,7 +74,7 @@ def getType(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
         )
         findInDeclList[types.ValType](unfold.decls, pred).typ
 
-    n:bound.NewType => //T-New
+    n:bound.New => //T-New
         val unfold:types.UnfoldedType = unfoldType(types.NominalType(n.binding), gamma)        
         def f(x:bound.Exp):DeclType = match x:
             v:bound.Val => types.ValType(v.binding, getType(v.exp, gamma))

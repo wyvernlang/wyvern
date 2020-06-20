@@ -41,9 +41,9 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):List[types.DeclType] = match
         llist.Singleton[types.DeclType](types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context)))
     default       => error.report("unexpected construct", error.unknownLocation)
 
-def bindTypeBody(e:raw.Exp, context:bound.Context):List[bound.Exp] = match e:
+def bindNewBody(e:raw.Exp, context:bound.Context):List[bound.Exp] = match e:
     s:raw.Seq    => match s.exps:
-        c:llist.Cons => llist.Cons[bound.Exp](bindHelper(c.value, context), bindTypeBody(raw.Seq(c.next), context))
+        c:llist.Cons => llist.Cons[bound.Exp](bindHelper(c.value, context), bindNewBody(raw.Seq(c.next), context))
         n:llist.Nil => llist.Nil[bound.Exp]()
     v:raw.Val    => llist.Singleton[bound.Exp](bindHelper(v, context))
     default      => error.report("not implemented yet",error.unknownLocation)
@@ -64,9 +64,9 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     t:raw.TypeDecl   =>
         val b = types.Binding(t.name, context.counter)
         bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context.extend(b)))
-    n:raw.NewType =>
+    n:raw.New =>
         val b:types.Binding = llist.find[types.Binding](context.bindings, (b:types.Binding) => b.name == n.name).get()
-        bound.NewType(b, bindTypeBody(context.parse(lexUtil.stripLeadingWhitespace(n.body)), context))
+        bound.New(b, bindNewBody(context.parse(lexUtil.stripLeadingWhitespace(n.body)), context))
     s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
     i:raw.Integer     => bound.Integer(i.str)
     default      => error.report("unexpected construct", error.unknownLocation)

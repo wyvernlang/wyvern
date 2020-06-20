@@ -50,7 +50,7 @@ val grammar: parsing.Grammar = ~
     Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
              | %lparen Expression %rparen                 : a:Dyn => a.get(1)
              | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
-             | %new_ %identifier %colon %block            : a:Dyn => raw.NewType(a.get(1).value, a.get(3).value)
+             | %new_ %identifier %colon %block            : a:Dyn => raw.New(a.get(1).value, a.get(3).value)
              
 
 
