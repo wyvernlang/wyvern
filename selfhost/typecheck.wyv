@@ -74,6 +74,17 @@ def getType(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
         )
         findInDeclList[types.ValType](unfold.decls, pred).typ
 
+    n:bound.New => //T-New
+        val unfold:types.UnfoldedType = unfoldType(types.NominalType(n.binding), gamma)        
+        def f(x:bound.Exp):DeclType = match x:
+            v:bound.Val => types.ValType(v.binding, getType(v.exp, gamma))
+            default => error.report("not implemented yet", error.unknownLocation)
+        val decls:List[DeclType] = n.body.map[DeclType](x => f(x))
+        if (types.equalType(unfold, types.UnfoldedType(decls)))
+            types.NominalType(n.binding)
+          else
+            error.report("invalid new expression",error.unknownLocation)
+
     s:bound.Seq => typeSeq(s.exps,gamma)
 
     i:bound.Integer => 
