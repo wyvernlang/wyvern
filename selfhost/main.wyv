@@ -5,6 +5,9 @@ require stdout
 // imports
 import javascript:stdlib.js
 import javascript:stdlib.support.regexUtils
+import javascript:stdlib.support.args
+import javascript:stdlib.support.file
+import javascript:stdlib.support.string
 import wyvernLexer
 import wyvernParser
 import bytecode
@@ -23,20 +26,23 @@ val toBytecode = toBytecode(javascript, js)
 val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
-
 val parser = wyvernParser.makeParser(lexer)
+val fileName = args.getFirstCommandLineArg()
 
-// TODO: right now there's an internal error in nearly if there's a parse error.  Need to fix this; somehow we are using nearly wrong.
-// simple test case
-//parser.feed("def f(x) = x\nval y = ( x => x)\n( x => x) (x => x)\n(x => x) (003+3202 * (65537 % 2) / -2 + -(2 - 3))\ntype foo:\n    val x:Int\n    val y:Int\n5\n")
-//parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\nval x = 5\nval y = x\nval z = y\nz+0-x+3+5")
-parser.feed("type Int:\n    def +(i:Int):Int\n    def -(i:Int):Int\ntype Foo:\n    val a:Int\n    val b:Int\nval x = new Foo:\n    val a = 5\n    val b = 3-2+4\ntype Bar:\n    val a:Foo\n    val b:Int\nval y = new Bar:\n    val a = x\n    val b = 3\ny.a.a")
-/* debugging code, currently commented out
-*/
+js.log("Argument:\n")
+js.log(fileName)
+
+val fileContents = file.readFileAsString(fileName)
+
+js.log("File Contents:\n")
+js.log(fileContents)
+
+parser.feed(fileContents)
+
 js.log("Raw Results:\n")
 js.log(parser.results)
-js.log("Results:\n")
 
+js.log("Results:\n")
 stdout.print(raw.expToString(parser.results.get(0)))
 stdout.println()
 
@@ -56,7 +62,10 @@ stdout.println()
 stdout.print("Lowering...\n")
 val ooExp = bound.lower(boundExp)
 
-stdout.print("Writing to sample.wyb...\n")
-toBytecode.writeExpToFile(ooExp, "sample.wyb")
-/*testing parsing
-*/
+val outputFileName = string.replace(fileName, ".wyv", ".wyb")
+
+stdout.print("Writing to ")
+stdout.print(outputFileName)
+stdout.print("...\n")
+
+toBytecode.writeExpToFile(ooExp, outputFileName)

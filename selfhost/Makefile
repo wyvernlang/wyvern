@@ -1,6 +1,7 @@
-lambda: bootstrap node_modules
-	wyby lambda.wyv
-	node ../backend/boot.js lambda.wyb > lambda.js
+all: bootstrap node_modules test
+
+test: test.sh
+	./test.sh
 
 bootstrap: ../backend/boot.js
 	cd ../backend && sh bootstrap.sh && cd ../selfhost
