@@ -1,0 +1,31 @@
+// required FFI and resources
+require javascript
+require stdout
+
+// imports
+import javascript:stdlib.js
+import javascript:stdlib.support.regexUtils
+import javascript:stdlib.support.args
+import wyvernLexer
+import wyvernParser
+import bytecode
+import raw
+import binding
+import bound
+import toBytecode
+import wyvern.collections.llist
+import types
+import typecheck
+
+// instantiate imports and create aliases
+type List = llist.LinkedList
+val wyvernLexer = wyvernLexer(js, regexUtils)
+val toBytecode = toBytecode(javascript, js)
+val b = bytecode(javascript, js)
+
+val lexer = wyvernLexer.makeLexer()
+val parser = wyvernParser.makeParser(lexer)
+val file = args.getFirstCommandLineArg()
+
+js.log("Argument: ")
+js.log(file)
