@@ -17,5 +17,9 @@ exports.ofCharacter = function(c) {
 }
 
 exports.fromCharCode = function(i) {
-	return String.fromCharCode(i)
+    return String.fromCharCode(i);
+}
+
+exports.replace = function(string, s1, s2) {
+    return string.replace(s1, s2);
 }

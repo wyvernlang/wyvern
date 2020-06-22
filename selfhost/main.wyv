@@ -6,6 +6,8 @@ require stdout
 import javascript:stdlib.js
 import javascript:stdlib.support.regexUtils
 import javascript:stdlib.support.args
+import javascript:stdlib.support.file
+import javascript:stdlib.support.string
 import wyvernLexer
 import wyvernParser
 import bytecode
@@ -25,7 +27,45 @@ val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
 val parser = wyvernParser.makeParser(lexer)
-val file = args.getFirstCommandLineArg()
+val fileName = args.getFirstCommandLineArg()
 
-js.log("Argument: ")
-js.log(file)
+js.log("Argument:\n")
+js.log(fileName)
+
+val fileContents = file.readFileAsString(fileName)
+
+js.log("File Contents:\n")
+js.log(fileContents)
+
+parser.feed(fileContents)
+
+js.log("Raw Results:\n")
+js.log(parser.results)
+
+js.log("Results:\n")
+stdout.print(raw.expToString(parser.results.get(0)))
+stdout.println()
+
+def parse(s:String):raw.Exp
+    val lex = wyvernLexer.makeLexer()
+    val pars = wyvernParser.makeParser(lex)
+    pars.feed(s)
+    pars.results.get(0)
+
+stdout.print("Binding...\n")
+val boundExp = binding.bind(parser.results.get(0), s => parse(s))
+
+val tc = typecheck.typecheck(boundExp)
+stdout.print("type: " + types.typeToString(tc))
+stdout.println()
+
+stdout.print("Lowering...\n")
+val ooExp = bound.lower(boundExp)
+
+val outputFileName = string.replace(fileName, ".wyv", ".wyb")
+
+stdout.print("Writing to ")
+stdout.print(outputFileName)
+stdout.print("...\n")
+
+toBytecode.writeExpToFile(ooExp, outputFileName)
