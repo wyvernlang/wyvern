@@ -92,7 +92,6 @@ tools/src/wyvern/target/llvm/configure
 tools/jacoco.exec
 tools/report
 tools/out.gradver
-
 node_modules
 *.wyb
 out.js
@@ -105,3 +104,4 @@ selfhost/lambda.js
 selfhost/sample.js
 selfhost/sample.wyb
 selfhost/lambda.wyb
+temp
