@@ -78,6 +78,7 @@ def getType(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
         val unfold:types.UnfoldedType = unfoldType(types.NominalType(n.binding), gamma)        
         def f(x:bound.Exp):DeclType = match x:
             v:bound.Val => types.ValType(v.binding, getType(v.exp, gamma))
+            d:bound.Def => types.DefType(d.binding, d.argTyp, d.retTyp)
             default => error.report("not implemented yet", error.unknownLocation)
         val decls:List[DeclType] = n.body.map[DeclType](x => f(x))
         if (types.equalType(unfold, types.UnfoldedType(decls)))
@@ -114,6 +115,15 @@ def typeSeq(es:List[bound.Exp], gamma:List[DeclType]):types.Type = match es:
                         val tt = types.TypeType(t.name, types.UnfoldedType(t.members))
                         val gammaPrime = llist.Cons[DeclType](tt, gamma)
                         typeSeq(c.next, gammaPrime)
+                    d:bound.Def =>
+                        val vt = types.ValType(d.arg, d.argTyp)
+                        val testType = getType(d.body, llist.Cons[DeclType](vt, gamma))
+                        if (types.equalType(testType, d.retTyp))
+                                val dt = types.DefType(d.binding, d.argTyp, d.retTyp)
+                                val gammaPrime = llist.Cons[DeclType](dt, gamma)
+                                typeSeq(c.next, gammaPrime)
+                            else
+                                error.report("types in def don't match",error.unknownLocation)
                     default =>
                         val typ = getType(c.value, gamma)
                         typeSeq(c.next, gamma)

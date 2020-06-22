@@ -42,6 +42,7 @@ datatype Exp
     Call(receiver:Exp, name:String, arg:Exp)
     Field(receiver:Exp, field:String)
     Val(binding:Binding, exp:Exp)
+    Def(binding:Binding, arg:Binding, argTyp:types.Type, retTyp:types.Type, body:Exp)
     TypeDecl(name:Binding, members:List[types.DeclType])
     New(binding:Binding, body:List[Exp])
     Seq(exps:List[Exp])
