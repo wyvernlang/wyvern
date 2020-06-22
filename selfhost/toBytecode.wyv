@@ -3,12 +3,18 @@ module def toBytecode(javascript:JavaScript, js:Dyn)
 import bound
 import bytecode
 import wyvern.collections.llist
+import error
 
 val b = bytecode(javascript, js)
 
 // to bytecode
 def toBytecodeMethod(m:bound.Method):b.MethodDecl
     b.MethodDecl(m.name, llist.Singleton[String](m.binding.name), toBytecode(m.body))
+
+def toBytecodeDecl(e:bound.Exp):b.Decl = match e:
+    v:bound.Val => b.ValDecl(v.binding.name, toBytecode(v.exp))
+    d:bound.Def => b.MethodDecl(d.binding.name, llist.Singleton[String](d.arg.name), toBytecode(d.body))
+    default => error.report("not a declaration",error.unknownLocation)
 
 def toBytecode(e:bound.Exp):b.Expr = match e:
     v:bound.Var   => b.VarExpr(v.binding.name)
@@ -18,7 +24,8 @@ def toBytecode(e:bound.Exp):b.Expr = match e:
     s:bound.Seq   =>
         val processStmt : bound.Exp -> b.SeqStmt = (exp =>
           val result:b.SeqStmt = match exp:
-            v:bound.Val => b.DeclStmt(b.ValDecl(v.binding.name, toBytecode(v.exp)))
+            v:bound.Val => b.DeclStmt(toBytecodeDecl(v))
+            d:bound.Def => b.DeclStmt(toBytecodeDecl(d))
             default     => b.ExpStmt(toBytecode(exp))
           result
         )
@@ -27,6 +34,7 @@ def toBytecode(e:bound.Exp):b.Expr = match e:
         b.SeqExpr(seqStmts)
     // no "val" case - should exist only under Seq
     // no lambda or app case - should have been lowered away
+    n:bound.New     => b.NewExpr(n.binding.name, n.body.map[b.Decl](e => toBytecodeDecl(e)))
     i:bound.Integer => b.IntLit(i.str)
     u:bound.UnitVal => b.IntLit("0")
 

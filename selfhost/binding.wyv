@@ -46,8 +46,9 @@ def bindNewBody(e:raw.Exp, context:bound.Context):List[bound.Exp] = match e:
         c:llist.Cons => llist.Cons[bound.Exp](bindHelper(c.value, context), bindNewBody(raw.Seq(c.next), context))
         n:llist.Nil => llist.Nil[bound.Exp]()
     v:raw.Val    => llist.Singleton[bound.Exp](bindHelper(v, context))
-    default      => error.report("not implemented yet",error.unknownLocation)
-    
+    d:raw.Def    => llist.Singleton[bound.Exp](bindHelper(d, context))
+    default      => error.report("raw expr: " + raw.expToString(e),error.unknownLocation)
+
 def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     v:raw.Var    => bound.Var(llist.find[types.Binding](context.bindings, (b:types.Binding) => v.name==b.name).get())
     a:raw.App    => bound.App(bindHelper(a.func, context), bindHelper(a.arg, context))
@@ -61,6 +62,10 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     v:raw.Val    =>
         val b = types.Binding(v.name, context.counter)
         bound.Val(b, bindHelper(v.exp, context))
+    d:raw.Def    =>
+        val b = types.Binding(d.name, context.counter)
+        val argb = types.Binding(d.arg, context.counter)
+        bound.Def(b, argb, stringToType(d.argTyp,context), stringToType(d.retTyp,context), bindHelper(d.body, context.extend(b).extend(argb)))
     t:raw.TypeDecl   =>
         val b = types.Binding(t.name, context.counter)
         bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context.extend(b)))
