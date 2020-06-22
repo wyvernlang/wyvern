@@ -1,0 +1,9 @@
+type Int:
+     def +(i:Int):Int
+     def -(i:Int):Int
+
+val x = 5
+val y = x
+val z = y
+
+z+0-x+3+5

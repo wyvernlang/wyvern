@@ -1,0 +1,7 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+    val a:Int
+
+val x = 5
+-x.a.a+3-x
