@@ -52,11 +52,12 @@ datatype Exp
 def lower(e:Exp):Exp = match e:
     v:Var     => v
     a:App     => Call(lower(a.func), "apply", lower(a.arg))
-    l:Lambda  => Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
+    l:Lambda  => UnitVal()//Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
     c:Call    => Call(lower(c.receiver),c.name,lower(c.arg))
     f:Field   => Field(lower(f.receiver),f.field)
     v:Val     => Val(v.binding, lower(v.exp))
-    n:New     => UnitVal()
+    d:Def     => Def(d.binding, d.arg, d.argTyp, d.retTyp, lower(d.body))
+    n:New     => New(n.binding, n.body.map[Exp](e => lower(e)))
     s:Seq     => Seq(s.exps.map[Exp](e => lower(e)))
     i:Integer    => i
     t:TypeDecl => UnitVal()
