@@ -107,3 +107,4 @@ selfhost/lambda.wyb
 temp
 selfhost/.js
 selfhost/main.js
+selfhost/tests/*.wyb
