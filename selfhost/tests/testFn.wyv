@@ -1,0 +1,14 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Foo:
+    def double(x:Int):Int
+    val a:Int
+
+val foo = new this:Foo:
+    def double(x:Int):Int:
+        x + 5
+    val a = 5
+
+foo.double(10)-3

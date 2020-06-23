@@ -54,6 +54,7 @@ def parse(s:String):raw.Exp
 
 stdout.print("Binding...\n")
 val boundExp = binding.bind(parser.results.get(0), s => parse(s))
+/*
 
 
 val tc = typecheck.typecheck(boundExp)
@@ -70,3 +71,4 @@ stdout.print(outputFileName)
 stdout.print("...\n")
 
 toBytecode.writeExpToFile(ooExp, outputFileName)
+*/

@@ -65,12 +65,12 @@ def bindHelper(e:raw.Exp, context:bound.Context):bound.Exp = match e:
     d:raw.Def    =>
         val b = types.Binding(d.name, context.counter)
         val argb = types.Binding(d.arg, context.counter)
-        bound.Def(b, argb, stringToType(d.argTyp,context), stringToType(d.retTyp,context), bindHelper(d.body, context.extend(b).extend(argb)))
+        bound.Def(b, argb, stringToType(d.argTyp,context), stringToType(d.retTyp,context), bindHelper(context.parse(lexUtil.stripLeadingWhitespace(d.body)), context.extend(b).extend(argb)))
     t:raw.TypeDecl   =>
         val b = types.Binding(t.name, context.counter)
         bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context.extend(b)))
     n:raw.New =>
-        val b:types.Binding = llist.find[types.Binding](context.bindings, (b:types.Binding) => b.name == n.name).get()
+        val b:types.Binding = llist.find[types.Binding](context.bindings, (b:types.Binding) => b.name == n.typeName).get()
         bound.New(b, bindNewBody(context.parse(lexUtil.stripLeadingWhitespace(n.body)), context))
     s:raw.Seq    => bound.Seq(bindList(s.exps.reverse(), context))
     i:raw.Integer     => bound.Integer(i.str)
