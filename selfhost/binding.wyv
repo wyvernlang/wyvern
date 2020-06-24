@@ -14,14 +14,18 @@ def stringToType(s:String, ctx:bound.Context):types.Type
             val b:types.Binding = llist.find[types.Binding](ctx.bindings, (b:types.Binding) => b.name == s).get()
             types.NominalType(b)
 
-def bindDeclTypes(e:raw.Exp, context:bound.Context):List[types.DeclType] = match e:
-    s:raw.Seq     => llist.flatten[types.DeclType](s.exps.map[List[types.DeclType]](x => bindDeclTypes(x, context)))
+def bindDeclTypes(e:raw.Exp, context:bound.Context):types.DeclType = match e:
     v:raw.ValType =>
         val b = types.Binding(v.name, context.counter)
-        llist.Singleton[types.DeclType](types.ValType(b,stringToType(v.typ, context)))
+        types.ValType(b,stringToType(v.typ, context))
     d:raw.DefDecl =>
         val b = types.Binding(d.name, context.counter)
-        llist.Singleton[types.DeclType](types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context)))
+        types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context))
+    t:raw.TypeDecl =>
+        val b = types.Binding(t.name, context.counter)
+        val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
+        val declList:List[types.DeclType] = declSeq.exps.map[types.DeclType](e => bindDeclTypes(e,context.extend(b)))
+        types.TypeType(b, types.UnfoldedType(declList))
     default       => error.report("unexpected construct", error.unknownLocation)
 
 def makeSeq(e:raw.Exp):raw.Seq = match e: //ensures that the whole expression is a Seq, in program order--actually all the raw Seqs are reversed
@@ -59,7 +63,9 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         bound.Def(b, argb, stringToType(d.argTyp,context), stringToType(d.retTyp,context), bindStatement(defn, context.extend(b).extend(argb)))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
-        bound.TypeDecl(b, bindDeclTypes(context.parse(lexUtil.stripLeadingWhitespace(t.decls)), context.extend(b)))
+        val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
+        val declList:List[types.DeclType] = declSeq.exps.map[types.DeclType](e => bindDeclTypes(e,context.extend(b)))
+        bound.TypeDecl(b, declList)
     default => error.report("not a declaration: " + raw.expToString(e),error.unknownLocation)
 
 def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:

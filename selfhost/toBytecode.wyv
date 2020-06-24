@@ -9,12 +9,6 @@ type List = llist.LinkedList
 
 val b = bytecode(javascript, js)
 
-/*
-// to bytecode
-def toBytecodeMethod(m:bound.Method):b.MethodDecl
-    b.MethodDecl(m.name, llist.Singleton[String](m.binding.name), toBytecode(m.body))
-*/
-
 def toBytecode(e:bound.Statement):b.SeqExpr
     b.SeqExpr(toBytecodeStmt(e))
 
