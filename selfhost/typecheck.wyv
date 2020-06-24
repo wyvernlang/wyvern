@@ -1,3 +1,4 @@
+/*
 module typecheck
 
 import types
@@ -128,3 +129,4 @@ def typeSeq(es:List[bound.Exp], gamma:List[DeclType]):types.Type = match es:
                         val typ = getType(c.value, gamma)
                         typeSeq(c.next, gamma)
     n:llist.Nil => error.report("program doesn't end in an expression", error.unknownLocation)
+*/

@@ -22,42 +22,40 @@ def Context(bs:List[Binding], c:Counter, p:String -> raw.Exp) : Context = new
     
 def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[Binding](), types.Counter(), p)
 
+datatype Statement
+    DeclStatement(decl:Decl, stmt:Statement)
+    ExprStatement(exp:Exp)
 
-type Method
-    val name:String
-    val binding:Binding
-    val body:Exp
+datatype Decl
+    Val(binding:Binding, exp:Exp)
+    Def(binding:Binding, arg:Binding, argTyp:types.Type, retTyp:types.Type, body:Statement)
+    TypeDecl(name:Binding, members:List[types.DeclType])
 
-def Method(name:String, binding:Binding, body:Exp):Method = new
-    val name = name
-    val binding = binding
-    val body = body
-
-    
 datatype Exp
     Var(binding:Binding)
     App(func:Exp, arg:Exp)
     Lambda(binding:Binding, body:Exp)
-    Obj(meths:List[Method])
     Call(receiver:Exp, name:String, arg:Exp)
     Field(receiver:Exp, field:String)
-    Val(binding:Binding, exp:Exp)
-    Def(binding:Binding, arg:Binding, argTyp:types.Type, retTyp:types.Type, body:Exp)
-    TypeDecl(name:Binding, members:List[types.DeclType])
-    New(binding:Binding, body:List[Exp])
-    Seq(exps:List[Exp])
+    New(binding:Binding, typ:types.Type, body:List[Decl])
     Integer(str:String)
     UnitVal()
 
-def lower(e:Exp):Exp = match e:
+def lowerStatement(stmt:Statement):Statement = match stmt:
+    d:DeclStatement => DeclStatement(lowerDecl(d.decl), lowerStatement(d.stmt))
+    e:ExprStatement => ExprStatement(lowerExp(e.exp))
+
+def lowerDecl(decl:Decl):Decl = match decl:
+    v:Val  => Val(v.binding, lowerExp(v.exp))
+    d:Def  => Def(d.binding, d.arg, d.argTyp, d.retTyp, lowerStatement(d.body))
+    t:TypeDecl => t
+
+def lowerExp(exp:Exp):Exp = match exp:
     v:Var     => v
-    a:App     => Call(lower(a.func), "apply", lower(a.arg))
+    a:App     => Call(lowerExp(a.func), "apply", lowerExp(a.arg))
     l:Lambda  => UnitVal()//Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
-    c:Call    => Call(lower(c.receiver),c.name,lower(c.arg))
-    f:Field   => Field(lower(f.receiver),f.field)
-    v:Val     => Val(v.binding, lower(v.exp))
-    d:Def     => Def(d.binding, d.arg, d.argTyp, d.retTyp, lower(d.body))
-    n:New     => New(n.binding, n.body.map[Exp](e => lower(e)))
-    s:Seq     => Seq(s.exps.map[Exp](e => lower(e)))
-    i:Integer    => i
-    t:TypeDecl => UnitVal()
+    c:Call    => Call(lowerExp(c.receiver), c.name, lowerExp(c.arg))
+    f:Field   => Field(lowerExp(f.receiver), f.field)
+    n:New     => New(n.binding, n.typ, n.body.map[Decl](d => lowerDecl(d)))
+    i:Integer => i
+    u:UnitVal => u

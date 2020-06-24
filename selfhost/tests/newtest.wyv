@@ -3,12 +3,13 @@ type Int:
     def -(i:Int):Int
 
 type Foo:
-    def double(x:Int):Int
+    def sum(x:Int):Int
     val a:Int
 
 val foo = new this:Foo:
-    def double(x:Int):Int:
-        x + 5
+    def sum(x:Int):Int:
+        this.a + x    
     val a = 5
 
-foo.double(10)-3
+val abc = 5
+foo.sum(10)-3
