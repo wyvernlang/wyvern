@@ -4,7 +4,6 @@ import bound
 import bytecode
 import wyvern.collections.llist
 import error
-import wyvern.collections.llist
 type List = llist.LinkedList
 
 val b = bytecode(javascript, js)

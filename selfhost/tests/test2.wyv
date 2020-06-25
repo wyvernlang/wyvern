@@ -1,9 +1,0 @@
-type Int:
-    def +(i:Int):Int
-    def -(i:Int):Int
-    val a = 5
-
-def sum(x:Int):Int:
-    this.a + x
-
-0
