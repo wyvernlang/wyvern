@@ -1,0 +1,15 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type X:
+    def f(x:Int):Int
+    val temp:Int
+
+val x = new this:X:
+    def f(x:Int):Int:
+        val y = x+1
+        this.f(y)
+    val temp = 0
+
+x.f(0)

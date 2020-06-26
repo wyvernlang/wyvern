@@ -15,7 +15,7 @@ val grammar: parsing.Grammar = ~
            
     Stmt  -> Expression                                                  : a:Dyn => a.get(0)
            | %val %identifier %eq Expression                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
-           | %def %identifier %lparen %identifier %rparen %eq Expression : a:Dyn => raw.Val(a.get(1).value, raw.Lambda(a.get(3).value, a.get(6)))
+           | %def %identifier %lparen %identifier %colon Type %rparen %colon Type %colon %block : a:Dyn => raw.Def(a.get(1).value, a.get(3).value, a.get(5), a.get(8), a.get(10).value)
            | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
            | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
            | %def %identifier %lparen %identifier %colon Type %rparen %colon Type : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3).value, a.get(5), a.get(8))
@@ -45,12 +45,13 @@ val grammar: parsing.Grammar = ~
               | ExprAppl ExprDot                          : a:Dyn => raw.App(a.get(0), a.get(1))
 
     ExprDot -> Primary                                    : a:Dyn => a.get(0)
+             | ExprDot %dot %identifier %lparen Expression %rparen   : a:Dyn => raw.Call(a.get(0), a.get(2).value, a.get(4))
              | ExprDot %dot %identifier                   : a:Dyn => raw.Field(a.get(0), a.get(2).value)
 
     Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
              | %lparen Expression %rparen                 : a:Dyn => a.get(1)
              | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
-             | %new_ %identifier %colon %block            : a:Dyn => raw.New(a.get(1).value, a.get(3).value)
+             | %new_ %identifier %colon %identifier %colon %block            : a:Dyn => raw.New(a.get(1).value, a.get(3).value, a.get(5).value)
              
 
 
