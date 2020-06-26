@@ -18,6 +18,8 @@ import toBytecode
 import wyvern.collections.llist
 import types
 import typecheck
+import error
+import wyvern.exception
 
 // instantiate imports and create aliases
 type List = llist.LinkedList
@@ -42,8 +44,8 @@ parser.feed(fileContents)
 js.log("Raw Results:\n")
 js.log(parser.results)
 
-if (parser.results.length > 0)
-    js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
+//if (parser.results.length > 1)
+//    js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
 
 js.log("Results:\n")
 stdout.print(raw.expToString(parser.results.get(0)))
@@ -53,15 +55,23 @@ def parse(s:String):raw.Exp
     val lex = wyvernLexer.makeLexer()
     val pars = wyvernParser.makeParser(lex)
     pars.feed(s)
-    if (pars.results.length > 0)
-        js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
+    //if (pars.results.length != 1)
+    //    js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
     pars.results.get(0)
 
 stdout.print("Binding...\n")
 val boundExp:bound.Statement = binding.bind(parser.results.get(0), s => parse(s))
 
-val tc = typecheck.typecheck(boundExp)
-stdout.print("type: " + types.typeToString(tc) + "\n")
+//val tc = typecheck.typecheck(boundExp)
+//stdout.print("type: " + types.typeToString(tc) + "\n")
+val tc : exception.Answer[types.Type,exception.Exception] = exception.try[types.Type](() => typecheck.typecheck(boundExp))
+match tc:
+    s1: exception.Success =>
+        stdout.print("type: " + types.typeToString(s1.value) + "\n")
+    f1: exception.Failure =>
+        match f1.exception:
+            exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
+            default => stdout.print("unexpected exception thrown\n")
 
 stdout.print("Lowering...\n")
 val ooExp:bound.Statement = bound.lowerStatement(boundExp)

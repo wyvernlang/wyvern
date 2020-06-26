@@ -6,21 +6,22 @@ import wyvern.collections.llist
 type List = llist.LinkedList
 type Counter = types.Counter
 type Binding = types.Binding
+type DeclType = types.DeclType
 
 resource type Context
-    val bindings:List[Binding]
+    val bindings:List[DeclType]
     val counter:Counter
     val parse:String -> raw.Exp
-    def extend(b:Binding):Context
+    def extend(b:DeclType):Context
 
-def Context(bs:List[Binding], c:Counter, p:String -> raw.Exp) : Context = new
+def Context(bs:List[DeclType], c:Counter, p:String -> raw.Exp) : Context = new
     val bindings = bs
     val counter = c
     val parse = p
-    def extend(b:Binding):Context
-        Context(llist.Cons[Binding](b, bs), c, p)
+    def extend(b:DeclType):Context
+        Context(llist.Cons[DeclType](b, bs), c, p)
     
-def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[Binding](), types.Counter(), p)
+def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[DeclType](), types.Counter(), p)
 
 datatype Statement
     DeclStatement(decl:Decl, stmt:Statement)
@@ -29,12 +30,10 @@ datatype Statement
 datatype Decl
     Val(binding:Binding, exp:Exp)
     Def(binding:Binding, arg:Binding, argTyp:types.Type, retTyp:types.Type, body:Statement)
-    TypeDecl(name:Binding, members:List[types.DeclType])
+    TypeDecl(name:Binding, members:List[DeclType])
 
 datatype Exp
     Var(binding:Binding)
-    App(func:Exp, arg:Exp)
-    Lambda(binding:Binding, body:Exp)
     Call(receiver:Exp, name:String, arg:Exp)
     Field(receiver:Exp, field:String)
     New(binding:Binding, typ:types.Type, body:List[Decl])
@@ -52,8 +51,6 @@ def lowerDecl(decl:Decl):Decl = match decl:
 
 def lowerExp(exp:Exp):Exp = match exp:
     v:Var     => v
-    a:App     => Call(lowerExp(a.func), "apply", lowerExp(a.arg))
-    l:Lambda  => UnitVal()//Obj(llist.Singleton[Method](Method("apply", l.binding, lower(l.body))))
     c:Call    => Call(lowerExp(c.receiver), c.name, lowerExp(c.arg))
     f:Field   => Field(lowerExp(f.receiver), f.field)
     n:New     => New(n.binding, n.typ, n.body.map[Decl](d => lowerDecl(d)))

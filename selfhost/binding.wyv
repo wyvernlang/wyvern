@@ -3,29 +3,40 @@ import bound
 import error
 import lexUtil
 import types
+import typecheck
 import wyvern.collections.llist
 
 type List = llist.LinkedList
+type DeclType = types.DeclType
 
 def stringToType(s:String, ctx:bound.Context):types.Type
     if (s == "Unit")
             types.UnitType()
         else
-            val b:types.Binding = llist.find[types.Binding](ctx.bindings, (b:types.Binding) => b.name == s).get()
-            types.NominalType(b)
+            val pred = ((b:DeclType) =>
+                val z = match b:
+                    tt:types.TypeType =>
+                        if (tt.name.name == s) { option.Some[types.TypeType](tt) } else { option.None[types.TypeType]() }
+                    default => option.None[types.TypeType]()
+                z
+            )
+            //val typ:types.Type = types.NominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
+            types.findInDeclList[types.TypeType](ctx.bindings, pred).typ
 
-def bindDeclTypes(e:raw.Exp, context:bound.Context):types.DeclType = match e:
+def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
     v:raw.ValType =>
         val b = types.Binding(v.name, context.counter)
         types.ValType(b,stringToType(v.typ, context))
     d:raw.DefDecl =>
         val b = types.Binding(d.name, context.counter)
         types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context))
+    /*
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
-        val declList:List[types.DeclType] = declSeq.exps.map[types.DeclType](e => bindDeclTypes(e,context.extend(b)))
+        val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(b)))
         types.TypeType(b, types.UnfoldedType(declList))
+    */
     default       => error.report("unexpected construct", error.unknownLocation)
 
 def makeSeq(e:raw.Exp):raw.Seq = match e: //ensures that the whole expression is a Seq, in program order--actually all the raw Seqs are reversed
@@ -39,16 +50,16 @@ def bindStatement(e:raw.Seq, context:bound.Context):bound.Statement = match e.ex
     c:llist.Cons => match c.next:
         cc:llist.Cons => 
             val b:bound.Decl = bindDecl(c.value, context)
-            match b:
+            val decl:DeclType = match b:
                 v:bound.Val =>
-                    val newCtx = context.extend(v.binding)
-                    bound.DeclStatement(b, bindStatement(raw.Seq(c.next), newCtx))
+                    val expType = typecheck.typecheckExpr(v.exp, context.bindings)
+                    types.ValType(v.binding, expType)
                 d:bound.Def =>
-                    val newCtx = context.extend(d.binding)
-                    bound.DeclStatement(b, bindStatement(raw.Seq(c.next), newCtx))
+                    types.DefType(d.binding, d.argTyp, d.retTyp)
                 t:bound.TypeDecl =>
-                    val newCtx = context.extend(t.name)
-                    bound.DeclStatement(b, bindStatement(raw.Seq(c.next), newCtx))
+                    types.TypeType(t.name, types.UnfoldedType(t.members))
+            val newCtx = context.extend(decl)
+            bound.DeclStatement(b, bindStatement(raw.Seq(c.next), newCtx))
         default => bound.ExprStatement(bindExpr(c.value, context))
     default => error.report("empty statement",error.unknownLocation)
 
@@ -58,31 +69,59 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         bound.Val(b, bindExpr(v.exp, context))
     d:raw.Def =>
         val b = types.Binding(d.name, context.counter)
+        val methodDecl = types.DefType(b, stringToType(d.argTyp,context), stringToType(d.retTyp,context))
         val argb = types.Binding(d.arg, context.counter)
+        val argDecl = types.ValType(argb, methodDecl.argTyp)
         val defn = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(d.body)))
-        bound.Def(b, argb, stringToType(d.argTyp,context), stringToType(d.retTyp,context), bindStatement(defn, context.extend(b).extend(argb)))
+        bound.Def(b, argb, methodDecl.argTyp, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extend(argDecl)))
     t:raw.TypeDecl =>
-        val b = types.Binding(t.name, context.counter)
+        val nominalb = types.Binding(t.name, context.counter)
+        val actualb = types.Binding(t.name, context.counter)
+        val nominalDecl = types.TypeType(nominalb, types.NominalType(actualb))
+
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
-        val declList:List[types.DeclType] = declSeq.exps.map[types.DeclType](e => bindDeclTypes(e,context.extend(b)))
-        bound.TypeDecl(b, declList)
+        val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(nominalDecl)))
+        bound.TypeDecl(actualb, declList)
     default => error.report("not a declaration: " + raw.expToString(e),error.unknownLocation)
 
 def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
-    v:raw.Var    => bound.Var(llist.find[types.Binding](context.bindings, (b:types.Binding) => v.name == b.name).get())
-    a:raw.App    => bound.App(bindExpr(a.func, context), bindExpr(a.arg, context))
+    v:raw.Var    => 
+        val pred = ((b:DeclType) =>
+            val z = match b:
+                vt:types.ValType =>
+                    if (vt.name.name == v.name) { option.Some[types.ValType](vt) } else { option.None[types.ValType]() }
+                default => option.None[types.ValType]()
+            z
+        )
+        val binding = types.findInDeclList[types.ValType](context.bindings, pred).name
+        bound.Var(binding)
+    a:raw.App    => bound.Call(bindExpr(a.func, context), "apply", bindExpr(a.arg, context))
     l:raw.Lambda =>
-        val b = types.Binding(l.name, context.counter)
-        bound.Lambda(b, bindExpr(l.body, context.extend(b)))
+        val argb = types.Binding(l.name, context.counter)
+        val argDecl = types.ValType(argb, stringToType(l.argTyp, context))
+
+        val newCtx = context.extend(argDecl)
+        val boundExp = bindExpr(l.body, newCtx)
+        val expType = typecheck.typecheckExpr(boundExp, newCtx.bindings)
+
+        val applyb = types.Binding("apply", context.counter)
+        val decl = types.DefType(applyb, argDecl.typ, expType)
+        val defDeclaration:bound.Decl = bound.Def(applyb, argb, argDecl.typ, expType, bound.ExprStatement(boundExp))
+
+        val thisb = types.Binding("_this", context.counter)
+        val thisType = types.UnfoldedType(llist.Singleton[DeclType](decl))
+        bound.New(thisb, thisType, llist.Singleton[bound.Decl](defDeclaration))
     c:raw.Call   => 
         bound.Call(bindExpr(c.receiver, context), c.name, bindExpr(c.arg, context))
     f:raw.Field  =>
         bound.Field(bindExpr(f.receiver, context), f.field)
-    n:raw.New =>
+    n:raw.New    =>
         val b:types.Binding = types.Binding(n.thisName, context.counter)
         val typ:types.Type = stringToType(n.typeName, context)
+        val thisDecl = types.ValType(b, typ)
+
         val parsedBody = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(n.body)))
-        val boundDecls:List[bound.Decl] = parsedBody.exps.map[bound.Decl]((e:raw.Exp) => bindDecl(e, context.extend(b)))
+        val boundDecls:List[bound.Decl] = parsedBody.exps.map[bound.Decl]((e:raw.Exp) => bindDecl(e, context.extend(thisDecl)))
         bound.New(b, typ, boundDecls)
     i:raw.Integer     => bound.Integer(i.str)
     default      => error.report("unexpected construct in bindexpr: " + raw.expToString(e), error.unknownLocation)

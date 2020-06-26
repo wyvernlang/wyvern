@@ -1,0 +1,7 @@
+type Int:
+     def +(i:Int):Int
+     def -(i:Int):Int
+
+val succ = x:Int => x + 1
+val fst = x:Int => y:Int => x
+fst

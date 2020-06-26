@@ -9,33 +9,6 @@ type List = llist.LinkedList
 type DeclType = types.DeclType
 type Option = option.Option
 
-def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
-    def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
-        match gamma:
-            c:llist.Cons => 
-                match (pred(c.value)):
-                    s:option.Some => s
-                    default => f(c.next, pred)
-            n:llist.Nil => option.None[T]()
-    match f(gamma, pred):
-        s:option.Some => s.get()
-        default => error.report("search in decllist failed",error.unknownLocation)
-
-def unfoldType(x:types.Type, gamma:List[DeclType]):types.UnfoldedType
-    match x:
-        u:types.UnitType => types.UnfoldedType(llist.Nil[DeclType]())
-        x:types.NominalType => 
-            val pred = ((b:DeclType) =>
-                val z = match b:
-                    t:types.TypeType => 
-                        if (types.equalBinding(x.L, t.name)) { option.Some[types.TypeType](t) } else { option.None[types.TypeType]() }
-                    default => option.None[types.TypeType]()
-                z
-            )
-            findInDeclList[types.TypeType](gamma, pred).typ
-        u:types.UnfoldedType => u
-
-
 def typecheck(e:bound.Statement):types.Type
     typecheckStmt(e,llist.Nil[DeclType]())
 
@@ -56,10 +29,10 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
     d:bound.Def =>
         val vt = types.ValType(d.arg, d.argTyp)
         val testType = typecheckStmt(d.body, llist.Cons[DeclType](vt, gamma))
-        if (types.equalType(testType, d.retTyp))
+        if (types.equalType(testType, d.retTyp, gamma))
                 types.DefType(d.binding, d.argTyp, d.retTyp)
             else
-                error.report("argument typ in def doesn't match expected",error.unknownLocation)
+                error.report("argument typ in def doesn't match expected:" + types.typeToString(testType) + ", " + types.typeToString(d.retTyp),error.unknownLocation)
 
 def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
     v:bound.Var =>
@@ -70,23 +43,23 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 default => option.None[types.ValType]()
             z
         )
-        findInDeclList[types.ValType](gamma, pred).typ
+        types.findInDeclList[types.ValType](gamma, pred).typ
 
     c:bound.Call => //T-Invk
         val recType = typecheckExpr(c.receiver, gamma)
-        val unfold:types.UnfoldedType = unfoldType(recType, gamma)
+        val unfold:types.UnfoldedType = types.unfoldType(recType, gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
                 da:types.DefType => 
-                    if (c.name == da.name.name && types.equalType(typecheckExpr(c.arg,gamma), da.argTyp)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
+                    if (c.name == da.name.name && types.equalType(typecheckExpr(c.arg,gamma), da.argTyp, gamma)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
                 default => option.None[types.DefType]()
             z
         )
-        findInDeclList[types.DefType](unfold.decls, pred).retTyp
+        types.findInDeclList[types.DefType](unfold.decls, pred).retTyp
 
     f:bound.Field => //T-Field
         val recType = typecheckExpr(f.receiver, gamma)
-        val unfold:types.UnfoldedType = unfoldType(recType, gamma)
+        val unfold:types.UnfoldedType = types.unfoldType(recType, gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
                 va:types.ValType => 
@@ -94,10 +67,10 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 default => option.None[types.ValType]()
             z
         )
-        findInDeclList[types.ValType](unfold.decls, pred).typ
+        types.findInDeclList[types.ValType](unfold.decls, pred).typ
 
     n:bound.New => //T-New
-        val unfold:types.UnfoldedType = unfoldType(n.typ, gamma)
+        val unfold:types.UnfoldedType = types.unfoldType(n.typ, gamma)
         def typeNewDecls(d:bound.Decl):DeclType
             val thisType = types.ValType(n.binding, n.typ)
             val ngamma = llist.Cons[DeclType](thisType, gamma)
@@ -106,7 +79,7 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 d:bound.Def      => typecheckDecl(d, ngamma)
                 t:bound.TypeDecl => typecheckDecl(d, ngamma)
         val decls = types.UnfoldedType(n.body.map[DeclType](x => typeNewDecls(x)))
-        if (types.equalType(unfold, decls))
+        if (types.equalType(unfold, decls, gamma))
             n.typ
           else
             error.report("invalid new expression, unfold = " + types.typeToString(unfold) + "\nnewexpr = " + types.typeToString(decls),error.unknownLocation)
@@ -119,6 +92,6 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 default => option.None[types.TypeType]()
             z
         ) 
-        types.NominalType(findInDeclList[types.TypeType](gamma, pred).name)
+        types.NominalType(types.findInDeclList[types.TypeType](gamma, pred).name)
 
     default => error.report("type error: unrecognized expression",error.unknownLocation)

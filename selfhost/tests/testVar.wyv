@@ -7,4 +7,5 @@ type A:
 
 val x = new this:A:
     val a = 5
+
 x.a+3-x.a

@@ -21,4 +21,4 @@ val tri = new this:Triangle:
     val temp = 0
 
 val perim = tri.s1.len + tri.s2.len + tri.s3.len
-tri.s1
+tri.s1.len

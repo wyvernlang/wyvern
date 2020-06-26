@@ -7,7 +7,7 @@ type List = llist.LinkedList
 datatype Exp
     Var(name:String)
     App(func:Exp, arg:Exp)
-    Lambda(name:String, body:Exp)
+    Lambda(name:String, argTyp:String, body:Exp)
     Call(receiver:Exp, name:String, arg:Exp)
     Field(receiver:Exp, field:String)
     Val(name:String, exp:Exp)
