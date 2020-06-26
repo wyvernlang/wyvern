@@ -53,6 +53,8 @@ def parse(s:String):raw.Exp
     val lex = wyvernLexer.makeLexer()
     val pars = wyvernParser.makeParser(lex)
     pars.feed(s)
+    if (pars.results.length > 0)
+        js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
     pars.results.get(0)
 
 stdout.print("Binding...\n")
