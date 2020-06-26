@@ -1,0 +1,16 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Foo:
+    def sum(x:Int):Int
+    val a:Int
+
+val foo = new this:Foo:
+    def sum(x:Int):Int:
+        this.a + x    
+    val a = 5
+
+val x = 5
+val abc = foo.sum(x+5)-3
+abc

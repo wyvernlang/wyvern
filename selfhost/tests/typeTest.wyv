@@ -1,0 +1,24 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Side:
+    val len:Int
+
+type Triangle:
+    val s1:Side
+    val s2:Side
+    val s3:Side
+    val temp:Int
+
+val tri = new this:Triangle:
+    val s1 = new x:Side:
+        val len = 1
+    val s2 = new x:Side:
+        val len = 2
+    val s3 = new x:Side:
+        val len = 3
+    val temp = 0
+
+val perim = tri.s1.len + tri.s2.len + tri.s3.len
+tri.s1

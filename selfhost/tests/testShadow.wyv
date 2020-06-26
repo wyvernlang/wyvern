@@ -1,0 +1,29 @@
+type Int:
+     def +(i:Int):Int
+     def -(i:Int):Int
+
+type X:
+    val a:Int
+
+val x = new this:X:
+    val a = 5
+
+type Fn:
+    def f(x:Int):Int
+    val temp:Int
+
+val fn = new this:Fn:
+    def f(b:Int):Int:
+        x.a + b
+    val temp = 0
+
+type X:
+    val b:Int
+
+val y = new this:X:
+    val b = 3
+
+val x = new this:X:
+    val b = 2
+
+x.b + y.b + fn.f(1)

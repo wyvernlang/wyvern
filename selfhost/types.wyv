@@ -63,6 +63,14 @@ datatype DeclType
     TypeType(name:Binding, typ:UnfoldedType)
     DefType(name:Binding, argTyp:Type, retTyp:Type)
 
+def declTypeToString(d:DeclType):String = match d:
+    v:ValType => "val " + v.name.name + ":" + typeToString(v.typ)
+    t:TypeType => "type " + t.name.name + ":" + typeToString(t.typ)
+    d:DefType => "def " + d.name.name + "(arg:" + typeToString(d.argTyp) + "):" + typeToString(d.retTyp)
+
 def typeToString(t:Type):String = match t:
     u:UnitType => "Unit"
     n:NominalType => n.L.name
+    u:UnfoldedType => 
+        val s = u.decls.map[String](e => declTypeToString(e))
+        s.foldLeft[String]((x:String,y:String) => x + ", " + y, "")
