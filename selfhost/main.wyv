@@ -42,7 +42,7 @@ parser.feed(fileContents)
 js.log("Raw Results:\n")
 js.log(parser.results)
 
-if (parser.results.length > 0)
+if (parser.results.length() > 1)
     js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
 
 js.log("Results:\n")
@@ -53,7 +53,7 @@ def parse(s:String):raw.Exp
     val lex = wyvernLexer.makeLexer()
     val pars = wyvernParser.makeParser(lex)
     pars.feed(s)
-    if (pars.results.length > 0)
+    if (pars.results.length() > 1)
         js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
     pars.results.get(0)
 
