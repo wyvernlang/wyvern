@@ -58,6 +58,8 @@ def bindStatement(e:raw.Seq, context:bound.Context):bound.Statement = match e.ex
                     types.DefType(d.binding, d.argTyp, d.retTyp)
                 t:bound.TypeDecl =>
                     types.TypeType(t.name, types.UnfoldedType(t.members))
+                t:bound.TypeAlias =>
+                    types.TypeType(t.name, t.typ)
             val newCtx = context.extend(decl)
             bound.DeclStatement(b, bindStatement(raw.Seq(c.next), newCtx))
         default => bound.ExprStatement(bindExpr(c.value, context))
@@ -81,6 +83,10 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
         val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(nominalDecl)))
         bound.TypeDecl(b, declList)
+    t:raw.TypeAlias =>
+        val b = types.Binding(t.name, context.counter)
+        val aliasType = stringToType(t.alias, context)
+        bound.TypeAlias(b, aliasType)
     default => error.report("not a declaration: " + raw.expToString(e),error.unknownLocation)
 
 def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:

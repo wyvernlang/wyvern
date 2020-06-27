@@ -33,6 +33,8 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
                 types.DefType(d.binding, d.argTyp, d.retTyp)
             else
                 error.report("argument typ in def doesn't match expected:" + types.typeToString(testType) + ", " + types.typeToString(d.retTyp),error.unknownLocation)
+    t:bound.TypeAlias =>     
+        types.TypeType(t.name, t.typ)
 
 def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
     v:bound.Var =>
@@ -76,9 +78,10 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
             val thisType = types.ValType(n.binding, n.typ)
             val ngamma = llist.Cons[DeclType](thisType, gamma)
             match d:
-                v:bound.Val      => typecheckDecl(d, gamma)
-                d:bound.Def      => typecheckDecl(d, ngamma)
-                t:bound.TypeDecl => typecheckDecl(d, ngamma)
+                v:bound.Val       => typecheckDecl(d, gamma)
+                d:bound.Def       => typecheckDecl(d, ngamma)
+                t:bound.TypeDecl  => typecheckDecl(d, ngamma)
+                t:bound.TypeAlias => typecheckDecl(d, ngamma)
         val decls = types.UnfoldedType(n.body.map[DeclType](x => typeNewDecls(x)))
         if (types.equalType(unfold, decls, gamma))
             n.typ

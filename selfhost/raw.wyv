@@ -14,6 +14,7 @@ datatype Exp
     Def(name:String, arg:String, argTyp:String, retTyp:String, body:String)
     ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
+    TypeAlias(name:String, alias:String)
     DefDecl(name:String, arg:String, argTyp:String, retTyp:String)
     New(thisName:String, typeName:String, body:String)
     Seq(exps:List[Exp])
