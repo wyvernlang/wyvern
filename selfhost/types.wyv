@@ -3,6 +3,7 @@ module types
 import wyvern.option
 import wyvern.collections.llist
 import error
+import wyvern.String
 type Option = option.Option
 type List = llist.LinkedList
 
@@ -49,6 +50,20 @@ def unfoldType(x:Type, gamma:List[DeclType]):UnfoldedType
 def equalBinding(b1:Binding, b2:Binding):Boolean
     b1.name == b2.name && b1.id == b2.id
 
+//nominal types that point to other nominal types form a tree,
+//so we find the "root" nominal type to compare if two aliases are equal
+def getNominalRoot(n:NominalType, gamma:List[DeclType]):NominalType
+    val pred = ((b:DeclType) =>
+        val z = match b:
+            t:TypeType => if (equalBinding(t.name, n.L)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
+            default => option.None[TypeType]()
+        z
+    )
+    val par = findInDeclList[TypeType](gamma, pred)
+    match par.typ:
+        nn:NominalType => getNominalRoot(nn,gamma)
+        default => n
+
 def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
     match a:
         v:ValType => match b:
@@ -67,7 +82,11 @@ def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
             v:UnitType => true
             default => equalType(unfoldType(t1,gamma),t2,gamma)
         n:NominalType => match t2:
-            v:NominalType => equalBinding(n.L, v.L)
+            v:NominalType => 
+                val r1 = getNominalRoot(n,gamma)
+                val r2 = getNominalRoot(v,gamma)
+                equalBinding(r1.L, r2.L)
+                //error.report("n: " + typeToString(n) + ", v: " + typeToString(v),error.unknownLocation)
             default => equalType(unfoldType(t1,gamma),t2,gamma)
         u:UnfoldedType => match t2:
             v:UnfoldedType =>
@@ -99,7 +118,7 @@ def declTypeToString(d:DeclType):String = match d:
 
 def typeToString(t:Type):String = match t:
     u:UnitType => "Unit"
-    n:NominalType => n.L.name
+    n:NominalType => n.L.name + " " + String.ofInt(n.L.id)
     u:UnfoldedType => 
         val s = u.decls.map[String](e => declTypeToString(e))
         s.foldLeft[String]((x:String,y:String) => x + ", " + y, "UNFLD: { ") + " }"

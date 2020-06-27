@@ -22,7 +22,7 @@ datatype Exp
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
     a:App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
-    l:Lambda => l.name + " => " + expToString(l.body)
+    l:Lambda => l.name + ":" + l.argTyp + " => " + expToString(l.body)
     c:Call   => expToString(c.receiver) + "." + c.name + "(" + expToString(c.arg) + ")" 
     f:Field  => expToString(f.receiver) + "." + f.field
     v:Val    => "val " + v.name + " = " + expToString(v.exp)

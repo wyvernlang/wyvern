@@ -20,8 +20,8 @@ def stringToType(s:String, ctx:bound.Context):types.Type
                     default => option.None[types.TypeType]()
                 z
             )
-            //val typ:types.Type = types.NominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
-            types.findInDeclList[types.TypeType](ctx.bindings, pred).typ
+            //types.findInDeclList[types.TypeType](ctx.bindings, pred).typ
+            types.NominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
 
 def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
     v:raw.ValType =>
@@ -75,13 +75,12 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         val defn = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(d.body)))
         bound.Def(b, argb, methodDecl.argTyp, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extend(argDecl)))
     t:raw.TypeDecl =>
-        val nominalb = types.Binding(t.name, context.counter)
-        val actualb = types.Binding(t.name, context.counter)
-        val nominalDecl = types.TypeType(nominalb, types.NominalType(actualb))
+        val b = types.Binding(t.name, context.counter)
+        val nominalDecl = types.TypeType(b, types.NominalType(b))
 
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
         val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(nominalDecl)))
-        bound.TypeDecl(actualb, declList)
+        bound.TypeDecl(b, declList)
     default => error.report("not a declaration: " + raw.expToString(e),error.unknownLocation)
 
 def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:

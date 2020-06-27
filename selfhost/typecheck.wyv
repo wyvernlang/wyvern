@@ -48,10 +48,11 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
     c:bound.Call => //T-Invk
         val recType = typecheckExpr(c.receiver, gamma)
         val unfold:types.UnfoldedType = types.unfoldType(recType, gamma)
+        val argt = typecheckExpr(c.arg,gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
                 da:types.DefType => 
-                    if (c.name == da.name.name && types.equalType(typecheckExpr(c.arg,gamma), da.argTyp, gamma)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
+                    if (c.name == da.name.name && types.equalType(argt, da.argTyp, gamma)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
                 default => option.None[types.DefType]()
             z
         )

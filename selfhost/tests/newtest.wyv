@@ -13,4 +13,4 @@ val foo = new this:Foo:
 
 val x = 5
 val abc = foo.sum(x+5)-3
-abc
+foo
