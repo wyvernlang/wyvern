@@ -1,8 +1,16 @@
-type Node:
-    var next:Node
-    def setNext(n:Node):Unit
+type List:
+    def sum(u:Unit):Int
 
+type Node:
+    def sum(u:Unit):Int
+    val next:List
+
+val empty = new this:List:
+    def sum(u:Unit):Int:
+        0
+    
 val root = new this:Node:
-    var next:Node
-    def setNext(n:Node):Unit:
-        this.next = n
+    def sum(u:Unit):Int:
+        1
+    val next = empty
+
