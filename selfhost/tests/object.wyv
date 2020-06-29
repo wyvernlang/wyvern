@@ -1,0 +1,8 @@
+type Node:
+    var next:Node
+    def setNext(n:Node):Unit
+
+val root = new this:Node:
+    var next:Node
+    def setNext(n:Node):Unit:
+        this.next = n
