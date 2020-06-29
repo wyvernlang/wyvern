@@ -17,6 +17,7 @@ val grammar: parsing.Grammar = ~
            | %val %identifier %eq Expression                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
            | %def %identifier %lparen %identifier %colon Type %rparen %colon Type %colon %block : a:Dyn => raw.Def(a.get(1).value, a.get(3).value, a.get(5), a.get(8), a.get(10).value)
            | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
+           | %type %identifier %eq %identifier                           : a:Dyn => raw.TypeAlias(a.get(1).value, a.get(3).value)
            | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
            | %def %identifier %lparen %identifier %colon Type %rparen %colon Type : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3).value, a.get(5), a.get(8))
            | %def %plus %lparen %identifier %colon Type %rparen %colon Type  : a:Dyn => raw.DefDecl("+", a.get(3).value, a.get(5), a.get(8))
@@ -27,7 +28,7 @@ val grammar: parsing.Grammar = ~
     Expression -> ExprLambda                              : a:Dyn => a.get(0) 
            
     ExprLambda -> ExprAddSub                              : a:Dyn => a.get(0)
-                | %identifier %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2))
+                | %identifier %colon Type %darrow ExprLambda          : a:Dyn => raw.Lambda(a.get(0).value, a.get(2), a.get(4))
 
     ExprAddSub -> ExprMultDiv                             : a:Dyn => a.get(0)
                 | ExprAddSub %plus ExprMultDiv            : a:Dyn => raw.Call(a.get(0),"+",a.get(2))

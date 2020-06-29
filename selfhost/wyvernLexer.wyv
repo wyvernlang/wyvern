@@ -272,13 +272,23 @@ def makeSecondLevelLexer():SecondLevelLexer = new (self) =>
             val firstTokens = self.lexLine(lineMatch.matched)
             printTokens(firstTokens)
             if (lineMatch.after == "")
-                firstTokens
+                def getBlocks():List[Dyn]
+                    val topState = self.lexerState.nth(0).getOrElse(() => DontCare())
+                    var pending:List[Dyn] = llist.Nil[Dyn]() // in reverse order
+                    match topState:
+                        b:Block => 
+                            val newblock = Token("block",b.text,-1,-1)
+                            pending = pending.push(newblock)
+                            self.lexerState = self.lexerState.drop(1).get()
+                            pending.append(getBlocks())
+                        default => llist.Nil[Dyn]()
+                firstTokens.append(getBlocks())
               else
                 val newlineMatch = regexUtils.doMatch(lineMatch.after, "\\r\\n|\\r|\\n")
                 val restTokens = self.lexLines(newlineMatch.after)
                 firstTokens.append(restTokens)
           else
-            llist.Nil[Dyn]()
+              llist.Nil[Dyn]()
         //js.log(newlineMatch.found)
         //js.log(newlineMatch.matched)
         //js.log(newlineMatch.after)

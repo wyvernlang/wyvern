@@ -4,20 +4,16 @@ type Int:
 
 type IntToInt:
     def f(i:Int):Int
-    val temp:Int
 
 val succ = new this:IntToInt:
     def f(i:Int):Int:
         i+1
-    val temp = 0
 
 type A:
     def f(i:IntToInt):Int
-    val temp:Int
 
 val apply0 = new this:A:
     def f(i:IntToInt):Int:
         i.f(0)
-    val temp = 0
 
 apply0.f(succ)

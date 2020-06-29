@@ -1,6 +1,9 @@
 module types
 
+import wyvern.option
 import wyvern.collections.llist
+import error
+type Option = option.Option
 type List = llist.LinkedList
 
 resource type Counter
@@ -18,40 +21,83 @@ def Binding(name:String, c:Counter):Binding
         val name = name
         val id = count
 
+def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
+    def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
+        match gamma:
+            c:llist.Cons => 
+                match (pred(c.value)):
+                    s:option.Some => s
+                    default => f(c.next, pred)
+            n:llist.Nil => option.None[T]()
+    match f(gamma, pred):
+        s:option.Some => s.get()
+        default => error.report("search in decllist failed",error.unknownLocation)
+
+def unfoldType(x:Type, gamma:List[DeclType]):UnfoldedType
+    match x:
+        u:UnitType => UnfoldedType(llist.Nil[DeclType]())
+        x:NominalType => 
+            val pred = ((b:DeclType) =>
+                val z = match b:
+                    t:TypeType => if (equalBinding(x.L, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
+                    default => option.None[TypeType]()
+                z
+            )
+            unfoldType(findInDeclList[TypeType](gamma, pred).typ, gamma)
+        u:UnfoldedType => u
+
 def equalBinding(b1:Binding, b2:Binding):Boolean
     b1.name == b2.name && b1.id == b2.id
 
-def equalDeclType(a:DeclType, b:DeclType):Boolean
+//nominal types that point to other nominal types form a tree,
+//so we find the "root" nominal type to compare if two aliases are equal
+def getNominalRoot(n:NominalType, gamma:List[DeclType]):NominalType
+    val pred = ((b:DeclType) =>
+        val z = match b:
+            t:TypeType => if (equalBinding(t.name, n.L)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
+            default => option.None[TypeType]()
+        z
+    )
+    val par = findInDeclList[TypeType](gamma, pred)
+    match par.typ:
+        nn:NominalType => getNominalRoot(nn,gamma)
+        default => n
+
+def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
     match a:
         v:ValType => match b:
-            u:ValType => v.name.name == u.name.name && equalType(v.typ,u.typ)
+            u:ValType => v.name.name == u.name.name && equalType(v.typ,u.typ,gamma)
             default => false
         t:TypeType => match b:
-            u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ)
+            u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ,gamma)
             default => false
         d:DefType => match b:
-            u:DefType => d.name.name == u.name.name && equalType(d.argTyp,u.argTyp) && equalType(d.retTyp,u.retTyp)
+            u:DefType => d.name.name == u.name.name && equalType(d.argTyp,u.argTyp,gamma) && equalType(d.retTyp,u.retTyp,gamma)
             default => false
 
-def equalType(t1:Type, t2:Type):Boolean
+def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
     match t1:
         u:UnitType => match t2:
             v:UnitType => true
-            default => false
+            default => equalType(unfoldType(t1,gamma),t2,gamma)
         n:NominalType => match t2:
-            v:NominalType => equalBinding(n.L, v.L)
-            default => false
+            v:NominalType => 
+                val r1 = getNominalRoot(n,gamma)
+                val r2 = getNominalRoot(v,gamma)
+                equalBinding(r1.L, r2.L)
+            default => equalType(unfoldType(t1,gamma),t2,gamma)
         u:UnfoldedType => match t2:
             v:UnfoldedType =>
                 if (u.decls.size() == v.decls.size())
-                        def f(a:List[DeclType], b:List[DeclType]):Boolean = match a:
-                            c:llist.Cons => match b:
-                                d:llist.Cons => equalDeclType(c.value,d.value) && f(c.next,d.next)
-                            n:llist.Nil => true
-                        f(u.decls, v.decls)
-                    else
-                        false
-            default => false
+                    def f(a:List[DeclType], b:List[DeclType]):Boolean = match a:
+                        c:llist.Cons => match b:
+                            d:llist.Cons => equalDeclType(c.value,d.value, gamma) && f(c.next,d.next)
+                            default => error.report("should never happens since lists are same len",error.unknownLocation)
+                        n:llist.Nil => true
+                    f(u.decls, v.decls)
+                  else
+                    false
+            default => equalType(t1,unfoldType(t2,gamma),gamma)
 
 datatype Type
     UnitType()
@@ -60,7 +106,7 @@ datatype Type
 
 datatype DeclType
     ValType(name:Binding, typ:Type)
-    TypeType(name:Binding, typ:UnfoldedType)
+    TypeType(name:Binding, typ:Type)
     DefType(name:Binding, argTyp:Type, retTyp:Type)
 
 def declTypeToString(d:DeclType):String = match d:
@@ -73,4 +119,4 @@ def typeToString(t:Type):String = match t:
     n:NominalType => n.L.name
     u:UnfoldedType => 
         val s = u.decls.map[String](e => declTypeToString(e))
-        s.foldLeft[String]((x:String,y:String) => x + ", " + y, "")
+        s.foldLeft[String]((x:String,y:String) => x + ", " + y, "UNFLD: { ") + " }"
