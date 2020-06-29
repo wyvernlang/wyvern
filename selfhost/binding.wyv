@@ -30,13 +30,14 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
     d:raw.DefDecl =>
         val b = types.Binding(d.name, context.counter)
         types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context))
-    /*
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
+        val nominalDecl = types.TypeType(b, types.NominalType(b))
+
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
-        val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(b)))
-        types.TypeType(b, types.UnfoldedType(declList))
-    */
+        val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(nominalDecl)))
+        types.TypeType(b,types.UnfoldedType(declList))
+
     default       => error.report("unexpected construct", error.unknownLocation)
 
 def makeSeq(e:raw.Exp):raw.Seq = match e: //ensures that the whole expression is a Seq, in program order--actually all the raw Seqs are reversed
