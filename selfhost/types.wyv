@@ -3,7 +3,6 @@ module types
 import wyvern.option
 import wyvern.collections.llist
 import error
-import wyvern.String
 type Option = option.Option
 type List = llist.LinkedList
 
@@ -86,7 +85,6 @@ def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
                 val r1 = getNominalRoot(n,gamma)
                 val r2 = getNominalRoot(v,gamma)
                 equalBinding(r1.L, r2.L)
-                //error.report("n: " + typeToString(n) + ", v: " + typeToString(v),error.unknownLocation)
             default => equalType(unfoldType(t1,gamma),t2,gamma)
         u:UnfoldedType => match t2:
             v:UnfoldedType =>
@@ -118,7 +116,7 @@ def declTypeToString(d:DeclType):String = match d:
 
 def typeToString(t:Type):String = match t:
     u:UnitType => "Unit"
-    n:NominalType => n.L.name + " " + String.ofInt(n.L.id)
+    n:NominalType => n.L.name
     u:UnfoldedType => 
         val s = u.decls.map[String](e => declTypeToString(e))
         s.foldLeft[String]((x:String,y:String) => x + ", " + y, "UNFLD: { ") + " }"

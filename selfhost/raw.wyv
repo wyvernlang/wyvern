@@ -30,6 +30,7 @@ def expToString(e:Exp):String = match e:
     d:Def    => "def " + d.name + "(" + d.arg + ":" + d.argTyp + "):" + d.retTyp + ":\n" + d.body
     v:ValType => "val " + v.name + ": " + v.typ
     t:TypeDecl => "type " + t.name + ":\n" + t.decls
+    t:TypeAlias => "type " + t.name + " = " + t.alias
     d:DefDecl => "def " + d.name + "(" + d.arg + ":" + d.argTyp + ")" + d.retTyp
     n:New => "new " + n.thisName + ":" + n.typeName + ":\n" + n.body
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")

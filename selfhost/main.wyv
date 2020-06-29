@@ -18,8 +18,6 @@ import toBytecode
 import wyvern.collections.llist
 import types
 import typecheck
-import error
-import wyvern.exception
 
 // instantiate imports and create aliases
 type List = llist.LinkedList
@@ -61,27 +59,9 @@ def parse(s:String):raw.Exp
 
 stdout.print("Binding...\n")
 val boundExp:bound.Statement = binding.bind(parser.results.get(0), s => parse(s))
-/*
-val boundExp : exception.Answer[bound.Statement,exception.Exception] = exception.try[bound.Statement](() => binding.bind(parser.results.get(0), s => parse(s)))
-match boundExp:
-    s1: exception.Success =>
-        stdout.print("success\n")
-    f1: exception.Failure =>
-        match f1.exception:
-            exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
-            default => stdout.print("unexpected exception thrown\n")
-            */
 
-//val tc = typecheck.typecheck(boundExp)
-//stdout.print("type: " + types.typeToString(tc) + "\n")
-val tc : exception.Answer[types.Type,exception.Exception] = exception.try[types.Type](() => typecheck.typecheck(boundExp))
-match tc:
-    s1: exception.Success =>
-        stdout.print("type: " + types.typeToString(s1.value) + "\n")
-    f1: exception.Failure =>
-        match f1.exception:
-            exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
-            default => stdout.print("unexpected exception thrown\n")
+val tc = typecheck.typecheck(boundExp)
+stdout.print("type: " + types.typeToString(tc) + "\n")
 
 stdout.print("Lowering...\n")
 val ooExp:bound.Statement = bound.lowerStatement(boundExp)
