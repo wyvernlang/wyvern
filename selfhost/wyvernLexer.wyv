@@ -24,9 +24,11 @@ def Token(t:String, value:String, line:Int, col:Int):Token = new
 
 /************** First Level Lexer ***************/
 
+// note: this lexer will never actually see a logline (\n, \r, or \r\n).  But we generate such tokens later on at line breaks
+
 val lowLevelLexer : lexing.Lexer = ~
         WS:         /[ \t]+/,
-        logline:    {match: /\n/, lineBreaks: true},
+        logline:    {match: /\\r\\n|\\r|\\n/, lineBreaks: true},
         identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ val : 'val', def : 'def', type : 'type', new_: 'new' })},
         lparen:     '(',
         rparen:     ')',
@@ -264,19 +266,29 @@ def makeSecondLevelLexer():SecondLevelLexer = new (self) =>
             
     // lex multiple lines to return a combined list (uses module-global variable, same as above)
     def lexLines(input:String):List[Dyn]
-        val lineMatch = regexUtils.doMatch(input, "[^\\n]*")
+        val lineMatch = regexUtils.doMatch(input, "[^\\r\\n]*")
         if (lineMatch.found)
-            js.log("reading line " + lineMatch.matched)
+            js.log("reading line \"" + lineMatch.matched + "\"")
             val firstTokens = self.lexLine(lineMatch.matched)
             printTokens(firstTokens)
             if (lineMatch.after == "")
-                firstTokens
+                def getBlocks():List[Dyn]
+                    val topState = self.lexerState.nth(0).getOrElse(() => DontCare())
+                    var pending:List[Dyn] = llist.Nil[Dyn]() // in reverse order
+                    match topState:
+                        b:Block => 
+                            val newblock = Token("block",b.text,-1,-1)
+                            pending = pending.push(newblock)
+                            self.lexerState = self.lexerState.drop(1).get()
+                            pending.append(getBlocks())
+                        default => llist.Nil[Dyn]()
+                firstTokens.append(getBlocks())
               else
-                val newlineMatch = regexUtils.doMatch(lineMatch.after, "\\n")
+                val newlineMatch = regexUtils.doMatch(lineMatch.after, "\\r\\n|\\r|\\n")
                 val restTokens = self.lexLines(newlineMatch.after)
                 firstTokens.append(restTokens)
           else
-            llist.Nil[Dyn]()
+              llist.Nil[Dyn]()
         //js.log(newlineMatch.found)
         //js.log(newlineMatch.matched)
         //js.log(newlineMatch.after)

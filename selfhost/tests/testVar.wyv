@@ -1,7 +1,11 @@
 type Int:
     def +(i:Int):Int
     def -(i:Int):Int
+
+type A:
     val a:Int
 
-val x = 5
--x.a.a+3-x
+val x = new this:A:
+    val a = 5
+
+x.a+3-x.a

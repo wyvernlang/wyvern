@@ -42,6 +42,9 @@ parser.feed(fileContents)
 js.log("Raw Results:\n")
 js.log(parser.results)
 
+if (parser.results.length() > 1)
+    js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
+
 js.log("Results:\n")
 stdout.print(raw.expToString(parser.results.get(0)))
 stdout.println()
@@ -50,18 +53,20 @@ def parse(s:String):raw.Exp
     val lex = wyvernLexer.makeLexer()
     val pars = wyvernParser.makeParser(lex)
     pars.feed(s)
+    if (pars.results.length() > 1)
+        js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
     pars.results.get(0)
 
 stdout.print("Binding...\n")
-val boundExp = binding.bind(parser.results.get(0), s => parse(s))
+val boundExp:bound.Statement = binding.bind(parser.results.get(0), s => parse(s))
+
 
 
 val tc = typecheck.typecheck(boundExp)
-stdout.print("type: " + types.typeToString(tc))
-stdout.println()
+stdout.print("type: " + types.typeToString(tc) + "\n")
 
 stdout.print("Lowering...\n")
-val ooExp = bound.lower(boundExp)
+val ooExp:bound.Statement = bound.lowerStatement(boundExp)
 
 val outputFileName = string.replace(fileName, ".wyv", ".wyb")
 

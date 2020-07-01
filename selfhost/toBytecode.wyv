@@ -4,41 +4,38 @@ import bound
 import bytecode
 import wyvern.collections.llist
 import error
+type List = llist.LinkedList
 
 val b = bytecode(javascript, js)
 
-// to bytecode
-def toBytecodeMethod(m:bound.Method):b.MethodDecl
-    b.MethodDecl(m.name, llist.Singleton[String](m.binding.name), toBytecode(m.body))
+def toBytecode(e:bound.Statement):b.SeqExpr
+    b.SeqExpr(toBytecodeStmt(e))
 
-def toBytecodeDecl(e:bound.Exp):b.Decl = match e:
-    v:bound.Val => b.ValDecl(v.binding.name, toBytecode(v.exp))
-    d:bound.Def => b.MethodDecl(d.binding.name, llist.Singleton[String](d.arg.name), toBytecode(d.body))
+def toBytecodeStmt(e:bound.Statement):List[b.SeqStmt] = match e:
+    d:bound.DeclStatement => 
+        val declBytecode = b.DeclStmt(toBytecodeDecl(d.decl))
+        val stmtBytecode = toBytecodeStmt(d.stmt)
+        llist.Cons[b.SeqStmt](declBytecode, stmtBytecode)
+    e:bound.ExprStatement => 
+        llist.Singleton[b.SeqStmt](b.ExpStmt(toBytecodeExpr(e.exp)))
+
+def toBytecodeDecl(e:bound.Decl):b.Decl = match e:
+    v:bound.Val       => b.ValDecl(v.binding.name, toBytecodeExpr(v.exp))
+    d:bound.Def       => b.MethodDecl(d.binding.name, llist.Singleton[String](d.arg.name), b.SeqExpr(toBytecodeStmt(d.body)))
+    t:bound.TypeDecl  => b.ValDecl("_", toBytecodeExpr(bound.UnitVal()))
+    t:bound.TypeAlias => b.ValDecl("_", toBytecodeExpr(bound.UnitVal()))
     default => error.report("not a declaration",error.unknownLocation)
 
-def toBytecode(e:bound.Exp):b.Expr = match e:
-    v:bound.Var   => b.VarExpr(v.binding.name)
-    o:bound.Obj   => b.NewExpr("this", o.meths.map[b.MethodDecl](m => toBytecodeMethod(m)))
-    c:bound.Call  => b.CallExpr(toBytecode(c.receiver), c.name, llist.Singleton[b.Expr](toBytecode(c.arg)), false)
-    f:bound.Field => b.AccessExpr(toBytecode(f.receiver), f.field)
-    s:bound.Seq   =>
-        val processStmt : bound.Exp -> b.SeqStmt = (exp =>
-          val result:b.SeqStmt = match exp:
-            v:bound.Val => b.DeclStmt(toBytecodeDecl(v))
-            d:bound.Def => b.DeclStmt(toBytecodeDecl(d))
-            default     => b.ExpStmt(toBytecode(exp))
-          result
-        )
-        // TODO: should be able to put this lambda inline!
-        val seqStmts = s.exps.map[b.SeqStmt](processStmt)
-        b.SeqExpr(seqStmts)
-    // no "val" case - should exist only under Seq
+def toBytecodeExpr(e:bound.Exp):b.Expr = match e:
+    v:bound.Var     => b.VarExpr(v.binding.name)
+    c:bound.Call    => b.CallExpr(toBytecodeExpr(c.receiver), c.name, llist.Singleton[b.Expr](toBytecodeExpr(c.arg)), false)
+    f:bound.Field   => b.AccessExpr(toBytecodeExpr(f.receiver), f.field)
     // no lambda or app case - should have been lowered away
-    n:bound.New     => b.NewExpr(n.binding.name, n.body.map[b.Decl](e => toBytecodeDecl(e)))
+    n:bound.New     => b.NewExpr(n.binding.name, n.body.map[b.Decl](d => toBytecodeDecl(d)))
     i:bound.Integer => b.IntLit(i.str)
     u:bound.UnitVal => b.IntLit("0")
 
-def writeExpToFile(e:bound.Exp, filename:String):Unit
+def writeExpToFile(e:bound.Statement, filename:String):Unit
     js.log("Converting expression to bytecode...\n")
     val expBytecode = toBytecode(e)
     //js.log(d.sequenceExpression.statements.get(0).declaration)

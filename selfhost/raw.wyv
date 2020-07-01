@@ -7,31 +7,35 @@ type List = llist.LinkedList
 datatype Exp
     Var(name:String)
     App(func:Exp, arg:Exp)
-    Lambda(name:String, body:Exp)
+    Lambda(name:String, argTyp:String, body:Exp)
     Call(receiver:Exp, name:String, arg:Exp)
     Field(receiver:Exp, field:String)
     Val(name:String, exp:Exp)
-    Def(name:String, arg:String, argTyp:String, retTyp:String, body:Exp)
+    ValAnnot(name:String, typ:String, exp:Exp)
+    Def(name:String, arg:String, argTyp:String, retTyp:String, body:String)
     ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
+    TypeAlias(name:String, alias:String)
     DefDecl(name:String, arg:String, argTyp:String, retTyp:String)
-    New(name:String, body:String)
+    New(thisName:String, typeName:String, body:String)
     Seq(exps:List[Exp])
     Integer(str:String)    
+    UnitVal()
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
     a:App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
-    l:Lambda => l.name + " => " + expToString(l.body)
+    l:Lambda => l.name + ":" + l.argTyp + " => " + expToString(l.body)
     c:Call   => expToString(c.receiver) + "." + c.name + "(" + expToString(c.arg) + ")" 
     f:Field  => expToString(f.receiver) + "." + f.field
     v:Val    => "val " + v.name + " = " + expToString(v.exp)
-    d:Def    => "def " + d.name + "(" + d.arg + ":" + d.argTyp + "):" + d.retTyp + " = " + expToString(d.body)
+    d:Def    => "def " + d.name + "(" + d.arg + ":" + d.argTyp + "):" + d.retTyp + ":\n" + d.body
     v:ValType => "val " + v.name + ": " + v.typ
     t:TypeDecl => "type " + t.name + ":\n" + t.decls
-    d:DefDecl => "defdecl"
-    n:New => "new " + n.name + ":\n" + n.body
+    t:TypeAlias => "type " + t.name + " = " + t.alias
+    d:DefDecl => "def " + d.name + "(" + d.arg + ":" + d.argTyp + ")" + d.retTyp
+    n:New => "new " + n.thisName + ":" + n.typeName + ":\n" + n.body
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")
     i:Integer => i.str
-    default   => "typecheck issue!"
-
+    u:UnitVal => "()"
+    default   => "typecheck issue!" 

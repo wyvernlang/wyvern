@@ -1,0 +1,19 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type IntToInt:
+    def f(i:Int):Int
+
+val succ = new this:IntToInt:
+    def f(i:Int):Int:
+        i+1
+
+type A:
+    def f(i:IntToInt):Int
+
+val apply0 = new this:A:
+    def f(i:IntToInt):Int:
+        i.f(0)
+
+apply0.f(succ)

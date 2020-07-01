@@ -1,0 +1,22 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Foo:
+    def sum(x:Int):Int
+    val a:Int
+
+val foo = new this:Foo:
+    def sum(x:Int):Int:
+        this.a + x    
+    val a = 5
+
+type Bar = Foo
+val bar = new this:Bar:
+    def sum(x:Int):Int:
+        this.a + x    
+    val a = 5
+
+val x = 3
+val abc = foo.sum(x+5)-3 + bar.sum(1)
+abc

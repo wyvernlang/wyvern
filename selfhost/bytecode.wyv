@@ -69,7 +69,6 @@ tagged type MethodDecl extends Decl
 tagged type ValDecl extends Decl
     val variableDeclaration : VDecl
 
-
 // Public types representing Expressions
 tagged type Expr
 tagged type LitExpr extends Expr
