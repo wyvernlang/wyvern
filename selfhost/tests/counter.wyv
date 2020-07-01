@@ -1,0 +1,20 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Counter:
+    val a:Int
+    def next(u:Unit):Counter
+
+type X:
+    def makeCounter(b:Int):Counter
+
+val x = new self:X:
+    def makeCounter(b:Int):Counter:
+        new this:Counter:    
+            val a = b
+            def next(u:Unit):Counter:
+                self.makeCounter(this.a+1)
+
+val c = x.makeCounter(1)
+c.next(()).a

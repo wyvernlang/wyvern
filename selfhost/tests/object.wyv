@@ -1,16 +1,34 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
 type List:
+    def sum(u:Unit):Int
+
+type Empty:
     def sum(u:Unit):Int
 
 type Node:
     def sum(u:Unit):Int
     val next:List
 
-val empty = new this:List:
+val empty = new this:Empty:
     def sum(u:Unit):Int:
         0
     
 val root = new this:Node:
     def sum(u:Unit):Int:
-        1
+        this.next.sum(()) + 1
     val next = empty
 
+val root2 = new this:Node:
+    def sum(u:Unit):Int:
+        this.next.sum(()) + 1
+    val next = root
+
+val root3 = new this:Node:
+    def sum(u:Unit):Int:
+        this.next.sum(()) + 1
+    val next = root2
+
+root3.sum(())

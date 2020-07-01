@@ -88,6 +88,13 @@ def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
             default => equalType(unfoldType(t1,gamma),t2,gamma)
         u:UnfoldedType => match t2:
             v:UnfoldedType =>
+                def isValidDecl(d:DeclType):Boolean
+                    val search = llist.find[DeclType](u.decls, (e:DeclType) => equalDeclType(e,d,gamma))
+                    match search:
+                        s:option.Some => true
+                        default => false
+                v.decls.foldRight[Boolean]((x:DeclType,y:Boolean) => isValidDecl(x) && y, true)
+                /*
                 if (u.decls.size() == v.decls.size())
                     def f(a:List[DeclType], b:List[DeclType]):Boolean = match a:
                         c:llist.Cons => match b:
@@ -97,7 +104,49 @@ def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
                     f(u.decls, v.decls)
                   else
                     false
+                    */
             default => equalType(t1,unfoldType(t2,gamma),gamma)
+
+type SubtypePair
+    val S:Type
+    val T:Type
+
+def SubtypePair(S:Type, T:Type):SubtypePair = new
+    val S = S
+    val T = T
+
+def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType], stack:List[SubtypePair]):Boolean = match a:
+    v:ValType => match b:    
+        u:ValType => v.name.name == u.name.name && isSubtypeHelper(v.typ,u.typ,gamma,stack)
+        default => false
+    t:TypeType => match b:
+        u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ,gamma)
+        default => false
+    d:DefType => match b:
+        u:DefType => d.name.name == u.name.name && isSubtypeHelper(u.argTyp,d.argTyp,gamma,stack) && isSubtypeHelper(d.retTyp,u.retTyp,gamma,stack)
+        default => false
+
+def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
+    isSubtypeHelper(t1,t2,gamma,llist.Nil[SubtypePair]())
+
+def isSubtypeHelper(t1:Type, t2:Type, gamma:List[DeclType], stack:List[SubtypePair]):Boolean
+    //if t1 <: t2 appears within its own judgement, return true
+    val findPrev = llist.find[SubtypePair](stack, (j:SubtypePair) => equalType(j.S,t1,gamma) && equalType(j.T,t2,gamma))
+    match findPrev:
+        s:option.Some => true    
+        default => 
+            if (equalType(t1,t2,gamma))
+                true
+              else
+                val newstack = llist.Cons[SubtypePair](SubtypePair(t1,t2), stack)
+                val u = unfoldType(t1,gamma)
+                val v = unfoldType(t2,gamma)
+                def isValidDecl(d:DeclType):Boolean
+                    val search = llist.find[DeclType](u.decls, (e:DeclType) => isSubtypeDecl(e,d,gamma,newstack))
+                    match search:
+                        s:option.Some => true
+                        default => false
+                v.decls.foldRight[Boolean]((x:DeclType,y:Boolean) => isValidDecl(x) && y, true)
 
 datatype Type
     UnitType()

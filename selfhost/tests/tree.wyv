@@ -1,0 +1,35 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Tree:
+    def sum(u:Unit):Int
+
+type Empty:
+    def sum(u:Unit):Int
+
+type Branch:
+    def sum(u:Unit):Int
+    val a:Int
+    val left:Tree
+    val right:Tree
+
+val empty:Empty = new this:Empty:
+    def sum(u:Unit):Int:
+        0
+
+val b1:Branch = new this:Branch:
+    def sum(u:Unit):Int:
+        this.a + this.left.sum(()) + this.right.sum(())
+    val a:Int = 3
+    val left:Tree = empty
+    val right:Tree = empty
+
+val b2:Branch = new this:Branch:
+    def sum(u:Unit):Int:
+        this.a + this.left.sum(()) + this.right.sum(())
+    val a:Int = 2
+    val left:Tree = b1
+    val right:Tree = empty
+
+b2
