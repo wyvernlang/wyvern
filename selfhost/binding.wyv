@@ -53,8 +53,7 @@ def bindStatement(e:raw.Seq, context:bound.Context):bound.Statement = match e.ex
             val b:bound.Decl = bindDecl(c.value, context)
             val decl:DeclType = match b:
                 v:bound.Val =>
-                    val expType = typecheck.typecheckExpr(v.exp, context.bindings)
-                    types.ValType(v.binding, expType)
+                    types.ValType(v.binding, v.typ)
                 d:bound.Def =>
                     types.DefType(d.binding, d.argTyp, d.retTyp)
                 t:bound.TypeDecl =>
@@ -69,7 +68,17 @@ def bindStatement(e:raw.Seq, context:bound.Context):bound.Statement = match e.ex
 def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
     v:raw.Val => 
         val b = types.Binding(v.name, context.counter)
-        bound.Val(b, bindExpr(v.exp, context))
+        val body = bindExpr(v.exp, context)
+        val expType = typecheck.typecheckExpr(body, context.bindings)
+        bound.Val(b, expType, body)
+    v:raw.ValAnnot =>
+        val b = types.Binding(v.name, context.counter)
+        val body = bindExpr(v.exp, context)
+        val expType = typecheck.typecheckExpr(body, context.bindings)
+        val annotType = stringToType(v.typ,context)
+        if (!types.isSubtype(expType,annotType,context.bindings))
+            error.report("val expr doesn't match annotation",error.unknownLocation)
+        bound.Val(b, annotType, body)
     d:raw.Def =>
         val b = types.Binding(d.name, context.counter)
         val methodDecl = types.DefType(b, stringToType(d.argTyp,context), stringToType(d.retTyp,context))
@@ -130,4 +139,5 @@ def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
         val boundDecls:List[bound.Decl] = parsedBody.exps.map[bound.Decl]((e:raw.Exp) => bindDecl(e, context.extend(thisDecl)))
         bound.New(b, typ, boundDecls)
     i:raw.Integer     => bound.Integer(i.str)
+    u:raw.UnitVal     => bound.UnitVal()
     default      => error.report("unexpected construct in bindexpr: " + raw.expToString(e), error.unknownLocation)

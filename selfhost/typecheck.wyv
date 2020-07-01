@@ -29,7 +29,7 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
     d:bound.Def =>
         val vt = types.ValType(d.arg, d.argTyp)
         val testType = typecheckStmt(d.body, llist.Cons[DeclType](vt, gamma))
-        if (types.equalType(testType, d.retTyp, gamma))
+        if (types.isSubtype(testType, d.retTyp, gamma))
                 types.DefType(d.binding, d.argTyp, d.retTyp)
             else
                 error.report("argument typ in def doesn't match expected:" + types.typeToString(testType) + ", " + types.typeToString(d.retTyp),error.unknownLocation)
@@ -54,7 +54,7 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
         val pred = ((b:DeclType) =>
             val z = match b:
                 da:types.DefType => 
-                    if (c.name == da.name.name && types.equalType(argt, da.argTyp, gamma)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
+                    if (c.name == da.name.name && types.isSubtype(argt, da.argTyp, gamma)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
                 default => option.None[types.DefType]()
             z
         )
@@ -83,7 +83,7 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 t:bound.TypeDecl  => typecheckDecl(d, ngamma)
                 t:bound.TypeAlias => typecheckDecl(d, ngamma)
         val decls = types.UnfoldedType(n.body.map[DeclType](x => typeNewDecls(x)))
-        if (types.equalType(unfold, decls, gamma))
+        if (types.isSubtype(decls, unfold, gamma))
             n.typ
           else
             error.report("invalid new expression, unfold = " + types.typeToString(unfold) + "\nnewexpr = " + types.typeToString(decls),error.unknownLocation)
@@ -97,5 +97,7 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
             z
         ) 
         types.NominalType(types.findInDeclList[types.TypeType](gamma, pred).name)
+
+    u:bound.UnitVal => types.UnitType()
 
     default => error.report("type error: unrecognized expression",error.unknownLocation)
