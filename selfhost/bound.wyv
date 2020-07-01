@@ -13,6 +13,7 @@ resource type Context
     val counter:Counter
     val parse:String -> raw.Exp
     def extend(b:DeclType):Context
+    def extendList(b:List[DeclType]):Context
 
 def Context(bs:List[DeclType], c:Counter, p:String -> raw.Exp) : Context = new
     val bindings = bs
@@ -20,8 +21,18 @@ def Context(bs:List[DeclType], c:Counter, p:String -> raw.Exp) : Context = new
     val parse = p
     def extend(b:DeclType):Context
         Context(llist.Cons[DeclType](b, bs), c, p)
+    def extendList(b:List[DeclType]):Context
+        val newBindings = b.append(bs)
+        Context(newBindings,c,p)
     
 def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[DeclType](), types.Counter(), p)
+
+type Arg
+    val arg:Binding
+    val argTyp:types.Type
+def Arg(arg:Binding,argTyp:types.Type):Arg = new
+    val arg = arg
+    val argTyp = argTyp
 
 datatype Statement
     DeclStatement(decl:Decl, stmt:Statement)
@@ -29,7 +40,7 @@ datatype Statement
 
 datatype Decl
     Val(binding:Binding, typ:types.Type, exp:Exp)
-    Def(binding:Binding, arg:Binding, argTyp:types.Type, retTyp:types.Type, body:Statement)
+    Def(binding:Binding, args:List[Arg], retTyp:types.Type, body:Statement)
     TypeDecl(name:Binding, members:List[DeclType])
     TypeAlias(name:Binding, typ:types.Type)
 
@@ -47,7 +58,7 @@ def lowerStatement(stmt:Statement):Statement = match stmt:
 
 def lowerDecl(decl:Decl):Decl = match decl:
     v:Val       => Val(v.binding, v.typ, lowerExp(v.exp))
-    d:Def       => Def(d.binding, d.arg, d.argTyp, d.retTyp, lowerStatement(d.body))
+    d:Def       => Def(d.binding, d.args, d.retTyp, lowerStatement(d.body))
     t:TypeDecl  => t
     t:TypeAlias => t
 

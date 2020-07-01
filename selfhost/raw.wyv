@@ -3,6 +3,14 @@ module raw
 import wyvern.collections.llist
 type List = llist.LinkedList
 
+type Arg
+    val arg:String
+    val argTyp:String
+def Arg(arg:String,argTyp:String):Arg = new
+    val arg = arg
+    val argTyp = argTyp
+def extendArgs(a:Arg,ls:List[Arg]):List[Arg]
+    llist.Cons[Arg](a,ls)
 
 datatype Exp
     Var(name:String)
@@ -12,15 +20,20 @@ datatype Exp
     Field(receiver:Exp, field:String)
     Val(name:String, exp:Exp)
     ValAnnot(name:String, typ:String, exp:Exp)
-    Def(name:String, arg:String, argTyp:String, retTyp:String, body:String)
+    Def(name:String, args:List[Arg], retTyp:String, body:String)
     ValType(name:String, typ:String)
     TypeDecl(name:String, decls:String)
     TypeAlias(name:String, alias:String)
-    DefDecl(name:String, arg:String, argTyp:String, retTyp:String)
+    DefDecl(name:String, args:List[Arg], retTyp:String)
     New(thisName:String, typeName:String, body:String)
     Seq(exps:List[Exp])
     Integer(str:String)    
     UnitVal()
+
+def argsToString(args:List[Arg]):String = match args:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => c.value.arg + ":" + c.value.argTyp
+        default => c.value.arg + ":" + c.value.argTyp + ", " + argsToString(c.next)
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
@@ -29,11 +42,12 @@ def expToString(e:Exp):String = match e:
     c:Call   => expToString(c.receiver) + "." + c.name + "(" + expToString(c.arg) + ")" 
     f:Field  => expToString(f.receiver) + "." + f.field
     v:Val    => "val " + v.name + " = " + expToString(v.exp)
-    d:Def    => "def " + d.name + "(" + d.arg + ":" + d.argTyp + "):" + d.retTyp + ":\n" + d.body
+    v:ValAnnot    => "val " + v.name + ":" + v.typ + " = " + expToString(v.exp)
+    d:Def    => "def " + d.name + "(" + argsToString(d.args) + "):" + d.retTyp + ":\n" + d.body
     v:ValType => "val " + v.name + ": " + v.typ
     t:TypeDecl => "type " + t.name + ":\n" + t.decls
     t:TypeAlias => "type " + t.name + " = " + t.alias
-    d:DefDecl => "def " + d.name + "(" + d.arg + ":" + d.argTyp + ")" + d.retTyp
+    d:DefDecl => "def " + d.name + "(" + argsToString(d.args) + ")" + d.retTyp
     n:New => "new " + n.thisName + ":" + n.typeName + ":\n" + n.body
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")
     i:Integer => i.str

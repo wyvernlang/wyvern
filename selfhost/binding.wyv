@@ -20,7 +20,6 @@ def stringToType(s:String, ctx:bound.Context):types.Type
                     default => option.None[types.TypeType]()
                 z
             )
-            //types.findInDeclList[types.TypeType](ctx.bindings, pred).typ
             types.NominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
 
 def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
@@ -29,7 +28,8 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
         types.ValType(b,stringToType(v.typ, context))
     d:raw.DefDecl =>
         val b = types.Binding(d.name, context.counter)
-        types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context))
+        val args = d.args.map[types.Type]((e:raw.Arg) => stringToType(e.argTyp,context))
+        types.DefType(b, args, stringToType(d.retTyp,context))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
         val nominalDecl = types.TypeType(b, types.NominalType(b))
@@ -81,11 +81,18 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         bound.Val(b, annotType, body)
     d:raw.Def =>
         val b = types.Binding(d.name, context.counter)
-        val methodDecl = types.DefType(b, stringToType(d.argTyp,context), stringToType(d.retTyp,context))
-        val argb = types.Binding(d.arg, context.counter)
-        val argDecl = types.ValType(argb, methodDecl.argTyp)
+        def rawToBoundArg(a:raw.Arg):bound.Arg
+            val argb = types.Binding(a.arg, context.counter)
+            val argDecl = types.ValType(argb, stringToType(a.argTyp,context))
+            bound.Arg(argb,argDecl)
+        val arglist = d.args.map[bound.Arg](a => rawToBoundArg(a))
+        val argtypes = arglist.map[types.Type]((a:bound.Arg) => a.argTyp)
+        val argdecls = arglist.map[types.ValType]((a:bound.Arg) => types.ValType(a.arg,a.argTyp))
+
+        val methodDecl = types.DefType(b, argtypes, stringToType(d.retTyp,context))
+
         val defn = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(d.body)))
-        bound.Def(b, argb, methodDecl.argTyp, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extend(argDecl)))
+        bound.Def(b, arglist, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extendList(argdecls)))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
         val nominalDecl = types.TypeType(b, types.NominalType(b))
