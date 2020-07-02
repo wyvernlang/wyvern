@@ -41,7 +41,7 @@ def callListToString(args:List[Exp]):String = match args:
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
-    a:App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
+    a:App    => "((" + expToString(a.func) + ") (" + expToString(a.arg) + "))"
     l:Lambda => l.name + ":" + l.argTyp + " => " + expToString(l.body)
     c:Call   => expToString(c.receiver) + "." + c.name + "(" + callListToString(c.args) + ")" 
     f:Field  => expToString(f.receiver) + "." + f.field

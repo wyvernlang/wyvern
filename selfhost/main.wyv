@@ -18,8 +18,6 @@ import toBytecode
 import wyvern.collections.llist
 import types
 import typecheck
-import error
-import wyvern.exception
 
 // instantiate imports and create aliases
 type List = llist.LinkedList
@@ -71,6 +69,7 @@ match boundExp:
             exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
             default => stdout.print("unexpected exception thrown\n")
 */
+
 val tc = typecheck.typecheck(boundExp)
 stdout.print("type: " + types.typeToString(tc) + "\n")
 

@@ -116,7 +116,25 @@ def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
         )
         val binding = types.findInDeclList[types.ValType](context.bindings, pred).name
         bound.Var(binding)
-    a:raw.App    => bound.Call(bindExpr(a.func, context), "apply", llist.Singleton[bound.Exp](bindExpr(a.arg, context)))
+    a:raw.App    => 
+        val rec = bindExpr(a.func, context)
+        val arg = bindExpr(a.arg, context)
+        val app = bound.Call(rec, "apply", llist.Singleton[bound.Exp](arg))
+        match rec:
+            f:bound.Field => 
+                //check if field is actually a method
+                val recType = typecheck.typecheckExpr(f.receiver,context.bindings)
+                val pred = ((b:types.DeclType) =>
+                    val z = match b:
+                        d:types.DefType => f.field == d.name.name
+                        default => false
+                    z
+                )
+                val searchMethod = llist.find[types.DeclType](types.unfoldType(recType,context.bindings).decls, pred)
+                match searchMethod:
+                    s:option.Some => bound.Call(f.receiver, f.field, llist.Singleton[bound.Exp](arg))
+                    default => app
+            default => app
     l:raw.Lambda =>
         val argb = types.Binding(l.name, context.counter)
         val argDecl = types.ValType(argb, stringToType(l.argTyp, context))

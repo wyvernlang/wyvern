@@ -8,18 +8,16 @@ type Fib:
     def next(u:Unit):Fib
 
 type X:
-    def makeCounter(x:Int,y:Int):Fib
+    def makeFib(x:Int,y:Int):Fib
 
 val x = new self:X:
-    def makeCounter(x:Int,y:Int):Fib:
+    def makeFib(x:Int,y:Int):Fib:
         new this:Fib:    
             val a1 = x
             val a2 = y
             def next(u:Unit):Fib:
-                self.makeCounter(y,x+y)
+                self.makeFib(y,x+y)
 
-val c = x.makeCounter(1,1)
-val d = c.next(())
-val e = d.next(())
-val f = e.next(())
-f.next(()).a2
+val c = x.makeFib(1,1)
+val d = (((c.next ()).next ()).next ()).next ()
+(d.next ()).a2

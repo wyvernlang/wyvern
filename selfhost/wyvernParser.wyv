@@ -58,7 +58,7 @@ val grammar: parsing.Grammar = ~
              | ExprDot %dot %identifier %lparen CallList %rparen   : a:Dyn => raw.Call(a.get(0), a.get(2).value, a.get(4))
              | ExprDot %dot %identifier                   : a:Dyn => raw.Field(a.get(0), a.get(2).value)
 
-    CallList -> Expression                                : a:Dyn => Single(a.get(0))
+    CallList -> Expression %comma Expression              : a:Dyn => llist.Cons[raw.Exp](a.get(0),Single(a.get(2)))
               | Expression %comma CallList                : a:Dyn => llist.Cons[raw.Exp](a.get(0),a.get(2))
 
     Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
