@@ -9,14 +9,12 @@ type Arg
 def Arg(arg:String,argTyp:String):Arg = new
     val arg = arg
     val argTyp = argTyp
-def extendArgs(a:Arg,ls:List[Arg]):List[Arg]
-    llist.Cons[Arg](a,ls)
 
 datatype Exp
     Var(name:String)
     App(func:Exp, arg:Exp)
     Lambda(name:String, argTyp:String, body:Exp)
-    Call(receiver:Exp, name:String, arg:Exp)
+    Call(receiver:Exp, name:String, args:List[Exp])
     Field(receiver:Exp, field:String)
     Val(name:String, exp:Exp)
     ValAnnot(name:String, typ:String, exp:Exp)
@@ -35,11 +33,17 @@ def argsToString(args:List[Arg]):String = match args:
         n:llist.Nil => c.value.arg + ":" + c.value.argTyp
         default => c.value.arg + ":" + c.value.argTyp + ", " + argsToString(c.next)
 
+def callListToString(args:List[Exp]):String = match args:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => expToString(c.value)
+        default => expToString(c.value) + ", " + callListToString(c.next)
+    default => "call list empty!"
+
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
     a:App    => "(" + expToString(a.func) + ") (" + expToString(a.arg) + ")"
     l:Lambda => l.name + ":" + l.argTyp + " => " + expToString(l.body)
-    c:Call   => expToString(c.receiver) + "." + c.name + "(" + expToString(c.arg) + ")" 
+    c:Call   => expToString(c.receiver) + "." + c.name + "(" + callListToString(c.args) + ")" 
     f:Field  => expToString(f.receiver) + "." + f.field
     v:Val    => "val " + v.name + " = " + expToString(v.exp)
     v:ValAnnot    => "val " + v.name + ":" + v.typ + " = " + expToString(v.exp)

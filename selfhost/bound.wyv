@@ -46,7 +46,7 @@ datatype Decl
 
 datatype Exp
     Var(binding:Binding)
-    Call(receiver:Exp, name:String, arg:Exp)
+    Call(receiver:Exp, name:String, args:List[Exp])
     Field(receiver:Exp, field:String)
     New(binding:Binding, typ:types.Type, body:List[Decl])
     Integer(str:String)
@@ -64,7 +64,7 @@ def lowerDecl(decl:Decl):Decl = match decl:
 
 def lowerExp(exp:Exp):Exp = match exp:
     v:Var     => v
-    c:Call    => Call(lowerExp(c.receiver), c.name, lowerExp(c.arg))
+    c:Call    => Call(lowerExp(c.receiver), c.name, c.args.map[Exp](e => lowerExp(e)))
     f:Field   => Field(lowerExp(f.receiver), f.field)
     n:New     => New(n.binding, n.typ, n.body.map[Decl](d => lowerDecl(d)))
     i:Integer => i

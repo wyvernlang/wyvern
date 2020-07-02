@@ -64,15 +64,15 @@ def getNominalRoot(n:NominalType, gamma:List[DeclType]):NominalType
         default => n
 
 def checkArgList(xs:List[Type],ys:List[Type],pred:Type->Type->Boolean):Boolean
-    if (xs.size() != ys.size())
-        false
-      else
+    if (xs.size() == ys.size())
         def f(xs:List[Type],ys:List[Type]):Boolean = match xs:
             a:llist.Cons => match ys:
                 b:llist.Cons =>   
                     (pred(a.value)(b.value)) && f(a.next,b.next)
             default => true
         f(xs,ys)
+      else
+        false
 
 def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
     match a:
@@ -127,7 +127,7 @@ def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType], stack:List[Subty
     d:DefType => match b:
         u:DefType => 
             val pred = x:Type => y:Type => isSubtypeHelper(x,y,gamma,stack)
-            d.name.name == u.name.name && checkArgList(d.args,u.args,pred) && isSubtypeHelper(d.retTyp,u.retTyp,gamma,stack)
+            d.name.name == u.name.name && checkArgList(u.args,d.args,pred) && isSubtypeHelper(d.retTyp,u.retTyp,gamma,stack)
         default => false
 
 def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
