@@ -20,7 +20,6 @@ def stringToType(s:String, ctx:bound.Context):types.Type
                     default => option.None[types.TypeType]()
                 z
             )
-            //types.findInDeclList[types.TypeType](ctx.bindings, pred).typ
             types.NominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
 
 def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
@@ -29,7 +28,8 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
         types.ValType(b,stringToType(v.typ, context))
     d:raw.DefDecl =>
         val b = types.Binding(d.name, context.counter)
-        types.DefType(b, stringToType(d.argTyp, context), stringToType(d.retTyp,context))
+        val argtypes = d.args.map[types.Type]((e:raw.Arg) => stringToType(e.argTyp,context))
+        types.DefType(b, argtypes, stringToType(d.retTyp,context))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
         val nominalDecl = types.TypeType(b, types.NominalType(b))
@@ -55,7 +55,7 @@ def bindStatement(e:raw.Seq, context:bound.Context):bound.Statement = match e.ex
                 v:bound.Val =>
                     types.ValType(v.binding, v.typ)
                 d:bound.Def =>
-                    types.DefType(d.binding, d.argTyp, d.retTyp)
+                    types.DefType(d.binding, d.args.map[types.Type](e => e.argTyp), d.retTyp)
                 t:bound.TypeDecl =>
                     types.TypeType(t.name, types.UnfoldedType(t.members))
                 t:bound.TypeAlias =>
@@ -81,11 +81,17 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         bound.Val(b, annotType, body)
     d:raw.Def =>
         val b = types.Binding(d.name, context.counter)
-        val methodDecl = types.DefType(b, stringToType(d.argTyp,context), stringToType(d.retTyp,context))
-        val argb = types.Binding(d.arg, context.counter)
-        val argDecl = types.ValType(argb, methodDecl.argTyp)
+        def rawToBoundArg(a:raw.Arg):bound.Arg
+            val argb = types.Binding(a.arg, context.counter)
+            bound.Arg(argb,stringToType(a.argTyp,context))
+        val arglist = d.args.map[bound.Arg](a => rawToBoundArg(a))
+        val argtypes = arglist.map[types.Type]((a:bound.Arg) => a.argTyp)
+        val argdecls = arglist.map[types.ValType]((a:bound.Arg) => types.ValType(a.arg,a.argTyp))
+
+        val methodDecl = types.DefType(b, argtypes, stringToType(d.retTyp,context))
+
         val defn = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(d.body)))
-        bound.Def(b, argb, methodDecl.argTyp, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extend(argDecl)))
+        bound.Def(b, arglist, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extendList(argdecls)))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
         val nominalDecl = types.TypeType(b, types.NominalType(b))
@@ -110,7 +116,25 @@ def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
         )
         val binding = types.findInDeclList[types.ValType](context.bindings, pred).name
         bound.Var(binding)
-    a:raw.App    => bound.Call(bindExpr(a.func, context), "apply", bindExpr(a.arg, context))
+    a:raw.App    => 
+        val rec = bindExpr(a.func, context)
+        val arg = bindExpr(a.arg, context)
+        val app = bound.Call(rec, "apply", llist.Singleton[bound.Exp](arg))
+        match rec:
+            f:bound.Field => 
+                //check if field is actually a method
+                val recType = typecheck.typecheckExpr(f.receiver,context.bindings)
+                val pred = ((b:types.DeclType) =>
+                    val z = match b:
+                        d:types.DefType => f.field == d.name.name
+                        default => false
+                    z
+                )
+                val searchMethod = llist.find[types.DeclType](types.unfoldType(recType,context.bindings).decls, pred)
+                match searchMethod:
+                    s:option.Some => bound.Call(f.receiver, f.field, llist.Singleton[bound.Exp](arg))
+                    default => app
+            default => app
     l:raw.Lambda =>
         val argb = types.Binding(l.name, context.counter)
         val argDecl = types.ValType(argb, stringToType(l.argTyp, context))
@@ -120,14 +144,14 @@ def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
         val expType = typecheck.typecheckExpr(boundExp, newCtx.bindings)
 
         val applyb = types.Binding("apply", context.counter)
-        val decl = types.DefType(applyb, argDecl.typ, expType)
-        val defDeclaration:bound.Decl = bound.Def(applyb, argb, argDecl.typ, expType, bound.ExprStatement(boundExp))
+        val decl = types.DefType(applyb, llist.Singleton[types.Type](argDecl.typ), expType)
+        val defDeclaration:bound.Decl = bound.Def(applyb, llist.Singleton[bound.Arg](bound.Arg(argb,argDecl.typ)), expType, bound.ExprStatement(boundExp))
 
         val thisb = types.Binding("_this", context.counter)
         val thisType = types.UnfoldedType(llist.Singleton[DeclType](decl))
         bound.New(thisb, thisType, llist.Singleton[bound.Decl](defDeclaration))
     c:raw.Call   => 
-        bound.Call(bindExpr(c.receiver, context), c.name, bindExpr(c.arg, context))
+        bound.Call(bindExpr(c.receiver, context), c.name, c.args.map[bound.Exp](e => bindExpr(e, context)))
     f:raw.Field  =>
         bound.Field(bindExpr(f.receiver, context), f.field)
     n:raw.New    =>

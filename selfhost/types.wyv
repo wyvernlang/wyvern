@@ -63,6 +63,17 @@ def getNominalRoot(n:NominalType, gamma:List[DeclType]):NominalType
         nn:NominalType => getNominalRoot(nn,gamma)
         default => n
 
+def checkArgList(xs:List[Type],ys:List[Type],pred:Type->Type->Boolean):Boolean
+    if (xs.size() == ys.size())
+        def f(xs:List[Type],ys:List[Type]):Boolean = match xs:
+            a:llist.Cons => match ys:
+                b:llist.Cons =>   
+                    (pred(a.value)(b.value)) && f(a.next,b.next)
+            default => true
+        f(xs,ys)
+      else
+        false
+
 def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
     match a:
         v:ValType => match b:
@@ -72,7 +83,9 @@ def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
             u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ,gamma)
             default => false
         d:DefType => match b:
-            u:DefType => d.name.name == u.name.name && equalType(d.argTyp,u.argTyp,gamma) && equalType(d.retTyp,u.retTyp,gamma)
+            u:DefType => 
+                val pred = x:Type => y:Type => equalType(x,y,gamma)
+                d.name.name == u.name.name && checkArgList(d.args,u.args,pred) && equalType(d.retTyp,u.retTyp,gamma)
             default => false
 
 def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
@@ -94,17 +107,6 @@ def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
                         s:option.Some => true
                         default => false
                 v.decls.foldRight[Boolean]((x:DeclType,y:Boolean) => isValidDecl(x) && y, true)
-                /*
-                if (u.decls.size() == v.decls.size())
-                    def f(a:List[DeclType], b:List[DeclType]):Boolean = match a:
-                        c:llist.Cons => match b:
-                            d:llist.Cons => equalDeclType(c.value,d.value, gamma) && f(c.next,d.next)
-                            default => error.report("should never happens since lists are same len",error.unknownLocation)
-                        n:llist.Nil => true
-                    f(u.decls, v.decls)
-                  else
-                    false
-                    */
             default => equalType(t1,unfoldType(t2,gamma),gamma)
 
 type SubtypePair
@@ -123,7 +125,9 @@ def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType], stack:List[Subty
         u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ,gamma)
         default => false
     d:DefType => match b:
-        u:DefType => d.name.name == u.name.name && isSubtypeHelper(u.argTyp,d.argTyp,gamma,stack) && isSubtypeHelper(d.retTyp,u.retTyp,gamma,stack)
+        u:DefType => 
+            val pred = x:Type => y:Type => isSubtypeHelper(x,y,gamma,stack)
+            d.name.name == u.name.name && checkArgList(u.args,d.args,pred) && isSubtypeHelper(d.retTyp,u.retTyp,gamma,stack)
         default => false
 
 def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
@@ -156,12 +160,12 @@ datatype Type
 datatype DeclType
     ValType(name:Binding, typ:Type)
     TypeType(name:Binding, typ:Type)
-    DefType(name:Binding, argTyp:Type, retTyp:Type)
+    DefType(name:Binding, args:List[Type], retTyp:Type)
 
 def declTypeToString(d:DeclType):String = match d:
     v:ValType => "val " + v.name.name + ":" + typeToString(v.typ)
     t:TypeType => "type " + t.name.name + ":" + typeToString(t.typ)
-    d:DefType => "def " + d.name.name + "(arg:" + typeToString(d.argTyp) + "):" + typeToString(d.retTyp)
+    d:DefType => "def " + d.name.name + "(args):" + typeToString(d.retTyp)
 
 def typeToString(t:Type):String = match t:
     u:UnitType => "Unit"
