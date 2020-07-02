@@ -1,0 +1,15 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type A:
+    def f(x:Int):Int
+    def g(x:Int,y:Int,z:Int):Int
+
+val a = new this:A:
+    def f(x:Int):Int:
+        x+1
+    def g(x:Int,y:Int,z:Int):Int:
+        x + y + z
+
+a.g(a.f(0),a.f(1),a.f(2))
