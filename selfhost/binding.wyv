@@ -4,6 +4,7 @@ import error
 import lexUtil
 import types
 import typecheck
+import subtyping
 import wyvern.collections.llist
 
 type List = llist.LinkedList
@@ -76,7 +77,7 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         val body = bindExpr(v.exp, context)
         val expType = typecheck.typecheckExpr(body, context.bindings)
         val annotType = stringToType(v.typ,context)
-        if (!types.isSubtype(expType,annotType,context.bindings))
+        if (!subtyping.isSubtype(expType,annotType,context.bindings))
             error.report("val expr doesn't match annotation",error.unknownLocation)
         bound.Val(b, annotType, body)
     d:raw.Def =>

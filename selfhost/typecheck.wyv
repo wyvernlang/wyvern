@@ -1,6 +1,7 @@
 module typecheck
 
 import types
+import subtyping
 import bound
 import error
 import wyvern.option
@@ -30,7 +31,7 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
         val argdecls:List[DeclType] = d.args.map[types.ValType]((a:bound.Arg) => types.ValType(a.arg,a.argTyp))
         val argtypes:List[types.Type] = d.args.map[types.Type]((a:bound.Arg) => a.argTyp)
         val testType = typecheckStmt(d.body, argdecls.append(gamma))
-        if (types.isSubtype(testType, d.retTyp, gamma))
+        if (subtyping.isSubtype(testType, d.retTyp, gamma))
             types.DefType(d.binding, argtypes, d.retTyp)
           else
             error.report("argument typ in def doesn't match expected:",error.unknownLocation)
@@ -53,11 +54,11 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
         val unfold = types.unfoldType(recType, gamma)
         val argtypes:List[types.Type] = c.args.map[types.Type](e => typecheckExpr(e,gamma))
 
-        val subcheck = x:types.Type => y:types.Type => types.isSubtype(x,y,gamma)
+        val subcheck = x:types.Type => y:types.Type => subtyping.isSubtype(x,y,gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
                 da:types.DefType => 
-                    if (c.name == da.name.name && types.checkArgList(argtypes,da.args,subcheck)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
+                    if (c.name == da.name.name && subtyping.checkArgList(argtypes,da.args,subcheck)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
                 default => option.None[types.DefType]()
             z
         )
@@ -86,7 +87,7 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 t:bound.TypeDecl  => typecheckDecl(d, ngamma)
                 t:bound.TypeAlias => typecheckDecl(d, ngamma)
         val decls = n.body.map[DeclType](x => typeNewDecls(x))
-        if (types.checkDeclList(decls, unfold, x=>y=>types.isSubtypeDecl(x,y,gamma)))
+        if (subtyping.checkDeclList(decls, unfold, x=>y=>subtyping.isSubtypeDecl(x,y,gamma)))
             n.typ
           else
             error.report("invalid new expression",error.unknownLocation)
