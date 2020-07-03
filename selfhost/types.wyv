@@ -21,6 +21,33 @@ def Binding(name:String, c:Counter):Binding
         val name = name
         val id = count
 
+def equalBinding(b1:Binding, b2:Binding):Boolean
+    b1.name == b2.name && b1.id == b2.id
+//////////////////////////////
+datatype BaseType
+    UnitType()
+    NominalType(L:Binding)
+
+type Type
+    val base:BaseType
+    val refines:List[DeclType]
+def Type(b:BaseType, r:List[DeclType]):Type = new
+    val base = b
+    val refines = r
+def makeNominalType(L:Binding):Type = new
+    val base = NominalType(L)
+    val refines = llist.Nil[DeclType]()
+def makeRefines(ls:List[DeclType]):Type = new
+    val base = UnitType()
+    val refines = ls
+
+datatype DeclType
+    ValType(name:Binding, typ:Type)
+    TypeType(name:Binding, unfld:Type)
+    DefType(name:Binding, args:List[Type], retTyp:Type)
+
+val theUnit = Type(UnitType(),llist.Nil[DeclType]())
+//////////////////////////////
 def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
     def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
         match gamma:
@@ -33,9 +60,9 @@ def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
         s:option.Some => s.get()
         default => error.report("search in decllist failed",error.unknownLocation)
 
-def unfoldType(x:Type, gamma:List[DeclType]):UnfoldedType
-    match x:
-        u:UnitType => UnfoldedType(llist.Nil[DeclType]())
+def unfoldType(x:Type, gamma:List[DeclType]):List[DeclType]
+    val decls = match x.base:
+        u:UnitType => llist.Nil[DeclType]()
         x:NominalType => 
             val pred = ((b:DeclType) =>
                 val z = match b:
@@ -43,26 +70,10 @@ def unfoldType(x:Type, gamma:List[DeclType]):UnfoldedType
                     default => option.None[TypeType]()
                 z
             )
-            unfoldType(findInDeclList[TypeType](gamma, pred).typ, gamma)
-        u:UnfoldedType => u
+            unfoldType(findInDeclList[TypeType](gamma, pred).unfld,gamma)
+    x.refines.append(decls)
 
-def equalBinding(b1:Binding, b2:Binding):Boolean
-    b1.name == b2.name && b1.id == b2.id
-
-//nominal types that point to other nominal types form a tree,
-//so we find the "root" nominal type to compare if two aliases are equal
-def getNominalRoot(n:NominalType, gamma:List[DeclType]):NominalType
-    val pred = ((b:DeclType) =>
-        val z = match b:
-            t:TypeType => if (equalBinding(t.name, n.L)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
-            default => option.None[TypeType]()
-        z
-    )
-    val par = findInDeclList[TypeType](gamma, pred)
-    match par.typ:
-        nn:NominalType => getNominalRoot(nn,gamma)
-        default => n
-
+//Check if two lists of arguments line up in the right way
 def checkArgList(xs:List[Type],ys:List[Type],pred:Type->Type->Boolean):Boolean
     if (xs.size() == ys.size())
         def f(xs:List[Type],ys:List[Type]):Boolean = match xs:
@@ -74,13 +85,25 @@ def checkArgList(xs:List[Type],ys:List[Type],pred:Type->Type->Boolean):Boolean
       else
         false
 
+//Check if for each y in ys there is an x in xs s.t. (pred x y) is true
+def checkDeclList(xs:List[DeclType],ys:List[DeclType],pred:DeclType->DeclType->Boolean):Boolean
+    def isValid(d:DeclType):Boolean
+        val search = llist.find[DeclType](xs, (e:DeclType) => pred(e)(d))
+        match search:
+            s:option.Some => true
+            default => false
+    ys.foldRight[Boolean]((x:DeclType,y:Boolean) => isValid(x) && y, true)
+
 def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
     match a:
         v:ValType => match b:
             u:ValType => v.name.name == u.name.name && equalType(v.typ,u.typ,gamma)
             default => false
         t:TypeType => match b:
-            u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ,gamma)
+            u:TypeType => 
+                val tt = unfoldType(makeNominalType(t.name),gamma)
+                val uu = unfoldType(makeNominalType(u.name),gamma)
+                t.name.name == u.name.name && checkDeclList(tt,uu,x=>y=>equalDeclType(x,y,gamma))
             default => false
         d:DefType => match b:
             u:DefType => 
@@ -88,88 +111,64 @@ def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
                 d.name.name == u.name.name && checkArgList(d.args,u.args,pred) && equalType(d.retTyp,u.retTyp,gamma)
             default => false
 
+def equalBaseType(a:BaseType, b:BaseType):Boolean = match a:
+    u:UnitType => match b:
+        v:UnitType => true
+        default => false
+    n:NominalType => match b:
+        v:NominalType => equalBinding(n.L,v.L)
+        default => false
+
 def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
-    match t1:
-        u:UnitType => match t2:
-            v:UnitType => true
-            default => equalType(unfoldType(t1,gamma),t2,gamma)
-        n:NominalType => match t2:
-            v:NominalType => 
-                val r1 = getNominalRoot(n,gamma)
-                val r2 = getNominalRoot(v,gamma)
-                equalBinding(r1.L, r2.L)
-            default => equalType(unfoldType(t1,gamma),t2,gamma)
-        u:UnfoldedType => match t2:
-            v:UnfoldedType =>
-                def isValidDecl(d:DeclType):Boolean
-                    val search = llist.find[DeclType](u.decls, (e:DeclType) => equalDeclType(e,d,gamma))
-                    match search:
-                        s:option.Some => true
-                        default => false
-                v.decls.foldRight[Boolean]((x:DeclType,y:Boolean) => isValidDecl(x) && y, true)
-            default => equalType(t1,unfoldType(t2,gamma),gamma)
+    val pred = x:DeclType => y:DeclType => equalDeclType(x,y,gamma)
+    equalBaseType(t1.base,t2.base) && checkDeclList(t1.refines,t2.refines,pred)
 
 type SubtypePair
     val S:Type
     val T:Type
-
 def SubtypePair(S:Type, T:Type):SubtypePair = new
     val S = S
     val T = T
 
-def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType], stack:List[SubtypePair]):Boolean = match a:
+def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match a:
     v:ValType => match b:    
-        u:ValType => v.name.name == u.name.name && isSubtypeHelper(v.typ,u.typ,gamma,stack)
+        u:ValType => v.name.name == u.name.name && isSubtype(v.typ,u.typ,gamma)
         default => false
     t:TypeType => match b:
-        u:TypeType => t.name.name == u.name.name && equalType(t.typ,u.typ,gamma)
+        u:TypeType => equalDeclType(a,b,gamma)
         default => false
     d:DefType => match b:
         u:DefType => 
-            val pred = x:Type => y:Type => isSubtypeHelper(x,y,gamma,stack)
-            d.name.name == u.name.name && checkArgList(u.args,d.args,pred) && isSubtypeHelper(d.retTyp,u.retTyp,gamma,stack)
+            val pred = x:Type => y:Type => isSubtype(x,y,gamma)
+            d.name.name == u.name.name && checkArgList(u.args,d.args,pred) && isSubtype(d.retTyp,u.retTyp,gamma)
         default => false
 
 def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
-    isSubtypeHelper(t1,t2,gamma,llist.Nil[SubtypePair]())
+    if (equalType(t2,theUnit,gamma))
+        true
+      else
+        isSubtypeBase(t1,t2.base,gamma) && checkDeclList(t1.refines,t2.refines,x=>y=>isSubtypeDecl(x,y,gamma))
 
-def isSubtypeHelper(t1:Type, t2:Type, gamma:List[DeclType], stack:List[SubtypePair]):Boolean
-    //if t1 <: t2 appears within its own judgement, return true
-    val findPrev = llist.find[SubtypePair](stack, (j:SubtypePair) => equalType(j.S,t1,gamma) && equalType(j.T,t2,gamma))
-    match findPrev:
-        s:option.Some => true    
-        default => 
-            if (equalType(t1,t2,gamma))
-                true
-              else
-                val newstack = llist.Cons[SubtypePair](SubtypePair(t1,t2), stack)
-                val u = unfoldType(t1,gamma)
-                val v = unfoldType(t2,gamma)
-                def isValidDecl(d:DeclType):Boolean
-                    val search = llist.find[DeclType](u.decls, (e:DeclType) => isSubtypeDecl(e,d,gamma,newstack))
-                    match search:
-                        s:option.Some => true
-                        default => false
-                v.decls.foldRight[Boolean]((x:DeclType,y:Boolean) => isValidDecl(x) && y, true)
+def isSubtypeBase(t1:Type, t2:BaseType, gamma:List[DeclType]):Boolean
+    true
 
-datatype Type
-    UnitType()
-    NominalType(L:Binding)
-    UnfoldedType(decls:List[DeclType])
-
-datatype DeclType
-    ValType(name:Binding, typ:Type)
-    TypeType(name:Binding, typ:Type)
-    DefType(name:Binding, args:List[Type], retTyp:Type)
+def combineStringList(ls:List[String]):String = match ls:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => c.value
+        cc:llist.Cons => c.value + ", " + combineStringList(c.next)
+    default => ""
 
 def declTypeToString(d:DeclType):String = match d:
     v:ValType => "val " + v.name.name + ":" + typeToString(v.typ)
-    t:TypeType => "type " + t.name.name + ":" + typeToString(t.typ)
-    d:DefType => "def " + d.name.name + "(args):" + typeToString(d.retTyp)
+    t:TypeType => "type " + t.name.name + ":" + typeToString(t.unfld)
+    d:DefType => 
+        val arglist = d.args.map[String](t => typeToString(t))
+        "def " + d.name.name + "(" + combineStringList(arglist) + "):" + typeToString(d.retTyp)
 
-def typeToString(t:Type):String = match t:
-    u:UnitType => "Unit"
-    n:NominalType => n.L.name
-    u:UnfoldedType => 
-        val s = u.decls.map[String](e => declTypeToString(e))
-        s.foldLeft[String]((x:String,y:String) => x + ", " + y, "UNFLD: { ") + " }"
+def typeToString(t:Type):String
+    val baseString = match t.base:
+        u:UnitType => "Unit"
+        n:NominalType => n.L.name
+    val s = t.refines.map[String](e => declTypeToString(e))
+    val refinesString = combineStringList(s)
+    baseString + " {" + refinesString + "}"

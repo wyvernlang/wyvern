@@ -11,7 +11,7 @@ type DeclType = types.DeclType
 
 def stringToType(s:String, ctx:bound.Context):types.Type
     if (s == "Unit")
-            types.UnitType()
+            types.theUnit
         else
             val pred = ((b:DeclType) =>
                 val z = match b:
@@ -20,7 +20,7 @@ def stringToType(s:String, ctx:bound.Context):types.Type
                     default => option.None[types.TypeType]()
                 z
             )
-            types.NominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
+            types.makeNominalType(types.findInDeclList[types.TypeType](ctx.bindings, pred).name)
 
 def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
     v:raw.ValType =>
@@ -32,11 +32,11 @@ def bindDeclTypes(e:raw.Exp, context:bound.Context):DeclType = match e:
         types.DefType(b, argtypes, stringToType(d.retTyp,context))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
-        val nominalDecl = types.TypeType(b, types.NominalType(b))
+        val nominalDecl = types.TypeType(b, types.makeNominalType(b))
 
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
         val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(nominalDecl)))
-        types.TypeType(b,types.UnfoldedType(declList))
+        types.TypeType(b,types.makeRefines((declList)))
 
     default       => error.report("unexpected construct", error.unknownLocation)
 
@@ -57,7 +57,7 @@ def bindStatement(e:raw.Seq, context:bound.Context):bound.Statement = match e.ex
                 d:bound.Def =>
                     types.DefType(d.binding, d.args.map[types.Type](e => e.argTyp), d.retTyp)
                 t:bound.TypeDecl =>
-                    types.TypeType(t.name, types.UnfoldedType(t.members))
+                    types.TypeType(t.name, types.makeRefines(t.members))
                 t:bound.TypeAlias =>
                     types.TypeType(t.name, t.typ)
             val newCtx = context.extend(decl)
@@ -94,7 +94,7 @@ def bindDecl(e:raw.Exp, context:bound.Context):bound.Decl = match e:
         bound.Def(b, arglist, methodDecl.retTyp, bindStatement(defn, context.extend(methodDecl).extendList(argdecls)))
     t:raw.TypeDecl =>
         val b = types.Binding(t.name, context.counter)
-        val nominalDecl = types.TypeType(b, types.NominalType(b))
+        val nominalDecl = types.TypeType(b, types.makeNominalType(b))
 
         val declSeq = makeSeq(context.parse(lexUtil.stripLeadingWhitespace(t.decls)))
         val declList:List[DeclType] = declSeq.exps.map[DeclType](e => bindDeclTypes(e,context.extend(nominalDecl)))
@@ -130,7 +130,7 @@ def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
                         default => false
                     z
                 )
-                val searchMethod = llist.find[types.DeclType](types.unfoldType(recType,context.bindings).decls, pred)
+                val searchMethod = llist.find[types.DeclType](types.unfoldType(recType,context.bindings), pred)
                 match searchMethod:
                     s:option.Some => bound.Call(f.receiver, f.field, llist.Singleton[bound.Exp](arg))
                     default => app
@@ -148,7 +148,7 @@ def bindExpr(e:raw.Exp, context:bound.Context):bound.Exp = match e:
         val defDeclaration:bound.Decl = bound.Def(applyb, llist.Singleton[bound.Arg](bound.Arg(argb,argDecl.typ)), expType, bound.ExprStatement(boundExp))
 
         val thisb = types.Binding("_this", context.counter)
-        val thisType = types.UnfoldedType(llist.Singleton[DeclType](decl))
+        val thisType = types.makeRefines(llist.Singleton[DeclType](decl))
         bound.New(thisb, thisType, llist.Singleton[bound.Decl](defDeclaration))
     c:raw.Call   => 
         bound.Call(bindExpr(c.receiver, context), c.name, c.args.map[bound.Exp](e => bindExpr(e, context)))
