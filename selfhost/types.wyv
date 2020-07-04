@@ -63,16 +63,20 @@ def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
         s:option.Some => s.get()
         default => error.report("search in decllist failed",error.unknownLocation)
 
+def findTypePredicate(bind:Binding):DeclType->Option[TypeType]
+    val pred = ((b:DeclType) =>
+        val z = match b:
+            t:TypeType => if (equalBinding(bind, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
+            default => option.None[TypeType]()
+        z
+    )
+    pred
+
 def unfoldType(x:Type, gamma:List[DeclType]):List[DeclType]
     val decls = match x.base:
         u:UnitType => llist.Nil[DeclType]()
         x:NominalType => 
-            val pred = ((b:DeclType) =>
-                val z = match b:
-                    t:TypeType => if (equalBinding(x.L, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
-                    default => option.None[TypeType]()
-                z
-            )
+            val pred = findTypePredicate(x.L)
             unfoldType(findInDeclList[TypeType](gamma, pred).unfld,gamma)
     x.refines.append(decls)
 

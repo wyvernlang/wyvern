@@ -41,8 +41,7 @@ datatype Statement
 datatype Decl
     Val(binding:Binding, typ:types.Type, exp:Exp)
     Def(binding:Binding, args:List[Arg], retTyp:types.Type, body:Statement)
-    TypeDecl(name:Binding, members:List[DeclType])
-    TypeAlias(name:Binding, typ:types.Type)
+    TypeDecl(name:Binding, typ:types.Type)
     SubtypeDecl(subtype:types.Type, supertype:types.Type)
 
 datatype Exp
@@ -61,7 +60,6 @@ def lowerDecl(decl:Decl):Decl = match decl:
     v:Val         => Val(v.binding, v.typ, lowerExp(v.exp))
     d:Def         => Def(d.binding, d.args, d.retTyp, lowerStatement(d.body))
     t:TypeDecl    => t
-    t:TypeAlias   => t
     s:SubtypeDecl => s
 
 def lowerExp(exp:Exp):Exp = match exp:

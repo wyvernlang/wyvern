@@ -26,7 +26,7 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
         val typ = typecheckExpr(v.exp, gamma)
         types.ValType(v.binding, typ)
     t:bound.TypeDecl =>
-        types.TypeType(t.name, types.makeRefines(t.members))
+        types.TypeType(t.name, t.typ)
     d:bound.Def =>
         val argdecls:List[DeclType] = d.args.map[types.ValType]((a:bound.Arg) => types.ValType(a.arg,a.argTyp))
         val argtypes:List[types.Type] = d.args.map[types.Type]((a:bound.Arg) => a.argTyp)
@@ -35,8 +35,6 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
             types.DefType(d.binding, argtypes, d.retTyp)
           else
             error.report("def decl is not well-formed",error.unknownLocation)
-    t:bound.TypeAlias =>     
-        types.TypeType(t.name, t.typ)
     s:bound.SubtypeDecl =>
         if (subtyping.checkSubtypeWF(s.subtype, s.supertype, gamma))
             types.SubtypeType(s.subtype, s.supertype)
@@ -90,7 +88,6 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 v:bound.Val       => typecheckDecl(d, gamma)
                 d:bound.Def       => typecheckDecl(d, ngamma)
                 t:bound.TypeDecl  => typecheckDecl(d, ngamma)
-                t:bound.TypeAlias => typecheckDecl(d, ngamma)
         val decls = n.body.map[DeclType](x => typeNewDecls(x))
         if (subtyping.checkDeclList(decls, unfold, x=>y=>subtyping.isSubtypeDecl(x,y,gamma)))
             n.typ

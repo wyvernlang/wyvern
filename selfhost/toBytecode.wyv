@@ -23,7 +23,6 @@ def toBytecodeDecl(e:bound.Decl):b.Decl = match e:
     v:bound.Val       => b.ValDecl(v.binding.name, toBytecodeExpr(v.exp))
     d:bound.Def       => b.MethodDecl(d.binding.name, d.args.map[String](e => e.arg.name), b.SeqExpr(toBytecodeStmt(d.body)))
     t:bound.TypeDecl  => b.ValDecl("_", toBytecodeExpr(bound.UnitVal()))
-    t:bound.TypeAlias => b.ValDecl("_", toBytecodeExpr(bound.UnitVal()))
     s:bound.SubtypeDecl => b.ValDecl("_", toBytecodeExpr(bound.UnitVal()))
 
     default => error.report("not a declaration",error.unknownLocation)

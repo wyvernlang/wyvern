@@ -54,17 +54,24 @@ def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean
                 d.name.name == u.name.name && checkArgList(d.args,u.args,pred) && equalType(d.retTyp,u.retTyp,gamma)
             default => false
 
-def equalBaseType(a:BaseType, b:BaseType):Boolean = match a:
+def equalBaseType(a:BaseType, b:BaseType, gamma:List[DeclType]):Boolean = match a:
     u:UnitType => match b:
         v:UnitType => true
         default => false
     n:NominalType => match b:
-        v:NominalType => types.equalBinding(n.L,v.L)
+        v:NominalType => 
+            def getNominalRoot(bind:Binding):Binding
+                val pred = types.findTypePredicate(bind)
+                val par = types.findInDeclList[TypeType](gamma, pred)
+                match par.unfld.base:
+                    u:UnitType    => bind
+                    n:NominalType => getNominalRoot(n.L)
+            types.equalBinding(getNominalRoot(n.L),getNominalRoot(v.L))
         default => false
 
 def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
     val pred = x:DeclType => y:DeclType => equalDeclType(x,y,gamma)
-    equalBaseType(t1.base,t2.base) && checkDeclList(t1.refines,t2.refines,pred)
+    equalBaseType(t1.base,t2.base,gamma) && checkDeclList(t1.refines,t2.refines,pred)
 
 def isSubtypeDeclList(xs:List[DeclType], ys:List[DeclType], gamma:List[DeclType]):Boolean
     checkDeclList(xs,ys,x=>y=>isSubtypeDecl(x,y,gamma))
