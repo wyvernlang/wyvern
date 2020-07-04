@@ -16,16 +16,17 @@ val grammar: parsing.Grammar = ~
     Stmts -> %logline Stmt                                : a:Dyn => a.get(1)
            | Stmts %logline Stmt                          : a:Dyn => makeSeq(a.get(0), a.get(2))
            
-    Stmt  -> Expression                                                  : a:Dyn => a.get(0)
-           | %val %identifier %eq Expression                             : a:Dyn => raw.Val(a.get(1).value, a.get(3))
-           | %val %identifier %colon Type %eq Expression                 : a:Dyn => raw.ValAnnot(a.get(1).value, a.get(3), a.get(5))
+    Stmt  -> Expression                                               : a:Dyn => a.get(0)
+           | %val %identifier %eq Expression                          : a:Dyn => raw.Val(a.get(1).value, a.get(3))
+           | %val %identifier %colon Type %eq Expression              : a:Dyn => raw.ValAnnot(a.get(1).value, a.get(3), a.get(5))
            | %def %identifier %lparen Arguments %rparen %colon Type %colon %block : a:Dyn => raw.Def(a.get(1).value, a.get(3), a.get(6), a.get(8).value)
-           | %type %identifier %colon %block                             : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
-           | %type %identifier %eq %identifier                           : a:Dyn => raw.TypeAlias(a.get(1).value, a.get(3).value)
-           | %val %identifier %colon Type                                : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
-           | %def %identifier %lparen Arguments %rparen %colon Type      : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3), a.get(6))
-           | %def %plus %lparen Arguments %rparen %colon Type  : a:Dyn => raw.DefDecl("+", a.get(3), a.get(6))
-           | %def %minus %lparen Arguments %rparen %colon Type : a:Dyn => raw.DefDecl("-", a.get(3), a.get(6))
+           | %type %identifier %colon %block                          : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
+           | %type %identifier %eq %identifier                        : a:Dyn => raw.TypeAlias(a.get(1).value, a.get(3).value)
+           | %val %identifier %colon Type                             : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
+           | %def %identifier %lparen Arguments %rparen %colon Type   : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3), a.get(6))
+           | %def %plus %lparen Arguments %rparen %colon Type         : a:Dyn => raw.DefDecl("+", a.get(3), a.get(6))
+           | %def %minus %lparen Arguments %rparen %colon Type        : a:Dyn => raw.DefDecl("-", a.get(3), a.get(6))
+           | %subtype Type %extends_ Type                             : a:Dyn => raw.SubtypeDecl(a.get(1),a.get(3))
 
     Arguments -> Arg                                      : a:Dyn => llist.Singleton[raw.Arg](a.get(0))
                | Arg %comma Arguments                     : a:Dyn => llist.Cons[raw.Arg](a.get(0),a.get(2))
@@ -66,8 +67,6 @@ val grammar: parsing.Grammar = ~
              | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
              | %new_ %identifier %colon %identifier %colon %block            : a:Dyn => raw.New(a.get(1).value, a.get(3).value, a.get(5).value)
              | %lparen %rparen                            : a:Dyn => raw.UnitVal()
-
-             
 
 
 def makeParser(lexer:lexing.Lexer):parsing.Parser

@@ -23,6 +23,7 @@ datatype Exp
     TypeDecl(name:String, decls:String)
     TypeAlias(name:String, alias:String)
     DefDecl(name:String, args:List[Arg], retTyp:String)
+    SubtypeDecl(subtype:String, supertype:String)
     New(thisName:String, typeName:String, body:String)
     Seq(exps:List[Exp])
     Integer(str:String)    

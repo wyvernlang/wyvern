@@ -29,7 +29,14 @@ def Token(t:String, value:String, line:Int, col:Int):Token = new
 val lowLevelLexer : lexing.Lexer = ~
         WS:         /[ \t]+/,
         logline:    {match: /\\r\\n|\\r|\\n/, lineBreaks: true},
-        identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ val : 'val', def : 'def', type : 'type', new_: 'new' })},
+        identifier: {match: /[a-zA-Z][a-zA-Z0-9_]*/, type: moo.keywords({ 
+            val      : 'val', 
+            def      : 'def', 
+            type     : 'type', 
+            new_     : 'new',
+            subtype  : 'subtype',
+            extends_ : 'extends'
+        })},
         lparen:     '(',
         rparen:     ')',
         lbrack:     '[',

@@ -34,9 +34,14 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
         if (subtyping.isSubtype(testType, d.retTyp, gamma))
             types.DefType(d.binding, argtypes, d.retTyp)
           else
-            error.report("argument typ in def doesn't match expected:",error.unknownLocation)
+            error.report("def decl is not well-formed",error.unknownLocation)
     t:bound.TypeAlias =>     
         types.TypeType(t.name, t.typ)
+    s:bound.SubtypeDecl =>
+        if (subtyping.checkSubtypeWF(s.subtype, s.supertype, gamma))
+            types.SubtypeType(s.subtype, s.supertype)
+          else
+            error.report("subtype decl is not well-formed",error.unknownLocation)
 
 def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
     v:bound.Var =>

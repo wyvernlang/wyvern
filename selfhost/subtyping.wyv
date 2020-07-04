@@ -3,6 +3,7 @@ module subtyping
 import types
 import error
 import wyvern.collections.llist
+import wyvern.option
 type List = llist.LinkedList
 type Binding = types.Binding
 type Type = types.Type
@@ -11,6 +12,7 @@ type BaseType = types.BaseType
 type ValType = types.ValType
 type TypeType = types.TypeType
 type DefType = types.DefType
+type SubtypeType = types.SubtypeType
 type UnitType = types.UnitType
 type NominalType = types.NominalType
 
@@ -64,12 +66,8 @@ def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
     val pred = x:DeclType => y:DeclType => equalDeclType(x,y,gamma)
     equalBaseType(t1.base,t2.base) && checkDeclList(t1.refines,t2.refines,pred)
 
-type SubtypePair
-    val S:Type
-    val T:Type
-def SubtypePair(S:Type, T:Type):SubtypePair = new
-    val S = S
-    val T = T
+def isSubtypeDeclList(xs:List[DeclType], ys:List[DeclType], gamma:List[DeclType]):Boolean
+    checkDeclList(xs,ys,x=>y=>isSubtypeDecl(x,y,gamma))
 
 def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match a:
     v:ValType => match b:    
@@ -88,7 +86,30 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
     if (equalType(t2,types.theUnit,gamma))
         true
       else
-        isSubtypeBase(t1,t2.base,gamma) && checkDeclList(t1.refines,t2.refines,x=>y=>isSubtypeDecl(x,y,gamma))
+        isSubtypeBase(t1,t2.base,gamma) && isSubtypeDeclList(t1.refines,t2.refines,gamma)
 
 def isSubtypeBase(t1:Type, t2:BaseType, gamma:List[DeclType]):Boolean
-    true //TODO--also need to add "subtype extends" decl
+    val b1 = types.Type(t1.base,llist.Nil[DeclType]())
+    val b2 = types.Type(t2,llist.Nil[DeclType]())
+    if (equalType(b1,b2,gamma))
+        true
+      else
+        val pred = ((b:DeclType) =>
+            val z = match b:
+                s:types.SubtypeType =>
+                    equalType(types.makeBase(s.subtype.base),types.makeBase(t1.base),gamma) \
+                 && isSubtypeDeclList(t1.refines,s.subtype.refines,gamma) \
+                 && isSubtypeBase(types.Type(s.supertype.base,t1.refines),t2,gamma)
+                default => false
+            z
+        )
+        val search = llist.find[DeclType](gamma,pred)
+        match search:
+            s:option.Some => true
+            default => false
+
+def checkSubtypeWF(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
+    val ua = types.unfoldType(t1,gamma)
+    val ub = types.unfoldType(t2,gamma)
+    val newgamma = llist.Cons[DeclType](types.SubtypeType(t1,t2),gamma)
+    isSubtypeDeclList(ua,ub,newgamma)
