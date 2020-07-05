@@ -2,21 +2,36 @@ type Int:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Side:
-    val len:Int
+type Polygon:
+    def perim(u:Unit):Int
 
 type Triangle:
-    val s1:Side
-    val s2:Side
-    val s3:Side
+    val s1:Int
+    val s2:Int
+    val s3:Int
+    def perim(u:Unit):Int
+subtype Triangle extends Polygon
 
-val tri = new this:Triangle:
-    val s1 = new x:Side:
-        val len = 1
-    val s2 = new x:Side:
-        val len = 2
-    val s3 = new x:Side:
-        val len = 3
+type Square:
+    val s:Int
+    def perim(u:Unit):Int
+subtype Square extends Polygon
 
-val perim = tri.s1.len + tri.s2.len + tri.s3.len
-tri.s1.len
+type A:
+    def makeTri(a:Int,b:Int,c:Int):Triangle
+
+val a = new this:A:
+    def makeTri(a:Int,b:Int,c:Int):Triangle:
+        new self:Triangle:
+            val s1 = a
+            val s2 = b
+            val s3 = c
+            def perim(u:Unit):Int:
+                self.s1 + self.s2 + self.s3
+    def makeSquare(a:Int):Square:
+        new self:Square:
+            val s = a
+            def perim(u:Unit):Int:
+                self.s + self.s + self.s + self.s
+
+a.makeTri(1,3,3).perim(())
