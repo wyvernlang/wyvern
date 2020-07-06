@@ -17,4 +17,4 @@ val x = new self:X:
                 self.makeCounter(this.a+1)
 
 val c = x.makeCounter(1)
-c.next(()).a
+(c.next(())).a

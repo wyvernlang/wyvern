@@ -1,0 +1,23 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Fib:
+    val a1:Int
+    val a2:Int
+    def next(u:Unit):Fib
+
+type X:
+    def makeFib(x:Int,y:Int):Fib
+
+val x = new self:X:
+    def makeFib(x:Int,y:Int):Fib:
+        new this:Fib:    
+            val a1 = x
+            val a2 = y
+            def next(u:Unit):Fib:
+                self.makeFib(y,x+y)
+
+val c = x.makeFib(1,1)
+val d = (((c.next ()).next ()).next ()).next ()
+(d.next ()).a2

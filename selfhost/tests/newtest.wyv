@@ -18,5 +18,5 @@ val bar = new this:Bar:
     val a = 5
 
 val x = 3
-val abc = foo.sum(x+5)-3 + bar.sum(1)
+val abc = foo.sum(x+5) - 3 + bar.sum(1)
 abc

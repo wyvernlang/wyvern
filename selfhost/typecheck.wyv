@@ -1,6 +1,7 @@
 module typecheck
 
 import types
+import subtyping
 import bound
 import error
 import wyvern.option
@@ -25,16 +26,20 @@ def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
         val typ = typecheckExpr(v.exp, gamma)
         types.ValType(v.binding, typ)
     t:bound.TypeDecl =>
-        types.TypeType(t.name, types.UnfoldedType(t.members))
-    d:bound.Def =>
-        val vt = types.ValType(d.arg, d.argTyp)
-        val testType = typecheckStmt(d.body, llist.Cons[DeclType](vt, gamma))
-        if (types.isSubtype(testType, d.retTyp, gamma))
-                types.DefType(d.binding, d.argTyp, d.retTyp)
-            else
-                error.report("argument typ in def doesn't match expected:" + types.typeToString(testType) + ", " + types.typeToString(d.retTyp),error.unknownLocation)
-    t:bound.TypeAlias =>     
         types.TypeType(t.name, t.typ)
+    d:bound.Def =>
+        val argdecls:List[DeclType] = d.args.map[types.ValType]((a:bound.Arg) => types.ValType(a.arg,a.argTyp))
+        val argtypes:List[types.Type] = d.args.map[types.Type]((a:bound.Arg) => a.argTyp)
+        val testType = typecheckStmt(d.body, argdecls.append(gamma))
+        if (subtyping.isSubtype(testType, d.retTyp, gamma))
+            types.DefType(d.binding, argtypes, d.retTyp)
+          else
+            error.report("def decl is not well-formed",error.unknownLocation)
+    s:bound.SubtypeDecl =>
+        if (subtyping.checkSubtypeWF(s.subtype, s.supertype, gamma))
+            types.SubtypeType(s.subtype, s.supertype)
+          else
+            error.report("subtype decl is not well-formed",error.unknownLocation)
 
 def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
     v:bound.Var =>
@@ -49,20 +54,22 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
 
     c:bound.Call => //T-Invk
         val recType = typecheckExpr(c.receiver, gamma)
-        val unfold:types.UnfoldedType = types.unfoldType(recType, gamma)
-        val argt = typecheckExpr(c.arg,gamma)
+        val unfold = types.unfoldType(recType, gamma)
+        val argtypes:List[types.Type] = c.args.map[types.Type](e => typecheckExpr(e,gamma))
+
+        val subcheck = x:types.Type => y:types.Type => subtyping.isSubtype(x,y,gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
                 da:types.DefType => 
-                    if (c.name == da.name.name && types.isSubtype(argt, da.argTyp, gamma)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
+                    if (c.name == da.name.name && subtyping.checkArgList(argtypes,da.args,subcheck)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
                 default => option.None[types.DefType]()
             z
         )
-        types.findInDeclList[types.DefType](unfold.decls, pred).retTyp
+        types.findInDeclList[types.DefType](unfold, pred).retTyp
 
     f:bound.Field => //T-Field
         val recType = typecheckExpr(f.receiver, gamma)
-        val unfold:types.UnfoldedType = types.unfoldType(recType, gamma)
+        val unfold = types.unfoldType(recType, gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
                 va:types.ValType => 
@@ -70,10 +77,10 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 default => option.None[types.ValType]()
             z
         )
-        types.findInDeclList[types.ValType](unfold.decls, pred).typ
+        types.findInDeclList[types.ValType](unfold, pred).typ
 
     n:bound.New => //T-New
-        val unfold:types.UnfoldedType = types.unfoldType(n.typ, gamma)
+        val unfold = types.unfoldType(n.typ, gamma)
         def typeNewDecls(d:bound.Decl):DeclType
             val thisType = types.ValType(n.binding, n.typ)
             val ngamma = llist.Cons[DeclType](thisType, gamma)
@@ -81,12 +88,11 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 v:bound.Val       => typecheckDecl(d, gamma)
                 d:bound.Def       => typecheckDecl(d, ngamma)
                 t:bound.TypeDecl  => typecheckDecl(d, ngamma)
-                t:bound.TypeAlias => typecheckDecl(d, ngamma)
-        val decls = types.UnfoldedType(n.body.map[DeclType](x => typeNewDecls(x)))
-        if (types.isSubtype(decls, unfold, gamma))
+        val decls = n.body.map[DeclType](x => typeNewDecls(x))
+        if (subtyping.checkDeclList(decls, unfold, x=>y=>subtyping.isSubtypeDecl(x,y,gamma)))
             n.typ
           else
-            error.report("invalid new expression, unfold = " + types.typeToString(unfold) + "\nnewexpr = " + types.typeToString(decls),error.unknownLocation)
+            error.report("invalid new expression",error.unknownLocation)
 
     i:bound.Integer => 
         val pred = ((b:DeclType) =>
@@ -96,8 +102,8 @@ def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
                 default => option.None[types.TypeType]()
             z
         ) 
-        types.NominalType(types.findInDeclList[types.TypeType](gamma, pred).name)
+        types.makeNominalType(types.findInDeclList[types.TypeType](gamma, pred).name)
 
-    u:bound.UnitVal => types.UnitType()
+    u:bound.UnitVal => types.theUnit
 
     default => error.report("type error: unrecognized expression",error.unknownLocation)

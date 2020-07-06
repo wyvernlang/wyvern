@@ -7,12 +7,14 @@ type Tree:
 
 type Empty:
     def sum(u:Unit):Int
+subtype Empty extends Tree
 
 type Branch:
     def sum(u:Unit):Int
     val a:Int
     val left:Tree
     val right:Tree
+subtype Branch extends Tree 
 
 val empty:Empty = new this:Empty:
     def sum(u:Unit):Int:

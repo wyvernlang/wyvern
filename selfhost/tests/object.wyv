@@ -7,10 +7,12 @@ type List:
 
 type Empty:
     def sum(u:Unit):Int
+subtype Empty extends List
 
 type Node:
     def sum(u:Unit):Int
     val next:List
+subtype Node extends List
 
 val empty = new this:Empty:
     def sum(u:Unit):Int:

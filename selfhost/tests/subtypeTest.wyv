@@ -1,0 +1,23 @@
+type Int:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Foo:
+    def +(i:Int):Foo
+    def -(i:Int):Foo
+subtype Foo extends Int
+
+type A:
+    def calc(x:Int):A
+type B:
+    def calc(x:Int):B
+    val z:Int
+subtype B extends A
+subtype B extends Unit
+type C:
+    def calc(x:Int):C
+    val z:Int
+    val y:B
+subtype C extends B
+subtype C extends A
+0
