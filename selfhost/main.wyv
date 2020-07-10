@@ -10,20 +10,20 @@ import javascript:stdlib.support.file
 import javascript:stdlib.support.string
 import wyvernLexer
 import wyvernParser
-import bytecode
+//import bytecode
 import raw
-import binding
-import bound
-import toBytecode
+//import binding
+//import bound
+//import toBytecode
 import wyvern.collections.llist
-import types
-import typecheck
+//import types
+//import typecheck
 
 // instantiate imports and create aliases
 type List = llist.LinkedList
 val wyvernLexer = wyvernLexer(js, regexUtils)
-val toBytecode = toBytecode(javascript, js)
-val b = bytecode(javascript, js)
+//val toBytecode = toBytecode(javascript, js)
+//val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
 val parser = wyvernParser.makeParser(lexer)
@@ -57,8 +57,8 @@ def parse(s:String):raw.Exp
         js.log("WARNING: parse was ambiguous.  Grammar should be fixed.\n")
     pars.results.get(0)
 
-stdout.print("Binding...\n")
-val boundExp:bound.Statement = binding.bind(parser.results.get(0), s => parse(s))
+//stdout.print("Binding...\n")
+//val boundExp:bound.Statement = binding.bind(parser.results.get(0), s => parse(s))
 /*
 val boundExp : exception.Answer[bound.Statement,exception.Exception] = exception.try[bound.Statement](() => binding.bind(parser.results.get(0), s => parse(s)))
 match boundExp:
@@ -68,7 +68,6 @@ match boundExp:
         match f1.exception:
             exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
             default => stdout.print("unexpected exception thrown\n")
-*/
 
 val tc = typecheck.typecheck(boundExp)
 stdout.print("type: " + types.typeToString(tc) + "\n")
@@ -83,3 +82,4 @@ stdout.print(outputFileName)
 stdout.print("...\n")
 
 toBytecode.writeExpToFile(ooExp, outputFileName)
+*/
