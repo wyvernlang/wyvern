@@ -1,0 +1,94 @@
+module typesUtil
+
+import wyvern.option
+import wyvern.collections.llist
+import wyvern.pair
+import error
+import types
+type Option = option.Option
+type List = llist.LinkedList
+type Binding = types.Binding
+type Type = types.Type
+type DeclType = types.DeclType
+type BaseType = types.BaseType
+type ValType = types.ValType
+type TypeType = types.TypeType
+type DefType = types.DefType
+type SubtypeType = types.SubtypeType
+type MemberType = types.MemberType
+type UnitType = types.UnitType
+type NominalType = types.NominalType
+type PathType = types.PathType
+type Pair = pair.Pair
+
+def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
+    def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
+        match gamma:
+            c:llist.Cons => 
+                match (pred(c.value)):
+                    s:option.Some => s
+                    default => f(c.next, pred)
+            n:llist.Nil => option.None[T]()
+    match f(gamma, pred):
+        s:option.Some => s.get()
+        default => error.report("search in decllist failed",error.unknownLocation)
+
+def zip[U,T](xs:List[U], ys:List[T]):List[Pair[U,T]] = match xs:
+    c:llist.Cons => match ys:
+        cc:llist.Cons => llist.Cons[Pair[U,T]](pair.Pair[U,T](c.value,cc.value), zip[U,T](c.next,cc.next))
+        default => llist.Nil[Pair[U,T]]()
+    default => llist.Nil[Pair[U,T]]()
+
+def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
+    x:types.LEQ => match b:
+        y:types.LEQ => true   
+        default => false
+    x:types.EQ => match b:
+        y:types.EQ => true   
+        default => false
+    x:types.GEQ => match b:
+        y:types.GEQ => true   
+        default => false
+
+def combineStringList(ls:List[String]):String = match ls:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => c.value
+        cc:llist.Cons => c.value + ", " + combineStringList(c.next)
+    default => ""
+
+def declTypeToString(d:DeclType):String = match d:
+    v:ValType => "val " + v.name.name + ":" + typeToString(v.typ)
+    t:TypeType => 
+        val s = t.unfld.map[String](e => declTypeToString(e))
+        "type " + t.name.name + ":" + " {" + combineStringList(s) + "}"
+    d:DefType => 
+        val arglist = d.args.map[String](t => t.arg.name + ":" + typeToString(t.argTyp))
+        "def " + d.name.name + "(" + combineStringList(arglist) + "):" + typeToString(d.retTyp)
+    s:SubtypeType => "subtype " + typeToString(s.subtype) + " extends " + typeToString(s.supertype)
+    m:MemberType => 
+        val boundStr:String = match m.bound:
+            a:types.LEQ => " <= "
+            a:types.EQ  => " = "
+            a:types.GEQ => " >= "
+        "type " + m.name.name + boundStr + typeToString(m.typ)
+    default => error.report("missed case",error.unknownLocation)
+
+def typeToString(t:Type):String
+    val baseString = match t.base:
+        u:UnitType => "Unit"
+        n:NominalType => n.L.name
+        path:PathType => expToString(path.p) + "." + path.t.name
+    val s = t.refines.map[String](e => declTypeToString(e))
+    val refinesString = combineStringList(s)
+    baseString + " {" + refinesString + "}"
+
+def expToString(e:types.Exp):String = match e:
+    v:types.Var  => v.binding.name
+    c:types.Call => 
+        val argList = c.args.map[String](e => expToString(e))
+        expToString(c.receiver) + "." + c.name + "(" + combineStringList(argList) + ")"
+    f:types.Field   => expToString(f.receiver) + "." + f.field
+    n:types.New     => error.report("TODO: new bound exp to string",error.unknownLocation)
+    i:types.Integer => i.str
+    u:types.UnitVal => "()"
+    default => error.report("missed case",error.unknownLocation)

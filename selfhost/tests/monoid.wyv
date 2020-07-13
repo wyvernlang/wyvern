@@ -1,0 +1,28 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Semi:z:
+    type T <= Unit
+    def op(a:z.T, b:z.T):z.T
+
+type Monoid:z:
+    type T <= Unit
+    val id:z.T
+    def op(a:z.T, b:z.T):z.T
+subtype Monoid extends Semi
+
+val sum = new this:Monoid {type T = Int}:
+    type T = Int
+    val id:this.T = 0
+    def op(a:this.T, b:this.T):this.T:
+        a + b
+
+type Util:z:
+    def apply3(s:Semi, a:s.T, b:s.T, c:s.T):s.T
+
+val util = new this:Util:
+    def apply3(s:Semi, a:s.T, b:s.T, c:s.T):s.T:
+        s.op(a,s.op(b,c))
+
+util.apply3(sum,1,2,3)

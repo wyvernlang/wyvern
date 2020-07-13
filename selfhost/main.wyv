@@ -10,20 +10,24 @@ import javascript:stdlib.support.file
 import javascript:stdlib.support.string
 import wyvernLexer
 import wyvernParser
-//import bytecode
+import bytecode
 import raw
-//import binding
-//import bound
-//import toBytecode
+import binding
+import bound
+import toBytecode
 import wyvern.collections.llist
-//import types
-//import typecheck
+import types
+import typesUtil
+import typecheck
+
+import wyvern.exception
+import error
 
 // instantiate imports and create aliases
 type List = llist.LinkedList
 val wyvernLexer = wyvernLexer(js, regexUtils)
-//val toBytecode = toBytecode(javascript, js)
-//val b = bytecode(javascript, js)
+val toBytecode = toBytecode(javascript, js)
+val b = bytecode(javascript, js)
 
 val lexer = wyvernLexer.makeLexer()
 val parser = wyvernParser.makeParser(lexer)
@@ -58,22 +62,24 @@ def parse(s:String):raw.Exp
     pars.results.get(0)
 
 //stdout.print("Binding...\n")
-//val boundExp:bound.Statement = binding.bind(parser.results.get(0), s => parse(s))
-/*
-val boundExp : exception.Answer[bound.Statement,exception.Exception] = exception.try[bound.Statement](() => binding.bind(parser.results.get(0), s => parse(s)))
+//val boundExp:types.Statement = binding.bind(parser.results.get(0), s => parse(s))
+val boundExp : exception.Answer[types.Statement,exception.Exception] = exception.try[types.Statement](() => binding.bind(parser.results.get(0), s => parse(s)))
 match boundExp:
     s1: exception.Success =>
-        stdout.print("success\n")
+        stdout.print("binding success\n")
+        val tc = typecheck.typecheck(s1.value)
+        stdout.print("type: " + typesUtil.typeToString(tc) + "\n")
     f1: exception.Failure =>
         match f1.exception:
             exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
             default => stdout.print("unexpected exception thrown\n")
 
-val tc = typecheck.typecheck(boundExp)
-stdout.print("type: " + types.typeToString(tc) + "\n")
+//val tc = typecheck.typecheck(boundExp)
+//stdout.print("type: " + types.typeToString(tc) + "\n")
 
+/*
 stdout.print("Lowering...\n")
-val ooExp:bound.Statement = bound.lowerStatement(boundExp)
+val ooExp:types.Statement = bound.lowerStatement(boundExp)
 
 val outputFileName = string.replace(fileName, ".wyv", ".wyb")
 

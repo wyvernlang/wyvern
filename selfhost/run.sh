@@ -7,6 +7,6 @@ wyby main.wyv
 node ../backend/boot.js main.wyb > main.js
 node main.js $1
 
-echo FINISHED PRODUCING WYB FILE FOR $1 NOW RUNNING IT
-node ../backend/boot.js `echo $1 | sed 's/\.wyv/\.wyb/'` > `echo $1 | sed 's/\.wyv/\.js/'`
-node  `echo $1 | sed 's/\.wyv/\.js/'`
+#echo FINISHED PRODUCING WYB FILE FOR $1 NOW RUNNING IT
+#node ../backend/boot.js `echo $1 | sed 's/\.wyv/\.wyb/'` > `echo $1 | sed 's/\.wyv/\.js/'`
+#node  `echo $1 | sed 's/\.wyv/\.js/'`
