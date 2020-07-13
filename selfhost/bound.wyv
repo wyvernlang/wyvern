@@ -17,6 +17,7 @@ def lowerDecl(decl:types.Decl):types.Decl = match decl:
     d:types.Def         => types.Def(d.binding, d.args, d.retTyp, lowerStatement(d.body))
     t:types.TypeDecl    => t
     s:types.SubtypeDecl => s
+    m:types.TypeEq  => m
 
 def lowerExp(exp:types.Exp):types.Exp = match exp:
     v:types.Var     => v

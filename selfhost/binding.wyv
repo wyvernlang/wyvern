@@ -107,12 +107,12 @@ def bindDecl(e:raw.Exp, context:types.Context):types.Decl = match e:
         val body = bindExpr(v.exp, context)
         val expType = typecheck.typecheckExpr(body, context.bindings)
         val annotType = rawToType(v.typ,context)
-        if (false /*TODO: !subtyping.isSubtype(expType,annotType,context.bindings)*/)
+        if (!typecheck.isSubtype(expType,annotType,context.bindings))
             error.report("val expr doesn't match annotation",error.unknownLocation)
         types.Val(b, annotType, body)
     d:raw.Def =>
         val b = types.Binding(d.name, context.counter)
-        //again VAR alert
+
         var newCtx:types.Context = context
         def mapParams(args:List[raw.Arg]):List[types.Arg] = match args:
             c:llist.Cons =>

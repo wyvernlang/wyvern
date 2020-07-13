@@ -10,7 +10,6 @@ type Monoid:z:
     type T <= Unit
     val id:z.T
     def op(a:z.T, b:z.T):z.T
-subtype Monoid extends Semi
 
 val sum = new this:Monoid {type T = Int}:
     type T = Int
@@ -19,10 +18,11 @@ val sum = new this:Monoid {type T = Int}:
         a + b
 
 type Util:z:
-    def apply3(s:Semi, a:s.T, b:s.T, c:s.T):s.T
+    def apply3(s:Monoid, a:s.T, b:s.T, c:s.T):s.T
 
 val util = new this:Util:
-    def apply3(s:Semi, a:s.T, b:s.T, c:s.T):s.T:
+    def apply3(s:Monoid, a:s.T, b:s.T, c:s.T):s.T:
         s.op(a,s.op(b,c))
 
-util.apply3(sum,1,2,3)
+val ans = util.apply3(sum,1,2,3)
+ans

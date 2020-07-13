@@ -39,6 +39,10 @@ def zip[U,T](xs:List[U], ys:List[T]):List[Pair[U,T]] = match xs:
         default => llist.Nil[Pair[U,T]]()
     default => llist.Nil[Pair[U,T]]()
 
+def doListOfSubstitutions(ty:Type, exps:List[types.Exp], bindings:List[Binding]):Type
+    val zipargs = zip[types.Exp,Binding](exps,bindings)
+    zipargs.foldRight[Type]((x:Pair[types.Exp,Binding],t:Type)=>types.substituteType(t,x.first,option.Some[Binding](x.second)),ty)
+
 def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
     x:types.LEQ => match b:
         y:types.LEQ => true   
@@ -49,6 +53,16 @@ def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
     x:types.GEQ => match b:
         y:types.GEQ => true   
         default => false
+
+def addRefines(t:Type, decls:List[DeclType]):Type
+    types.Type(t.base,decls.append(t.refines))
+
+/////////////////////////
+def combineWithNewlines(ls:List[String]):String = match ls:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => c.value
+        cc:llist.Cons => c.value + "\n" + combineWithNewlines(c.next)
+    default => ""
 
 def combineStringList(ls:List[String]):String = match ls:
     c:llist.Cons => match c.next:

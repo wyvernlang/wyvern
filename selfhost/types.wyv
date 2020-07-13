@@ -47,6 +47,7 @@ def Context(bs:List[DeclType], c:Counter, p:String -> raw.Exp) : Context = new
     
 def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[DeclType](), Counter(), p)
 
+//TODO: ARG should really just be a valType to make things easier
 type Arg
     val arg:Binding
     val argTyp:Type
@@ -91,8 +92,6 @@ def makeNominalType(L:Binding):Type = new
 def makeRefines(ls:List[DeclType]):Type = new
     val base = UnitType()
     val refines = ls
-//def makeBase(b:BaseType):Type
-//    Type(b,llist.Nil[DeclType]())
 
 datatype Bound
     LEQ()    

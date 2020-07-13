@@ -1,15 +1,15 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type List:
+type List:z:
     def sum(u:Unit):Int
 
-type Empty:
+type Empty:z:
     def sum(u:Unit):Int
 subtype Empty extends List
 
-type Node:
+type Node:z:
     def sum(u:Unit):Int
     val next:List
 subtype Node extends List
