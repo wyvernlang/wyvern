@@ -39,10 +39,10 @@ def typecheckDecl(e:types.Decl, gamma:List[DeclType]):DeclType = match e:
         val typ = typecheckExpr(v.exp, gamma)
         types.ValType(v.binding, typ)
     t:types.TypeDecl =>
+        //TODO: check WF here
         types.TypeType(t.name, t.z, t.typ)
     d:types.Def =>
-        val argdecls:List[DeclType] = d.args.map[ValType]((a:types.Arg) => types.ValType(a.arg,a.argTyp))
-        val ngamma = argdecls.append(gamma)
+        val ngamma = d.args.map[DeclType](e=>e).append(gamma)
         val testType = typecheckStmt(d.body, ngamma)
         if (isSubtype(testType, d.retTyp, ngamma))
             types.DefType(d.binding, d.args, d.retTyp)
@@ -75,9 +75,9 @@ def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
         val pred = ((b:DeclType) =>
             val z = match b:
                 da:DefType => 
-                    val argBindings = da.args.map[Binding](a => a.arg)
+                    val argBindings = da.args.map[Binding](a => a.name)
 
-                    val argsSub = da.args.map[ValType](e => types.ValType(e.arg,types.substituteType(e.argTyp,c.receiver,unfold.z)))
+                    val argsSub = da.args.map[ValType](e => types.ValType(e.name,types.substituteType(e.typ,c.receiver,unfold.z)))
                     val argsSub2 = argsSub.map[ValType](e => types.ValType(e.name,typesUtil.doListOfSubstitutions(e.typ,c.args,argBindings)))
                     val defargs = argsSub2.map[Type](e => e.typ)
 
@@ -92,7 +92,7 @@ def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
         val func = typesUtil.findInDeclList[DefType](unfold.decls, pred)
         //Do substitutions to get the correct return type
         val retTyp = types.substituteType(func.retTyp, c.receiver, unfold.z)
-        val argBindings = func.args.map[Binding](a => a.arg)
+        val argBindings = func.args.map[Binding](a => a.name)
         typesUtil.doListOfSubstitutions(retTyp,c.args,argBindings)
 
     f:types.Field => //T-Field
@@ -146,26 +146,18 @@ def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
 /////////////////////////////////
 //UNFOLD
 type Unfold
-    val z:Option[Binding]
+    val z:Binding
     val decls:List[DeclType]
-def Unfold(z:Option[Binding], decls:List[DeclType]):Unfold = new
+def Unfold(z:Binding, decls:List[DeclType]):Unfold = new
     val z = z
     val decls = decls
 
-def findTypePredicate(bind:Binding):DeclType->Option[TypeType]
-    val pred = ((b:DeclType) =>
-        val z = match b:
-            t:TypeType => if (types.equalBinding(bind, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
-            default => option.None[TypeType]()
-        z
-    )
-    pred
 
 def fetchDeclFromList(path:PathType, ls:List[DeclType]):DeclType
     val pred = ((d:DeclType) => 
         val z = match d:
-            t:TypeType   => path.t.name == t.name.name 
-            m:MemberType => path.t.name == m.name.name //compare just names instead of bindings? I think its ok since just searching in an unfld list like for field names
+            t:TypeType   => path.t == t.name.name 
+            m:MemberType => path.t == m.name.name
             default => false
         z
     )
@@ -176,11 +168,14 @@ def fetchDeclFromList(path:PathType, ls:List[DeclType]):DeclType
 
 def unfoldType(x:Type, gamma:List[DeclType]):Unfold
     val b = match x.base:
-        u:UnitType => Unfold(option.None[Binding](),llist.Nil[DeclType]())
-        x:NominalType => 
-            val pred = findTypePredicate(x.L)
+        u:UnitType => 
+            val pred = typesUtil.findTypePredicateFromStr("Unit")
             val tt = typesUtil.findInDeclList[TypeType](gamma, pred)
-            Unfold(option.Some[Binding](tt.z),tt.unfld)
+            Unfold(tt.z,llist.Nil[DeclType]())
+        x:NominalType => 
+            val pred = typesUtil.findTypePredicate(x.L)
+            val tt = typesUtil.findInDeclList[TypeType](gamma, pred)
+            Unfold(tt.z,tt.unfld)
         path:PathType =>
                 val tau = typecheckExpr(path.p,gamma)
                 val pUnfold = unfoldType(tau,gamma)
@@ -188,9 +183,12 @@ def unfoldType(x:Type, gamma:List[DeclType]):Unfold
                 match d:
                     t:TypeType => 
                         val subUnfold = t.unfld.map[DeclType](e => types.substituteDeclType(e,path.p,pUnfold.z))
-                        Unfold(option.Some[Binding](t.z),subUnfold)
+                        Unfold(t.z,subUnfold)
                     m:MemberType => match m.bound:
-                        g:types.GEQ => Unfold(option.None[Binding](),llist.Nil[DeclType]())
+                        g:types.GEQ => 
+                            val pred = typesUtil.findTypePredicateFromStr("Unit")
+                            val tt = typesUtil.findInDeclList[TypeType](gamma, pred)
+                            Unfold(tt.z,llist.Nil[DeclType]())
                         default => unfoldType(types.substituteType(m.typ,path.p,pUnfold.z),gamma)
                     default => error.report("should never happend",error.unknownLocation)
     Unfold(b.z,x.refines.append(b.decls))
@@ -228,10 +226,10 @@ def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match 
         default => false
     d:DefType => match b:
         u:DefType => 
-            val dargs = d.args.map[Type](e => e.argTyp)
-            val uargs = u.args.map[Type](e => e.argTyp)
-            val ngamma = d.args.map[DeclType](e => types.ValType(e.arg,e.argTyp)).append(gamma)
-            val nngamma = u.args.map[DeclType](e => types.ValType(e.arg,e.argTyp)).append(ngamma)
+            val dargs = d.args.map[Type](e => e.typ)
+            val uargs = u.args.map[Type](e => e.typ)
+            val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+            val nngamma = u.args.map[DeclType](e=>e).append(ngamma)
             val pred = x:Type => y:Type => equalType(x,y,nngamma)
             d.name.name == u.name.name && checkArgList(dargs,uargs,pred) && equalType(d.retTyp,u.retTyp,nngamma)
         default => false
@@ -255,7 +253,7 @@ def equalBaseType(a:BaseType, b:BaseType, gamma:List[DeclType]):Boolean = match 
         v:PathType => 
             val tauA = typecheckExpr(path.p,gamma)
             val tauB = typecheckExpr(v.p,gamma)
-            equalType(tauA,tauB,gamma) && path.t.name == v.t.name
+            equalType(tauA,tauB,gamma) && path.t == v.t
         default => false
 
 def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
@@ -274,10 +272,10 @@ def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match 
         default => false
     d:DefType => match b:
         u:DefType => 
-            val dargs = d.args.map[Type](e => e.argTyp)
-            val uargs = u.args.map[Type](e => e.argTyp)
-            val ngamma = d.args.map[DeclType](e => types.ValType(e.arg,e.argTyp)).append(gamma)
-            val nngamma = u.args.map[DeclType](e => types.ValType(e.arg,e.argTyp)).append(ngamma)
+            val dargs = d.args.map[Type](e => e.typ)
+            val uargs = u.args.map[Type](e => e.typ)
+            val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+            val nngamma = u.args.map[DeclType](e=>e).append(ngamma)
             val pred = x:Type => y:Type => isSubtype(x,y,nngamma)
             d.name.name == u.name.name && checkArgList(uargs,dargs,pred) && isSubtype(d.retTyp,u.retTyp,nngamma)
         default => false
@@ -372,16 +370,12 @@ def isSubtypeBase(t1:Type, t2:BaseType, gamma:List[DeclType]):Boolean
 def checkSubtypeWF(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
     val ua = unfoldType(t1,gamma)
     val ub = unfoldType(t2,gamma)
-    var newgamma:List[DeclType] = llist.Cons[DeclType](types.SubtypeType(t1,t2),gamma)
-    match ua.z:
-        s:option.Some => 
-            val vt = types.ValType(s.get(),t1)
-            newgamma = llist.Cons[DeclType](vt,newgamma)
-    match ub.z:
-        s:option.Some => 
-            val vt = types.ValType(s.get(),t2)
-            newgamma = llist.Cons[DeclType](vt,newgamma)
-    //val ng:List[DeclType] = newgamma
+    val ngamma = llist.Cons[DeclType](types.SubtypeType(t1,t2),gamma)
+    val nngamma = llist.Cons[DeclType](types.ValType(ua.z,t1),ngamma)
+    //ADD ua.z to ctx, substitute ub.z for ua.z
+    val supertypeDecls = ub.decls.map[DeclType](d => types.substituteDeclType(d,types.Var(ua.z),ub.z))
     //error.report("ngamma: \n" + typesUtil.combineWithNewlines(ng.map[String](e => typesUtil.declTypeToString(e))),error.unknownLocation)
-    isSubtypeDeclList(ua.decls,ub.decls,newgamma)
+    isSubtypeDeclList(ua.decls,supertypeDecls,nngamma)
     
+def checkTypeDeclWF(d:DeclType,gamma:List[DeclType]):Boolean
+    true

@@ -15,19 +15,12 @@ def rawToType(s:raw.Type, ctx:types.Context):types.Type
             if (b.str == "Unit")
                 types.UnitType()
               else
-                val pred = ((d:DeclType) =>
-                    val z = match d:
-                        tt:types.TypeType =>
-                            if (tt.name.name == b.str) { option.Some[types.TypeType](tt) } else { option.None[types.TypeType]() }
-                        default => option.None[types.TypeType]()
-                    z
-                )
+                val pred = typesUtil.findTypePredicateFromStr(b.str)
                 val L = typesUtil.findInDeclList[types.TypeType](ctx.bindings, pred).name
                 types.NominalType(L)
         path:raw.Path =>
             val p = bindExpr(path.p,ctx)
-            val t = types.Binding(path.t,ctx.counter) //maybe should just be a String?
-            types.PathType(p,t)
+            types.PathType(p,path.t)
     val refines = s.refines.map[types.DeclType](e => bindDeclTypes(e,ctx))
     types.Type(base,refines)
 
@@ -39,12 +32,12 @@ def bindDeclTypes(e:raw.Exp, context:types.Context):DeclType = match e:
         val b = types.Binding(d.name, context.counter)
 
         var newCtx:types.Context = context
-        def mapParams(args:List[raw.Arg]):List[types.Arg] = match args:
+        def mapParams(args:List[raw.Arg]):List[types.ValType] = match args:
             c:llist.Cons =>
-                val arg = types.Arg(types.Binding(c.value.arg,newCtx.counter),rawToType(c.value.argTyp,newCtx))
-                newCtx = newCtx.extend(types.ValType(arg.arg,arg.argTyp))
-                llist.Cons[types.Arg](arg,mapParams(c.next))
-            n:llist.Nil => llist.Nil[types.Arg]()
+                val arg = types.ValType(types.Binding(c.value.arg,newCtx.counter),rawToType(c.value.argTyp,newCtx))
+                newCtx = newCtx.extend(arg)
+                llist.Cons[types.ValType](arg,mapParams(c.next))
+            n:llist.Nil => llist.Nil[types.ValType]()
         val arglist = mapParams(d.args)
         types.DefType(b, arglist, rawToType(d.retTyp,newCtx))
     
@@ -74,7 +67,17 @@ def makeSeq(e:raw.Exp):raw.Seq = match e: //ensures that the whole expression is
     default => raw.Seq(llist.Singleton[raw.Exp](e))
 
 def bind(e:raw.Exp, parse: String -> raw.Exp):types.Statement
-    bindStatement(makeSeq(e), types.emptyContext(parse))
+    bindTopLevel(e, types.emptyContext(parse))
+
+def bindTopLevel(e:raw.Exp, context:types.Context):types.Statement
+    //add Unit type decl
+    val nameb = types.Binding("Unit",context.counter)
+    val zb = types.Binding("z",context.counter)
+    val unitTypeDecl = types.TypeDecl(nameb,zb,llist.Nil[DeclType]())
+    val unitDeclType = types.TypeType(nameb,zb,llist.Nil[DeclType]())
+
+    val program = bindStatement(makeSeq(e),context.extend(unitDeclType))
+    types.DeclStatement(unitTypeDecl,program)
 
 def bindStatement(e:raw.Seq, context:types.Context):types.Statement = match e.exps:
     c:llist.Cons => match c.next:
@@ -114,12 +117,12 @@ def bindDecl(e:raw.Exp, context:types.Context):types.Decl = match e:
         val b = types.Binding(d.name, context.counter)
 
         var newCtx:types.Context = context
-        def mapParams(args:List[raw.Arg]):List[types.Arg] = match args:
+        def mapParams(args:List[raw.Arg]):List[types.ValType] = match args:
             c:llist.Cons =>
-                val arg = types.Arg(types.Binding(c.value.arg,newCtx.counter),rawToType(c.value.argTyp,newCtx))
-                newCtx = newCtx.extend(types.ValType(arg.arg,arg.argTyp))
-                llist.Cons[types.Arg](arg,mapParams(c.next))
-            n:llist.Nil => llist.Nil[types.Arg]()
+                val arg = types.ValType(types.Binding(c.value.arg,newCtx.counter),rawToType(c.value.argTyp,newCtx))
+                newCtx = newCtx.extend(arg)
+                llist.Cons[types.ValType](arg,mapParams(c.next))
+            n:llist.Nil => llist.Nil[types.ValType]()
         val arglist = mapParams(d.args)
 
         val methodDecl = types.DefType(b, arglist, rawToType(d.retTyp,newCtx))
@@ -185,8 +188,8 @@ def bindExpr(e:raw.Exp, context:types.Context):types.Exp = match e:
         val expType = typecheck.typecheckExpr(boundExp, newCtx.bindings)
 
         val applyb = types.Binding("apply", context.counter)
-        val decl = types.DefType(applyb, llist.Singleton[types.Arg](types.Arg(argb,argDecl.typ)), expType)
-        val defDeclaration:types.Decl = types.Def(applyb, llist.Singleton[types.Arg](types.Arg(argb,argDecl.typ)), expType, types.ExprStatement(boundExp))
+        val decl = types.DefType(applyb, llist.Singleton[types.ValType](types.ValType(argb,argDecl.typ)), expType)
+        val defDeclaration:types.Decl = types.Def(applyb, llist.Singleton[types.ValType](types.ValType(argb,argDecl.typ)), expType, types.ExprStatement(boundExp))
 
         val thisb = types.Binding("_this", context.counter)
         val thisType = types.makeRefines(llist.Singleton[DeclType](decl))

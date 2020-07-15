@@ -4,19 +4,20 @@ type Int:z:
 
 type Equatable:z:    
     type T <= Unit
-    def equals(x:z.T):Int
+    def equals(x:z.T):z.T
 
 type Fruit:z:
     type T <= Unit
     type S <= Unit
     val item:z.T
-    def equals(x:z.T):Int
+    def equals(x:z.T):z.T
+subtype Fruit extends Equatable
 
 val f1 = new this:Fruit {type T = Int}:
     type T = Int
     type S <= Unit
     val item:this.T = 3
-    def equals(x:this.T):Int:
+    def equals(x:this.T):this.T:
         this.item + x
 
 f1.equals(3)

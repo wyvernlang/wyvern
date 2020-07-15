@@ -1,0 +1,26 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Cloneable:z:
+    type T <= Unit
+    def clone(u:Unit):z.T
+
+type String:z:
+    type T <= String
+    def clone(u:Unit):z.T
+subtype String extends Cloneable
+
+type A:z:
+    def makeClone(arg:Cloneable):arg.T
+val a = new this:A:
+    def makeClone(arg:Cloneable):arg.T:
+        arg.clone(())
+
+val s = new this:String:
+    type T <= String
+    def clone(u:Unit):this.T:
+        a.makeClone(this)
+
+
+a.makeClone(s)

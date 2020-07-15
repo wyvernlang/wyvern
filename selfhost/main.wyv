@@ -63,23 +63,24 @@ def parse(s:String):raw.Exp
 
 stdout.print("Binding...\n")
 val boundExp:types.Statement = binding.bind(parser.results.get(0), s => parse(s))
-//val boundExp : exception.Answer[types.Statement,exception.Exception] = exception.try[types.Statement](() => binding.bind(parser.results.get(0), s => parse(s)))
-//match boundExp:
-//    s1: exception.Success =>
-//        stdout.print("binding success\n")
-//        val tc:exception.Answer[types.Type,exception.Exception] = exception.try[types.Type](() => typecheck.typecheck(s1.value))
-//        match tc:
-//            s1: exception.Success =>
-//                stdout.print("type: " + typesUtil.typeToString(s1.value) + "\n")
-//            f1: exception.Failure =>
-//                match f1.exception:
-//                    exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
-//                    default => stdout.print("unexpected exception thrown\n")
-//    f1: exception.Failure =>
-//        match f1.exception:
-//            exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
-//            default => stdout.print("unexpected exception thrown\n")
+val boundExp : exception.Answer[types.Statement,exception.Exception] = exception.try[types.Statement](() => binding.bind(parser.results.get(0), s => parse(s)))
+match boundExp:
+    s1: exception.Success =>
+        stdout.print("binding success\n")
+        val tc:exception.Answer[types.Type,exception.Exception] = exception.try[types.Type](() => typecheck.typecheck(s1.value))
+        match tc:
+            s1: exception.Success =>
+                stdout.print("type: " + typesUtil.typeToString(s1.value) + "\n")
+            f1: exception.Failure =>
+                match f1.exception:
+                    exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
+                    default => stdout.print("unexpected exception thrown\n")
+    f1: exception.Failure =>
+        match f1.exception:
+            exn: error.ErrorReportingException => stdout.print(error.asString(exn)+"\n")
+            default => stdout.print("unexpected exception thrown\n")
 
+/*
 val tc = typecheck.typecheck(boundExp)
 stdout.print("type: " + typesUtil.typeToString(tc) + "\n")
 
@@ -93,3 +94,4 @@ stdout.print(outputFileName)
 stdout.print("...\n")
 
 toBytecode.writeExpToFile(ooExp, outputFileName)
+*/

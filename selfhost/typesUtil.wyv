@@ -41,7 +41,7 @@ def zip[U,T](xs:List[U], ys:List[T]):List[Pair[U,T]] = match xs:
 
 def doListOfSubstitutions(ty:Type, exps:List[types.Exp], bindings:List[Binding]):Type
     val zipargs = zip[types.Exp,Binding](exps,bindings)
-    zipargs.foldRight[Type]((x:Pair[types.Exp,Binding],t:Type)=>types.substituteType(t,x.first,option.Some[Binding](x.second)),ty)
+    zipargs.foldRight[Type]((x:Pair[types.Exp,Binding],t:Type)=>types.substituteType(t,x.first,x.second),ty)
 
 def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
     x:types.LEQ => match b:
@@ -57,6 +57,24 @@ def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
 def addRefines(t:Type, decls:List[DeclType]):Type
     types.Type(t.base,decls.append(t.refines))
 
+def findTypePredicate(bind:Binding):DeclType->Option[TypeType]
+    val pred = ((b:DeclType) =>
+        val z = match b:
+            t:TypeType => if (types.equalBinding(bind, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
+            default => option.None[TypeType]()
+        z
+    )
+    pred
+
+def findTypePredicateFromStr(s:String):DeclType->Option[TypeType]
+    val pred = ((d:DeclType) =>
+        val z = match d:
+            tt:types.TypeType =>
+                if (tt.name.name == s) { option.Some[types.TypeType](tt) } else { option.None[types.TypeType]() }
+            default => option.None[types.TypeType]()
+        z
+    )
+    pred
 /////////////////////////
 def combineWithNewlines(ls:List[String]):String = match ls:
     c:llist.Cons => match c.next:
@@ -76,7 +94,7 @@ def declTypeToString(d:DeclType):String = match d:
         val s = t.unfld.map[String](e => declTypeToString(e))
         "type " + t.name.name + ":" + " {" + combineStringList(s) + "}"
     d:DefType => 
-        val arglist = d.args.map[String](t => t.arg.name + ":" + typeToString(t.argTyp))
+        val arglist = d.args.map[String](t => t.name.name + ":" + typeToString(t.typ))
         "def " + d.name.name + "(" + combineStringList(arglist) + "):" + typeToString(d.retTyp)
     s:SubtypeType => "subtype " + typeToString(s.subtype) + " extends " + typeToString(s.supertype)
     m:MemberType => 
@@ -85,13 +103,12 @@ def declTypeToString(d:DeclType):String = match d:
             a:types.EQ  => " = "
             a:types.GEQ => " >= "
         "type " + m.name.name + boundStr + typeToString(m.typ)
-    default => error.report("missed case",error.unknownLocation)
 
 def typeToString(t:Type):String
     val baseString = match t.base:
         u:UnitType => "Unit"
         n:NominalType => n.L.name
-        path:PathType => expToString(path.p) + "." + path.t.name
+        path:PathType => expToString(path.p) + "." + path.t
     val s = t.refines.map[String](e => declTypeToString(e))
     val refinesString = combineStringList(s)
     baseString + " {" + refinesString + "}"
@@ -102,7 +119,6 @@ def expToString(e:types.Exp):String = match e:
         val argList = c.args.map[String](e => expToString(e))
         expToString(c.receiver) + "." + c.name + "(" + combineStringList(argList) + ")"
     f:types.Field   => expToString(f.receiver) + "." + f.field
-    n:types.New     => error.report("TODO: new bound exp to string",error.unknownLocation)
+    n:types.New     => "new"
     i:types.Integer => i.str
     u:types.UnitVal => "()"
-    default => error.report("missed case",error.unknownLocation)

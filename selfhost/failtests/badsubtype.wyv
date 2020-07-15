@@ -1,0 +1,15 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type A:z:
+    type T >= Int
+    val a:z.T
+
+type B:z:
+    type T <= Int
+    val a:z.T
+
+subtype B extends A
+
+0

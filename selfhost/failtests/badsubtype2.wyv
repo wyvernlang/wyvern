@@ -1,0 +1,19 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type A:z:
+    type T >= Int
+    val a:z.T
+
+type B:z:
+    type T <= Int
+    val a:z.T
+
+type C:z:
+    val a:Int    
+
+subtype Unit {val a:Int} extends C
+subtype Unit {val a:Int} extends A
+
+0

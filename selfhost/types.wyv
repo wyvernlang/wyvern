@@ -47,21 +47,13 @@ def Context(bs:List[DeclType], c:Counter, p:String -> raw.Exp) : Context = new
     
 def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[DeclType](), Counter(), p)
 
-//TODO: ARG should really just be a valType to make things easier
-type Arg
-    val arg:Binding
-    val argTyp:Type
-def Arg(arg:Binding,argTyp:Type):Arg = new
-    val arg = arg
-    val argTyp = argTyp
-
 datatype Statement
     DeclStatement(decl:Decl, stmt:Statement)
     ExprStatement(exp:Exp)
 
 datatype Decl
     Val(binding:Binding, typ:Type, exp:Exp)
-    Def(binding:Binding, args:List[Arg], retTyp:Type, body:Statement)
+    Def(binding:Binding, args:List[ValType], retTyp:Type, body:Statement)
     TypeDecl(name:Binding, z:Binding, typ:List[DeclType])
     SubtypeDecl(subtype:Type, supertype:Type)
     TypeEq(name:Binding, typ:Type)
@@ -78,7 +70,7 @@ datatype Exp
 datatype BaseType
     UnitType()
     NominalType(L:Binding)
-    PathType(p:Exp, t:Binding)
+    PathType(p:Exp, t:String)
 
 type Type
     val base:BaseType
@@ -101,34 +93,29 @@ datatype Bound
 datatype DeclType
     ValType(name:Binding, typ:Type)
     TypeType(name:Binding, z:Binding, unfld:List[DeclType])
-    DefType(name:Binding, args:List[Arg], retTyp:Type)
+    DefType(name:Binding, args:List[ValType], retTyp:Type)
     SubtypeType(subtype:Type, supertype:Type)
     MemberType(name:Binding, bound:Bound, typ:Type)
 
 val theUnit = Type(UnitType(),llist.Nil[DeclType]())
 //////////////////////////////
-def substituteBaseType(beta:BaseType, newb:Exp, oldb:Option[Binding]):BaseType = match beta:
+def substituteBaseType(beta:BaseType, newb:Exp, oldb:Binding):BaseType = match beta:
     p:PathType => PathType(substituteExp(p.p,newb,oldb),p.t)
     default => beta
         
-def substituteType(tau:Type, newb:Exp, oldb:Option[Binding]):Type
+def substituteType(tau:Type, newb:Exp, oldb:Binding):Type
     val subBase = substituteBaseType(tau.base,newb,oldb)
     val subRefines = tau.refines.map[DeclType](e => substituteDeclType(e,newb,oldb))
     Type(subBase,subRefines)
 
-def substituteDeclType(d:DeclType, newb:Exp, oldb:Option[Binding]):DeclType = match d:
+def substituteDeclType(d:DeclType, newb:Exp, oldb:Binding):DeclType = match d:
     v:ValType     => ValType(v.name,substituteType(v.typ,newb,oldb))
     t:TypeType    => TypeType(t.name,t.z,t.unfld.map[DeclType](e => substituteDeclType(e,newb,oldb)))
-    d:DefType     => DefType(d.name,d.args.map[Arg](e=>Arg(e.arg,substituteType(e.argTyp,newb,oldb))),substituteType(d.retTyp,newb,oldb))
+    d:DefType     => DefType(d.name,d.args.map[ValType](e=>ValType(e.name,substituteType(e.typ,newb,oldb))),substituteType(d.retTyp,newb,oldb))
     s:SubtypeType => SubtypeType(substituteType(s.subtype,newb,oldb),substituteType(s.supertype,newb,oldb))
     m:MemberType  => MemberType(m.name,m.bound,substituteType(m.typ,newb,oldb))
 
-def substituteExp(e:Exp, newb:Exp, oldb:Option[Binding]):Exp = match e:
-    v:Var => match oldb:
-        s:option.Some => if (equalBinding(v.binding,s.get())) { newb } else { v }
-        default => v
-    c:Call => Call(substituteExp(c.receiver,newb,oldb),c.name,c.args.map[Exp](e => substituteExp(e,newb,oldb)))
+def substituteExp(e:Exp, newb:Exp, oldb:Binding):Exp = match e:
+    v:Var => if (equalBinding(v.binding, oldb)) { newb } else { v }
     f:Field => Field(substituteExp(f.receiver,newb,oldb),f.field)
-    n:New => error.report("TODO: substitute new",error.unknownLocation) //fix this--need to add substitute Decl and Statement, probably
-    i:Integer => i
-    u:UnitVal => u
+    default => error.report("Substitution into invalid path type",error.unknownLocation)
