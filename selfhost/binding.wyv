@@ -141,7 +141,6 @@ def bindDecl(e:raw.Exp, context:types.Context):types.Decl = match e:
 
         types.TypeDecl(b, z, declList)
     t:raw.TypeMem =>
-        //TODO: here, we assumes that it's =, should check if it's <= and >=
         val b = types.Binding(t.name, context.counter)
         val typ = rawToType(t.tau, context)
         types.TypeEq(b, typ)

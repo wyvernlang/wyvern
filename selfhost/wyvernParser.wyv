@@ -35,8 +35,11 @@ val grammar: parsing.Grammar = ~
 
     Arg -> %identifier %colon Type                        : a:Dyn => raw.Arg(a.get(0).value,a.get(2))
 
+    Refinements -> Stmt                                   : a:Dyn => Single(a.get(0))
+                 | Stmt %comma Refinements                : a:Dyn => llist.Cons[raw.Exp](a.get(0),a.get(2))
+
     Type  -> BaseType                                     : a:Dyn => raw.Type(a.get(0),llist.Nil[raw.Exp]())
-           | BaseType %lcurl Stmt %rcurl                  : a:Dyn => raw.Type(a.get(0),Single(a.get(2)))
+           | BaseType %lcurl Refinements %rcurl           : a:Dyn => raw.Type(a.get(0),a.get(2))
 
     BaseType -> %identifier                               : a:Dyn => raw.Base(a.get(0).value) 
               | Expression %dot %identifier               : a:Dyn => raw.Path(a.get(0),a.get(2).value)
