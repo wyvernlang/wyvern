@@ -37,10 +37,18 @@ def typecheckStmt(e:types.Statement, gamma:List[DeclType]):Type = match e:
 def typecheckDecl(e:types.Decl, gamma:List[DeclType]):DeclType = match e:
     v:types.Val => 
         val typ = typecheckExpr(v.exp, gamma)
-        types.ValType(v.binding, typ)
+        if (isSubtype(typ,v.typ,gamma))
+            types.ValType(v.binding, v.typ)
+          else
+            error.report("val expr not a subtype of declared type",error.unknownLocation)
     t:types.TypeDecl =>
-        //TODO: check WF here
-        types.TypeType(t.name, t.z, t.typ)
+        val tt = types.TypeType(t.name, t.z, t.typ)
+        val ngamma = llist.Cons[DeclType](types.ValType(t.z,types.makeNominalType(t.name)),gamma)
+        val nngamma = llist.Cons[DeclType](tt,ngamma)
+        if (t.typ.foldRight[Boolean]((x:DeclType,y:Boolean)=>checkDeclTypeWF(x,nngamma),true))
+            tt
+          else
+            error.report("type decl is not well-formed",error.unknownLocation)
     d:types.Def =>
         val ngamma = d.args.map[DeclType](e=>e).append(gamma)
         val testType = typecheckStmt(d.body, ngamma)
@@ -49,12 +57,16 @@ def typecheckDecl(e:types.Decl, gamma:List[DeclType]):DeclType = match e:
           else
             error.report("def decl is not well-formed: " + typesUtil.typeToString(testType) + " is not subtype of " + typesUtil.typeToString(d.retTyp),error.unknownLocation)
     s:types.SubtypeDecl =>
-        if (checkSubtypeWF(s.subtype, s.supertype, gamma))
-            types.SubtypeType(s.subtype, s.supertype)
+        val subDecl = types.SubtypeType(s.subtype, s.supertype)
+        if (checkDeclTypeWF(subDecl, gamma))
+            subDecl
           else
             error.report("subtype decl is not well-formed",error.unknownLocation)
     t:types.TypeEq =>
-        types.MemberType(t.name, types.EQ(),t.typ)
+        if (checkTypeWF(t.typ,gamma))
+            types.MemberType(t.name, types.EQ(),t.typ)
+          else
+            error.report("typeEq type not well-formed",error.unknownLocation)
 
 def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
     v:types.Var =>
@@ -115,18 +127,17 @@ def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
         val ngamma = llist.Cons[DeclType](thisType, gamma)
         def typeNewDecls(d:types.Decl):DeclType
             match d:
-                v:types.Val         => typecheckDecl(d, gamma)
+                v:types.Val         => typecheckDecl(d, ngamma)
                 d:types.Def         => typecheckDecl(d, ngamma)
                 t:types.TypeDecl    => typecheckDecl(d, ngamma)
                 s:types.SubtypeDecl => typecheckDecl(d, ngamma)
                 t:types.TypeEq      => typecheckDecl(d, ngamma)
         val decls = n.body.map[DeclType](x => typeNewDecls(x))
         val unfoldDecls = unfold.decls.map[DeclType](d => types.substituteDeclType(d,types.Var(n.binding),unfold.z))
-        //error.report("decls: " + typesUtil.combineStringList(unfoldDecls.map[String](e => typesUtil.declTypeToString(e))),error.unknownLocation)
         if (isSubtypeDeclList(decls,unfoldDecls,ngamma)) 
             n.typ 
           else 
-            error.report("invalid new expression",error.unknownLocation)
+            error.report("invalid new expression: "+"decls:\n" + typesUtil.combineWithNewlines(decls.map[String](e => typesUtil.declTypeToString(e))),error.unknownLocation)
 
     i:types.Integer => 
         val pred = ((b:DeclType) =>
@@ -313,7 +324,7 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
             val d = fetchDeclFromList(path,pUnfold.decls)
             match d:
                 m:MemberType => match m.bound:
-                    l:types.LEQ => false
+                    l:types.LEQ => normalAns()
                     default =>
                         val typeBound = typesUtil.addRefines(m.typ,t2.refines)
                         val subType = types.substituteType(typeBound,path.p,pUnfold.z)
@@ -331,7 +342,7 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
                 val d = fetchDeclFromList(path,pUnfold.decls)
                 match d:
                     m:MemberType => match m.bound:
-                        g:types.GEQ => false
+                        g:types.GEQ => normalAns()
                         default => 
                             val typeBound = typesUtil.addRefines(m.typ,t1.refines)
                             val subType = types.substituteType(typeBound,path.p,pUnfold.z)
@@ -365,14 +376,35 @@ def isSubtypeBase(t1:Type, t2:BaseType, gamma:List[DeclType]):Boolean
             s:option.Some => true
             default => false
 
-def checkSubtypeWF(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
-    val ua = unfoldType(t1,gamma)
-    val ub = unfoldType(t2,gamma)
-    val ngamma = llist.Cons[DeclType](types.SubtypeType(t1,t2),gamma)
-    val nngamma = llist.Cons[DeclType](types.ValType(ua.z,t1),ngamma)
-    //ADD ua.z to ctx, substitute ub.z for ua.z
-    val supertypeDecls = ub.decls.map[DeclType](d => types.substituteDeclType(d,types.Var(ua.z),ub.z))
-    isSubtypeDeclList(ua.decls,supertypeDecls,nngamma)
+def checkTypeWF(t:Type, gamma:List[DeclType]):Boolean
+    match t.refines:
+        n:llist.Nil => true
+        c:llist.Cons =>
+            val ua = unfoldType(t,gamma)
+            val ub = unfoldType(types.Type(t.base,llist.Nil[DeclType]()),gamma)
+            val ngamma = llist.Cons[DeclType](types.ValType(ua.z,t),gamma)
+            //error.report("decl list: " + typesUtil.printDeclList(ngamma)+"\n",error.unknownLocation)
+            isSubtypeDeclList(ua.decls,ub.decls,ngamma)
     
-def checkTypeDeclWF(d:DeclType,gamma:List[DeclType]):Boolean
-    true
+def checkDeclTypeWF(decl:DeclType,gamma:List[DeclType]):Boolean
+    match decl:
+        v:ValType     => checkTypeWF(v.typ,gamma)
+        t:TypeType    =>
+            val ngamma = llist.Cons[DeclType](types.ValType(t.z,types.makeNominalType(t.name)),gamma)
+            val nngamma = llist.Cons[DeclType](t,ngamma)
+            t.unfld.foldRight[Boolean]((d:DeclType,y:Boolean)=>checkDeclTypeWF(d,nngamma) && y,true)
+        d:DefType     =>
+            val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+            val checkArgsWF = d.args.foldRight[Boolean]((v:ValType,y:Boolean)=>checkTypeWF(v.typ,ngamma) && y,true)
+            val checkRetWF = checkTypeWF(d.retTyp,ngamma)
+            checkArgsWF && checkRetWF
+        s:SubtypeType =>
+            val t1 = s.subtype
+            val t2 = s.supertype
+            val ua = unfoldType(t1,gamma)
+            val ub = unfoldType(t2,gamma)
+            val ngamma = llist.Cons[DeclType](types.SubtypeType(t1,t2),gamma)
+            val nngamma = llist.Cons[DeclType](types.ValType(ua.z,t1),ngamma)
+            val supertypeDecls = ub.decls.map[DeclType](d => types.substituteDeclType(d,types.Var(ua.z),ub.z))
+            isSubtypeDeclList(ua.decls,supertypeDecls,nngamma)
+        m:MemberType  => checkTypeWF(m.typ,gamma)

@@ -76,6 +76,8 @@ def findTypePredicateFromStr(s:String):DeclType->Option[TypeType]
     )
     pred
 /////////////////////////
+def printDeclList(ls:List[DeclType]):String
+    combineWithNewlines(ls.map[String](e => declTypeToString(e)))
 def combineWithNewlines(ls:List[String]):String = match ls:
     c:llist.Cons => match c.next:
         n:llist.Nil => c.value

@@ -1,12 +1,12 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Counter:
+type Counter:z:
     val a:Int
     def next(u:Unit):Counter
 
-type X:
+type X:z:
     def makeCounter(b:Int):Counter
 
 val x = new self:X:

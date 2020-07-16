@@ -14,6 +14,6 @@ type C:z:
     val a:Int    
 
 subtype Unit {val a:Int} extends C
-subtype Unit {val a:Int} extends A
+subtype Unit {type T <= Int, val a:Int} extends B
 
 0

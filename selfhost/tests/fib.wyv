@@ -1,13 +1,13 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Fib:
+type Fib:z:
     val a1:Int
     val a2:Int
     def next(u:Unit):Fib
 
-type X:
+type X:z:
     def makeFib(x:Int,y:Int):Fib
 
 val x = new self:X:

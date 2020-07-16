@@ -1,0 +1,17 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Pair:z:
+    type S <= Unit
+    type T <= Unit
+    val fst:z.S
+    val snd:z.T
+
+val p1 = new this:Pair {type S = Int, type T = Unit}:
+    type S = Int
+    type T = Unit
+    val fst:this.S = 3
+    val snd:this.T = ()
+
+p1

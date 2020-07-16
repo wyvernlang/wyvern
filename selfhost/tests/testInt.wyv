@@ -1,4 +1,4 @@
-type Int:
+type Int:z:
      def +(i:Int):Int
      def -(i:Int):Int
 

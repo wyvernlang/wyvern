@@ -1,21 +1,21 @@
-type Int:
+type Int:z:
      def +(i:Int):Int
      def -(i:Int):Int
 
-type X:
+type X:z:
     val a:Int
 
 val x = new this:X:
     val a = 5
 
-type Fn:
+type Fn:z:
     def f(x:Int):Int
 
 val fn = new this:Fn:
     def f(b:Int):Int:
         x.a + b
 
-type X:
+type X:z:
     val b:Int
 
 val y = new this:X:

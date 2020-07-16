@@ -1,8 +1,8 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type A:
+type A:z:
     val a:Int
 
 val x = new this:A:
