@@ -75,6 +75,33 @@ def findTypePredicateFromStr(s:String):DeclType->Option[TypeType]
         z
     )
     pred
+
+def isMatchDeclType(a:DeclType, b:DeclType):Boolean = match a:
+    v:ValType => match b:    
+        u:ValType => v.name.name == u.name.name
+        default => false
+    t:TypeType => match b:
+        u:TypeType => t.name.name == u.name.name
+        default => false
+    d:DefType => match b:
+        u:DefType => d.name.name == u.name.name
+        default => false
+    s:SubtypeType => false
+    m:MemberType => match b:
+        u:MemberType => m.name.name == u.name.name
+        default => false
+
+//delete replaced ones in ys
+def mergeDeclList(xs:List[DeclType], ys:List[DeclType]):List[DeclType]
+    val pred = ((b:DeclType) =>
+        val search = llist.find[DeclType](xs, (e:DeclType) => isMatchDeclType(e,b))
+        val ans = match search:
+            s:option.Some => false
+            default => true
+        ans
+    )
+    xs.append(ys.filter(pred))
+    
 /////////////////////////
 def printDeclList(ls:List[DeclType]):String
     combineWithNewlines(ls.map[String](e => declTypeToString(e)))

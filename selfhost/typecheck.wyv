@@ -93,8 +93,7 @@ def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
                     val argsSub2 = argsSub.map[ValType](e => types.ValType(e.name,typesUtil.doListOfSubstitutions(e.typ,c.args,argBindings)))
                     val defargs = argsSub2.map[Type](e => e.typ)
 
-                    val argsSub3 = argsSub2.map[DeclType](e => e)
-                    val ngamma:List[DeclType] = argsSub3.append(gamma)
+                    val ngamma:List[DeclType] = argsSub2.map[DeclType](e => e).append(gamma)
 
                     val subcheck = x:Type => y:Type => isSubtype(x,y,ngamma)
                     if (c.name == da.name.name && checkArgList(argtypes,defargs,subcheck)) { option.Some[DefType](da) } else { option.None[DefType]() }
@@ -137,7 +136,7 @@ def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
         if (isSubtypeDeclList(decls,unfoldDecls,ngamma)) 
             n.typ 
           else 
-            error.report("invalid new expression: "+"decls:\n" + typesUtil.combineWithNewlines(decls.map[String](e => typesUtil.declTypeToString(e))),error.unknownLocation)
+            error.report("invalid new expression: "+"decls:\n" + typesUtil.combineWithNewlines(unfoldDecls.map[String](e => typesUtil.declTypeToString(e))),error.unknownLocation)
 
     i:types.Integer => 
         val pred = ((b:DeclType) =>
@@ -200,7 +199,7 @@ def unfoldType(x:Type, gamma:List[DeclType]):Unfold
                             Unfold(tt.z,llist.Nil[DeclType]())
                         default => unfoldType(types.substituteType(m.typ,path.p,pUnfold.z),gamma)
                     default => error.report("should never happend",error.unknownLocation)
-    Unfold(b.z,x.refines.append(b.decls))
+    Unfold(b.z,typesUtil.mergeDeclList(x.refines,b.decls))
 /////////////////////////////////
 //SUBTYPING
 
@@ -299,7 +298,7 @@ def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match 
             if (m.name.name == u.name.name)
                 match u.bound:
                     e:types.EQ => match m.bound:
-                        ee:types.EQ => equalType(m.typ,u.typ,gamma)   
+                        ee:types.EQ => equalType(m.typ,u.typ,gamma) || (isSubtype(m.typ,u.typ,gamma) && isSubtype(u.typ,m.typ,gamma))
                         default => false
                     l:types.LEQ => match m.bound:
                         g:types.GEQ => false
@@ -342,7 +341,7 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
                 val d = fetchDeclFromList(path,pUnfold.decls)
                 match d:
                     m:MemberType => match m.bound:
-                        g:types.GEQ => normalAns()
+                        g:types.GEQ => recurseRHS()
                         default => 
                             val typeBound = typesUtil.addRefines(m.typ,t1.refines)
                             val subType = types.substituteType(typeBound,path.p,pUnfold.z)

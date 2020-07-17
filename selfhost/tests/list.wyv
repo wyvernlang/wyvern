@@ -1,0 +1,40 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type List:z:
+    type T <= Unit
+
+type Nil:z:
+    type T <= Unit
+subtype Nil extends List
+
+type Cons:z:
+    type T <= Unit
+    val value:z.T
+    val next:List {type T = z.T}
+subtype Cons extends List
+
+type Param:z:
+    type A >= Int
+
+type AA:z:
+    def makeNil(a:Param):List {type T = a.A}
+    def makeCons(a:Param, x:a.A, xs:List {type T = a.A}):List {type T = a.A}
+
+val aa = new this:AA:
+    def makeNil(a:Param):List {type T = a.A}:
+        new this:Nil {type T = a.A}:
+            type T = a.A
+    def makeCons(a:Param, x:a.A, xs:List {type T = a.A}):List {type T = a.A}:
+        new this:Cons {type T = a.A}:
+            type T = a.A
+            val value = x
+            val next = xs
+
+val IntP = new this:Param {type A = Int}:
+    type A = Int
+
+val IntNil = aa.makeNil(IntP)
+val IntList = aa.makeCons(IntP,3,IntNil)
+IntList
