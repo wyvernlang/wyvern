@@ -1,5 +1,5 @@
 import uiEffects
-module def lightTheme(logger: Logger, uiManager: UIManager): {} Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}]
+module def lightTheme(logger: Logger, uiManager: UIManager): {} ThemePlugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}]
 // N.B.: In Java, once the theme is changed, apparently, there is no way to change it again, so this plugin shouldn't be registered in the menu.
 
 effect Run = {logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}

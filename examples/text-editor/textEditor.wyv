@@ -94,8 +94,8 @@ def getAttenuatedNativeJOptionPane(): {} OptionPane
 
 /******* Step 2: Instantiate plugins passing in appropriate resources *******/
 
-val darkTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = darkTheme(logger, getAttenuatedNativeUIManager())
-val lightTheme: Plugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = lightTheme(logger, getAttenuatedNativeUIManager())
+val darkTheme: ThemePlugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = darkTheme(logger, getAttenuatedNativeUIManager())
+val lightTheme: ThemePlugin[{logger.Update, uiEffects.PaintUI, uiEffects.SetUILookAndFeel}] = lightTheme(logger, getAttenuatedNativeUIManager())
 val wordCount: Plugin[{logger.Update, uiEffects.ReadTextArea, uiEffects.ShowDialog, uiEffects.GetMessageValue}] = wordCount(logger, getAttenuatedNativeJTextArea(), getAttenuatedNativeJOptionPane()) // Must pass in TextArea and not just String because need to get the latest version of the text
 val questionnaireCreator: Plugin[{logger.Update, fs.Write, fs.Append, uiEffects.ReadTextArea}] = questionnaireCreator(logger, getAttenuatedNativeJTextArea(), fs) // Must pass in TextArea and not just String because need to get the latest version of the text
 
