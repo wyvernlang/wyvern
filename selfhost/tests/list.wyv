@@ -16,7 +16,7 @@ type Cons:z:
 subtype Cons extends List
 
 type Param:z:
-    type A >= Int
+    type A <= Unit
 
 type AA:z:
     def makeNil(a:Param):List {type T = a.A}

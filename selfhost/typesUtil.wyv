@@ -54,6 +54,15 @@ def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
         y:types.GEQ => true   
         default => false
 
+def equalPath(p1:types.Exp, p2:types.Exp):Boolean = match p1:
+    v:types.Var => match p2:
+        u:types.Var => types.equalBinding(v.binding,u.binding)
+        default => false
+    v:types.Field => match p2:
+        u:types.Field => equalPath(v.receiver,u.receiver) && v.field == u.field
+        default => false
+    default => false
+
 def addRefines(t:Type, decls:List[DeclType]):Type
     types.Type(t.base,decls.append(t.refines))
 
