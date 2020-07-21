@@ -69,6 +69,7 @@ datatype Exp
 //Type defn
 datatype BaseType
     UnitType()
+    BotType()
     NominalType(L:Binding)
     PathType(p:Exp, t:String)
 

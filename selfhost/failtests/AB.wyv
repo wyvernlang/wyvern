@@ -1,0 +1,17 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type A:z:
+    type T >= Bottom
+   
+type B:z:
+    type S <= Unit
+    type T = A {type T >= B {type S = B {type S = z.S}}}
+subtype B extends A
+
+val bad:A {type T >= B {type S = Int}} = new this:B {type S = Int}:
+    type S = Int
+    type T = A {type T >= B {type S = B {type S = this.S}}}
+
+0  

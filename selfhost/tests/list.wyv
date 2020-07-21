@@ -2,17 +2,31 @@ type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
+type Monoid:z:
+    type T <= Unit
+    val id:z.T
+    def op(a:z.T, b:z.T):z.T
+
+val Sum = new this:Monoid {type T = Int}:
+    type T = Int
+    val id:this.T = 0
+    def op(a:this.T, b:this.T):this.T:
+        a + b
+
 type List:z:
     type T <= Unit
+    def reduce(m:Monoid {type T >= z.T}):m.T
 
 type Nil:z:
     type T <= Unit
+    def reduce(m:Monoid {type T >= z.T}):m.T
 subtype Nil extends List
 
 type Cons:z:
     type T <= Unit
     val value:z.T
     val next:List {type T = z.T}
+    def reduce(m:Monoid {type T >= z.T}):m.T
 subtype Cons extends List
 
 type Param:z:
@@ -26,15 +40,21 @@ val aa = new this:AA:
     def makeNil(a:Param):List {type T = a.A}:
         new this:Nil {type T = a.A}:
             type T = a.A
+            def reduce(m:Monoid {type T >= this.T}):m.T:
+                m.id
+
     def makeCons(a:Param, x:a.A, xs:List {type T = a.A}):List {type T = a.A}:
         new this:Cons {type T = a.A}:
             type T = a.A
             val value = x
             val next = xs
+            def reduce(m:Monoid {type T >= this.T}):m.T:
+                m.op(this.value,this.next.reduce(m))
 
 val IntP = new this:Param {type A = Int}:
     type A = Int
 
 val IntNil = aa.makeNil(IntP)
-val IntList = aa.makeCons(IntP,3,IntNil)
-IntList
+val l1 = aa.makeCons(IntP,3,IntNil)
+val l2 = aa.makeCons(IntP,4,l1)
+l2.reduce(Sum)

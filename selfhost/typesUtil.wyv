@@ -17,6 +17,7 @@ type DefType = types.DefType
 type SubtypeType = types.SubtypeType
 type MemberType = types.MemberType
 type UnitType = types.UnitType
+type BotType = types.BotType
 type NominalType = types.NominalType
 type PathType = types.PathType
 type Pair = pair.Pair
@@ -145,6 +146,7 @@ def declTypeToString(d:DeclType):String = match d:
 def typeToString(t:Type):String
     val baseString = match t.base:
         u:UnitType => "Unit"
+        b:BotType => "Bottom"
         n:NominalType => n.L.name
         path:PathType => expToString(path.p) + "." + path.t
     val s = t.refines.map[String](e => declTypeToString(e))

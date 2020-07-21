@@ -21,6 +21,7 @@ type MemberType = types.MemberType
 type UnitType = types.UnitType
 type NominalType = types.NominalType
 type PathType = types.PathType
+type BotType = types.BotType
 type Pair = pair.Pair
 
 def typecheck(e:types.Statement):Type
@@ -255,6 +256,9 @@ def equalBaseType(a:BaseType, b:BaseType, gamma:List[DeclType]):Boolean = match 
     u:UnitType => match b:
         v:UnitType => true
         default => false
+    bot:BotType => match b:
+        v:BotType => true
+        default => false
     n:NominalType => match b:
         v:NominalType => types.equalBinding(n.L,v.L)
         default => false
@@ -317,7 +321,15 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
         if (equalType(t2,types.theUnit,gamma)) 
             true 
           else 
-            isSubtypeBase(t1,t2.base,gamma) && isSubtypeDeclList(t1.refines,t2.refines,gamma)
+            match t1.base:
+                b:BotType => true
+                default => 
+                    if (isSubtypeBase(t1,t2.base,gamma)) 
+                        val unfold = unfoldType(t1,gamma)
+                        val ngamma = llist.Cons[DeclType](types.ValType(unfold.z,t1),gamma)
+                        isSubtypeDeclList(unfold.decls,t2.refines,ngamma)
+                      else
+                        false
     def recurseRHS():Boolean = match t2.base:
         path:PathType =>
             val tau = typecheckExpr(path.p,gamma)
@@ -325,13 +337,13 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
             val d = fetchDeclFromList(path,pUnfold.decls)
             match d:
                 m:MemberType => match m.bound:
-                    l:types.LEQ => normalAns()
+                    l:types.LEQ => false
                     default =>
                         val typeBound = typesUtil.addRefines(m.typ,t2.refines)
                         val subType = types.substituteType(typeBound,path.p,pUnfold.z)
                         isSubtype(t1,subType,gamma)
-                t:TypeType => normalAns()
-        default => normalAns()
+                t:TypeType => false
+        default => false
 
     def recurseLHS():Boolean = match t1.base:
         path:PathType =>
@@ -340,33 +352,19 @@ def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
             val d = fetchDeclFromList(path,pUnfold.decls)
             match d:
                 m:MemberType => match m.bound:
-                    l:types.GEQ => normalAns()
+                    l:types.GEQ => false
                     default =>
                         val typeBound = typesUtil.addRefines(m.typ,t1.refines)
                         val subType = types.substituteType(typeBound,path.p,pUnfold.z)
                         isSubtype(subType,t2,gamma)
-                t:TypeType => normalAns()
-        default => normalAns()
+                t:TypeType => false
+        default => false
     
     if (equalBaseType(t1.base,t2.base,gamma))
         isSubtypeDeclList(t1.refines,t2.refines,gamma)
       else
         //try both left and right bounds at the same time
-        recurseLHS() || recurseRHS()
-        //match t1.base:
-        //    path:PathType =>
-        //        val tau = typecheckExpr(path.p,gamma)
-        //        val pUnfold = unfoldType(tau,gamma)
-        //        val d = fetchDeclFromList(path,pUnfold.decls)
-        //        match d:
-        //            m:MemberType => match m.bound:
-        //                g:types.GEQ => recurseRHS()
-        //                default => 
-        //                    val typeBound = typesUtil.addRefines(m.typ,t1.refines)
-        //                    val subType = types.substituteType(typeBound,path.p,pUnfold.z)
-        //                    isSubtype(subType,t2,gamma)
-        //            t:TypeType => recurseRHS()
-        //    default => recurseRHS()
+        recurseLHS() || recurseRHS() || normalAns()
 
 def isSubtypeBase(t1:Type, t2:BaseType, gamma:List[DeclType]):Boolean
     if (equalBaseType(t1.base,t2,gamma))

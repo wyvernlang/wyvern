@@ -14,10 +14,13 @@ def rawToType(s:raw.Type, ctx:types.Context):types.Type
         b:raw.Base => 
             if (b.str == "Unit")
                 types.UnitType()
-              else
-                val pred = typesUtil.findTypePredicateFromStr(b.str)
-                val L = typesUtil.findInDeclList[types.TypeType](ctx.bindings, pred).name
-                types.NominalType(L)
+              else 
+                if (b.str == "Bottom")
+                    types.BotType()
+                  else
+                    val pred = typesUtil.findTypePredicateFromStr(b.str)
+                    val L = typesUtil.findInDeclList[types.TypeType](ctx.bindings, pred).name
+                    types.NominalType(L)
         path:raw.Path =>
             val p = bindExpr(path.p,ctx)
             types.PathType(p,path.t)

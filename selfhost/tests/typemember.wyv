@@ -15,7 +15,7 @@ subtype Fruit extends Equatable
 
 val f1 = new this:Fruit {type T = Int}:
     type T = Int
-    type S <= Unit
+    type S = Unit
     val item:this.T = 3
     def equals(x:this.T):this.T:
         this.item + x
