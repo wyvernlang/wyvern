@@ -109,4 +109,6 @@ selfhost/.js
 selfhost/main.js
 selfhost/tests/*.wyb
 selfhost/tests/*.js
+selfhost/failtests/*.wyb
+selfhost/failtests/*.js
 selfhost/output.js

@@ -248,7 +248,6 @@ def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match 
         default => false
     m:MemberType => match b:
         u:MemberType =>
-            //error.report("check: " + typesUtil.typeToString(m.typ) + " , " + typesUtil.typeToString(u.typ),error.unknownLocation)
             m.name.name == u.name.name && typesUtil.equalBound(m.bound,u.bound) && equalType(m.typ,u.typ,gamma)
         default => false
 
