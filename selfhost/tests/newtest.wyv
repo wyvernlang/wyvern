@@ -1,8 +1,8 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Foo:
+type Foo:z:
     def sum(x:Int):Int
     val a:Int
 
@@ -11,8 +11,7 @@ val foo = new this:Foo:
         this.a + x    
     val a = 5
 
-type Bar = Foo
-val bar = new this:Bar:
+val bar = new this:Foo:
     def sum(x:Int):Int:
         this.a + x    
     val a = 5

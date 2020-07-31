@@ -1,15 +1,15 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type IntToInt:
+type IntToInt:z:
     def f(i:Int):Int
 
 val succ = new this:IntToInt:
     def f(i:Int):Int:
         i+1
 
-type A:
+type A:z:
     def f(i:IntToInt):Int
 
 val apply0 = new this:A:

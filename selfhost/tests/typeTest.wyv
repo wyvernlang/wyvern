@@ -1,23 +1,23 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Polygon:
+type Polygon:z:
     def perim(u:Unit):Int
 
-type Triangle:
+type Triangle:z:
     val s1:Int
     val s2:Int
     val s3:Int
     def perim(u:Unit):Int
 subtype Triangle extends Polygon
 
-type Square:
+type Square:z:
     val s:Int
     def perim(u:Unit):Int
 subtype Square extends Polygon
 
-type A:
+type A:z:
     def makeTri(a:Int,b:Int,c:Int):Triangle
 
 val a = new this:A:

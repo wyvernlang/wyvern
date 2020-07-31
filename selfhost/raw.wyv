@@ -5,56 +5,82 @@ type List = llist.LinkedList
 
 type Arg
     val arg:String
-    val argTyp:String
-def Arg(arg:String,argTyp:String):Arg = new
+    val argTyp:Type
+def Arg(arg:String,argTyp:Type):Arg = new
     val arg = arg
     val argTyp = argTyp
+
+datatype Bound
+    EQ()
+    LEQ()
+    GEQ()
+
+datatype BaseType
+    Base(str:String)
+    Path(p:Exp,t:String)
+type Type
+    val base:BaseType
+    val refines:List[Exp]
+def Type(b:BaseType, r:List[Exp]):Type = new
+    val base = b
+    val refines = r
 
 datatype Exp
     Var(name:String)
     App(func:Exp, arg:Exp)
-    Lambda(name:String, argTyp:String, body:Exp)
+    Lambda(name:String, argTyp:Type, body:Exp)
     Call(receiver:Exp, name:String, args:List[Exp])
     Field(receiver:Exp, field:String)
     Val(name:String, exp:Exp)
-    ValAnnot(name:String, typ:String, exp:Exp)
-    Def(name:String, args:List[Arg], retTyp:String, body:String)
-    ValType(name:String, typ:String)
-    TypeDecl(name:String, decls:String)
-    TypeAlias(name:String, alias:String)
-    DefDecl(name:String, args:List[Arg], retTyp:String)
-    SubtypeDecl(subtype:String, supertype:String)
-    New(thisName:String, typeName:String, body:String)
+    ValAnnot(name:String, typ:Type, exp:Exp)
+    Def(name:String, args:List[Arg], retTyp:Type, body:String)
+    ValType(name:String, typ:Type)
+    TypeDecl(name:String, self:String, decls:String)
+    TypeMem(name:String, bound:Bound, tau:Type)
+    DefDecl(name:String, args:List[Arg], retTyp:Type)
+    SubtypeDecl(subtype:Type, supertype:Type)
+    New(thisName:String, typeName:Type, body:String)
     Seq(exps:List[Exp])
     Integer(str:String)    
     UnitVal()
 
 def argsToString(args:List[Arg]):String = match args:
     c:llist.Cons => match c.next:
-        n:llist.Nil => c.value.arg + ":" + c.value.argTyp
-        default => c.value.arg + ":" + c.value.argTyp + ", " + argsToString(c.next)
+        n:llist.Nil => c.value.arg + ":" + typeToString(c.value.argTyp)
+        default => c.value.arg + ":" + typeToString(c.value.argTyp) + ", " + argsToString(c.next)
 
 def callListToString(args:List[Exp]):String = match args:
     c:llist.Cons => match c.next:
         n:llist.Nil => expToString(c.value)
         default => expToString(c.value) + ", " + callListToString(c.next)
-    default => "call list empty!"
+    default => ""
+
+def typeToString(t:Type):String
+    val baseString = match t.base:
+        b:Base => b.str    
+        p:Path => expToString(p.p) + "." + p.t
+    baseString + " {" + callListToString(t.refines) + "}"
+
+def boundToString(b:Bound):String = match b:
+    e:EQ  => "="
+    e:LEQ => "<="
+    e:GEQ => ">="
 
 def expToString(e:Exp):String = match e:
     v:Var    => v.name
     a:App    => "((" + expToString(a.func) + ") (" + expToString(a.arg) + "))"
-    l:Lambda => l.name + ":" + l.argTyp + " => " + expToString(l.body)
+    l:Lambda => l.name + ":" + typeToString(l.argTyp) + " => " + expToString(l.body)
     c:Call   => expToString(c.receiver) + "." + c.name + "(" + callListToString(c.args) + ")" 
     f:Field  => expToString(f.receiver) + "." + f.field
     v:Val    => "val " + v.name + " = " + expToString(v.exp)
-    v:ValAnnot    => "val " + v.name + ":" + v.typ + " = " + expToString(v.exp)
-    d:Def    => "def " + d.name + "(" + argsToString(d.args) + "):" + d.retTyp + ":\n" + d.body
-    v:ValType => "val " + v.name + ": " + v.typ
-    t:TypeDecl => "type " + t.name + ":\n" + t.decls
-    t:TypeAlias => "type " + t.name + " = " + t.alias
-    d:DefDecl => "def " + d.name + "(" + argsToString(d.args) + ")" + d.retTyp
-    s:SubtypeDecl => "subtype " + s.subtype + " extends " + s.supertype
-    n:New => "new " + n.thisName + ":" + n.typeName + ":\n" + n.body
+    v:ValAnnot    => "val " + v.name + ":" + typeToString(v.typ) + " = " + expToString(v.exp)
+    d:Def    => "def " + d.name + "(" + argsToString(d.args) + "):" + typeToString(d.retTyp) + ":\n" + d.body
+    v:ValType => "val " + v.name + ": " + typeToString(v.typ)
+    t:TypeDecl => "type " + t.name + ":" + t.self + ":\n" + t.decls
+    t:TypeMem => "type " + t.name + " " + boundToString(t.bound) + " " + typeToString(t.tau)
+    d:DefDecl => "def " + d.name + "(" + argsToString(d.args) + ")" + typeToString(d.retTyp)
+    s:SubtypeDecl => "subtype " + typeToString(s.subtype) + " extends " + typeToString(s.supertype)
+    n:New => "new " + n.thisName + ":" + typeToString(n.typeName) + ":\n" + n.body
     s:Seq    => s.exps.foldRight[String]((e:Exp, s:String) => s + "\n" + expToString(e), "")
     i:Integer => i.str
     u:UnitVal => "()"

@@ -1,11 +1,14 @@
 module types
 
+import raw
 import wyvern.option
 import wyvern.collections.llist
 import error
 type Option = option.Option
 type List = llist.LinkedList
 
+//////////////////////////////
+//Binding defn
 resource type Counter
     var value:Int
 def Counter():Counter = new
@@ -24,9 +27,51 @@ def Binding(name:String, c:Counter):Binding
 def equalBinding(b1:Binding, b2:Binding):Boolean
     b1.name == b2.name && b1.id == b2.id
 //////////////////////////////
+//bound AST defn
+resource type Context
+    val bindings:List[DeclType]
+    val counter:Counter
+    val parse:String -> raw.Exp
+    def extend(b:DeclType):Context
+    def extendList(b:List[DeclType]):Context
+
+def Context(bs:List[DeclType], c:Counter, p:String -> raw.Exp) : Context = new
+    val bindings = bs
+    val counter = c
+    val parse = p
+    def extend(b:DeclType):Context
+        Context(llist.Cons[DeclType](b, bs), c, p)
+    def extendList(b:List[DeclType]):Context
+        val newBindings = b.append(bs)
+        Context(newBindings,c,p)
+    
+def emptyContext(p:String -> raw.Exp):Context = Context(llist.Nil[DeclType](), Counter(), p)
+
+datatype Statement
+    DeclStatement(decl:Decl, stmt:Statement)
+    ExprStatement(exp:Exp)
+
+datatype Decl
+    Val(binding:Binding, typ:Type, exp:Exp)
+    Def(binding:Binding, args:List[ValType], retTyp:Type, body:Statement)
+    TypeDecl(name:Binding, z:Binding, typ:List[DeclType])
+    SubtypeDecl(subtype:Type, supertype:Type)
+    TypeEq(name:Binding, typ:Type)
+
+datatype Exp
+    Var(binding:Binding)
+    Call(receiver:Exp, name:String, args:List[Exp])
+    Field(receiver:Exp, field:String)
+    New(binding:Binding, typ:Type, body:List[Decl])
+    Integer(str:String)
+    UnitVal()
+//////////////////////////////
+//Type defn
 datatype BaseType
     UnitType()
+    BotType()
     NominalType(L:Binding)
+    PathType(p:Exp, t:String)
 
 type Type
     val base:BaseType
@@ -40,63 +85,38 @@ def makeNominalType(L:Binding):Type = new
 def makeRefines(ls:List[DeclType]):Type = new
     val base = UnitType()
     val refines = ls
-def makeBase(b:BaseType):Type
-    Type(b,llist.Nil[DeclType]())
+
+datatype Bound
+    LEQ()    
+    EQ()
+    GEQ()
 
 datatype DeclType
     ValType(name:Binding, typ:Type)
-    TypeType(name:Binding, unfld:Type)
-    DefType(name:Binding, args:List[Type], retTyp:Type)
+    TypeType(name:Binding, z:Binding, unfld:List[DeclType])
+    DefType(name:Binding, args:List[ValType], retTyp:Type)
     SubtypeType(subtype:Type, supertype:Type)
+    MemberType(name:Binding, bound:Bound, typ:Type)
 
 val theUnit = Type(UnitType(),llist.Nil[DeclType]())
 //////////////////////////////
-def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
-    def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
-        match gamma:
-            c:llist.Cons => 
-                match (pred(c.value)):
-                    s:option.Some => s
-                    default => f(c.next, pred)
-            n:llist.Nil => option.None[T]()
-    match f(gamma, pred):
-        s:option.Some => s.get()
-        default => error.report("search in decllist failed",error.unknownLocation)
+def substituteBaseType(beta:BaseType, newb:Exp, oldb:Binding):BaseType = match beta:
+    p:PathType => PathType(substituteExp(p.p,newb,oldb),p.t)
+    default => beta
+        
+def substituteType(tau:Type, newb:Exp, oldb:Binding):Type
+    val subBase = substituteBaseType(tau.base,newb,oldb)
+    val subRefines = tau.refines.map[DeclType](e => substituteDeclType(e,newb,oldb))
+    Type(subBase,subRefines)
 
-def findTypePredicate(bind:Binding):DeclType->Option[TypeType]
-    val pred = ((b:DeclType) =>
-        val z = match b:
-            t:TypeType => if (equalBinding(bind, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
-            default => option.None[TypeType]()
-        z
-    )
-    pred
+def substituteDeclType(d:DeclType, newb:Exp, oldb:Binding):DeclType = match d:
+    v:ValType     => ValType(v.name,substituteType(v.typ,newb,oldb))
+    t:TypeType    => TypeType(t.name,t.z,t.unfld.map[DeclType](e => substituteDeclType(e,newb,oldb)))
+    d:DefType     => DefType(d.name,d.args.map[ValType](e=>ValType(e.name,substituteType(e.typ,newb,oldb))),substituteType(d.retTyp,newb,oldb))
+    s:SubtypeType => SubtypeType(substituteType(s.subtype,newb,oldb),substituteType(s.supertype,newb,oldb))
+    m:MemberType  => MemberType(m.name,m.bound,substituteType(m.typ,newb,oldb))
 
-def unfoldType(x:Type, gamma:List[DeclType]):List[DeclType]
-    val decls = match x.base:
-        u:UnitType => llist.Nil[DeclType]()
-        x:NominalType => 
-            val pred = findTypePredicate(x.L)
-            unfoldType(findInDeclList[TypeType](gamma, pred).unfld,gamma)
-    x.refines.append(decls)
-
-def combineStringList(ls:List[String]):String = match ls:
-    c:llist.Cons => match c.next:
-        n:llist.Nil => c.value
-        cc:llist.Cons => c.value + ", " + combineStringList(c.next)
-    default => ""
-
-def declTypeToString(d:DeclType):String = match d:
-    v:ValType => "val " + v.name.name + ":" + typeToString(v.typ)
-    t:TypeType => "type " + t.name.name + ":" + typeToString(t.unfld)
-    d:DefType => 
-        val arglist = d.args.map[String](t => typeToString(t))
-        "def " + d.name.name + "(" + combineStringList(arglist) + "):" + typeToString(d.retTyp)
-
-def typeToString(t:Type):String
-    val baseString = match t.base:
-        u:UnitType => "Unit"
-        n:NominalType => n.L.name
-    val s = t.refines.map[String](e => declTypeToString(e))
-    val refinesString = combineStringList(s)
-    baseString + " {" + refinesString + "}"
+def substituteExp(e:Exp, newb:Exp, oldb:Binding):Exp = match e:
+    v:Var => if (equalBinding(v.binding, oldb)) { newb } else { v }
+    f:Field => Field(substituteExp(f.receiver,newb,oldb),f.field)
+    default => error.report("Substitution into invalid path type",error.unknownLocation)

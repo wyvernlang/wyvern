@@ -1,109 +1,422 @@
 module typecheck
 
 import types
-import subtyping
-import bound
+import typesUtil
 import error
 import wyvern.option
 import wyvern.collections.llist
-type List = llist.LinkedList
-type DeclType = types.DeclType
-type Option = option.Option
+import wyvern.pair
 
-def typecheck(e:bound.Statement):types.Type
+type Option = option.Option
+type List = llist.LinkedList
+type Binding = types.Binding
+type Type = types.Type
+type BaseType = types.BaseType
+type DeclType = types.DeclType
+type ValType = types.ValType
+type TypeType = types.TypeType
+type DefType = types.DefType
+type SubtypeType = types.SubtypeType
+type MemberType = types.MemberType
+type UnitType = types.UnitType
+type NominalType = types.NominalType
+type PathType = types.PathType
+type BotType = types.BotType
+type Pair = pair.Pair
+
+def typecheck(e:types.Statement):Type
     typecheckStmt(e,llist.Nil[DeclType]())
 
-def typecheckStmt(e:bound.Statement, gamma:List[DeclType]):types.Type = match e:
-    d:bound.DeclStatement => 
-        val dc:types.DeclType = typecheckDecl(d.decl, gamma)
+def typecheckStmt(e:types.Statement, gamma:List[DeclType]):Type = match e:
+    d:types.DeclStatement => 
+        val dc:DeclType = typecheckDecl(d.decl, gamma)
         val gammaPrime:List[DeclType] = llist.Cons[DeclType](dc, gamma)
         typecheckStmt(d.stmt, gammaPrime)
-    e:bound.ExprStatement => 
+    e:types.ExprStatement => 
         typecheckExpr(e.exp, gamma)
 
-def typecheckDecl(e:bound.Decl, gamma:List[DeclType]):types.DeclType = match e:
-    v:bound.Val => 
+def typecheckDecl(e:types.Decl, gamma:List[DeclType]):DeclType = match e:
+    v:types.Val => 
         val typ = typecheckExpr(v.exp, gamma)
-        types.ValType(v.binding, typ)
-    t:bound.TypeDecl =>
-        types.TypeType(t.name, t.typ)
-    d:bound.Def =>
-        val argdecls:List[DeclType] = d.args.map[types.ValType]((a:bound.Arg) => types.ValType(a.arg,a.argTyp))
-        val argtypes:List[types.Type] = d.args.map[types.Type]((a:bound.Arg) => a.argTyp)
-        val testType = typecheckStmt(d.body, argdecls.append(gamma))
-        if (subtyping.isSubtype(testType, d.retTyp, gamma))
-            types.DefType(d.binding, argtypes, d.retTyp)
+        if (isSubtype(typ,v.typ,gamma))
+            types.ValType(v.binding, v.typ)
           else
-            error.report("def decl is not well-formed",error.unknownLocation)
-    s:bound.SubtypeDecl =>
-        if (subtyping.checkSubtypeWF(s.subtype, s.supertype, gamma))
-            types.SubtypeType(s.subtype, s.supertype)
+            error.report("val expr not a subtype of declared type",error.unknownLocation)
+    t:types.TypeDecl =>
+        val tt = types.TypeType(t.name, t.z, t.typ)
+        val ngamma = llist.Cons[DeclType](types.ValType(t.z,types.makeNominalType(t.name)),gamma)
+        val nngamma = llist.Cons[DeclType](tt,ngamma)
+        if (t.typ.foldRight[Boolean]((x:DeclType,y:Boolean)=>checkDeclTypeWF(x,nngamma),true))
+            tt
+          else
+            error.report("type decl is not well-formed",error.unknownLocation)
+    d:types.Def =>
+        val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+        val testType = typecheckStmt(d.body, ngamma)
+        if (isSubtype(testType, d.retTyp, ngamma))
+            types.DefType(d.binding, d.args, d.retTyp)
+          else
+            error.report("def decl is not well-formed: " + typesUtil.typeToString(testType) + " is not subtype of " + typesUtil.typeToString(d.retTyp),error.unknownLocation)
+    s:types.SubtypeDecl =>
+        val subDecl = types.SubtypeType(s.subtype, s.supertype)
+        if (checkDeclTypeWF(subDecl, gamma))
+            subDecl
           else
             error.report("subtype decl is not well-formed",error.unknownLocation)
+    t:types.TypeEq =>
+        if (checkTypeWF(t.typ,gamma))
+            types.MemberType(t.name, types.EQ(),t.typ)
+          else
+            error.report("typeEq type not well-formed",error.unknownLocation)
 
-def typecheckExpr(e:bound.Exp, gamma:List[DeclType]):types.Type = match e:
-    v:bound.Var =>
+def typecheckExpr(e:types.Exp, gamma:List[DeclType]):Type = match e:
+    v:types.Var =>
         val pred = ((b:DeclType) => 
             val z = match b:
-                va:types.ValType => 
-                    if (types.equalBinding(v.binding,va.name)) { option.Some[types.ValType](va) } else { option.None[types.ValType]() }
-                default => option.None[types.ValType]()
+                va:ValType => 
+                    if (types.equalBinding(v.binding,va.name)) { option.Some[ValType](va) } else { option.None[ValType]() }
+                default => option.None[ValType]()
             z
         )
-        types.findInDeclList[types.ValType](gamma, pred).typ
+        typesUtil.findInDeclList[ValType](gamma, pred).typ
 
-    c:bound.Call => //T-Invk
+    c:types.Call => //T-Invk
         val recType = typecheckExpr(c.receiver, gamma)
-        val unfold = types.unfoldType(recType, gamma)
-        val argtypes:List[types.Type] = c.args.map[types.Type](e => typecheckExpr(e,gamma))
+        val unfold = unfoldType(recType, gamma)
+        val argtypes:List[Type] = c.args.map[Type](e => typecheckExpr(e,gamma))
 
-        val subcheck = x:types.Type => y:types.Type => subtyping.isSubtype(x,y,gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
-                da:types.DefType => 
-                    if (c.name == da.name.name && subtyping.checkArgList(argtypes,da.args,subcheck)) { option.Some[types.DefType](da) } else { option.None[types.DefType]() }
-                default => option.None[types.DefType]()
+                da:DefType => 
+                    val argBindings = da.args.map[Binding](a => a.name)
+
+                    val argsSub = da.args.map[ValType](e => types.ValType(e.name,types.substituteType(e.typ,c.receiver,unfold.z)))
+                    val argsSub2 = argsSub.map[ValType](e => types.ValType(e.name,typesUtil.doListOfSubstitutions(e.typ,c.args,argBindings)))
+                    val defargs = argsSub2.map[Type](e => e.typ)
+
+                    val ngamma:List[DeclType] = argsSub2.map[DeclType](e => e).append(gamma)
+
+                    val subcheck = x:Type => y:Type => isSubtype(x,y,ngamma)
+                    if (c.name == da.name.name && checkArgList(argtypes,defargs,subcheck)) { option.Some[DefType](da) } else { option.None[DefType]() }
+                default => option.None[DefType]()
             z
         )
-        types.findInDeclList[types.DefType](unfold, pred).retTyp
+        val func = typesUtil.findInDeclList[DefType](unfold.decls, pred)
+        //Do substitutions to get the correct return type
+        val retTyp = types.substituteType(func.retTyp, c.receiver, unfold.z)
+        val argBindings = func.args.map[Binding](a => a.name)
+        typesUtil.doListOfSubstitutions(retTyp,c.args,argBindings)
 
-    f:bound.Field => //T-Field
+    f:types.Field => //T-Field
         val recType = typecheckExpr(f.receiver, gamma)
-        val unfold = types.unfoldType(recType, gamma)
+        val unfold = unfoldType(recType, gamma)
         val pred = ((b:DeclType) =>
             val z = match b:
-                va:types.ValType => 
-                    if (f.field == va.name.name) { option.Some[types.ValType](va) } else { option.None[types.ValType]() }
-                default => option.None[types.ValType]()
+                va:ValType => 
+                    if (f.field == va.name.name) { option.Some[ValType](va) } else { option.None[ValType]() }
+                default => option.None[ValType]()
             z
         )
-        types.findInDeclList[types.ValType](unfold, pred).typ
+        val tauV = typesUtil.findInDeclList[ValType](unfold.decls, pred).typ
+        types.substituteType(tauV, f.receiver, unfold.z)
 
-    n:bound.New => //T-New
-        val unfold = types.unfoldType(n.typ, gamma)
-        def typeNewDecls(d:bound.Decl):DeclType
-            val thisType = types.ValType(n.binding, n.typ)
-            val ngamma = llist.Cons[DeclType](thisType, gamma)
+    n:types.New => //T-New
+        val unfold = unfoldType(n.typ, gamma)
+
+        val thisType = types.ValType(n.binding, n.typ)
+        val ngamma = llist.Cons[DeclType](thisType, gamma)
+        def typeNewDecls(d:types.Decl):DeclType
             match d:
-                v:bound.Val       => typecheckDecl(d, gamma)
-                d:bound.Def       => typecheckDecl(d, ngamma)
-                t:bound.TypeDecl  => typecheckDecl(d, ngamma)
+                v:types.Val         => typecheckDecl(d, ngamma)
+                d:types.Def         => typecheckDecl(d, ngamma)
+                t:types.TypeDecl    => typecheckDecl(d, ngamma)
+                s:types.SubtypeDecl => typecheckDecl(d, ngamma)
+                t:types.TypeEq      => typecheckDecl(d, ngamma)
         val decls = n.body.map[DeclType](x => typeNewDecls(x))
-        if (subtyping.checkDeclList(decls, unfold, x=>y=>subtyping.isSubtypeDecl(x,y,gamma)))
-            n.typ
-          else
-            error.report("invalid new expression",error.unknownLocation)
+        val unfoldDecls = unfold.decls.map[DeclType](d => types.substituteDeclType(d,types.Var(n.binding),unfold.z))
+        if (isSubtypeDeclList(decls,unfoldDecls,ngamma)) 
+            n.typ 
+          else 
+            error.report("invalid new expression: "+"decls:\n" + typesUtil.combineWithNewlines(unfoldDecls.map[String](e => typesUtil.declTypeToString(e))),error.unknownLocation)
 
-    i:bound.Integer => 
+    i:types.Integer => 
         val pred = ((b:DeclType) =>
             val z = match b:
-                tt:types.TypeType => 
-                    if (tt.name.name == "Int") { option.Some[types.TypeType](tt) } else { option.None[types.TypeType]() }
-                default => option.None[types.TypeType]()
+                tt:TypeType => 
+                    if (tt.name.name == "Int") { option.Some[TypeType](tt) } else { option.None[TypeType]() }
+                default => option.None[TypeType]()
             z
         ) 
-        types.makeNominalType(types.findInDeclList[types.TypeType](gamma, pred).name)
+        val L = typesUtil.findInDeclList[TypeType](gamma, pred).name
+        types.makeNominalType(L)
 
-    u:bound.UnitVal => types.theUnit
+    u:types.UnitVal => types.theUnit
 
     default => error.report("type error: unrecognized expression",error.unknownLocation)
+/////////////////////////////////
+//UNFOLD
+type Unfold
+    val z:Binding
+    val decls:List[DeclType]
+def Unfold(z:Binding, decls:List[DeclType]):Unfold = new
+    val z = z
+    val decls = decls
+
+def fetchDeclFromList(path:PathType, ls:List[DeclType]):DeclType
+    val pred = ((d:DeclType) => 
+        val z = match d:
+            t:TypeType   => path.t == t.name.name 
+            m:MemberType => path.t == m.name.name
+            default => false
+        z
+    )
+    val search = llist.find[DeclType](ls,pred)
+    match search:
+        s:option.Some => s.get()
+        default => error.report("fetch: type member not found",error.unknownLocation)
+
+def unfoldType(x:Type, gamma:List[DeclType]):Unfold
+    val b = match x.base:
+        u:UnitType => 
+            val pred = typesUtil.findTypePredicateFromStr("Unit")
+            val tt = typesUtil.findInDeclList[TypeType](gamma, pred)
+            Unfold(tt.z,llist.Nil[DeclType]())
+        x:NominalType => 
+            val pred = typesUtil.findTypePredicate(x.L)
+            val tt = typesUtil.findInDeclList[TypeType](gamma, pred)
+            Unfold(tt.z,tt.unfld)
+        path:PathType =>
+                val tau = typecheckExpr(path.p,gamma)
+                val pUnfold = unfoldType(tau,gamma)
+                val d = fetchDeclFromList(path,pUnfold.decls)
+                match d:
+                    t:TypeType => 
+                        val subUnfold = t.unfld.map[DeclType](e => types.substituteDeclType(e,path.p,pUnfold.z))
+                        Unfold(t.z,subUnfold)
+                    m:MemberType => match m.bound:
+                        g:types.GEQ => 
+                            val pred = typesUtil.findTypePredicateFromStr("Unit")
+                            val tt = typesUtil.findInDeclList[TypeType](gamma, pred)
+                            Unfold(tt.z,llist.Nil[DeclType]())
+                        default => unfoldType(types.substituteType(m.typ,path.p,pUnfold.z),gamma)
+                    default => error.report("should never happend",error.unknownLocation)
+    Unfold(b.z,typesUtil.mergeDeclList(x.refines,b.decls))
+/////////////////////////////////
+//SUBTYPING
+
+//Check if two lists of arguments line up in the right way
+def checkArgList(xs:List[Type],ys:List[Type],pred:Type->Type->Boolean):Boolean
+    if (xs.size() == ys.size())
+        def f(xs:List[Type],ys:List[Type]):Boolean = match xs:
+            a:llist.Cons => match ys:
+                b:llist.Cons =>   
+                    (pred(a.value)(b.value)) && f(a.next,b.next)
+            default => true
+        f(xs,ys)
+      else
+        false
+
+//Check if for each y in ys there is an x in xs s.t. (pred x y) is true
+def checkDeclList(xs:List[DeclType],ys:List[DeclType],pred:DeclType->DeclType->Boolean):Boolean
+    def isValid(d:DeclType):Boolean
+        val search = llist.find[DeclType](xs, (e:DeclType) => pred(e)(d))
+        match search:
+            s:option.Some => true
+            default => false
+    ys.foldRight[Boolean]((x:DeclType,y:Boolean) => isValid(x) && y, true)
+
+def equalDeclType(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match a:
+    v:ValType => match b:
+        u:ValType => v.name.name == u.name.name && equalType(v.typ,u.typ,gamma)
+        default => false
+    t:TypeType => match b:
+        u:TypeType => 
+            t.name.name == u.name.name && checkDeclList(t.unfld,u.unfld,x=>y=>equalDeclType(x,y,gamma))
+        default => false
+    d:DefType => match b:
+        u:DefType => 
+            val dargs = d.args.map[Type](e => e.typ)
+            val uargs = u.args.map[Type](e => e.typ)
+            val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+            val nngamma = u.args.map[DeclType](e=>e).append(ngamma)
+            val pred = x:Type => y:Type => equalType(x,y,nngamma)
+            d.name.name == u.name.name && checkArgList(dargs,uargs,pred) && equalType(d.retTyp,u.retTyp,nngamma)
+        default => false
+    s:SubtypeType => match b:
+        u:SubtypeType =>
+            equalType(s.subtype,u.subtype,gamma) && equalType(s.supertype,u.supertype,gamma)            
+        default => false
+    m:MemberType => match b:
+        u:MemberType =>
+            m.name.name == u.name.name && typesUtil.equalBound(m.bound,u.bound) && equalType(m.typ,u.typ,gamma)
+        default => false
+
+def equalBaseType(a:BaseType, b:BaseType, gamma:List[DeclType]):Boolean = match a:
+    u:UnitType => match b:
+        v:UnitType => true
+        default => false
+    bot:BotType => match b:
+        v:BotType => true
+        default => false
+    n:NominalType => match b:
+        v:NominalType => types.equalBinding(n.L,v.L)
+        default => false
+    path:PathType => match b:
+        v:PathType => 
+            val tauA = typecheckExpr(path.p,gamma)
+            val tauB = typecheckExpr(v.p,gamma)
+            (typesUtil.equalPath(path.p,v.p) || equalType(tauA,tauB,gamma)) && path.t == v.t
+        default => false
+
+def equalType(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
+    val pred = x:DeclType => y:DeclType => equalDeclType(x,y,gamma)
+    equalBaseType(t1.base,t2.base,gamma) && checkDeclList(t1.refines,t2.refines,pred) && checkDeclList(t2.refines,t1.refines,pred)
+
+def isSubtypeDeclList(xs:List[DeclType], ys:List[DeclType], gamma:List[DeclType]):Boolean
+    checkDeclList(xs,ys,x=>y=>isSubtypeDecl(x,y,gamma))
+
+def isSubtypeDecl(a:DeclType, b:DeclType, gamma:List[DeclType]):Boolean = match a:
+    v:ValType => match b:    
+        u:ValType => v.name.name == u.name.name && isSubtype(v.typ,u.typ,gamma)
+        default => false
+    t:TypeType => match b:
+        u:TypeType => equalDeclType(a,b,gamma)
+        default => false
+    d:DefType => match b:
+        u:DefType => 
+            val dargs = d.args.map[Type](e => e.typ)
+            val uargs = u.args.map[Type](e => e.typ)
+            val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+            val nngamma = u.args.map[DeclType](e=>e).append(ngamma)
+            val pred = x:Type => y:Type => isSubtype(x,y,nngamma)
+            d.name.name == u.name.name && checkArgList(uargs,dargs,pred) && isSubtype(d.retTyp,u.retTyp,nngamma)
+        default => false
+    s:SubtypeType => match b:
+        u:SubtypeType => equalType(s.subtype,u.subtype,gamma)
+        default => false
+    m:MemberType => match b:
+        //RHS =: LHS =
+        //RHS <=: LHS <=, =
+        //RHS >=: LHS >=, =
+        u:MemberType => 
+            if (m.name.name == u.name.name)
+                match u.bound:
+                    e:types.EQ => match m.bound:
+                        ee:types.EQ => 
+                            equalType(m.typ,u.typ,gamma) || (isSubtype(m.typ,u.typ,gamma) && isSubtype(u.typ,m.typ,gamma))
+                        default => false
+                    l:types.LEQ => match m.bound:
+                        g:types.GEQ => false
+                        default => isSubtype(m.typ,u.typ,gamma)
+                    g:types.GEQ => match m.bound:
+                        l:types.LEQ => false
+                        default => isSubtype(u.typ,m.typ,gamma)
+              else
+                false
+        default => false
+
+def isSubtype(t1:Type, t2:Type, gamma:List[DeclType]):Boolean
+    def normalAns():Boolean
+        if (equalType(t2,types.theUnit,gamma)) 
+            true 
+          else 
+            match t1.base:
+                b:BotType => true
+                default => 
+                    if (isSubtypeBase(t1,t2.base,gamma)) 
+                        val unfold = unfoldType(t1,gamma)
+                        val ngamma = llist.Cons[DeclType](types.ValType(unfold.z,t1),gamma)
+                        isSubtypeDeclList(unfold.decls,t2.refines,ngamma)
+                      else
+                        false
+    def recurseRHS():Boolean = match t2.base:
+        path:PathType =>
+            val tau = typecheckExpr(path.p,gamma)
+            val pUnfold = unfoldType(tau,gamma)
+            val d = fetchDeclFromList(path,pUnfold.decls)
+            match d:
+                m:MemberType => match m.bound:
+                    l:types.LEQ => false
+                    default =>
+                        val typeBound = typesUtil.addRefines(m.typ,t2.refines)
+                        val subType = types.substituteType(typeBound,path.p,pUnfold.z)
+                        isSubtype(t1,subType,gamma)
+                t:TypeType => false
+        default => false
+
+    def recurseLHS():Boolean = match t1.base:
+        path:PathType =>
+            val tau = typecheckExpr(path.p,gamma)
+            val pUnfold = unfoldType(tau,gamma)
+            val d = fetchDeclFromList(path,pUnfold.decls)
+            match d:
+                m:MemberType => match m.bound:
+                    l:types.GEQ => false
+                    default =>
+                        val typeBound = typesUtil.addRefines(m.typ,t1.refines)
+                        val subType = types.substituteType(typeBound,path.p,pUnfold.z)
+                        isSubtype(subType,t2,gamma)
+                t:TypeType => false
+        default => false
+    
+    if (equalBaseType(t1.base,t2.base,gamma))
+        isSubtypeDeclList(t1.refines,t2.refines,gamma)
+      else
+        //try both left and right bounds at the same time
+        recurseLHS() || recurseRHS() || normalAns()
+
+def isSubtypeBase(t1:Type, t2:BaseType, gamma:List[DeclType]):Boolean
+    if (equalBaseType(t1.base,t2,gamma))
+        true
+      else
+        val pred = ((b:DeclType) =>
+            val z = match b:
+                s:types.SubtypeType =>
+                    equalBaseType(s.subtype.base,t1.base,gamma) \
+                 && isSubtypeDeclList(t1.refines,s.subtype.refines,gamma) \
+                 && isSubtypeBase(types.Type(s.supertype.base,t1.refines),t2,gamma)
+                default => false
+            z
+        )
+        val listToSearch:List[DeclType] = match t1.base:
+            path:PathType => 
+                val tau = typecheckExpr(path.p,gamma)
+                val unfold = unfoldType(tau,gamma)
+                unfold.decls.map[DeclType](d => types.substituteDeclType(d,path.p,unfold.z))
+            default => gamma
+        val search = llist.find[DeclType](listToSearch,pred)
+        match search:
+            s:option.Some => true
+            default => false
+
+def checkTypeWF(t:Type, gamma:List[DeclType]):Boolean
+    match t.refines:
+        n:llist.Nil => true
+        c:llist.Cons =>
+            val ua = unfoldType(t,gamma)
+            val ub = unfoldType(types.Type(t.base,llist.Nil[DeclType]()),gamma)
+            val ngamma = llist.Cons[DeclType](types.ValType(ua.z,t),gamma)
+            isSubtypeDeclList(ua.decls,ub.decls,ngamma)
+    
+def checkDeclTypeWF(decl:DeclType,gamma:List[DeclType]):Boolean
+    match decl:
+        v:ValType     => checkTypeWF(v.typ,gamma)
+        t:TypeType    =>
+            val ngamma = llist.Cons[DeclType](types.ValType(t.z,types.makeNominalType(t.name)),gamma)
+            val nngamma = llist.Cons[DeclType](t,ngamma)
+            t.unfld.foldRight[Boolean]((d:DeclType,y:Boolean)=>checkDeclTypeWF(d,nngamma) && y,true)
+        d:DefType     =>
+            val ngamma = d.args.map[DeclType](e=>e).append(gamma)
+            val checkArgsWF = d.args.foldRight[Boolean]((v:ValType,y:Boolean)=>checkTypeWF(v.typ,ngamma) && y,true)
+            val checkRetWF = checkTypeWF(d.retTyp,ngamma)
+            checkArgsWF && checkRetWF
+        s:SubtypeType =>
+            val t1 = s.subtype
+            val t2 = s.supertype
+            val ua = unfoldType(t1,gamma)
+            val ub = unfoldType(t2,gamma)
+            val ngamma = llist.Cons[DeclType](types.SubtypeType(t1,t2),gamma)
+            val nngamma = llist.Cons[DeclType](types.ValType(ua.z,t1),ngamma)
+            val supertypeDecls = ub.decls.map[DeclType](d => types.substituteDeclType(d,types.Var(ua.z),ub.z))
+            isSubtypeDeclList(ua.decls,supertypeDecls,nngamma)
+        m:MemberType  => checkTypeWF(m.typ,gamma)

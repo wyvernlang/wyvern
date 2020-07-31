@@ -1,20 +1,20 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Foo:
+type Foo:z:
     def +(i:Int):Foo
     def -(i:Int):Foo
 subtype Foo extends Int
 
-type A:
+type A:z:
     def calc(x:Int):A
-type B:
+type B:z:
     def calc(x:Int):B
     val z:Int
 subtype B extends A
 subtype B extends Unit
-type C:
+type C:z:
     def calc(x:Int):C
     val z:Int
     val y:B

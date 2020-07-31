@@ -1,0 +1,164 @@
+module typesUtil
+
+import wyvern.option
+import wyvern.collections.llist
+import wyvern.pair
+import error
+import types
+type Option = option.Option
+type List = llist.LinkedList
+type Binding = types.Binding
+type Type = types.Type
+type DeclType = types.DeclType
+type BaseType = types.BaseType
+type ValType = types.ValType
+type TypeType = types.TypeType
+type DefType = types.DefType
+type SubtypeType = types.SubtypeType
+type MemberType = types.MemberType
+type UnitType = types.UnitType
+type BotType = types.BotType
+type NominalType = types.NominalType
+type PathType = types.PathType
+type Pair = pair.Pair
+
+def findInDeclList[T](gamma:List[DeclType], pred:DeclType->Option[T]):T
+    def f(gamma:List[DeclType], pred:DeclType->Option[T]):Option[T]
+        match gamma:
+            c:llist.Cons => 
+                match (pred(c.value)):
+                    s:option.Some => s
+                    default => f(c.next, pred)
+            n:llist.Nil => option.None[T]()
+    match f(gamma, pred):
+        s:option.Some => s.get()
+        default => error.report("search in decllist failed",error.unknownLocation)
+
+def zip[U,T](xs:List[U], ys:List[T]):List[Pair[U,T]] = match xs:
+    c:llist.Cons => match ys:
+        cc:llist.Cons => llist.Cons[Pair[U,T]](pair.Pair[U,T](c.value,cc.value), zip[U,T](c.next,cc.next))
+        default => llist.Nil[Pair[U,T]]()
+    default => llist.Nil[Pair[U,T]]()
+
+def doListOfSubstitutions(ty:Type, exps:List[types.Exp], bindings:List[Binding]):Type
+    val zipargs = zip[types.Exp,Binding](exps,bindings)
+    zipargs.foldRight[Type]((x:Pair[types.Exp,Binding],t:Type)=>types.substituteType(t,x.first,x.second),ty)
+
+def equalBound(a:types.Bound, b:types.Bound):Boolean = match a:
+    x:types.LEQ => match b:
+        y:types.LEQ => true   
+        default => false
+    x:types.EQ => match b:
+        y:types.EQ => true   
+        default => false
+    x:types.GEQ => match b:
+        y:types.GEQ => true   
+        default => false
+
+def equalPath(p1:types.Exp, p2:types.Exp):Boolean = match p1:
+    v:types.Var => match p2:
+        u:types.Var => types.equalBinding(v.binding,u.binding)
+        default => false
+    v:types.Field => match p2:
+        u:types.Field => equalPath(v.receiver,u.receiver) && v.field == u.field
+        default => false
+    default => false
+
+def addRefines(t:Type, decls:List[DeclType]):Type
+    types.Type(t.base,decls.append(t.refines))
+
+def findTypePredicate(bind:Binding):DeclType->Option[TypeType]
+    val pred = ((b:DeclType) =>
+        val z = match b:
+            t:TypeType => if (types.equalBinding(bind, t.name)) { option.Some[TypeType](t) } else { option.None[TypeType]() }
+            default => option.None[TypeType]()
+        z
+    )
+    pred
+
+def findTypePredicateFromStr(s:String):DeclType->Option[TypeType]
+    val pred = ((d:DeclType) =>
+        val z = match d:
+            tt:types.TypeType =>
+                if (tt.name.name == s) { option.Some[types.TypeType](tt) } else { option.None[types.TypeType]() }
+            default => option.None[types.TypeType]()
+        z
+    )
+    pred
+
+def isMatchDeclType(a:DeclType, b:DeclType):Boolean = match a:
+    v:ValType => match b:    
+        u:ValType => v.name.name == u.name.name
+        default => false
+    t:TypeType => match b:
+        u:TypeType => t.name.name == u.name.name
+        default => false
+    d:DefType => match b:
+        u:DefType => d.name.name == u.name.name
+        default => false
+    s:SubtypeType => false
+    m:MemberType => match b:
+        u:MemberType => m.name.name == u.name.name
+        default => false
+
+//delete replaced ones in ys
+def mergeDeclList(xs:List[DeclType], ys:List[DeclType]):List[DeclType]
+    val pred = ((b:DeclType) =>
+        val search = llist.find[DeclType](xs, (e:DeclType) => isMatchDeclType(e,b))
+        val ans = match search:
+            s:option.Some => false
+            default => true
+        ans
+    )
+    xs.append(ys.filter(pred))
+    
+/////////////////////////
+def printDeclList(ls:List[DeclType]):String
+    combineWithNewlines(ls.map[String](e => declTypeToString(e)))
+def combineWithNewlines(ls:List[String]):String = match ls:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => c.value
+        cc:llist.Cons => c.value + "\n" + combineWithNewlines(c.next)
+    default => ""
+
+def combineStringList(ls:List[String]):String = match ls:
+    c:llist.Cons => match c.next:
+        n:llist.Nil => c.value
+        cc:llist.Cons => c.value + ", " + combineStringList(c.next)
+    default => ""
+
+def declTypeToString(d:DeclType):String = match d:
+    v:ValType => "val " + v.name.name + ":" + typeToString(v.typ)
+    t:TypeType => 
+        val s = t.unfld.map[String](e => declTypeToString(e))
+        "type " + t.name.name + ":" + " {" + combineStringList(s) + "}"
+    d:DefType => 
+        val arglist = d.args.map[String](t => t.name.name + ":" + typeToString(t.typ))
+        "def " + d.name.name + "(" + combineStringList(arglist) + "):" + typeToString(d.retTyp)
+    s:SubtypeType => "subtype " + typeToString(s.subtype) + " extends " + typeToString(s.supertype)
+    m:MemberType => 
+        val boundStr:String = match m.bound:
+            a:types.LEQ => " <= "
+            a:types.EQ  => " = "
+            a:types.GEQ => " >= "
+        "type " + m.name.name + boundStr + typeToString(m.typ)
+
+def typeToString(t:Type):String
+    val baseString = match t.base:
+        u:UnitType => "Unit"
+        b:BotType => "Bottom"
+        n:NominalType => n.L.name
+        path:PathType => expToString(path.p) + "." + path.t
+    val s = t.refines.map[String](e => declTypeToString(e))
+    val refinesString = combineStringList(s)
+    baseString + " {" + refinesString + "}"
+
+def expToString(e:types.Exp):String = match e:
+    v:types.Var  => v.binding.name
+    c:types.Call => 
+        val argList = c.args.map[String](e => expToString(e))
+        expToString(c.receiver) + "." + c.name + "(" + combineStringList(argList) + ")"
+    f:types.Field   => expToString(f.receiver) + "." + f.field
+    n:types.New     => "new"
+    i:types.Integer => i.str
+    u:types.UnitVal => "()"

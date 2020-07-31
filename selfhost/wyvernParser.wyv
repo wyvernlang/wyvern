@@ -20,8 +20,10 @@ val grammar: parsing.Grammar = ~
            | %val %identifier %eq Expression                          : a:Dyn => raw.Val(a.get(1).value, a.get(3))
            | %val %identifier %colon Type %eq Expression              : a:Dyn => raw.ValAnnot(a.get(1).value, a.get(3), a.get(5))
            | %def %identifier %lparen Arguments %rparen %colon Type %colon %block : a:Dyn => raw.Def(a.get(1).value, a.get(3), a.get(6), a.get(8).value)
-           | %type %identifier %colon %block                          : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value)
-           | %type %identifier %eq %identifier                        : a:Dyn => raw.TypeAlias(a.get(1).value, a.get(3).value)
+           | %type %identifier %colon %identifier %colon %block       : a:Dyn => raw.TypeDecl(a.get(1).value, a.get(3).value, a.get(5).value)
+           | %type %identifier %eq Type                               : a:Dyn => raw.TypeMem(a.get(1).value, raw.EQ(), a.get(3))
+           | %type %identifier %leq Type                              : a:Dyn => raw.TypeMem(a.get(1).value, raw.LEQ(), a.get(3))
+           | %type %identifier %geq Type                              : a:Dyn => raw.TypeMem(a.get(1).value, raw.GEQ(), a.get(3))
            | %val %identifier %colon Type                             : a:Dyn => raw.ValType(a.get(1).value, a.get(3))
            | %def %identifier %lparen Arguments %rparen %colon Type   : a:Dyn => raw.DefDecl(a.get(1).value, a.get(3), a.get(6))
            | %def %plus %lparen Arguments %rparen %colon Type         : a:Dyn => raw.DefDecl("+", a.get(3), a.get(6))
@@ -33,7 +35,14 @@ val grammar: parsing.Grammar = ~
 
     Arg -> %identifier %colon Type                        : a:Dyn => raw.Arg(a.get(0).value,a.get(2))
 
-    Type  -> %identifier                                  : a:Dyn => a.get(0).value
+    Refinements -> Stmt                                   : a:Dyn => Single(a.get(0))
+                 | Stmt %comma Refinements                : a:Dyn => llist.Cons[raw.Exp](a.get(0),a.get(2))
+
+    Type  -> BaseType                                     : a:Dyn => raw.Type(a.get(0),llist.Nil[raw.Exp]())
+           | BaseType %lcurl Refinements %rcurl           : a:Dyn => raw.Type(a.get(0),a.get(2))
+
+    BaseType -> %identifier                               : a:Dyn => raw.Base(a.get(0).value) 
+              | Expression %dot %identifier               : a:Dyn => raw.Path(a.get(0),a.get(2).value)
 
     Expression -> ExprLambda                              : a:Dyn => a.get(0) 
            
@@ -65,7 +74,7 @@ val grammar: parsing.Grammar = ~
     Primary -> %identifier                                : a:Dyn => raw.Var(a.get(0).value)
              | %lparen Expression %rparen                 : a:Dyn => a.get(1)
              | %integer                                   : a:Dyn => raw.Integer(a.get(0).value)
-             | %new_ %identifier %colon %identifier %colon %block            : a:Dyn => raw.New(a.get(1).value, a.get(3).value, a.get(5).value)
+             | %new_ %identifier %colon Type %colon %block: a:Dyn => raw.New(a.get(1).value, a.get(3), a.get(5).value)
              | %lparen %rparen                            : a:Dyn => raw.UnitVal()
 
 

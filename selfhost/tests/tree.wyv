@@ -1,15 +1,15 @@
-type Int:
+type Int:z:
     def +(i:Int):Int
     def -(i:Int):Int
 
-type Tree:
+type Tree:z:
     def sum(u:Unit):Int
 
-type Empty:
+type Empty:z:
     def sum(u:Unit):Int
 subtype Empty extends Tree
 
-type Branch:
+type Branch:z:
     def sum(u:Unit):Int
     val a:Int
     val left:Tree

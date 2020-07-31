@@ -1,0 +1,35 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Pair:z:
+    type S <= Unit
+    type T <= Unit
+    val fst:z.S
+    val snd:z.T
+
+val p1 = new this:Pair {type S = Int, type T = Unit}:
+    type S = Int
+    type T = Unit
+    val fst:this.S = 3
+    val snd:this.T = ()
+
+type Param:z:
+    type A >= Int
+val IntP = new this:Param {type A = Int}:
+    type A = Int
+val UnitP = new this:Param {type A = Unit}:
+    type A = Unit
+
+type AA:z:
+    def swapPair(a:Param, b:Param, pair:Pair {type S = a.A, type T = b.A}):Pair {type S = b.A, type T = a.A}
+
+val aa = new this:AA:
+    def swapPair(a:Param, b:Param, pair:Pair {type S = a.A, type T = b.A}):Pair {type S = b.A, type T = a.A}:
+        new this:Pair {type S = b.A, type T = a.A}:
+            type S = b.A
+            type T = a.A
+            val fst = pair.snd
+            val snd = pair.fst
+
+aa.swapPair(IntP, UnitP, p1)

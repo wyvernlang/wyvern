@@ -41,10 +41,14 @@ val lowLevelLexer : lexing.Lexer = ~
         rparen:     ')',
         lbrack:     '[',
         rbrack:     ']',
+        lcurl:      '{',
+        rcurl:      '}',
         darrow:     '=>',
         arrow:      '->',
         colon:      ':',
         eq:         '=',
+        leq:        '<=',
+        geq:        '>=',
         dot:        '.',
         comma:      ',',
         linecont:   '\\',
@@ -216,7 +220,7 @@ def makeSecondLevelLexer():SecondLevelLexer = new (self) =>
     def handleLine(pending_:List[Dyn], tokens:List[Token]):List[Dyn]
         //inLine = true
         var toks:List[Dyn] = tokens
-        printTokens(toks)
+        //printTokens(toks)
         var pending:List[Dyn] = pending_ // in reverse order
         
         def computeDedents(matchingType:String):Unit
@@ -276,9 +280,9 @@ def makeSecondLevelLexer():SecondLevelLexer = new (self) =>
     def lexLines(input:String):List[Dyn]
         val lineMatch = regexUtils.doMatch(input, "[^\\r\\n]*")
         if (lineMatch.found)
-            js.log("reading line \"" + lineMatch.matched + "\"")
+            //js.log("reading line \"" + lineMatch.matched + "\"")
             val firstTokens = self.lexLine(lineMatch.matched)
-            printTokens(firstTokens)
+            //printTokens(firstTokens)
             if (lineMatch.after == "")
                 def getBlocks():List[Dyn]
                     val topState = self.lexerState.nth(0).getOrElse(() => DontCare())
@@ -331,9 +335,9 @@ def initLexer(toks : List[Dyn]):lexing.Lexer
                            //js.log("lexer returning " + token.value)
                            c.value
             n:llist.Nil => js.getUndefined()
-        def save():Dyn = js.log("called save\n")
+        def save():Dyn = unit //js.log("called save\n")
         def reset(chunk:String, info:Dyn):Unit
-            js.log("called reset\n")
+            //js.log("called reset\n")
             val secondLevelLexer = makeSecondLevelLexer()
             tokens = secondLevelLexer.lexLines(chunk).filter((t:Dyn) => !js.equalsJS("WS", t."type"))
             //tokens.do((t:Dyn) => printToken(t))

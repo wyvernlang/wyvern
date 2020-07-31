@@ -1,0 +1,18 @@
+type Int:z:
+    def +(i:Int):Int
+    def -(i:Int):Int
+
+type Pair:z:
+	type S <= Unit
+	type T <= Unit
+
+type IPair:z:
+	type S = Int
+	type T <= Unit
+subtype IPair extends Pair
+
+val ok:Pair{type S = Int, type T = Int} = new this:IPair {type T = Int}:
+	type S = Int
+	type T = Int
+
+ok
