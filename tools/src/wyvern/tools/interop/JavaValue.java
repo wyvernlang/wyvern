@@ -48,6 +48,7 @@ public class JavaValue extends AbstractValue implements Invokable {
 
     @Override
     public Value invoke(String methodName, List<Value> args, FileLocation loc) {
+        System.out.println("DEBUG 10 JavaValue Invoke");
         List<Object> javaArgs = new LinkedList<Object>();
         Class<?>[] hints = foreignObject.getTypeHints(methodName);
         int hintNum = 0;
@@ -194,6 +195,10 @@ public class JavaValue extends AbstractValue implements Invokable {
 
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+        System.out.println("DEBUG 11");
+//        Class<?> cls = foreignObject.getJavaClass();
+//        System.out.println("DEBUG 9 " + cls.getName());
+
         return this.getType();
     }
 

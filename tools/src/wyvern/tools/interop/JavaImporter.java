@@ -2,8 +2,10 @@ package wyvern.tools.interop;
 
 import static wyvern.tools.errors.ToolError.reportError;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.HasLocation;
@@ -19,10 +21,19 @@ public class JavaImporter implements Importer {
         JObject obj = null;
         try {
             Class<?> cls = java.lang.Class.forName(qualifiedName);
+
+//            if (Arrays.stream(cls.getAnnotations()).anyMatch(a -> a.annotationType().getName().equals("org.checkerframework.dataflow.qual.Pure"))) {
+//                System.out.println("DEBUG 4 has pure annotation.");
+//            } else {
+//                System.out.println("DEBUG 4 has no pure annotation.");
+//            }
+
             obj = new JObject(cls);
         } catch (ReflectiveOperationException e1) {
             isField = true;
         }
+
+//        System.out.println("DEBUG 3 isField " + isField);
 
         // Now, let's handle the execution path where the exception is thrown
         if (isField) {
