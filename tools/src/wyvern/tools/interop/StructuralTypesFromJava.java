@@ -28,7 +28,7 @@ public class StructuralTypesFromJava extends StructuralType {
      */
     public ValueType getJavaType(Class<?> javaClass, TypeContext ctx, boolean safe) {
         Package package1 = javaClass.getPackage();
-        String packageName = package1 == null ? "noPackage" : package1.getName();
+        String packageName = package1 == null || package1.getName().isBlank() ? "noPackage" : package1.getName();
         String className = javaClass.getSimpleName();
         DeclType packageDecl = findDecl(packageName, ctx);
         if (packageDecl == null) {

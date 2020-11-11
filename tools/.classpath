@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="lib/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/javatuples-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/protobuf-java-3.5.1.jar"/>
+	<classpathentry kind="lib" path="/home/clarkemaxw/srp/checker-framework-3.7.1/checker/dist/checker-qual.jar"/>
+	<classpathentry kind="lib" path="/home/clarkemaxw/srp/call-java-pure" sourcepath="/home/clarkemaxw/srp/call-java-pure"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

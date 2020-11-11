@@ -99,8 +99,17 @@ public final class GenUtil {
             return Util.listType();
         }
 
+        if (javaClass.getName().equals("void")) {
+            return Util.unitType();
+        }
+
+        // otherwise, arbitrary java class
+        System.out.println("DEBUG 20 GenUtil " + javaClass.getName());
+
         StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupTypeOf(javaTypesObjectName);
-        return type.getJavaType(javaClass, ctx, safe);
+        ValueType newType = type.getJavaType(javaClass, ctx, safe);
+
+        return newType;
     }
 
     public static Variable getJavaTypesObject() {

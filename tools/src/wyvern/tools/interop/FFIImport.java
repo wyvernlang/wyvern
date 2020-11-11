@@ -71,7 +71,7 @@ public class FFIImport extends Expression {
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         try {
             FObject obj = wyvern.tools.interop.Default.importer().find(path, this);
-            System.out.println("DEBUG 8 " + obj.getWrappedValue().getClass());
+//            System.out.println("DEBUG 8 " + obj.getWrappedValue().getClass());
         } catch (ReflectiveOperationException e1) {
             throw new RuntimeException(e1);
         }
