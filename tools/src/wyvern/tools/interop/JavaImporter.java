@@ -22,18 +22,10 @@ public class JavaImporter implements Importer {
         try {
             Class<?> cls = java.lang.Class.forName(qualifiedName);
 
-//            if (Arrays.stream(cls.getAnnotations()).anyMatch(a -> a.annotationType().getName().equals("org.checkerframework.dataflow.qual.Pure"))) {
-//                System.out.println("DEBUG 4 has pure annotation.");
-//            } else {
-//                System.out.println("DEBUG 4 has no pure annotation.");
-//            }
-
             obj = new JObject(cls);
         } catch (ReflectiveOperationException e1) {
             isField = true;
         }
-
-//        System.out.println("DEBUG 3 isField " + isField);
 
         // Now, let's handle the execution path where the exception is thrown
         if (isField) {

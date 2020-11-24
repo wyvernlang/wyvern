@@ -104,7 +104,6 @@ public final class GenUtil {
         }
 
         // otherwise, arbitrary java class
-        System.out.println("DEBUG 20 GenUtil " + javaClass.getName());
 
         StructuralTypesFromJava type = (StructuralTypesFromJava) ctx.lookupTypeOf(javaTypesObjectName);
         ValueType newType = type.getJavaType(javaClass, ctx, safe);

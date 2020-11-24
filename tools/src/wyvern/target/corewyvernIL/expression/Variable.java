@@ -118,7 +118,6 @@ public class Variable extends Expression implements Path {
     @Override
     public ValueType typeCheck(TypeContext env, EffectAccumulator effectAccumulator) {
         ValueType matchedType = env.lookupTypeOf(this);
-//        System.out.println("DEBUG 17 var type check " + matchedType);
         if (getExplicitConversionFlag()) {
 
           // obtain the option type of the matched type

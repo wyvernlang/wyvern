@@ -46,8 +46,6 @@ public class LazyStructuralType extends StructuralType {
     }
 
     private void fillOutType() {
-        System.out.println("DEBUG 18 LazyStructuralType fillOutType for " + javaClass.getName());
-
         List<DeclType> newDeclTypes = new ArrayList<DeclType>();
         // for each method in javaClass, attempt to convert argument types
         // if we fail, we just leave out that method
@@ -76,10 +74,8 @@ public class LazyStructuralType extends StructuralType {
             if (safe) {
                 newDeclTypes.add(new DefDeclType(m.getName(), retType, argTypes));
             } else if (m.getAnnotationsByType(Pure.class).length > 0 || m.getAnnotationsByType(SideEffectFree.class).length > 0) {
-                System.out.println("DEBUG 21    annotated method: " + javaClass.getName() + " m:" + m.getName());
                 newDeclTypes.add(new DefDeclType(m.getName(), retType, argTypes));
             } else {
-                System.out.println("DEBUG 22 un-annotated method: " + javaClass.getName() + " m:" + m.getName());
 
                 EffectSet ffiEffect = new EffectSet(new Effect(new Variable("system"), "FFI", null));
                 newDeclTypes.add(new DefDeclType(m.getName(), retType, argTypes, ffiEffect));

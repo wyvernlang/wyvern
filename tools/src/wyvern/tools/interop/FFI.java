@@ -44,12 +44,6 @@ public class FFI extends AbstractValue {
 
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
-
-//        System.out.println("DEBUG 11 FFI TypeCheck");
-
-//        System.out.println("DEBUG 12 " + this.type);
-//        System.out.println("DEBUG 13 " + this.importName);
-
         return type;
     }
 
