@@ -298,6 +298,7 @@ public final class Globals {
         declTypes.add(new ValDeclType("unit", Util.unitType()));
         //declTypes.add(new EffectDeclType("ffiEffect", null, null));
         declTypes.add(new EffectDeclType("FFI", null, null));
+        declTypes.add(new EffectDeclType("FFI2", null, null));
         declTypes.add(new EffectDeclType("EffectNotInScope", null, null));
         ValueType systemType = new StructuralType(new BindingSite("this"), declTypes);
         return systemType;
