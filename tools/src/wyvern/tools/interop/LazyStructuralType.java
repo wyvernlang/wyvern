@@ -13,6 +13,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
 import wyvern.target.corewyvernIL.FormalArg;
 import wyvern.target.corewyvernIL.decltype.DeclType;
 import wyvern.target.corewyvernIL.decltype.DefDeclType;
+import wyvern.target.corewyvernIL.decltype.EffectDeclType;
 import wyvern.target.corewyvernIL.effects.Effect;
 import wyvern.target.corewyvernIL.effects.EffectSet;
 import wyvern.target.corewyvernIL.expression.Variable;
@@ -76,9 +77,12 @@ public class LazyStructuralType extends StructuralType {
             } else if (m.getAnnotationsByType(Pure.class).length > 0 || m.getAnnotationsByType(SideEffectFree.class).length > 0) {
                 newDeclTypes.add(new DefDeclType(m.getName(), retType, argTypes));
             } else {
-
-                EffectSet ffiEffect = new EffectSet(new Effect(new Variable("system"), "FFI", null));
-                newDeclTypes.add(new DefDeclType(m.getName(), retType, argTypes, ffiEffect));
+                String effectName = m.getName() + "Effect";
+                EffectDeclType ffiEffect = new EffectDeclType(effectName, null, null);
+                EffectSet set = new EffectSet(new Effect(new Variable(this.getSelfSite()), effectName, null));
+                newDeclTypes.add(ffiEffect);
+                DefDeclType methodDecl = new DefDeclType(m.getName(), retType, argTypes, set);
+                newDeclTypes.add(methodDecl);
             }
         }
 
