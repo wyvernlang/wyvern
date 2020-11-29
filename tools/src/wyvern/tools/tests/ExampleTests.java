@@ -9,6 +9,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -227,6 +228,7 @@ public class ExampleTests {
                 null);
     }
 
+    @Ignore
     @Test
     public void testPythonCompilerOnScript() {
         String[] args = new String[] {TestUtil.EXAMPLES_PATH + "pong/pong.wyv"};
@@ -235,6 +237,7 @@ public class ExampleTests {
         PythonCompiler.main(args);
     }
 
+    @Ignore
     @Test
     public void testPython2Webserver() {
         String[] args = new String[] {
@@ -245,6 +248,7 @@ public class ExampleTests {
         PythonCompiler.main(args);
     }
 
+    @Ignore
     @Test
     public void testPython3Webserver() {
         String[] args = new String[] {
@@ -262,12 +266,14 @@ public class ExampleTests {
                 Util.unitType(), Util.unitValue());
     }
 
+    @Ignore
     @Test
     public void testMandelbrot() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "rosetta.mandelbrot", Util.unitType(),
                 Util.unitValue());
     }
 
+    @Ignore
     @Test
     public void testJulia() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "rosetta.julia", Util.unitType(),

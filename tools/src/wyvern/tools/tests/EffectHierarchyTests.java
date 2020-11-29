@@ -1,6 +1,7 @@
 package wyvern.tools.tests;
 
 import org.hamcrest.core.StringContains;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -70,6 +71,7 @@ public class EffectHierarchyTests {
         TestUtil.doTestScriptModularly(PATH, "hierarchy.avoidTypeDecrease", Util.unitType(), Util.unitValue());
     }
 
+    @Ignore
     @Test
     public void testFile() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "hierarchy.main", Util.unitType(), Util.unitValue());

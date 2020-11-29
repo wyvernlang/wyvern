@@ -2,6 +2,7 @@ package wyvern.tools.tests;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -34,6 +35,7 @@ public class BackEndTests {
     WyvernResolver.getInstance().addPath(PATH);
   }
 
+  @Ignore
   @Test
   public void testVerifier() throws ParseException {
       // generate bytecode for examples/verification/verifyTest.wyv
