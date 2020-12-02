@@ -1,0 +1,12 @@
+require java
+require stdout
+
+// We import a static object instead of a class. The type is converted to
+// a Wyvern structural type through reflection.
+import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
+
+// This FFI method has no effects because it is annotated in Java with @Pure from the checker framework.
+def getString(): {} String
+  singleton.getString()
+
+stdout.print(singleton.getString())

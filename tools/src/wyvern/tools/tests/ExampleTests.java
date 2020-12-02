@@ -170,9 +170,27 @@ public class ExampleTests {
     }
 
     @Test
-    public void testJavaFFI() throws ParseException {
-      TestUtil.doTestScriptModularly(PATH, "ffi.callFromJava", Util.unitType(),
+    public void testJavaFFIPure() throws ParseException {
+      TestUtil.doTestScriptModularly(PATH, "ffi.callJava", Util.unitType(),
           Util.unitValue());
+    }
+
+    @Test
+    public void testJavaFFIImpure() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.callImpure", Util.unitType(),
+                Util.unitValue());
+    }
+
+    @Test
+    public void testJavaFFIWyvernThunk() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.callWyvernThunk", Util.unitType(),
+                Util.unitValue());
+    }
+
+    @Test
+    public void testJavaFFIObjectFromJava() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.objectFromJava", Util.unitType(),
+                Util.unitValue());
     }
 
     @Test

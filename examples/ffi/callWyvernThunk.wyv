@@ -1,0 +1,6 @@
+require java
+require stdout
+
+import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
+
+singleton.callWyvernThunk(() => stdout.print("called from Java!"))

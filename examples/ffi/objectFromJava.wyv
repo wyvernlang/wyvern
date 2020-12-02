@@ -1,0 +1,12 @@
+require java
+
+import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
+
+val obj = singleton.getObject()
+
+obj.print()
+
+// Currently broken - the printEffect member is not present in the
+// type of the returned object
+def objectPrint(): {obj.printEffect} Unit
+  obj.print()
