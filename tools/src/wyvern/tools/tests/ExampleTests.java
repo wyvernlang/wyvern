@@ -194,6 +194,12 @@ public class ExampleTests {
     }
 
     @Test
+    public void testJavaFFIEffectMembersModuleDef() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.effectMembersInModuleDef", Util.unitType(),
+                Util.unitValue());
+    }
+
+    @Test
     public void testTSL() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "tsls.postfixClient", Util.intType(),
                 new IntegerLiteral(7));
