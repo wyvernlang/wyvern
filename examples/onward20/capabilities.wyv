@@ -1,0 +1,13 @@
+require java
+require stdout
+
+import fileSystem
+import untrusted
+
+val fileSys = fileSystem(java)
+
+val reader = fileSys.fileFor("conference.txt").makeReader()
+
+val untrusted = untrusted(reader)
+
+stdout.print(untrusted.readIt())

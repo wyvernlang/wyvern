@@ -1,0 +1,4 @@
+module def untrusted(reader: fileSystem.BoundedReader):Untrusted
+
+def readIt():String
+    reader.readLine().get()

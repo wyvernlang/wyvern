@@ -1,0 +1,9 @@
+module def untrusted(reader: fileSystem.BoundedReader):Untrusted
+
+import fileSystem
+
+val fileSys = fileSystem(java)
+
+def readIt():String
+    val passwordFile = fileSys.fileFor("password.txt")
+    passwordFile.makeReader().readLine().get()

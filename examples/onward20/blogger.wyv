@@ -1,0 +1,99 @@
+require io
+require fileSystem
+
+import io.networkEffects
+import fileSystem.fileEffects
+import fileSystem.Writer
+import fileSystem.File
+
+type NetEffects
+    effect Read >= {system.FFI}
+    effect Write >= {system.FFI}
+    effect Connect >= {this.Read}
+    effect Close >= {system.FFI}
+
+val netEffects : NetEffects = networkEffects
+
+type Post
+    val name:String
+    val content:String
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+// BLOGGER COMPONENT FUNCTIONS
+
+def save(p:Post) : {netEffects.Write} Unit
+    val socket = io.makeSocket("plaid.isri.cmu.edu", 80)
+    val writer : Writer[{networkEffects.Write}] = socket.makeWriter()
+    writer.write(p.content)
+
+def post(p:Post) : {netEffects.Write} Unit
+    val socket = io.makeSocket("plaid.isri.cmu.edu", 80)
+    val writer : Writer[{networkEffects.Write}] = socket.makeWriter()
+    writer.write(p.content)
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+// BLOGGER CLIENT FUNCTIONS
+
+def edit(p:Post) : {fileEffects.Write} Unit
+    update(p)
+    save(p)
+
+def publish(p:Post) : {netEffects.Write} Unit
+    post(p)
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+// CLIENT HELPER FUNCTIONS    
+    
+def update(p:Post) : {} Unit
+    unit
+    
+/*
+show blogger app that takes a network and a fileSystem permission
+    has save(Post) {fileSytem} and publish(Post) {network}
+    
+    client has edit(Post) and share(Post) functions with similar effects
+    
+    updating the blogger app to one where "save" has a network effect warns the user
+        show what it does and why it's bad
+        
+TO RUN
+    compile and show the code working
+    then replace code in save with code in post, and update effect in signature
+    recompile and show that error is caught
+*/
