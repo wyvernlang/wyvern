@@ -1,8 +1,8 @@
 module wyvernParser
 
-import lexing
-import metadata parsing
-import raw
+import selfhost.lexing
+import metadata selfhost.parsing
+import selfhost.raw
 import wyvern.collections.llist
 type List = llist.LinkedList
 

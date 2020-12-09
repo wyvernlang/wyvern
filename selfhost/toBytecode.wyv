@@ -1,9 +1,9 @@
 module def toBytecode(javascript:JavaScript, js:Dyn)
 
-import types
-import bytecode
+import selfhost.types
+import selfhost.bytecode
 import wyvern.collections.llist
-import error
+import selfhost.error
 type List = llist.LinkedList
 
 val b = bytecode(javascript, js)
@@ -38,14 +38,25 @@ def toBytecodeExpr(e:types.Exp):b.Expr = match e:
     i:types.Integer => b.IntLit(i.str)
     u:types.UnitVal => b.IntLit("0")
 
-def writeExpToFile(e:types.Statement, filename:String):Unit
+def toFileBytecode(e:types.Statement):b.Bytecode
     js.log("Converting expression to bytecode...\n")
     val expBytecode = toBytecode(e)
     //js.log(d.sequenceExpression.statements.get(0).declaration)
     js.log("Creating top level bytecode...\n")
-    val fileBytecode = b.singletonBytecode(b.toplevel(expBytecode))
+    b.singletonBytecode(b.toplevel(expBytecode))
+    
+// takes the same thing as writeExpToFile
+// encodes to protobuf bytes and decodes
+// returns the same thing as b.loadBytecode
+def encodeAndDecode(e:types.Statement): Dyn
+    val fileBytecode = toFileBytecode(e)
+    b.encodeAndDecode(fileBytecode)
+
+def writeExpToFile(e:types.Statement, filename:String):Unit
+    val fileBytecode = toFileBytecode(e)
     js.log("Actually saving...\n")
     b.saveBytecode(filename, fileBytecode)
+
 
 /*
 // test code

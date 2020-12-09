@@ -1,9 +1,9 @@
 module def wyvernLexer(js:Dyn, regexUtils:Dyn)
 
-import metadata lexing
+import metadata selfhost.lexing
 import wyvern.collections.llist
 import wyvern.runtime
-import lexUtil
+import selfhost.lexUtil
 
 type List = llist.LinkedList
 
@@ -26,6 +26,7 @@ def Token(t:String, value:String, line:Int, col:Int):Token = new
 
 // note: this lexer will never actually see a logline (\n, \r, or \r\n).  But we generate such tokens later on at line breaks
 
+// This is the only state in the lexer.  It gets reset on every call to the higher-level lex functions, so this state is mostly innoccuous; it's OK to use those higher-level functions in any single-threaded way, including creating multiple higher-level Lexers and interleaving their use.  But note that the current design requires each instance of wyvernLexer to be used in a single-threaded manner.  If you want multiple threads create multiple wyvernLexers.
 val lowLevelLexer : lexing.Lexer = ~
         WS:         /[ \t]+/,
         logline:    {match: /\\r\\n|\\r|\\n/, lineBreaks: true},
@@ -311,7 +312,6 @@ resource type IncrementalLexer
     /*
 // TODO: revise to work with lineCont
 def incrementalLexer():IncrementalLexer
-    // TODO: make all the state above local
     new
         var tokens : List[Dyn] = llist.Nil[Dyn]()
         def addLine(input:String):option.Option[lexing.Lexer]

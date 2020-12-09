@@ -1,0 +1,17 @@
+// executes Javascript
+module def exec(javascript:JavaScript)
+
+import javascript:stdlib.support.exec
+import wyvern.collections.llist
+
+type ArgPair
+    val name:String
+    val value:Dyn
+    
+def ArgPair(name:String, value:Dyn):ArgPair = new
+    val name:String = name
+    val value:Dyn = value
+
+// executes a string of Javascript in a given environment, returning the result
+def execute(environment: llist.LinkedList[ArgPair], code:String):Dyn
+    exec.execute(environment, code)

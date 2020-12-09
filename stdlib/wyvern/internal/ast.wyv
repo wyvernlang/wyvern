@@ -159,6 +159,8 @@ val types = new
 
 def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = utils.stripLeadingWhitespace(input, mustStrip)
 
+def reportError(msg : String) : Unit = utils.reportError(msg)
+
 def genIdent() : String = utils.genIdent()
 
 def let(ident : String, bindingType : Type, bindingValue : AST, inExpr : AST) : AST = new

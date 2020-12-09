@@ -3,8 +3,8 @@ module typesUtil
 import wyvern.option
 import wyvern.collections.llist
 import wyvern.pair
-import error
-import types
+import selfhost.error
+import selfhost.types
 type Option = option.Option
 type List = llist.LinkedList
 type Binding = types.Binding

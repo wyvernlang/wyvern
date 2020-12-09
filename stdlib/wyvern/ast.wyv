@@ -91,6 +91,8 @@ def formalArg(name : String, argType : Type) : FormalArg = ast.formalArg(name, a
 // Utility Functions
 def stripLeadingWhitespace(input : String, mustStrip : Boolean) : String = ast.stripLeadingWhitespace(input, mustStrip)
 
+def reportError(msg : String) : Unit = ast.reportError(msg)
+
 def genIdent() : String = ast.genIdent()
 
 def getMetadataTypeReceiver(ctx : system.Context) : AST

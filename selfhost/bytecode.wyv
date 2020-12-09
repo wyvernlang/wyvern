@@ -167,3 +167,5 @@ def encodeExpr(e:Expr):Unit
 def saveBytecode(path:String, b:Bytecode):Unit
     bytecode.saveBytecode(path, b)
 
+def encodeAndDecode(b:Bytecode):Unit
+    bytecode.encodeAndDecode(b)

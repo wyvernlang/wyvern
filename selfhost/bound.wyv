@@ -1,6 +1,6 @@
 module bound
 
-import types
+import selfhost.types
 import wyvern.collections.llist
 type List = llist.LinkedList
 type Counter = types.Counter

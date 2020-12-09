@@ -1,7 +1,7 @@
 module errors
 
 import wyvern.exception
-import Location
+import selfhost.Location
 import wyvern.String
 
 type ErrorReportingException extends exception.Exception

@@ -4,7 +4,7 @@ import javaMetaDebug
 import wyvern.ast
 import metadata wyvern.collections.list
 import javascript:stdlib.support.parsing
-import lexing
+import selfhost.lexing
 import wyvern.util.matching.regexInternal
 import java:wyvern.stdlib.support.StringHelper.utils
 

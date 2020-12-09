@@ -428,6 +428,10 @@ public class AST {
         return result.toString();
     }
 
+    public void reportError(String msg) {
+        ToolError.reportError(ErrorMessage.TSL_ERROR, new FileLocation("TSL", 1, 1), msg);
+    }
+    
     public String genIdent() {
         return "ASTIDENT$" + Integer.toString(++identNum);
     }

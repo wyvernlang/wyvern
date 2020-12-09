@@ -71,6 +71,7 @@ def convStringAST(input : String, ctx : system.Context, floatPrecision : Int) : 
                 if (ast.types.equals(ty, ast.types.boolean(), ctx))
                     option.Some[AST](ast.call(exp, "ifTrue", {ast.parseExpression("() => \"true\"", ctx), ast.parseExpression("() => \"false\"", ctx)}))
                   else
+                    ast.reportError("Wyvern expressions inside format string must have type Int, String, Float, or Boolean")
                     option.None[AST]()
     
 

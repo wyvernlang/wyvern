@@ -94,6 +94,18 @@ exports.saveBytecode = function(path, bytecodeObject) {
 	fs.writeFileSync(path, bbuffer);
 }
 
+exports.encodeAndDecode = function(bytecodeObject) {
+	setRoot();
+    const Bytecode = root.lookupType('Bytecode');
+	var errMsg = Bytecode.verify(bytecodeObject);
+    if (errMsg)
+        throw Error(errMsg);
+	var bmsg = Bytecode.create(bytecodeObject);
+	var bbuffer = Bytecode.encode(bmsg).finish();
+    var newBytecode = Bytecode.decode(bbuffer);
+    return wrap(newBytecode);
+}
+
 exports.encodeExpr = function(exprObject) {
 	setRoot();
     const Expression= root.lookupType('Expression');

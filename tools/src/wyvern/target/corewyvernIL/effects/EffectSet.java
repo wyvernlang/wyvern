@@ -205,7 +205,7 @@ public class EffectSet {
 
     @Override
     public String toString() {
-        return effectSet == null ? "" : effectSet.toString().replace("[", "{").replace("]", "}");
+        return effectSet == null ? "" : effectSet.toString().replace("[", "{").replace("]", "}").replaceAll("MOD\\$", "");
     }
 
 

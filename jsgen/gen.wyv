@@ -1,0 +1,7 @@
+// generates javascript from protobuf-based bytecode
+module gen
+
+// generates javascript in a string from protobuf bytecode (in a buffer)
+def generate(bytecodeBuffer:Dyn):String
+    // placeholder for now
+    "console.log(\"executing now!\");"

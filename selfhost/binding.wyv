@@ -1,9 +1,9 @@
-import raw
-import error
-import lexUtil
-import types
-import typesUtil
-import typecheck
+import selfhost.raw
+import selfhost.error
+import selfhost.lexUtil
+import selfhost.types
+import selfhost.typesUtil
+import selfhost.typecheck
 import wyvern.collections.llist
 
 type List = llist.LinkedList

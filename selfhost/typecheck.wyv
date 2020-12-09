@@ -1,8 +1,9 @@
 module typecheck
 
-import types
-import typesUtil
-import error
+import selfhost.types
+import selfhost.typesUtil
+import selfhost.error
+import debug
 import wyvern.option
 import wyvern.collections.llist
 import wyvern.pair
