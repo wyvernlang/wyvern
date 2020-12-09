@@ -3,23 +3,26 @@ require stdout
 import metadata formatstring
 import wyvern.String
 
-/*
 def printf(str:formatstring.FormatString): {stdout.print} Unit
     stdout.print(str)
     stdout.println()
 
+val conference = "Onward!"
 
-//just a plain string
-stdout.printf(~)
- Hello \\\%World!\n
+val id = (x:Int) => x
 
-stdout.printf(~)
- Hello %{"string!"}%{" \"}{mm}"} and %{ "another string!" }
+printf(~)
+ Hello %{conference}
 
 val x = 3
-stdout.printf(~)
- %{x} %{4} %.5{1.6} %{1.7}
 
-stdout.printf({%{1 == 2}%{true}})
-*/
+printf(~)
+ %{id(4)} %.5{1.6}
+
+printf({%{1 == 2}%{true}})
+
+
+printf(~)
+ %.5{1.5}
+
 3
