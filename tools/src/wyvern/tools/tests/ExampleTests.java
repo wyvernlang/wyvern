@@ -190,7 +190,7 @@ public class ExampleTests {
     @Test
     public void testJavaFFIObjectFromJava() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "ffi.objectFromJava", Util.unitType(),
-                Util.unitValue());
+                null);
     }
 
     @Test
