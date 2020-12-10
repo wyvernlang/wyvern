@@ -13,6 +13,7 @@
         <pathelement location="lib/checkstyle-8.7-all.jar" />
         <pathelement location="lib/jacocoant.jar" />
         <pathelement location="lib/protobuf-java-3.5.1.jar" />
+        <pathelement location="lib/checker-qual-3.7.1.jar" />
     </path>
 
     <taskdef name="copper" classname="edu.umn.cs.melt.copper.ant.CopperAntTask" classpath="lib/CopperCompiler.jar"/>
