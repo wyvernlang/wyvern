@@ -1,10 +1,16 @@
 package wyvern.tools.interop;
 
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import wyvern.stdlib.Globals;
+import wyvern.stdlib.support.Effect;
 import wyvern.stdlib.support.backend.BytecodeOuterClass;
 import wyvern.target.corewyvernIL.VarBinding;
 import wyvern.target.corewyvernIL.astvisitor.ASTVisitor;
@@ -13,9 +19,12 @@ import wyvern.target.corewyvernIL.expression.AbstractValue;
 import wyvern.target.corewyvernIL.expression.Expression;
 import wyvern.target.corewyvernIL.expression.Tag;
 import wyvern.target.corewyvernIL.expression.Variable;
+import wyvern.target.corewyvernIL.modules.Module;
+import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
+import wyvern.target.corewyvernIL.support.ModuleResolver;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.type.DynamicType;
 import wyvern.target.corewyvernIL.type.NominalType;
@@ -73,14 +82,15 @@ public class FFI extends AbstractValue {
         return nt.getTag(ctx);
     }
 
-    public static Pair<VarBinding, GenContext> importURI(URI uri, GenContext ctx, HasLocation errorLocation) {
+    public static Pair<Pair<VarBinding, GenContext>, List<TypedModuleSpec>> importURI(URI uri, GenContext ctx, HasLocation errorLocation) {
         final String scheme = uri.getScheme();
+        List<TypedModuleSpec> noDependencies = Collections.emptyList();
         if (scheme.equals("java")) {
             return doJavaImport(uri, ctx, errorLocation);
         } else if (scheme.equals("python")) {
-            return doPythonImport(uri, ctx);
+            return new Pair<>(doPythonImport(uri, ctx), noDependencies);
         } else if (scheme.equals("javascript")) {
-            return doJavaScriptImport(uri, ctx, errorLocation);
+            return new Pair<>(doJavaScriptImport(uri, ctx, errorLocation), noDependencies);
         } else {
             // TODO: support non-Java imports too - probably separated out into various FFI subclasses
             System.err.println("importURI called with uri=" + uri + ", ctx=" + ctx);
@@ -88,7 +98,7 @@ public class FFI extends AbstractValue {
         }
     }
 
-    public static Pair<VarBinding, GenContext> doJavaImport(URI uri, GenContext ctx, HasLocation errorLocation) {
+    public static Pair<Pair<VarBinding, GenContext>, List<TypedModuleSpec>> doJavaImport(URI uri, GenContext ctx, HasLocation errorLocation) {
         String importName = uri.getSchemeSpecificPart();
         if (importName.contains(".")) {
             importName = importName.substring(importName.lastIndexOf(".") + 1);
@@ -104,13 +114,36 @@ public class FFI extends AbstractValue {
         ctx = GenUtil.ensureJavaTypesPresent(ctx);
         ctx = ImportDeclaration.extendWithImportCtx(obj, ctx);
 
+        List<TypedModuleSpec> dependencies = getJavaDependencies(obj.getJavaClass());
+
         assert (uri.toString().substring(0, 5).equals("java:"));
         boolean safe = Globals.checkSafeJavaImport(uri.toString().substring(5));
         ValueType type = GenUtil.javaClassToWyvernType(obj.getJavaClass(), ctx, safe);
 
         Expression importExp = new FFIImport(new NominalType("system", "java"), importPath, type);
         ctx = ctx.extend(importName, new Variable(importName), type);
-        return new Pair<VarBinding, GenContext>(new VarBinding(importName, type, importExp), ctx);
+        return new Pair<>(new Pair<>(new VarBinding(importName, type, importExp), ctx), dependencies);
+    }
+
+    public static List<TypedModuleSpec> getJavaDependencies(Class<?> javaClass) {
+        Set<String> modulePaths = new HashSet<>();
+        for (Method m : javaClass.getMethods()) {
+            Effect[] annotations = m.getAnnotationsByType(Effect.class);
+            for (Effect e : annotations) {
+                for (String path: e.value()) {
+                    String[] parts = path.split("\\.");
+                    String modulePath = String.join(".", Arrays.copyOf(parts, parts.length - 1));
+                    modulePaths.add(modulePath);
+                }
+            }
+        }
+
+        List<TypedModuleSpec> specs = new ArrayList<>();
+        for (String path : modulePaths) {
+            Module mod = ModuleResolver.getLocal().resolveModule(path);
+            specs.add(mod.getSpec());
+        }
+        return specs;
     }
 
     public static Pair<VarBinding, GenContext> doPythonImport(URI uri, GenContext ctx) {

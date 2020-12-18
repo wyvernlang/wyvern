@@ -3,7 +3,8 @@ package wyvern.tools.tests.examples.support;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.checkerframework.dataflow.qual.Pure;
+import wyvern.stdlib.support.Effect;
+import wyvern.stdlib.support.Pure;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
 
@@ -20,6 +21,7 @@ public class CallFromJava {
 
     }
 
+    @Effect("io.networkEffects.Write")
     public void impureMethod() {
         System.out.println("Hello from CallFromJava.impureMethod!");
     }
@@ -30,6 +32,7 @@ public class CallFromJava {
     }
 
     public static class DemoObject {
+        @Effect("io.networkEffects.Write")
         public void print() {
             System.out.println("Hello from DemoObject.print!");
         }

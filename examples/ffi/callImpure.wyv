@@ -1,12 +1,12 @@
 require java
 require stdout
-
+import io.networkEffects
 import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
 
 // Each impure FFI method has its own corresponding effect type, as
 // a member on the same object, which we can reference using dependent
 // types.
-def doImpureThing(): {singleton.impureMethodEffect} Unit
+def doImpureThing(): {networkEffects.Write} Unit
   singleton.impureMethod()
 
 doImpureThing()

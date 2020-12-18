@@ -155,10 +155,21 @@ public class ImportDeclaration extends Declaration implements CoreAST {
         final String scheme = this.getUri().getScheme();
         if (ctx.isPresent(scheme, true)) {
             // TODO: hack; replace this by getting FFI metadata from the type of the scheme
-            return FFI.importURI(this.getUri(), ctx, this);
+            Pair<Pair<VarBinding, GenContext>, List<TypedModuleSpec>> pairPair = FFI.importURI(this.getUri(), ctx, this);
+            List<TypedModuleSpec> deps = pairPair.getSecond();
+            dependencies.addAll(deps);
+            GenContext newCtx = resolver.extendGenContext(pairPair.getFirst().getSecond(), deps);
+            return new Pair<>(pairPair.getFirst().getFirst(), newCtx);
         } else if (scheme.equals("java")) {
             // we are not using Java like a capability in this branch, so check the whitelist!
-            return FFI.doJavaImport(getUri(), ctx, this);
+            if (!Globals.checkSafeJavaImport(this.getUri().getSchemeSpecificPart())) {
+                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, "java", this.getUri().getSchemeSpecificPart(), "java");
+            }
+            Pair<Pair<VarBinding, GenContext>, List<TypedModuleSpec>> pairPair =  FFI.doJavaImport(getUri(), ctx, this);
+            List<TypedModuleSpec> deps = pairPair.getSecond();
+            dependencies.addAll(deps);
+            GenContext newCtx = resolver.extendGenContext(pairPair.getFirst().getSecond(), deps);
+            return new Pair<>(pairPair.getFirst().getFirst(), newCtx);
         } else if (this.getUri().getScheme().equals("python")) {
             String moduleName = this.getUri().getRawSchemeSpecificPart();
             importExp = new FFIImport(new NominalType("system", "python"),
