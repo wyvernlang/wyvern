@@ -106,7 +106,7 @@ public class FFI extends AbstractValue {
         String importPath = uri.getRawSchemeSpecificPart();
         FObject obj = null;
         try {
-            obj = wyvern.tools.interop.Default.importer().find(importPath, errorLocation);
+            obj = new JavaImporter(ctx).find(importPath, errorLocation);
         } catch (ReflectiveOperationException e1) {
             ToolError.reportError(ErrorMessage.IMPORT_NOT_FOUND, errorLocation, uri.toString());
         }

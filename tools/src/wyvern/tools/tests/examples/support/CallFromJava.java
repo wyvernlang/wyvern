@@ -8,8 +8,13 @@ import wyvern.stdlib.support.Pure;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
 
+@Effect("stdio.print")
 public class CallFromJava {
     public static final CallFromJava singleton = new CallFromJava();
+
+    public CallFromJava() {
+        System.out.println("Static init side effect.");
+    }
 
     public void callWyvernThunk(ObjectValue lambda) {
         List<Value> args = new LinkedList<Value>();

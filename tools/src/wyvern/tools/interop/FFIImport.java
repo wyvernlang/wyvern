@@ -70,7 +70,7 @@ public class FFIImport extends Expression {
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
         try {
-            FObject obj = wyvern.tools.interop.Default.importer().find(path, this);
+            FObject obj = new JavaImporter(ctx).find(path, this);
         } catch (ReflectiveOperationException e1) {
             throw new RuntimeException(e1);
         }
@@ -81,7 +81,7 @@ public class FFIImport extends Expression {
     public Value interpret(EvalContext ctx) {
         if (this.ffiType.equals(new NominalType("system", "java"))) {
             try {
-                FObject obj = wyvern.tools.interop.Default.importer().find(path, this);
+                FObject obj = new JavaImporter(ctx).find(path, this);
                 return new JavaValue(obj, this.getType());
             } catch (ReflectiveOperationException e1) {
                 throw new RuntimeException(e1);

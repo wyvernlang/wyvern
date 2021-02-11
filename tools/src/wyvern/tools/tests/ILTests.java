@@ -23,17 +23,20 @@ import wyvern.target.corewyvernIL.expression.StringLiteral;
 import wyvern.target.corewyvernIL.expression.Value;
 import wyvern.target.corewyvernIL.expression.Variable;
 import wyvern.target.corewyvernIL.modules.TypedModuleSpec;
+import wyvern.target.corewyvernIL.support.EmptyGenContext;
 import wyvern.target.corewyvernIL.support.EvalContext;
 import wyvern.target.corewyvernIL.support.GenContext;
 import wyvern.target.corewyvernIL.support.InterpreterState;
 import wyvern.target.corewyvernIL.support.TypeContext;
 import wyvern.target.corewyvernIL.support.Util;
+import wyvern.target.corewyvernIL.support.VarGenContext;
 import wyvern.target.corewyvernIL.type.NominalType;
 import wyvern.target.corewyvernIL.type.ValueType;
 import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.ToolError;
 import wyvern.tools.imports.extensions.WyvernResolver;
 import wyvern.tools.interop.FObject;
+import wyvern.tools.interop.JavaImporter;
 import wyvern.tools.parsing.coreparser.ParseException;
 import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
@@ -564,7 +567,7 @@ public class ILTests {
 
     @Test
     public void testJavaImportLibrary1() throws ReflectiveOperationException {
-        FObject obj = wyvern.tools.interop.Default.importer().find("wyvern.tools.tests.ILTests.importTest", null);
+        FObject obj = new JavaImporter(EvalContext.empty()).find("wyvern.tools.tests.ILTests.importTest", null);
         List<Object> args = new LinkedList<Object>();
         args.add(1);
         Object result = obj.invokeMethod("addOne", args);
@@ -573,7 +576,7 @@ public class ILTests {
 
     @Test
     public void testJavaImportLibrary2() throws ReflectiveOperationException {
-        FObject obj = wyvern.tools.interop.Default.importer().find("java.lang.System.out", null);
+        FObject obj = new JavaImporter(EvalContext.empty()).find("java.lang.System.out", null);
         List<Object> args = new LinkedList<Object>();
         args.add("Hello, world!");
         obj.invokeMethod("println", args);
