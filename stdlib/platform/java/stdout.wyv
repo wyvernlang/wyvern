@@ -30,7 +30,7 @@ def printFloat(f:Float): {print} Unit
 //    val s : String = str
 //    stdio.print(s)
 
-def printRational(r:Rational): Unit
+def printRational(r:Rational): {print} Unit
   stdio.printRational(r)
 
 def println(): {print} Unit

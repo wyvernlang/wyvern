@@ -1,11 +1,11 @@
 require java
 require stdout
 
-import java:wyvern.tools.tests.examples.support.CallFromJava.callFromJava
+import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
 
-callFromJava.callFive(() => stdout.print("called from Java!"))
+singleton.callWyvernThunk(() => stdout.print("called from Java!"))
 
-def fun() : {system.FFI} Unit
-    callFromJava.callFive(() => stdout.print("called from Java!"))
+def fun() : {singleton.callWyvernThunkEffect} Unit
+    singleton.callWyvernThunk(() => stdout.print("called from Java!"))
 
 unit

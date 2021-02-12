@@ -1,6 +1,8 @@
-module def effectMembersInModuleDef(java: Java): {}
+module def effectMembersInModuleDef(java: Java, stdout: Stdout): {}
+
+// this demonstrates using the java and stdout capabilities from within a `module def`
 
 import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
 
-def doImpureThing(): {singleton.impureMethodEffect} Unit
+def doImpureThing(): {stdout.print} Unit
   singleton.impureMethod()

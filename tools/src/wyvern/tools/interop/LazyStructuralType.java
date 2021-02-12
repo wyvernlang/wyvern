@@ -62,7 +62,7 @@ public class LazyStructuralType extends StructuralType {
                 continue;
             }
 
-            ValueType retType = GenUtil.javaClassToWyvernType(m.getReturnType(), ctx);
+            ValueType retType = GenUtil.javaClassToWyvernType(m.getReturnType(), ctx, safe);
             if (retType == null) {
                 continue;
             }
@@ -84,7 +84,7 @@ public class LazyStructuralType extends StructuralType {
                 String[] parts = effect1path.split("\\.");
                 String modulePath = String.join(".", Arrays.copyOf(parts, parts.length -1));
 
-                Effect effect = new Effect(new Variable("MOD$" + modulePath), parts[parts.length-1], null);
+                Effect effect = new Effect(new Variable(modulePath), parts[parts.length-1], null);
 
                 DefDeclType methodDecl = new DefDeclType(m.getName(), retType, argTypes, new EffectSet(effect));
 

@@ -196,7 +196,7 @@ public class ExampleTests {
     @Test
     public void testJavaFFIEffectMembersModuleDef() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "ffi.effectMembersInModuleDef", Util.unitType(),
-                Util.unitValue());
+                null);
     }
 
     @Test

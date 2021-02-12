@@ -47,18 +47,18 @@ public class JavaImporter {
                 int lastDot = qualifiedName.lastIndexOf('.');
                 String fieldName = qualifiedName.substring(lastDot + 1);
                 String className = qualifiedName.substring(0, lastDot);
-                System.out.println("Before load");
                 // Load class without initialization to avoid unsafe side effects
                 Class<?> cls = java.lang.Class.forName(className,false, ClassLoader.getSystemClassLoader());
-                System.out.println("After load, before init");
                 // check whether class is declared pure or not
                 // note the annotations are trusted, not checked.
                 Annotation[] annotations = cls.getAnnotations();
                 boolean classInitIsPure = Arrays.stream(annotations).anyMatch(annotation -> annotation instanceof Pure);
-                boolean javaCapabilityPresent = ctx.isPresent("java", true);
-                boolean classInWhitelist = Globals.checkSafeJavaImport(qualifiedName);
-                if (!classInitIsPure && !javaCapabilityPresent && !classInWhitelist) {
-                    ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, errorLocation, qualifiedName);
+
+                if (!classInitIsPure) {
+                    // TODO: not clear what to do here, since Wyvern doesn't currently allow "import"s to have
+                    //       effects. An idea is that importing could work by importing classes as module objects,
+                    //       without initializing them. This would be instead of importing singleton objects which
+                    //       trigger initialization at import time.
                 }
                 // continue and initialize the class and load the field.
                 // else, error. require the java capability to proceed.

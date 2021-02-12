@@ -7,6 +7,6 @@ import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
 
 // This FFI method has no effects because it is annotated in Java with @Pure from the checker framework.
 def getString(): {} String
-  singleton.getString()
+  singleton.pureMethod()
 
-stdout.print(singleton.getString())
+stdout.print(getString())

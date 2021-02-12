@@ -8,37 +8,28 @@ import wyvern.stdlib.support.Pure;
 import wyvern.target.corewyvernIL.expression.ObjectValue;
 import wyvern.target.corewyvernIL.expression.Value;
 
-@Effect("stdio.print")
+// Tell Wyvern that this class has no side effects on initialization.
+@Pure
 public class CallFromJava {
     public static final CallFromJava singleton = new CallFromJava();
-
-    public CallFromJava() {
-        System.out.println("Static init side effect.");
-    }
 
     public void callWyvernThunk(ObjectValue lambda) {
         List<Value> args = new LinkedList<Value>();
         lambda.invoke("apply", args).executeIfThunk();
     }
 
-    @Pure
-    public void pureMethod() {
-
-    }
-
-    @Effect("io.networkEffects.Write")
+    @Effect("stdout.print")
     public void impureMethod() {
         System.out.println("Hello from CallFromJava.impureMethod!");
     }
 
     @Pure
-    public String getString() {
+    public String pureMethod() {
         return "Hello from CallFromJava.getString!";
     }
 
     public static class DemoObject {
-        @Effect("io.networkEffects.Write")
-        public void print() {
+        public void doThing() {
             System.out.println("Hello from DemoObject.print!");
         }
     }

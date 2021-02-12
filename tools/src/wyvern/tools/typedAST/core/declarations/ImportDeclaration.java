@@ -161,7 +161,10 @@ public class ImportDeclaration extends Declaration implements CoreAST {
             GenContext newCtx = resolver.extendGenContext(pairPair.getFirst().getSecond(), deps);
             return new Pair<>(pairPair.getFirst().getFirst(), newCtx);
         } else if (scheme.equals("java")) {
-
+            // we are not using Java like a capability in this branch, so check the whitelist!
+            if (!Globals.checkSafeJavaImport(this.getUri().getSchemeSpecificPart())) {
+                ToolError.reportError(ErrorMessage.UNSAFE_JAVA_IMPORT, this, "java", this.getUri().getSchemeSpecificPart(), "java");
+            }
             Pair<Pair<VarBinding, GenContext>, List<TypedModuleSpec>> pairPair =  FFI.doJavaImport(getUri(), ctx, this);
             List<TypedModuleSpec> deps = pairPair.getSecond();
             dependencies.addAll(deps);
