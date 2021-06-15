@@ -2,7 +2,6 @@
 .DS_STORE
 tags
 .idea
-tools/wyvern-tools.iml
 *.class
 *.pyc
 *.wyv.py

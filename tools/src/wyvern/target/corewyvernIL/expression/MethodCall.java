@@ -38,6 +38,8 @@ import wyvern.tools.errors.ErrorMessage;
 import wyvern.tools.errors.FileLocation;
 import wyvern.tools.errors.HasLocation;
 import wyvern.tools.errors.ToolError;
+import wyvern.tools.interop.JObject;
+import wyvern.tools.interop.JavaValue;
 import wyvern.tools.typedAST.core.declarations.DefDeclaration;
 
 public class MethodCall extends Expression {
@@ -135,6 +137,7 @@ public class MethodCall extends Expression {
 
     @Override
     public ValueType typeCheck(TypeContext ctx, EffectAccumulator effectAccumulator) {
+
         // If calling on a dynamic receiver, it types to Dyn (provided the args typecheck)
         if (Util.isDynamicType(getReceiverType(ctx))) {
             for (IExpr arg : args) {
@@ -429,8 +432,10 @@ public class MethodCall extends Expression {
      */
     public DefDeclType typeMethodDeclaration(TypeContext ctx, EffectAccumulator effectAccumulator) {
         boolean isTarget = false;
+
         // Typecheck receiver.
         ValueType receiver = getReceiverType(ctx);
+
         StructuralType receiverType = receiver.getStructuralType(ctx);
         // Sanity check: make sure it has declarations.
         List<DeclType> declarationTypes = receiverType.findDecls(methodName, ctx);
