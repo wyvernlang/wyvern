@@ -6,11 +6,10 @@
   "directories": {},
   "dependencies": {
     "moo": "^0.5.1",
-    "nearley": "^2.19.3",
-    "protobufjs": "^6.8.6",
-    "sprintf-js": "^1.1.1"
+    "nearley": "^2.20.1",
+    "protobufjs": "^6.11.3",
+    "sprintf-js": "^1.1.2"
   },
-  "devDependencies": {},
   "scripts": {},
   "author": "",
   "license": "ISC"
