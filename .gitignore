@@ -112,3 +112,6 @@ selfhost/tests/*.js
 selfhost/failtests/*.wyb
 selfhost/failtests/*.js
 selfhost/output.js
+examples/io-lib-redesign/binary.txt
+examples/io-lib-redesign/example.txt
+tools/build
