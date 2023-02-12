@@ -19,7 +19,7 @@
     "https-post": "^0.1.1",
     "jsdom": "^20.0.0",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.18",
+    "nodemon": "^2.0.20",
     "pg": "^7.18.2"
   },
   "devDependencies": {
