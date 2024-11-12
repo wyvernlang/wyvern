@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const request = require('request');
+const request = require('axios');
 const test = require('tape');
 
 // Start the app

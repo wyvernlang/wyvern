@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "description": "Wyvern REPL app",
   "engines": {
-    "node": "8.9.1"
+    "node": ">=8.9.1"
   },
   "main": "app.js",
   "scripts": {
@@ -11,20 +11,20 @@
     "test": "node test.js"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "body-parser": "^1.18.2",
     "ejs": "^3.1.8",
-    "ejs-lint": "^1.2.2",
-    "express": "^4.18.1",
-    "express-session": "^1.17.3",
+    "ejs-lint": "^2.0.1",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
     "https-post": "^0.1.1",
-    "jsdom": "^20.0.0",
+    "jsdom": "^20.0.3",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.18",
-    "pg": "^7.18.2"
+    "nodemon": "^3.1.7",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
-    "request": "^2.88.2",
-    "tape": "^4.15.1"
+    "tape": "^4.17.0"
   },
   "repository": {
     "type": "git",
