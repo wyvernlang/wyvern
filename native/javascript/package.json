@@ -7,7 +7,7 @@
   "dependencies": {
     "moo": "^0.5.1",
     "nearley": "^2.20.1",
-    "protobufjs": "^6.11.3",
+    "protobufjs": "^6.11.4",
     "sprintf-js": "^1.1.2"
   },
   "scripts": {},
