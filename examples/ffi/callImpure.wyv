@@ -1,0 +1,10 @@
+require java
+require stdout
+
+import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
+
+// singleton.impureMethod is annotated with @Effect("stdout.print")
+def doImpureThing(): {stdout.print} Unit
+  singleton.impureMethod()
+
+doImpureThing()

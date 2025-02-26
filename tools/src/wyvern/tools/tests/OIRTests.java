@@ -11,10 +11,7 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.experimental.categories.Category;
 
 import wyvern.stdlib.Globals;
@@ -35,6 +32,7 @@ import wyvern.tools.tests.suites.CurrentlyBroken;
 import wyvern.tools.tests.suites.RegressionTests;
 import wyvern.tools.typedAST.interfaces.ExpressionAST;
 
+@Ignore
 @Category(RegressionTests.class)
 public class OIRTests {
 

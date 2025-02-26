@@ -1,0 +1,11 @@
+require java
+require stdout
+
+import java:wyvern.tools.tests.examples.support.CallFromJava.singleton
+
+val obj = singleton.getObject()
+
+def objectPrint(): {obj.doThingEffect} Unit
+  obj.doThing()
+
+objectPrint()
