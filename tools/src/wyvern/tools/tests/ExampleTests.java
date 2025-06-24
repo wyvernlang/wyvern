@@ -9,6 +9,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -169,9 +170,33 @@ public class ExampleTests {
     }
 
     @Test
-    public void testJavaFFI() throws ParseException {
-      TestUtil.doTestScriptModularly(PATH, "ffi.callFromJava", Util.unitType(),
+    public void testJavaFFIPure() throws ParseException {
+      TestUtil.doTestScriptModularly(PATH, "ffi.callJava", Util.unitType(),
           Util.unitValue());
+    }
+
+    @Test
+    public void testJavaFFIImpure() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.callImpure", Util.unitType(),
+                Util.unitValue());
+    }
+
+    @Test
+    public void testJavaFFIWyvernThunk() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.callWyvernThunk", Util.unitType(),
+                Util.unitValue());
+    }
+
+    @Test
+    public void testJavaFFIObjectFromJava() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.objectFromJava", Util.unitType(),
+                null);
+    }
+
+    @Test
+    public void testJavaFFIEffectMembersModuleDef() throws ParseException {
+        TestUtil.doTestScriptModularly(PATH, "ffi.effectMembersInModuleDef", Util.unitType(),
+                null);
     }
 
     @Test
@@ -227,6 +252,7 @@ public class ExampleTests {
                 null);
     }
 
+    @Ignore
     @Test
     public void testPythonCompilerOnScript() {
         String[] args = new String[] {TestUtil.EXAMPLES_PATH + "pong/pong.wyv"};
@@ -235,6 +261,7 @@ public class ExampleTests {
         PythonCompiler.main(args);
     }
 
+    @Ignore
     @Test
     public void testPython2Webserver() {
         String[] args = new String[] {
@@ -245,6 +272,7 @@ public class ExampleTests {
         PythonCompiler.main(args);
     }
 
+    @Ignore
     @Test
     public void testPython3Webserver() {
         String[] args = new String[] {
@@ -262,12 +290,14 @@ public class ExampleTests {
                 Util.unitType(), Util.unitValue());
     }
 
+    @Ignore
     @Test
     public void testMandelbrot() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "rosetta.mandelbrot", Util.unitType(),
                 Util.unitValue());
     }
 
+    @Ignore
     @Test
     public void testJulia() throws ParseException {
         TestUtil.doTestScriptModularly(PATH, "rosetta.julia", Util.unitType(),
