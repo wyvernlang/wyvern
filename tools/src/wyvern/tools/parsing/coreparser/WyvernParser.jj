@@ -71,6 +71,10 @@ public class WyvernParser<AST,Type> {
             // error to have two news in one expression
             if (!isEmpty() && this.kind != INVOKE_KIND && kind != INVOKE_KIND)
                 throw new ParseException("May not have two \"new\" or \"DSL literal\" expressions within the same line");
+            // If you are using IntelliJ the above line will show an error. This
+            // error is a false positive, caused by the following bug:
+            // https://youtrack.jetbrains.com/issue/IDEABKL-6770
+
             if (kind == INVOKE_KIND && this.kind != null && this.kind != INVOKE_KIND)
             	return; // don't override a new or DSL literal with an invocation
             // otherwise update 

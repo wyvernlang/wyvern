@@ -49,7 +49,7 @@ public enum ErrorMessage {
     QUALIFIED_TYPES_ONLY_FIELDS("Qualified types can only include val fields", 0),
     ILLEGAL_JUXTAPOSITION("Juxtaposed an additional argument to something that was not an application", 0),
     ILLEGAL_BINARY_JUXTAPOSITION("Cannot juxtapose an additional argument to a binary operation", 0),
-    VAL_NEEDS_TYPE("val declaration %ARG is inside a new statement and thus needs a type annotation", 1),
+    VAL_NEEDS_TYPE("val declaration %ARG is inside a \"new\" statement and thus needs a type annotation", 1),
     EFFECT_ANNOTATION_SEPARATION("Effect-annotated module depends on an effect-unannotated module", 0),
     EFFECT_ANNOTATION_DEF("Module definition has incorrect annotation", 0),
     PURE_MODULE_ANNOTATION("Pure module should always have empty effect annotation", 0),
@@ -112,8 +112,10 @@ public enum ErrorMessage {
     SCRIPT_REQUIRED_MODULE_ONLY_JAVA("A module required by a top-level script must have exactly one argument, a platform such as java", 0),
     NOT_AN_FFI("Expected an FFI object as the schema in an import URI", 0),
     SCHEME_NOT_RECOGNIZED("import scheme %ARG not recognized; did you forget to \"require java\"?", 1),
-    UNSAFE_JAVA_IMPORT("To import the %ARG object %ARG, make sure you \"require %ARG\" "
-            + "(security experts only: if this object is harmless, you can add it to the built-in whitelist (see Globals.java)", 3),
+    UNSAFE_JAVA_IMPORT("Importing java object %ARG is unsafe. Either annotate the class definition with @Pure, or use \"require java\" to include the \"java\" capability. "
+            + "(or, security experts only: if this object is harmless, you can add it to the built-in whitelist (see Globals.java)).", 1),
+    UNSAFE_JAVASCRIPT_IMPORT("To import the %ARG object %ARG, make sure you \"require %ARG\" "
+            + "(security experts only: if this object is harmless, you can add it to the built-in whitelist (see Globals.java)).", 3),
     ILLEGAL_ESCAPE_SEQUENCE("Illegal escape sequence", 0),
     UNCLOSED_STRING_LITERAL("Unclosed string literal", 0),
     NO_ABSTRACT_TYPES_IN_OBJECTS("Abstract types may not be declared in objects or modules, only in type definitions", 0),
