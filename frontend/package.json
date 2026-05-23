@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "axios": "^1.15.2",
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.20.5",
     "ejs": "^4.0.1",
     "ejs-lint": "^2.0.1",
-    "express": "^4.21.1",
+    "express": "^4.22.2",
     "express-session": "^1.18.1",
     "https-post": "^0.1.1",
     "jsdom": "^28.1.0",
