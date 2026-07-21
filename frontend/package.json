@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "axios": "^1.18.0",
-    "body-parser": "^1.20.5",
+    "body-parser": "^1.20.6",
     "ejs": "^4.0.1",
     "ejs-lint": "^2.0.1",
     "express": "^4.22.2",
